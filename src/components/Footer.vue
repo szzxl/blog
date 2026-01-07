@@ -31,7 +31,7 @@
         </div>
       </div>
       <div class="footer-decoration">
-        <span class="deco">🌸</span>
+        <span class="deco">🌸</span>  
         <span class="deco">💕</span>
         <span class="deco">✨</span>
         <span class="deco">🦋</span>
