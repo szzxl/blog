@@ -1,0 +1,57 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: #5a5a5a;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 卡片通用样式 */
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* 女生主题样式 */
+.theme-girl .card {
+  box-shadow: 0 8px 30px rgba(252, 182, 159, 0.2);
+}
+
+.theme-girl .card:hover {
+  box-shadow: 0 12px 40px rgba(252, 182, 159, 0.3);
+}
+
+/* 男生主题样式 */
+.theme-boy .card {
+  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.2);
+}
+
+.theme-boy .card:hover {
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.3);
+}
