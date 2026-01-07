@@ -354,11 +354,10 @@ const handleCommand = (command: string) => {
   }
   
   .user-center {
-    position: absolute;
+    position: fixed;
     right: 30px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
+    top: 15px;
+    z-index: 1000;
     
     .user-info {
       display: flex;
@@ -649,8 +648,9 @@ const handleCommand = (command: string) => {
     }
     
     .user-center {
-      position: absolute;
+      position: fixed;
       right: 15px;
+      top: 12px;
       
       .user-info {
         width: 45px;
