@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUserStore } from '@/stores/user'
+import { ElMessage } from 'element-plus'
 import Home from '@/views/Home.vue'
 
 const router = createRouter({
@@ -8,6 +10,16 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: Home
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/Login.vue')
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: () => import('@/views/Register.vue')
     },
     {
       path: '/articles',
@@ -48,8 +60,38 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: () => import('@/views/About.vue')
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('@/views/Profile.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/profile/likes',
+      name: 'profile-likes',
+      component: () => import('@/views/Profile.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/profile/comments',
+      name: 'profile-comments',
+      component: () => import('@/views/Profile.vue'),
+      meta: { requiresAuth: true }
     }
   ]
+})
+
+// 路由守卫 - 检查登录状态
+router.beforeEach((to, _from, next) => {
+  const userStore = useUserStore()
+  
+  if (to.meta.requiresAuth && !userStore.isLoggedIn) {
+    ElMessage.warning('请先登录')
+    next('/')
+  } else {
+    next()
+  }
 })
 
 export default router

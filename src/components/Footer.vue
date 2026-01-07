@@ -1,121 +1,118 @@
 <template>
   <footer class="footer">
+    <div class="footer-wave">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M0,0 C150,100 350,0 600,50 C850,100 1050,0 1200,50 L1200,120 L0,120 Z" fill="rgba(255, 255, 255, 0.95)"></path>
+      </svg>
+    </div>
     <div class="container">
       <div class="footer-content">
         <div class="footer-info">
-          <p class="motto">{{ motto }}</p>
-          <p class="copyright">© {{ year }} {{ siteName }} · {{ siteDesc }}</p>
+          <div class="footer-logo">
+            <span class="logo-icon">🌸</span>
+            <span class="logo-text">小花的日记本</span>
+          </div>
+          <p class="motto">🌸 愿你温柔且有力量 🌸</p>
+          <p class="copyright">© {{ year }} 记录美好生活的每一天</p>
         </div>
         <div class="footer-links">
-          <a href="https://github.com" target="_blank">{{ githubText }}</a>
-          <span>·</span>
-          <a href="mailto:example@email.com">{{ emailText }}</a>
-          <span>·</span>
-          <a href="#">{{ rssText }}</a>
+          <div class="link-group">
+            <h4>快速导航</h4>
+            <router-link to="/">首页</router-link>
+            <router-link to="/articles">文章</router-link>
+            <router-link to="/about">关于</router-link>
+          </div>
+          <div class="link-group">
+            <h4>联系方式</h4>
+            <span class="contact-item">💬 QQ: 123456789</span>
+            <span class="contact-item">💚 微信: xiahua2024</span>
+            <span class="contact-item">💌 邮箱: hello@example.com</span>
+          </div>
         </div>
       </div>
       <div class="footer-decoration">
-        <span class="deco" v-for="(icon, index) in decoIcons" :key="index">{{ icon }}</span>
+        <span class="deco">🌸</span>
+        <span class="deco">💕</span>
+        <span class="deco">✨</span>
+        <span class="deco">🦋</span>
+        <span class="deco">💗</span>
+        <span class="deco">🌸</span>
       </div>
     </div>
   </footer>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useThemeStore } from '@/stores/theme'
-
-const themeStore = useThemeStore()
 const year = new Date().getFullYear()
-
-const themeConfig = {
-  girl: {
-    motto: '🌸 愿你温柔且有力量 🌸',
-    siteName: '小花的日记本',
-    siteDesc: '记录美好生活',
-    githubText: '💗 GitHub',
-    emailText: '💌 联系我',
-    rssText: '🌈 RSS',
-    decoIcons: ['🌸', '💕', '✨', '🦋', '🌸']
-  },
-  boy: {
-    motto: '💻 代码改变世界，技术成就梦想 💻',
-    siteName: '技术成长笔记',
-    siteDesc: '记录技术成长',
-    githubText: '⚡ GitHub',
-    emailText: '📧 联系我',
-    rssText: '📡 RSS',
-    decoIcons: ['💻', '⚡', '🚀', '🔥', '💻']
-  },
-  it: {
-    motto: '💻 技术驱动创新，代码创造价值 💻',
-    siteName: 'IT技术博客',
-    siteDesc: '分享技术干货',
-    githubText: '🔧 GitHub',
-    emailText: '📧 联系我',
-    rssText: '📡 RSS',
-    decoIcons: ['💻', '🔧', '⚙️', '🖥️', '💻']
-  },
-  finance: {
-    motto: '💰 理性投资，智慧理财，财富自由 💰',
-    siteName: '财富管理笔记',
-    siteDesc: '专业财经分析',
-    githubText: '📊 GitHub',
-    emailText: '📧 联系我',
-    rssText: '📈 RSS',
-    decoIcons: ['💰', '📈', '💎', '💵', '💰']
-  },
-  mom: {
-    motto: '👶 陪伴是最长情的告白，记录成长每一刻 👶',
-    siteName: '宝妈成长日记',
-    siteDesc: '记录育儿点滴',
-    githubText: '💗 GitHub',
-    emailText: '💌 联系我',
-    rssText: '🌟 RSS',
-    decoIcons: ['👶', '💗', '🍼', '🎈', '👶']
-  }
-}
-
-const config = computed(() => themeConfig[themeStore.currentTheme])
-const motto = computed(() => config.value.motto)
-const siteName = computed(() => config.value.siteName)
-const siteDesc = computed(() => config.value.siteDesc)
-const githubText = computed(() => config.value.githubText)
-const emailText = computed(() => config.value.emailText)
-const rssText = computed(() => config.value.rssText)
-const decoIcons = computed(() => config.value.decoIcons)
 </script>
 
 <style scoped lang="scss">
 .footer {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 40px 0 30px;
-  margin-top: 80px;
-  border-top: 2px solid rgba(0, 0, 0, 0.05);
-  transition: all 0.3s;
+  background: transparent;
+  padding: 0;
+  margin-top: 100px;
+  position: relative;
+  
+  .footer-wave {
+    position: absolute;
+    top: -50px;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    overflow: hidden;
+    
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
   
   .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 60px 30px 30px;
+    border-top: 3px solid transparent;
+    border-image: linear-gradient(90deg, #ff9a9e, #fecfef, #ffd0d0) 1;
   }
   
   .footer-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 25px;
-    margin-bottom: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 50px;
+    margin-bottom: 40px;
   }
   
   .footer-info {
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      
+      .logo-icon {
+        font-size: 35px;
+      }
+      
+      .logo-text {
+        font-size: 24px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+    }
+    
     .motto {
-      font-size: 17px;
-      margin-bottom: 10px;
+      font-size: 18px;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
       font-weight: 600;
-      transition: all 0.3s;
     }
     
     .copyright {
@@ -126,34 +123,56 @@ const decoIcons = computed(() => config.value.decoIcons)
   
   .footer-links {
     display: flex;
-    gap: 15px;
-    align-items: center;
+    gap: 50px;
     
-    a {
-      transition: all 0.3s;
-      font-size: 14px;
-      
-      &:hover {
-        transform: translateY(-3px);
+    .link-group {
+      h4 {
+        font-size: 16px;
+        color: #ff9a9e;
+        margin-bottom: 15px;
+        font-weight: 700;
       }
-    }
-    
-    span {
-      color: #ddd;
+      
+      a {
+        display: block;
+        color: #888;
+        font-size: 14px;
+        margin-bottom: 10px;
+        transition: all 0.3s;
+        
+        &:hover {
+          color: #ff9a9e;
+          transform: translateX(5px);
+        }
+      }
+      
+      .contact-item {
+        display: block;
+        color: #888;
+        font-size: 14px;
+        margin-bottom: 10px;
+        cursor: default;
+      }
     }
   }
   
   .footer-decoration {
+    max-width: 1200px;
+    margin: 0 auto;
     display: flex;
     justify-content: center;
     gap: 30px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding-top: 30px;
+    border-top: 2px solid rgba(255, 182, 193, 0.2);
     
     .deco {
-      font-size: 20px;
+      font-size: 24px;
       opacity: 0.6;
       animation: float 3s ease-in-out infinite;
+      
+      &:nth-child(1) {
+        animation-delay: 0s;
+      }
       
       &:nth-child(2) {
         animation-delay: 0.5s;
@@ -170,160 +189,42 @@ const decoIcons = computed(() => config.value.decoIcons)
       &:nth-child(5) {
         animation-delay: 2s;
       }
-    }
-  }
-}
-
-/* 女生主题 */
-.theme-girl {
-  .footer {
-    border-top-color: rgba(255, 182, 193, 0.2);
-    
-    .footer-info .motto {
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .footer-links a {
-      color: #ff9a9e;
       
-      &:hover {
-        color: #fecfef;
+      &:nth-child(6) {
+        animation-delay: 2.5s;
       }
-    }
-    
-    .footer-decoration {
-      border-top-color: rgba(255, 182, 193, 0.15);
-    }
-  }
-}
-
-/* 男生主题 */
-.theme-boy {
-  .footer {
-    border-top-color: rgba(102, 126, 234, 0.2);
-    
-    .footer-info .motto {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .footer-links a {
-      color: #667eea;
-      
-      &:hover {
-        color: #764ba2;
-      }
-    }
-    
-    .footer-decoration {
-      border-top-color: rgba(102, 126, 234, 0.15);
-    }
-  }
-}
-
-/* IT主题 */
-.theme-it {
-  .footer {
-    border-top-color: rgba(0, 212, 255, 0.2);
-    
-    .footer-info .motto {
-      background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .footer-links a {
-      color: #00d4ff;
-      
-      &:hover {
-        color: #0099ff;
-      }
-    }
-    
-    .footer-decoration {
-      border-top-color: rgba(0, 212, 255, 0.15);
-    }
-  }
-}
-
-/* 金融主题 */
-.theme-finance {
-  .footer {
-    border-top-color: rgba(255, 215, 0, 0.2);
-    
-    .footer-info .motto {
-      background: linear-gradient(135deg, #ffd700 0%, #ff9500 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .footer-links a {
-      color: #ffd700;
-      
-      &:hover {
-        color: #ff9500;
-      }
-    }
-    
-    .footer-decoration {
-      border-top-color: rgba(255, 215, 0, 0.15);
-    }
-  }
-}
-
-/* 宝妈主题 */
-.theme-mom {
-  .footer {
-    border-top-color: rgba(255, 182, 193, 0.2);
-    
-    .footer-info .motto {
-      background: linear-gradient(135deg, #ffb6c1 0%, #ffc0cb 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .footer-links a {
-      color: #ffb6c1;
-      
-      &:hover {
-        color: #ffc0cb;
-      }
-    }
-    
-    .footer-decoration {
-      border-top-color: rgba(255, 182, 193, 0.15);
     }
   }
 }
 
 @keyframes float {
   0%, 100% {
-    transform: translateY(0);
+    transform: translateY(0) rotate(0deg);
   }
   50% {
-    transform: translateY(-8px);
+    transform: translateY(-10px) rotate(10deg);
   }
 }
 
 @media (max-width: 768px) {
-  .footer-content {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .footer-decoration {
-    gap: 15px;
+  .footer {
+    .footer-content {
+      grid-template-columns: 1fr;
+      gap: 30px;
+      text-align: center;
+    }
     
-    .deco {
-      font-size: 16px;
+    .footer-links {
+      justify-content: center;
+      gap: 30px;
+    }
+    
+    .footer-decoration {
+      gap: 15px;
+      
+      .deco {
+        font-size: 18px;
+      }
     }
   }
 }

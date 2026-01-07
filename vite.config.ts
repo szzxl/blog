@@ -14,7 +14,9 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()],
     }),
     Components({
-      resolvers: [ElementPlusResolver()],
+      resolvers: [ElementPlusResolver({
+        importStyle: 'sass'
+      })],
     }),
   ],
   resolve: {
@@ -26,5 +28,16 @@ export default defineConfig({
     port: 3001,
     host: '0.0.0.0',
     open: '/web/'
+  },
+  build: {
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
+  },
+  css: {
+    devSourcemap: false
   }
 })

@@ -233,9 +233,9 @@ onBeforeUnmount(() => {
 <style scoped lang="scss">
 .music-player {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
-  z-index: 999;
+  top: 100px;
+  left: 30px;
+  z-index: 998;
   
   .player-toggle {
     width: 60px;
@@ -770,8 +770,8 @@ onBeforeUnmount(() => {
 
 @media (max-width: 768px) {
   .music-player {
-    bottom: 20px;
-    right: 20px;
+    top: 80px;
+    left: 20px;
     
     .player-toggle {
       width: 50px;

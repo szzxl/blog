@@ -1,12 +1,19 @@
 <template>
   <div class="carousel">
-    <el-carousel :interval="4000" height="500px" arrow="always">
+    <el-carousel :interval="5000" height="550px" arrow="always" indicator-position="outside">
       <el-carousel-item v-for="(item, index) in carouselItems" :key="index">
         <div class="carousel-item" :style="{ backgroundImage: `url(${item.image})` }">
+          <div class="carousel-overlay"></div>
           <div class="carousel-content">
+            <div class="content-decoration">
+              <span class="deco-icon">{{ item.icon }}</span>
+            </div>
             <h2 class="carousel-title">{{ item.title }}</h2>
             <p class="carousel-desc">{{ item.desc }}</p>
-            <el-button type="primary" size="large" round>
+            <div class="carousel-tags">
+              <span v-for="tag in item.tags" :key="tag" class="tag">{{ tag }}</span>
+            </div>
+            <el-button type="primary" size="large" round class="carousel-btn">
               {{ item.buttonText }}
             </el-button>
           </div>
@@ -17,128 +24,73 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useThemeStore } from '@/stores/theme'
-
-const themeStore = useThemeStore()
-
-const carouselData = {
-  girl: [
-    {
-      image: 'https://via.placeholder.com/1200x500/fecfef/ffffff?text=Welcome',
-      title: '✨ 欢迎来到我的小世界',
-      desc: '记录美好生活的每一刻',
-      buttonText: '开始阅读'
-    },
-    {
-      image: 'https://via.placeholder.com/1200x500/ffd0d0/ffffff?text=Share',
-      title: '💕 分享生活中的小确幸',
-      desc: '用文字温暖彼此的心',
-      buttonText: '查看更多'
-    },
-    {
-      image: 'https://via.placeholder.com/1200x500/ffe8f0/ffffff?text=Dream',
-      title: '🌸 追逐梦想的旅程',
-      desc: '每一步都值得被记录',
-      buttonText: '了解详情'
-    }
-  ],
-  boy: [
-    {
-      image: 'https://via.placeholder.com/1200x500/667eea/ffffff?text=Tech',
-      title: '⚡ 探索技术的无限可能',
-      desc: '用代码改变世界',
-      buttonText: '开始探索'
-    },
-    {
-      image: 'https://via.placeholder.com/1200x500/764ba2/ffffff?text=Code',
-      title: '💻 分享编程经验',
-      desc: '记录成长的每一步',
-      buttonText: '查看文章'
-    },
-    {
-      image: 'https://via.placeholder.com/1200x500/5a67d8/ffffff?text=Learn',
-      title: '🚀 持续学习，不断进步',
-      desc: '技术之路永无止境',
-      buttonText: '了解更多'
-    }
-  ],
-  it: [
-    {
-      image: 'https://via.placeholder.com/1200x500/00d4ff/ffffff?text=IT',
-      title: '💻 IT技术分享平台',
-      desc: '深入浅出，技术干货',
-      buttonText: '开始学习'
-    },
-    {
-      image: 'https://via.placeholder.com/1200x500/0099ff/ffffff?text=Code',
-      title: '🔧 实战项目经验',
-      desc: '从理论到实践的完整指南',
-      buttonText: '查看项目'
-    },
-    {
-      image: 'https://via.placeholder.com/1200x500/0066cc/ffffff?text=Tech',
-      title: '🚀 前沿技术探索',
-      desc: '紧跟技术潮流，持续创新',
-      buttonText: '探索更多'
-    }
-  ],
-  finance: [
-    {
-      image: 'https://via.placeholder.com/1200x500/ffd700/ffffff?text=Finance',
-      title: '💰 财富管理智慧',
-      desc: '理性投资，稳健增值',
-      buttonText: '了解更多'
-    },
-    {
-      image: 'https://via.placeholder.com/1200x500/ffb700/ffffff?text=Investment',
-      title: '📈 投资理财指南',
-      desc: '专业分析，精准决策',
-      buttonText: '查看分析'
-    },
-    {
-      image: 'https://via.placeholder.com/1200x500/ff9500/ffffff?text=Wealth',
-      title: '💎 财富自由之路',
-      desc: '科学规划，实现目标',
-      buttonText: '开始规划'
-    }
-  ],
-  mom: [
-    {
-      image: 'https://via.placeholder.com/1200x500/ffb6c1/ffffff?text=Mom',
-      title: '👶 宝妈成长日记',
-      desc: '记录宝宝成长的每一刻',
-      buttonText: '查看日记'
-    },
-    {
-      image: 'https://via.placeholder.com/1200x500/ffc0cb/ffffff?text=Baby',
-      title: '🍼 育儿经验分享',
-      desc: '科学育儿，快乐成长',
-      buttonText: '学习经验'
-    },
-    {
-      image: 'https://via.placeholder.com/1200x500/ffd0e0/ffffff?text=Family',
-      title: '💕 温馨家庭时光',
-      desc: '陪伴是最长情的告白',
-      buttonText: '了解更多'
-    }
-  ]
-}
-
-const carouselItems = computed(() => {
-  return carouselData[themeStore.currentTheme] || carouselData.girl
-})
+const carouselItems = [
+  {
+    image: 'https://via.placeholder.com/1200x550/fecfef/ffffff?text=Welcome',
+    icon: '🌸',
+    title: '欢迎来到我的小世界',
+    desc: '在这里记录生活的美好瞬间，分享温暖的故事',
+    tags: ['生活', '记录', '分享'],
+    buttonText: '开始阅读'
+  },
+  {
+    image: 'https://via.placeholder.com/1200x550/ffd0d0/ffffff?text=Share',
+    icon: '💕',
+    title: '分享生活中的小确幸',
+    desc: '用文字和图片记录每一个值得珍藏的时刻',
+    tags: ['日常', '心情', '美好'],
+    buttonText: '查看更多'
+  },
+  {
+    image: 'https://via.placeholder.com/1200x550/ffe8f0/ffffff?text=Dream',
+    icon: '✨',
+    title: '追逐梦想的旅程',
+    desc: '每一步都值得被记录，每一天都充满希望',
+    tags: ['梦想', '成长', '努力'],
+    buttonText: '了解详情'
+  }
+]
 </script>
 
 <style scoped lang="scss">
 .carousel {
   width: 100%;
-  border-radius: 20px;
+  border-radius: 30px;
   overflow: hidden;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 15px 50px rgba(252, 182, 159, 0.3);
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
   
   :deep(.el-carousel) {
-    border-radius: 20px;
+    border-radius: 30px;
+    position: relative;
+    z-index: 1;
+    
+    .el-carousel__container {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .el-carousel__arrow {
+      z-index: 2;
+    }
+    
+    .el-carousel__indicator {
+      button {
+        background: rgba(255, 255, 255, 0.5);
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+      
+      &.is-active button {
+        background: #ff9a9e;
+        width: 30px;
+        border-radius: 6px;
+      }
+    }
   }
   
   .carousel-item {
@@ -151,14 +103,13 @@ const carouselItems = computed(() => {
     justify-content: center;
     position: relative;
     
-    &::before {
-      content: '';
+    .carousel-overlay {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.3);
+      background: linear-gradient(135deg, rgba(255, 154, 158, 0.7) 0%, rgba(254, 207, 239, 0.7) 100%);
     }
     
     .carousel-content {
@@ -166,25 +117,77 @@ const carouselItems = computed(() => {
       z-index: 2;
       text-align: center;
       color: #fff;
-      padding: 20px;
+      padding: 40px;
+      max-width: 800px;
+      
+      .content-decoration {
+        margin-bottom: 20px;
+        
+        .deco-icon {
+          font-size: 80px;
+          display: inline-block;
+          animation: bounce 2s ease-in-out infinite;
+          filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+        }
+      }
       
       .carousel-title {
-        font-size: 48px;
-        margin-bottom: 20px;
-        font-weight: 700;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        font-size: 52px;
+        margin-bottom: 25px;
+        font-weight: 800;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         animation: fadeInUp 0.8s ease;
+        letter-spacing: 2px;
       }
       
       .carousel-desc {
-        font-size: 20px;
+        font-size: 22px;
         margin-bottom: 30px;
         opacity: 0.95;
         animation: fadeInUp 0.8s ease 0.2s both;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        line-height: 1.6;
       }
       
-      .el-button {
-        animation: fadeInUp 0.8s ease 0.4s both;
+      .carousel-tags {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 35px;
+        animation: fadeInUp 0.8s ease 0.3s both;
+        
+        .tag {
+          background: rgba(255, 255, 255, 0.3);
+          backdrop-filter: blur(10px);
+          padding: 10px 25px;
+          border-radius: 25px;
+          font-size: 15px;
+          border: 2px solid rgba(255, 255, 255, 0.5);
+          transition: all 0.3s;
+          
+          &:hover {
+            background: rgba(255, 255, 255, 0.5);
+            transform: translateY(-3px);
+          }
+        }
+      }
+      
+      .carousel-btn {
+        animation: fadeInUp 0.8s ease 0.5s both;
+        background: #fff;
+        color: #ff9a9e;
+        border: none;
+        padding: 15px 40px;
+        font-size: 16px;
+        font-weight: 700;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        
+        &:hover {
+          background: #ff9a9e;
+          color: #fff;
+          transform: translateY(-3px);
+          box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+        }
       }
     }
   }
@@ -193,7 +196,7 @@ const carouselItems = computed(() => {
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(40px);
   }
   to {
     opacity: 1;
@@ -201,20 +204,46 @@ const carouselItems = computed(() => {
   }
 }
 
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
 @media (max-width: 768px) {
   .carousel {
+    border-radius: 20px;
+    
     :deep(.el-carousel) {
-      height: 350px !important;
+      height: 450px !important;
     }
     
     .carousel-item {
       .carousel-content {
+        padding: 20px;
+        
+        .content-decoration .deco-icon {
+          font-size: 50px;
+        }
+        
         .carousel-title {
-          font-size: 28px !important;
+          font-size: 32px !important;
         }
         
         .carousel-desc {
           font-size: 16px !important;
+        }
+        
+        .carousel-tags {
+          flex-wrap: wrap;
+          
+          .tag {
+            font-size: 13px;
+            padding: 8px 18px;
+          }
         }
       }
     }
