@@ -45,39 +45,39 @@
           <span class="nav-text">关于</span>
         </router-link>
       </nav>
-      
-      <!-- 用户中心 -->
-      <div class="user-center">
-        <template v-if="userStore.isLoggedIn">
-          <el-dropdown @command="handleCommand">
-            <div class="user-info">
-              <img :src="userStore.user?.avatar" alt="头像" class="user-avatar">
-            </div>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="admin">
-                  <span class="menu-icon">⚙️</span>
-                  管理后台
-                </el-dropdown-item>
-                <el-dropdown-item divided command="profile">
-                  <span class="menu-icon">👤</span>
-                  个人中心
-                </el-dropdown-item>
-                <el-dropdown-item command="logout">
-                  <span class="menu-icon">🚪</span>
-                  退出登录
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-        </template>
-        <template v-else>
-          <el-button type="primary" round @click="goToLogin">
-            <span class="btn-icon">🌸</span>
-            登录
-          </el-button>
-        </template>
-      </div>
+    </div>
+    
+    <!-- 用户中心 - 移到container外面 -->
+    <div class="user-center">
+      <template v-if="userStore.isLoggedIn">
+        <el-dropdown @command="handleCommand">
+          <div class="user-info">
+            <img :src="userStore.user?.avatar" alt="头像" class="user-avatar">
+          </div>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="admin">
+                <span class="menu-icon">⚙️</span>
+                管理后台
+              </el-dropdown-item>
+              <el-dropdown-item divided command="profile">
+                <span class="menu-icon">👤</span>
+                个人中心
+              </el-dropdown-item>
+              <el-dropdown-item command="logout">
+                <span class="menu-icon">🚪</span>
+                退出登录
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </template>
+      <template v-else>
+        <el-button type="primary" round @click="goToLogin">
+          <span class="btn-icon">🌸</span>
+          登录
+        </el-button>
+      </template>
     </div>
   </header>
   
@@ -191,8 +191,11 @@ const handleCommand = (command: string) => {
       showProfileDialog.value = true
       break
     case 'admin':
-      // 跳转到管理后台，可以改成实际的后台地址
-      window.open('/admin', '_blank')
+      // 跳转到管理后台 - 同域名根路径
+      const hostname = window.location.hostname
+      const protocol = window.location.protocol
+      const adminUrl = `${protocol}//${hostname}`
+      window.open(adminUrl, '_blank')
       ElMessage.success('正在跳转到管理后台...')
       break
     case 'logout':
@@ -230,8 +233,7 @@ const handleCommand = (command: string) => {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 30px;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
+    display: flex;
     align-items: center;
     min-height: 80px;
     position: relative;
@@ -288,6 +290,7 @@ const handleCommand = (command: string) => {
     display: flex;
     gap: 10px;
     justify-content: center;
+    flex: 1;
     
     .nav-item {
       display: flex;

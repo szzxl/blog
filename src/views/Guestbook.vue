@@ -10,31 +10,6 @@
         </div>
       </div>
       
-      <!-- 留言统计 -->
-      <div class="stats-card card">
-        <div class="stat-item">
-          <div class="stat-icon">💬</div>
-          <div class="stat-info">
-            <div class="stat-value">128</div>
-            <div class="stat-label">留言总数</div>
-          </div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-icon">👥</div>
-          <div class="stat-info">
-            <div class="stat-value">89</div>
-            <div class="stat-label">访客数量</div>
-          </div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-icon">💕</div>
-          <div class="stat-info">
-            <div class="stat-value">256</div>
-            <div class="stat-label">收到的爱心</div>
-          </div>
-        </div>
-      </div>
-      
       <!-- 发表留言 -->
       <div class="message-form card">
         <h3 class="form-title">✨ 写下你的留言</h3>
@@ -156,40 +131,6 @@ const submitMessage = () => {
   }
 }
 
-.stats-card {
-  display: flex;
-  justify-content: space-around;
-  padding: 30px;
-  margin-bottom: 40px;
-  
-  .stat-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    
-    .stat-icon {
-      font-size: 40px;
-    }
-    
-    .stat-info {
-      .stat-value {
-        font-size: 32px;
-        font-weight: 700;
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-      
-      .stat-label {
-        font-size: 14px;
-        color: #999;
-        margin-top: 5px;
-      }
-    }
-  }
-}
-
 .message-form {
   padding: 35px;
   margin-bottom: 40px;
@@ -296,19 +237,8 @@ const submitMessage = () => {
     }
   }
   
-  .stats-card {
-    flex-direction: column;
-    gap: 20px;
-    
-    .stat-item {
-      justify-content: center;
-    }
-  }
-  
   .message-form {
     padding: 25px;
   }
-  
-
 }
 </style>
