@@ -29,15 +29,9 @@
         <div class="filter-row">
           <el-select v-model="selectedCategory" placeholder="选择分类" clearable>
             <el-option label="全部分类" value="" />
-            <el-option label="生活随笔" value="1" />
-            <el-option label="技术分享" value="2" />
-            <el-option label="旅行游记" value="3" />
           </el-select>
           <el-select v-model="selectedTag" placeholder="选择标签" clearable>
             <el-option label="全部标签" value="" />
-            <el-option label="Vue" value="1" />
-            <el-option label="生活" value="2" />
-            <el-option label="旅行" value="3" />
           </el-select>
         </div>
       </div>

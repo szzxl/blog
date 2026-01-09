@@ -134,6 +134,56 @@
         </el-form>
       </div>
       
+      <!-- 留言记录 -->
+      <div class="message-list">
+        <h3 class="list-title">💬 留言记录</h3>
+        
+        <!-- 留言模板 1 - 带图片 -->
+        <div class="message-item card">
+          <div class="message-header">
+            <img src="/web/default-avatar.svg" alt="头像" class="avatar">
+            <div class="user-info">
+              <div class="username">访客A</div>
+              <div class="time">2024-01-03 15:30</div>
+            </div>
+          </div>
+          <div class="message-content">
+            网站做得很漂亮，喜欢这个粉色系的设计~ 💕
+          </div>
+          <div class="message-images">
+            <img src="/web/vite.svg" alt="图片" class="msg-img">
+            <img src="/web/vite.svg" alt="图片" class="msg-img">
+          </div>
+        </div>
+        
+        <!-- 留言模板 2 - 纯文字 -->
+        <div class="message-item card">
+          <div class="message-header">
+            <img src="/web/default-avatar.svg" alt="头像" class="avatar">
+            <div class="user-info">
+              <div class="username">小明</div>
+              <div class="time">2024-01-02 20:15</div>
+            </div>
+          </div>
+          <div class="message-content">
+            路过留个脚印，祝博主越来越好！✨
+          </div>
+        </div>
+        
+        <!-- 留言模板 3 - 长文本 -->
+        <div class="message-item card">
+          <div class="message-header">
+            <img src="/web/default-avatar.svg" alt="头像" class="avatar">
+            <div class="user-info">
+              <div class="username">小红</div>
+              <div class="time">2024-01-01 12:00</div>
+            </div>
+          </div>
+          <div class="message-content">
+            第一次来访，感觉这个博客很温馨！内容也很有趣，已经收藏了，会经常来看的~ 希望博主继续加油，期待更多精彩内容！🌸🌸🌸
+          </div>
+        </div>
+      </div>
 
     </div>
     
@@ -659,6 +709,85 @@ const submitMessage = async () => {
           transform: translate(-50%, -50%);
           font-size: 32px;
           color: #ff9a9e;
+        }
+      }
+    }
+  }
+}
+
+.message-list {
+  .list-title {
+    font-size: 24px;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 25px 0;
+    font-weight: 700;
+  }
+  
+  .message-item {
+    padding: 30px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(255, 154, 158, 0.2);
+    }
+    
+    .message-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+      
+      .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+      }
+      
+      .user-info {
+        .username {
+          font-size: 16px;
+          font-weight: 700;
+          color: #5a5a5a;
+          margin-bottom: 5px;
+        }
+        
+        .time {
+          font-size: 13px;
+          color: #999;
+        }
+      }
+    }
+    
+    .message-content {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    
+    .message-images {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+      
+      .msg-img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        
+        &:hover {
+          transform: scale(1.05);
+          box-shadow: 0 6px 20px rgba(255, 154, 158, 0.3);
         }
       }
     }

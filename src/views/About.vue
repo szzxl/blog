@@ -13,7 +13,7 @@
       <!-- 个人介绍卡片 -->
       <div class="intro-section card">
         <div class="intro-avatar">
-          <img src="https://via.placeholder.com/150/ff9a9e/ffffff?text=♡" alt="头像">
+          <img src="/web/default-avatar.svg" alt="头像">
           <div class="avatar-decoration">✨</div>
         </div>
         <h2 class="intro-name">小花 🌸</h2>
@@ -91,7 +91,7 @@
             <div class="contact-icon">📧</div>
             <div class="contact-info">
               <div class="contact-label">邮箱</div>
-              <div class="contact-value">hello@example.com</div>
+              <div class="contact-value">your-email@example.com</div>
             </div>
           </div>
           <div class="contact-item">

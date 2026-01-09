@@ -86,12 +86,18 @@ const router = createRouter({
 router.beforeEach((to, _from, next) => {
   const userStore = useUserStore()
   
-  if (to.meta.requiresAuth && !userStore.isLoggedIn) {
+  // 只有明确标记 requiresAuth 的路由才需要登录
+  if (to.meta.requiresAuth === true && !userStore.isLoggedIn) {
     ElMessage.warning('请先登录')
-    next('/')
+    next('/login')
   } else {
     next()
   }
+})
+
+// 路由错误处理
+router.onError((error) => {
+  console.error('路由错误:', error)
 })
 
 export default router

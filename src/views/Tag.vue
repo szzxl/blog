@@ -16,11 +16,11 @@
           class="tag-item" 
           v-for="(tag, index) in tags" 
           :key="index"
-          :style="{ fontSize: getTagSize(tag.count) + 'px' }"
+          :style="{ fontSize: getTagSize(tag.useNum) + 'px' }"
           @click="viewTag(tag.id)"
         >
           <span class="tag-name">{{ tag.tagName }}</span>
-          <span class="tag-count">({{ tag.count }})</span>
+          <span class="tag-count">({{ tag.useNum }})</span>
         </div>
       </div>
       
@@ -34,7 +34,7 @@
               <span class="tag-name">{{ tag.tagName }}</span>
             </div>
             <div class="tag-info">
-              <span class="tag-count">{{ tag.count }} 篇文章</span>
+              <span class="tag-count">{{ tag.useNum }} 篇文章</span>
             </div>
             <el-button class="view-btn" size="small" @click="viewTag(tag.id)">
               查看 →
@@ -55,16 +55,16 @@ import { ElMessage } from 'element-plus'
 const router = useRouter()
 
 interface Tag {
-  id: number
+  id: string | number
   tagName: string
-  count?: number
+  useNum?: number
 }
 
 const tags = ref<Tag[]>([])
 const loading = ref(false)
 
 const sortedTags = computed(() => {
-  return [...tags.value].sort((a, b) => (b.count || 0) - (a.count || 0))
+  return [...tags.value].sort((a, b) => (b.useNum || 0) - (a.useNum || 0))
 })
 
 // 获取标签列表
@@ -73,52 +73,44 @@ const fetchTags = async () => {
   try {
     const res: any = await getTagList({
       pageNo: 1,
-      pageSize: 3
+      pageSize: 100
     })
     
+    // 处理返回的数据
     if (res && res.list) {
       tags.value = res.list.map((item: any) => ({
         id: item.id,
         tagName: item.tagName,
-        count: item.articleCount || 0
+        useNum: item.useNum || 0
       }))
     } else if (Array.isArray(res)) {
       tags.value = res.map((item: any) => ({
         id: item.id,
         tagName: item.tagName,
-        count: item.articleCount || 0
+        useNum: item.useNum || 0
       }))
     }
   } catch (error) {
     console.error('获取标签列表失败:', error)
     ElMessage.error('获取标签列表失败')
-    // 使用默认数据
-    tags.value = [
-      { id: 1, tagName: 'Vue', count: 25 },
-      { id: 2, tagName: 'JavaScript', count: 30 },
-      { id: 3, tagName: '生活', count: 45 },
-      { id: 4, tagName: '旅行', count: 18 },
-      { id: 5, tagName: '美食', count: 22 },
-      { id: 6, tagName: '摄影', count: 28 }
-    ]
   } finally {
     loading.value = false
   }
 }
 
-const getTagSize = (count: number = 0) => {
+const getTagSize = (useNum: number = 0) => {
   const minSize = 14
   const maxSize = 36
-  const counts = tags.value.map(t => t.count || 0)
+  const counts = tags.value.map(t => t.useNum || 0)
   const minCount = Math.min(...counts)
   const maxCount = Math.max(...counts)
   
   if (maxCount === minCount) return (minSize + maxSize) / 2
   
-  return minSize + ((count - minCount) / (maxCount - minCount)) * (maxSize - minSize)
+  return minSize + ((useNum - minCount) / (maxCount - minCount)) * (maxSize - minSize)
 }
 
-const viewTag = (id: number) => {
+const viewTag = (id: string | number) => {
   router.push(`/articles?tag=${id}`)
 }
 

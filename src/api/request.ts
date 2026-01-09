@@ -36,19 +36,25 @@ service.interceptors.response.use(
     // 根据后端返回的数据结构调整
     // 假设后端返回格式为 { code: 0, data: {}, message: '' }
     if (res.code !== undefined && res.code !== 0) {
-      // 增加查看次数接口不弹错误提示
       const url = response.config.url || ''
+      
+      // 不弹错误提示的接口
       const isSilentApi = url.includes('/web/article/addView')
+      
+      // 公开接口列表（不需要登录）
+      const isPublicApi = url.includes('/message/add/guestbook') || 
+                          url.includes('/system/auth/register') ||
+                          url.includes('/system/auth/login') ||
+                          url.includes('/web/article/list') ||
+                          url.includes('/web/article/detail') ||
+                          url.includes('/web/category/list') ||
+                          url.includes('/web/tag/list')
       
       if (!isSilentApi) {
         ElMessage.error(res.message || res.msg || '请求失败')
       }
       
-      // 401 未授权，跳转登录（但留言板和注册接口除外）
-      const isPublicApi = url.includes('/message/add/guestbook') || 
-                          url.includes('/system/auth/register') ||
-                          url.includes('/system/auth/login')
-      
+      // 401 未授权，只有非公开接口才跳转登录
       if (res.code === 401 && !isPublicApi) {
         localStorage.removeItem('token')
         localStorage.removeItem('user')
@@ -65,9 +71,15 @@ service.interceptors.response.use(
     
     if (error.response) {
       const url = error.config?.url || ''
+      
+      // 公开接口列表（不需要登录）
       const isPublicApi = url.includes('/message/add/guestbook') || 
                           url.includes('/system/auth/register') ||
-                          url.includes('/system/auth/login')
+                          url.includes('/system/auth/login') ||
+                          url.includes('/web/article/list') ||
+                          url.includes('/web/article/detail') ||
+                          url.includes('/web/category/list') ||
+                          url.includes('/web/tag/list')
       
       switch (error.response.status) {
         case 401:

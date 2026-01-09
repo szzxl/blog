@@ -21,7 +21,7 @@
           </div>
           <div class="info-item">
             <span class="label">网站地址：</span>
-            <span class="value">https://example.com</span>
+            <span class="value">你的网站地址</span>
           </div>
           <div class="info-item">
             <span class="label">网站描述：</span>
@@ -63,44 +63,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const links = ref([
-  {
-    name: '小明的博客',
-    url: 'https://example.com',
-    avatar: 'https://via.placeholder.com/80/667eea/ffffff?text=XM',
-    desc: '一个热爱技术的程序员'
-  },
-  {
-    name: '小红的日记',
-    url: 'https://example.com',
-    avatar: 'https://via.placeholder.com/80/ff9a9e/ffffff?text=XH',
-    desc: '记录生活的点点滴滴'
-  },
-  {
-    name: '旅行者',
-    url: 'https://example.com',
-    avatar: 'https://via.placeholder.com/80/fecfef/ffffff?text=LX',
-    desc: '世界那么大，我想去看看'
-  },
-  {
-    name: '美食家',
-    url: 'https://example.com',
-    avatar: 'https://via.placeholder.com/80/ffd0d0/ffffff?text=MS',
-    desc: '分享美食与生活'
-  },
-  {
-    name: '摄影师',
-    url: 'https://example.com',
-    avatar: 'https://via.placeholder.com/80/ffe8f0/ffffff?text=SY',
-    desc: '用镜头记录美好'
-  },
-  {
-    name: '设计师',
-    url: 'https://example.com',
-    avatar: 'https://via.placeholder.com/80/ffecd2/ffffff?text=SJ',
-    desc: '热爱设计与创作'
-  }
-])
+const links = ref([])
 </script>
 
 <style scoped lang="scss">

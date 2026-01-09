@@ -28,7 +28,9 @@ export default defineConfig({
     port: 3000,
     host: '0.0.0.0',
     open: '/web/',
-    hmr: false,
+    hmr: {
+      overlay: false
+    },
     proxy: {
       '/admin-api': {
         target: 'http://localhost:48080',

@@ -96,36 +96,11 @@ const audioPlayer = ref<HTMLAudioElement | null>(null)
 
 // 不同主题的播放列表
 const playlistData = {
-  girl: [
-    { name: '小幸运', artist: '田馥甄', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', cover: 'https://via.placeholder.com/200/ff9a9e/ffffff?text=♡', duration: '3:45' },
-    { name: '告白气球', artist: '周杰伦', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', cover: 'https://via.placeholder.com/200/fecfef/ffffff?text=♡', duration: '4:20' },
-    { name: '可爱女人', artist: '周杰伦', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', cover: 'https://via.placeholder.com/200/ffd0d0/ffffff?text=♡', duration: '3:58' },
-    { name: '甜甜的', artist: '周杰伦', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', cover: 'https://via.placeholder.com/200/ffe8f0/ffffff?text=♡', duration: '3:59' }
-  ],
-  boy: [
-    { name: '夜曲', artist: '周杰伦', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', cover: 'https://via.placeholder.com/200/667eea/ffffff?text=Music', duration: '3:45' },
-    { name: '以父之名', artist: '周杰伦', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', cover: 'https://via.placeholder.com/200/764ba2/ffffff?text=Music', duration: '4:20' },
-    { name: '止战之殇', artist: '周杰伦', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', cover: 'https://via.placeholder.com/200/5a67d8/ffffff?text=Music', duration: '3:58' },
-    { name: '龙拳', artist: '周杰伦', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', cover: 'https://via.placeholder.com/200/667eea/ffffff?text=Music', duration: '3:59' }
-  ],
-  it: [
-    { name: 'Code Monkey', artist: 'Jonathan Coulton', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', cover: 'https://via.placeholder.com/200/00d4ff/ffffff?text=Code', duration: '3:45' },
-    { name: 'Programmer', artist: 'Tech Music', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', cover: 'https://via.placeholder.com/200/0099ff/ffffff?text=Code', duration: '4:20' },
-    { name: 'Binary', artist: 'Digital Sound', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', cover: 'https://via.placeholder.com/200/0066cc/ffffff?text=Code', duration: '3:58' },
-    { name: 'Algorithm', artist: 'Code Beat', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', cover: 'https://via.placeholder.com/200/00d4ff/ffffff?text=Code', duration: '3:59' }
-  ],
-  finance: [
-    { name: 'Money Money', artist: 'ABBA', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', cover: 'https://via.placeholder.com/200/ffd700/ffffff?text=$', duration: '3:45' },
-    { name: 'Rich', artist: 'Finance Music', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', cover: 'https://via.placeholder.com/200/ffb700/ffffff?text=$', duration: '4:20' },
-    { name: 'Investment', artist: 'Wall Street', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', cover: 'https://via.placeholder.com/200/ff9500/ffffff?text=$', duration: '3:58' },
-    { name: 'Fortune', artist: 'Gold Sound', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', cover: 'https://via.placeholder.com/200/ffd700/ffffff?text=$', duration: '3:59' }
-  ],
-  mom: [
-    { name: '听妈妈的话', artist: '周杰伦', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', cover: 'https://via.placeholder.com/200/ffb6c1/ffffff?text=Baby', duration: '3:45' },
-    { name: '宝贝', artist: '张悬', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', cover: 'https://via.placeholder.com/200/ffc0cb/ffffff?text=Baby', duration: '4:20' },
-    { name: '童话', artist: '光良', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', cover: 'https://via.placeholder.com/200/ffd0e0/ffffff?text=Baby', duration: '3:58' },
-    { name: '摇篮曲', artist: '儿歌', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', cover: 'https://via.placeholder.com/200/ffb6c1/ffffff?text=Baby', duration: '3:59' }
-  ]
+  girl: [],
+  boy: [],
+  it: [],
+  finance: [],
+  mom: []
 }
 
 const playlist = computed(() => playlistData[themeStore.currentTheme])
