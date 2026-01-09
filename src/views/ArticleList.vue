@@ -6,81 +6,96 @@
         <div class="header-icon">📝</div>
         <div class="header-text">
           <h1>文章列表</h1>
-          <p>共 {{ articles.length }} 篇文章</p>
+          <p>共 {{ total }} 篇文章</p>
         </div>
       </div>
       
       <!-- 筛选栏 -->
       <div class="filter-bar card">
-        <el-input 
-          v-model="searchKeyword" 
-          placeholder="搜索文章标题或内容..."
-          prefix-icon="Search"
-          clearable
-          class="search-input"
-        />
-        <el-select v-model="selectedCategory" placeholder="选择分类" clearable>
-          <el-option label="全部分类" value="" />
-          <el-option label="生活随笔" value="1" />
-          <el-option label="技术分享" value="2" />
-          <el-option label="旅行游记" value="3" />
-        </el-select>
-        <el-select v-model="selectedTag" placeholder="选择标签" clearable>
-          <el-option label="全部标签" value="" />
-          <el-option label="Vue" value="1" />
-          <el-option label="生活" value="2" />
-          <el-option label="旅行" value="3" />
-        </el-select>
+        <div class="search-row">
+          <el-input 
+            v-model="searchKeyword" 
+            placeholder="搜索文章标题..."
+            prefix-icon="Search"
+            clearable
+            class="search-input"
+            @keyup.enter="handleSearch"
+            @clear="handleClear"
+          />
+          <el-button type="primary" class="search-btn" @click="handleSearch">
+            搜索
+          </el-button>
+        </div>
+        <div class="filter-row">
+          <el-select v-model="selectedCategory" placeholder="选择分类" clearable>
+            <el-option label="全部分类" value="" />
+            <el-option label="生活随笔" value="1" />
+            <el-option label="技术分享" value="2" />
+            <el-option label="旅行游记" value="3" />
+          </el-select>
+          <el-select v-model="selectedTag" placeholder="选择标签" clearable>
+            <el-option label="全部标签" value="" />
+            <el-option label="Vue" value="1" />
+            <el-option label="生活" value="2" />
+            <el-option label="旅行" value="3" />
+          </el-select>
+        </div>
       </div>
       
       <!-- 文章列表 -->
-      <div class="articles">
-        <div class="article-item card" v-for="i in 8" :key="i" @click="viewArticle(i)">
+      <div class="articles" v-loading="loading">
+        <div class="article-item card" v-for="article in articles" :key="article.id" @click="viewArticle(article.id)">
           <div class="article-cover">
-            <img src="https://via.placeholder.com/400x250/fecfef/ffffff?text=♡" alt="封面">
+            <img :src="article.articleCover || '/web/default-cover.svg'" alt="封面">
             <div class="cover-overlay">
               <span class="read-more">阅读全文 →</span>
             </div>
           </div>
           <div class="article-info">
-            <h3 class="article-title">这是文章标题 {{ i }} - 记录美好生活的每一天</h3>
-            <p class="article-desc">
-              这是文章摘要，简单介绍文章的主要内容。分享生活中的美好瞬间，记录成长的点点滴滴...
+            <h3 class="article-title">{{ article.articleName }}</h3>
+            <p class="article-desc" v-if="article.articleCategory">
+              <span class="category-badge">📂 {{ article.articleCategory }}</span>
             </p>
             <div class="article-meta">
               <span class="meta-item">
                 <span class="icon">📅</span>
-                2024-01-{{ String(i).padStart(2, '0') }}
+                {{ formatTime(article.createTime) }}
               </span>
-              <span class="meta-item">
+              <span class="meta-item" v-if="article.articleCategory">
                 <span class="icon">📂</span>
-                生活随笔
+                {{ article.articleCategory }}
               </span>
-              <span class="meta-item">
+              <span class="meta-item" v-if="article.readNum !== undefined">
                 <span class="icon">👁️</span>
-                {{ 100 + i * 20 }}
+                {{ article.readNum }}
               </span>
-              <span class="meta-item">
+              <span class="meta-item" v-if="article.likeCount">
                 <span class="icon">💗</span>
-                {{ 10 + i * 2 }}
+                {{ article.likeCount }}
               </span>
             </div>
-            <div class="article-tags">
-              <span class="tag">Vue</span>
-              <span class="tag">生活</span>
-              <span class="tag">随笔</span>
+            <div class="article-tags" v-if="article.articleTag">
+              <span class="tag" v-for="(tag, index) in parseTags(article.articleTag)" :key="index">{{ tag }}</span>
             </div>
           </div>
+        </div>
+        
+        <!-- 空状态 -->
+        <div v-if="!loading && articles.length === 0" class="empty-state">
+          <div class="empty-icon">📝</div>
+          <div class="empty-text">暂无文章</div>
         </div>
       </div>
       
       <!-- 分页 -->
-      <div class="pagination">
+      <div class="pagination" v-if="total > 0">
         <el-pagination
           background
           layout="prev, pager, next, jumper"
-          :total="80"
-          :page-size="10"
+          :total="total"
+          :page-size="pageSize"
+          :current-page="pageNo"
+          @current-change="handlePageChange"
         />
       </div>
     </div>
@@ -88,20 +103,106 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { getArticleList } from '@/api/articleApi'
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
+
+interface Article {
+  id: number
+  articleName: string
+  articleAbstract?: string
+  articleCover?: string
+  articleCategory?: string
+  articleTag?: string
+  readNum?: number
+  likeCount?: number
+  createTime?: number
+}
 
 const searchKeyword = ref('')
 const selectedCategory = ref('')
 const selectedTag = ref('')
+const articles = ref<Article[]>([])
+const total = ref(0)
+const pageNo = ref(1)
+const pageSize = ref(10)
+const loading = ref(false)
 
-const articles = ref(Array.from({ length: 80 }, (_, i) => ({ id: i + 1 })))
+// 获取文章列表
+const fetchArticles = async () => {
+  loading.value = true
+  try {
+    const params: any = {
+      pageNo: pageNo.value,
+      pageSize: pageSize.value
+    }
+    
+    // 添加搜索关键词
+    if (searchKeyword.value) {
+      params.articleName = searchKeyword.value
+    }
+    
+    const res: any = await getArticleList(params)
+    
+    if (res && res.list) {
+      articles.value = res.list
+      total.value = res.total || 0
+    } else if (Array.isArray(res)) {
+      articles.value = res
+      total.value = res.length
+    }
+  } catch (error) {
+    console.error('获取文章列表失败:', error)
+    ElMessage.error('获取文章列表失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+// 格式化时间
+const formatTime = (timestamp?: number) => {
+  if (!timestamp) return ''
+  const date = new Date(timestamp)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+// 解析标签字符串为数组
+const parseTags = (tagStr?: string) => {
+  if (!tagStr) return []
+  return tagStr.split(',').map(t => t.trim()).filter(t => t)
+}
+
+// 搜索
+const handleSearch = () => {
+  pageNo.value = 1
+  fetchArticles()
+}
+
+// 清除搜索
+const handleClear = () => {
+  pageNo.value = 1
+  fetchArticles()
+}
+
+// 分页变化
+const handlePageChange = (page: number) => {
+  pageNo.value = page
+  fetchArticles()
+}
 
 const viewArticle = (id: number) => {
-  router.push(`/web/article/${id}`)
+  router.push(`/article/${id}`)
 }
+
+onMounted(() => {
+  fetchArticles()
+})
 </script>
 
 <style scoped lang="scss">
@@ -150,10 +251,37 @@ const viewArticle = (id: number) => {
   padding: 25px;
   margin-bottom: 30px;
   display: flex;
+  flex-direction: column;
   gap: 15px;
   
-  .search-input {
-    flex: 1;
+  .search-row {
+    display: flex;
+    gap: 15px;
+    
+    .search-input {
+      flex: 1;
+    }
+    
+    .search-btn {
+      height: 40px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      padding: 0 30px;
+      box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+      cursor: pointer;
+    }
+  }
+  
+  .filter-row {
+    display: flex;
+    gap: 15px;
+    
+    .el-select {
+      flex: 1;
+    }
   }
   
   .el-input, .el-select {
@@ -161,15 +289,6 @@ const viewArticle = (id: number) => {
       border-radius: 15px;
       box-shadow: 0 2px 12px rgba(252, 182, 159, 0.1);
       border: 2px solid rgba(255, 182, 193, 0.2);
-      
-      &:hover {
-        border-color: rgba(255, 182, 193, 0.3);
-      }
-      
-      &.is-focus {
-        border-color: #ff9a9e;
-        box-shadow: 0 4px 20px rgba(255, 154, 158, 0.25);
-      }
     }
   }
 }
@@ -260,6 +379,16 @@ const viewArticle = (id: number) => {
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      
+      .category-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(255, 154, 158, 0.15) 0%, rgba(254, 207, 239, 0.15) 100%);
+        color: #ff9a9e;
+        font-size: 13px;
+        font-weight: 600;
+      }
     }
     
     .article-meta {
@@ -295,6 +424,23 @@ const viewArticle = (id: number) => {
         font-weight: 600;
       }
     }
+  }
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 20px;
+  
+  .empty-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+  }
+  
+  .empty-text {
+    font-size: 18px;
+    color: #999;
   }
 }
 
@@ -438,6 +584,18 @@ const viewArticle = (id: number) => {
   
   .filter-bar {
     flex-direction: column;
+    
+    .search-row {
+      flex-direction: column;
+      
+      .search-btn {
+        width: 100%;
+      }
+    }
+    
+    .filter-row {
+      flex-direction: column;
+    }
   }
   
   .articles {

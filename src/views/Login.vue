@@ -34,7 +34,7 @@
         <el-form-item>
           <div class="form-options">
             <el-checkbox v-model="rememberMe">记住密码</el-checkbox>
-            <el-link type="primary" :underline="false">忘记密码？</el-link>
+            <el-link type="primary" underline="never">忘记密码？</el-link>
           </div>
         </el-form-item>
         
@@ -51,7 +51,7 @@
         
         <el-form-item>
           <div class="register-tip">
-            还没有账号？<el-link type="primary" :underline="false" @click="goToRegister">立即注册</el-link>
+            还没有账号？<el-link type="primary" underline="never" @click="goToRegister">立即注册</el-link>
           </div>
         </el-form-item>
       </el-form>
@@ -90,26 +90,22 @@ const rules: FormRules = {
 const handleLogin = async () => {
   if (!loginFormRef.value) return
   
-  await loginFormRef.value.validate((valid) => {
+  await loginFormRef.value.validate(async (valid) => {
     if (valid) {
       loginLoading.value = true
       
-      // 模拟登录延迟（实际应该调用 API）
-      setTimeout(() => {
-        const userData = {
-          id: '1',
-          username: loginForm.value.username,
-          avatar: 'https://via.placeholder.com/40/ff9a9e/ffffff?text=♡',
-          email: 'user@example.com'
+      try {
+        const success = await userStore.login(loginForm.value.username, loginForm.value.password)
+        
+        if (success) {
+          // 跳转到首页
+          router.push('/')
         }
-        
-        userStore.login(userData)
+      } catch (error) {
+        console.error('登录失败:', error)
+      } finally {
         loginLoading.value = false
-        ElMessage.success('登录成功！欢迎回来 🌸')
-        
-        // 跳转到首页
-        router.push('/')
-      }, 800)
+      }
     }
   })
 }

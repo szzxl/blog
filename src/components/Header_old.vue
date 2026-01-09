@@ -119,7 +119,7 @@
         <el-form-item>
           <div class="form-footer">
             <el-checkbox v-model="rememberMe">记住密码</el-checkbox>
-            <el-link type="primary" :underline="false">忘记密码</el-link>
+            <el-link type="primary" underline="never">忘记密码</el-link>
           </div>
         </el-form-item>
         
@@ -136,7 +136,7 @@
         
         <el-form-item>
           <div class="register-link">
-            还没有账号？<el-link type="primary" :underline="false">立即注册</el-link>
+            还没有账号？<el-link type="primary" underline="never">立即注册</el-link>
           </div>
         </el-form-item>
       </el-form>

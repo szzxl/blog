@@ -13,37 +13,48 @@
         </div>
       </div>
       
-      <div class="article-grid">
-        <div class="article-card card" v-for="i in 6" :key="i">
+      <div class="article-grid" v-loading="loading">
+        <div class="article-card card" v-for="article in articles" :key="article.id" @click="viewArticle(article.id)">
           <div class="article-badge">NEW</div>
           <div class="article-cover">
-            <img src="https://via.placeholder.com/400x200/fecfef/ffffff?text=♡" alt="文章封面">
+            <img :src="article.articleCover || '/web/default-cover.svg'" alt="文章封面">
             <div class="cover-overlay">
               <span class="read-more">阅读全文 →</span>
             </div>
           </div>
           <div class="article-info">
-            <h3 class="article-title">✨ 这是一篇温柔的文章标题</h3>
-            <p class="article-desc">记录今天的美好时光，分享生活中的小确幸和温暖瞬间...</p>
+            <h3 class="article-title">✨ {{ article.articleName }}</h3>
+            <p class="article-desc" v-if="article.articleCategory">
+              <span class="category-badge">📂 {{ article.articleCategory }}</span>
+            </p>
             <div class="article-meta">
               <span class="meta-item">
                 <span class="icon">📅</span>
-                2024-01-06
+                {{ formatTime(article.createTime) }}
               </span>
-              <span class="meta-item">
+              <span class="meta-item" v-if="article.readNum !== undefined">
+                <span class="icon">👁️</span>
+                {{ article.readNum }}
+              </span>
+              <span class="meta-item" v-if="article.likeCount">
                 <span class="icon">💗</span>
-                123
+                {{ article.likeCount }}
               </span>
-              <span class="meta-item">
+              <span class="meta-item" v-if="article.commentCount">
                 <span class="icon">💬</span>
-                5
+                {{ article.commentCount }}
               </span>
             </div>
-            <div class="article-tags">
-              <span class="tag-item">🌸 日常</span>
-              <span class="tag-item">💕 心情</span>
+            <div class="article-tags" v-if="article.articleTag">
+              <span class="tag-item" v-for="(tag, index) in parseTags(article.articleTag).slice(0, 2)" :key="index">🌸 {{ tag }}</span>
             </div>
           </div>
+        </div>
+        
+        <!-- 空状态 -->
+        <div v-if="!loading && articles.length === 0" class="empty-state">
+          <div class="empty-icon">📝</div>
+          <div class="empty-text">暂无文章</div>
         </div>
       </div>
     </div>
@@ -51,7 +62,74 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import Carousel from '@/components/Carousel.vue'
+import { getArticleList } from '@/api/articleApi'
+import { ElMessage } from 'element-plus'
+
+const router = useRouter()
+
+interface Article {
+  id: number
+  articleName: string
+  articleAbstract?: string
+  articleCover?: string
+  articleTag?: string
+  articleCategory?: string
+  readNum?: number
+  likeCount?: number
+  commentCount?: number
+  createTime?: number
+}
+
+const articles = ref<Article[]>([])
+const loading = ref(false)
+
+// 获取最新文章（首页只显示3篇）
+const fetchArticles = async () => {
+  loading.value = true
+  try {
+    const res: any = await getArticleList({
+      pageNo: 1,
+      pageSize: 3
+    })
+    
+    if (res && res.list) {
+      articles.value = res.list
+    } else if (Array.isArray(res)) {
+      articles.value = res.slice(0, 3)
+    }
+  } catch (error) {
+    console.error('获取文章列表失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 格式化时间
+const formatTime = (timestamp?: number) => {
+  if (!timestamp) return ''
+  const date = new Date(timestamp)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+// 解析标签字符串为数组
+const parseTags = (tagStr?: string) => {
+  if (!tagStr) return []
+  return tagStr.split(',').map(t => t.trim()).filter(t => t)
+}
+
+const viewArticle = (id: number) => {
+  router.push(`/article/${id}`)
+}
+
+onMounted(() => {
+  fetchArticles()
+})
 </script>
 
 <style scoped lang="scss">
@@ -201,6 +279,16 @@ import Carousel from '@/components/Carousel.vue'
       line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      
+      .category-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(255, 154, 158, 0.15) 0%, rgba(254, 207, 239, 0.15) 100%);
+        color: #ff9a9e;
+        font-size: 13px;
+        font-weight: 600;
+      }
     }
     
     .article-meta {
@@ -263,6 +351,23 @@ import Carousel from '@/components/Carousel.vue'
   }
   50% {
     transform: scale(1.05);
+  }
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 20px;
+  
+  .empty-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+  }
+  
+  .empty-text {
+    font-size: 18px;
+    color: #999;
   }
 }
 

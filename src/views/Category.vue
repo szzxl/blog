@@ -15,7 +15,7 @@
         <div class="category-item card" v-for="(cat, index) in categories" :key="index">
           <div class="category-icon">{{ cat.icon }}</div>
           <div class="category-info">
-            <h3 class="category-name">{{ cat.name }}</h3>
+            <h3 class="category-name">{{ cat.categoryName }}</h3>
             <p class="category-desc">{{ cat.desc }}</p>
             <div class="category-count">
               <span class="count">{{ cat.count }}</span>
@@ -32,27 +32,103 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { getCategoryList } from '@/api/articleApi'
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 
-const categories = ref([
-  { id: 1, name: '生活随笔', icon: '✨', desc: '记录日常生活的美好瞬间', count: 28 },
-  { id: 2, name: '技术分享', icon: '💻', desc: '前端开发技术与经验', count: 15 },
-  { id: 3, name: '旅行游记', icon: '✈️', desc: '世界那么大，一起去看看', count: 12 },
-  { id: 4, name: '美食日记', icon: '🍰', desc: '分享美食与烹饪心得', count: 20 },
-  { id: 5, name: '读书笔记', icon: '📚', desc: '阅读感悟与书籍推荐', count: 18 },
-  { id: 6, name: '摄影作品', icon: '📷', desc: '用镜头记录美好时光', count: 25 }
-])
+interface Category {
+  id: number
+  categoryName: string
+  icon?: string
+  desc?: string
+  count?: number
+}
+
+const categories = ref<Category[]>([])
+const loading = ref(false)
 
 const totalArticles = computed(() => {
-  return categories.value.reduce((sum, cat) => sum + cat.count, 0)
+  return categories.value.reduce((sum, cat) => sum + (cat.count || 0), 0)
 })
 
-const viewCategory = (id: number) => {
-  router.push(`/web/articles?category=${id}`)
+// 获取分类列表
+const fetchCategories = async () => {
+  loading.value = true
+  try {
+    const res: any = await getCategoryList({
+      pageNo: 1,
+      pageSize: 3
+    })
+    
+    // 处理返回的数据
+    if (res && res.list) {
+      categories.value = res.list.map((item: any) => ({
+        id: item.id,
+        categoryName: item.categoryName,
+        icon: getDefaultIcon(item.categoryName),
+        desc: item.description || `${item.categoryName}相关文章`,
+        count: item.articleCount || 0
+      }))
+    } else if (Array.isArray(res)) {
+      categories.value = res.map((item: any) => ({
+        id: item.id,
+        categoryName: item.categoryName,
+        icon: getDefaultIcon(item.categoryName),
+        desc: item.description || `${item.categoryName}相关文章`,
+        count: item.articleCount || 0
+      }))
+    }
+  } catch (error) {
+    console.error('获取分类列表失败:', error)
+    ElMessage.error('获取分类列表失败')
+    // 使用默认数据
+    categories.value = [
+      { id: 1, categoryName: '生活随笔', icon: '✨', desc: '记录日常生活的美好瞬间', count: 28 },
+      { id: 2, categoryName: '技术分享', icon: '💻', desc: '前端开发技术与经验', count: 15 },
+      { id: 3, categoryName: '旅行游记', icon: '✈️', desc: '世界那么大，一起去看看', count: 12 },
+      { id: 4, categoryName: '美食日记', icon: '🍰', desc: '分享美食与烹饪心得', count: 20 },
+      { id: 5, categoryName: '读书笔记', icon: '📚', desc: '阅读感悟与书籍推荐', count: 18 },
+      { id: 6, categoryName: '摄影作品', icon: '📷', desc: '用镜头记录美好时光', count: 25 }
+    ]
+  } finally {
+    loading.value = false
+  }
 }
+
+// 根据分类名称返回默认图标
+const getDefaultIcon = (name: string) => {
+  const iconMap: Record<string, string> = {
+    '生活': '✨',
+    '技术': '💻',
+    '旅行': '✈️',
+    '美食': '🍰',
+    '读书': '📚',
+    '摄影': '📷',
+    '音乐': '🎵',
+    '电影': '🎬',
+    '运动': '⚽',
+    '学习': '📖'
+  }
+  
+  for (const key in iconMap) {
+    if (name.includes(key)) {
+      return iconMap[key]
+    }
+  }
+  
+  return '📂'
+}
+
+const viewCategory = (id: number) => {
+  router.push(`/articles?category=${id}`)
+}
+
+onMounted(() => {
+  fetchCategories()
+})
 </script>
 
 <style scoped lang="scss">

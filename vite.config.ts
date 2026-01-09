@@ -25,9 +25,19 @@ export default defineConfig({
     }
   },
   server: {
-    port: 3001,
+    port: 3000,
     host: '0.0.0.0',
-    open: '/web/'
+    open: '/web/',
+    hmr: {
+      overlay: false
+    },
+    proxy: {
+      '/admin-api': {
+        target: 'http://localhost:48080',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/admin-api/, '/admin-api')
+      }
+    }
   },
   build: {
     sourcemap: false,

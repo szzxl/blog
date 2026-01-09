@@ -17,11 +17,11 @@
           />
         </el-form-item>
         
-        <el-form-item prop="email">
+        <el-form-item prop="nickname">
           <el-input 
-            v-model="registerForm.email" 
-            placeholder="邮箱"
-            prefix-icon="Message"
+            v-model="registerForm.nickname" 
+            placeholder="昵称"
+            prefix-icon="User"
             clearable
           />
         </el-form-item>
@@ -53,9 +53,9 @@
           <div class="agreement">
             <el-checkbox v-model="agreeTerms">
               我已阅读并同意
-              <el-link type="primary" :underline="false">《用户协议》</el-link>
+              <el-link type="primary" underline="never">《用户协议》</el-link>
               和
-              <el-link type="primary" :underline="false">《隐私政策》</el-link>
+              <el-link type="primary" underline="never">《隐私政策》</el-link>
             </el-checkbox>
           </div>
         </el-form-item>
@@ -73,7 +73,7 @@
         
         <el-form-item>
           <div class="login-tip">
-            已有账号？<el-link type="primary" :underline="false" @click="goToLogin">立即登录</el-link>
+            已有账号？<el-link type="primary" underline="never" @click="goToLogin">立即登录</el-link>
           </div>
         </el-form-item>
       </el-form>
@@ -84,19 +84,18 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
+import { register } from '@/api/articleApi'
 
 const router = useRouter()
-const userStore = useUserStore()
 
 const registerFormRef = ref<FormInstance>()
 const registerLoading = ref(false)
 const agreeTerms = ref(false)
 const registerForm = ref({
   username: '',
-  email: '',
+  nickname: '',
   password: '',
   confirmPassword: ''
 })
@@ -127,9 +126,9 @@ const rules: FormRules = {
     { required: true, message: '请输入用户名', trigger: 'blur' },
     { min: 3, max: 20, message: '用户名长度在 3 到 20 个字符', trigger: 'blur' }
   ],
-  email: [
-    { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
+  nickname: [
+    { required: true, message: '请输入昵称', trigger: 'blur' },
+    { min: 2, max: 20, message: '昵称长度在 2 到 20 个字符', trigger: 'blur' }
   ],
   password: [
     { required: true, validator: validatePass, trigger: 'blur' },
@@ -148,26 +147,27 @@ const handleRegister = async () => {
     return
   }
   
-  await registerFormRef.value.validate((valid) => {
+  await registerFormRef.value.validate(async (valid) => {
     if (valid) {
       registerLoading.value = true
       
-      // 模拟注册延迟（实际应该调用 API）
-      setTimeout(() => {
-        const userData = {
-          id: '1',
+      try {
+        await register({
           username: registerForm.value.username,
-          avatar: 'https://via.placeholder.com/40/ff9a9e/ffffff?text=♡',
-          email: registerForm.value.email
-        }
+          nickname: registerForm.value.nickname,
+          password: registerForm.value.password
+        })
         
-        userStore.login(userData)
+        ElMessage.success('注册成功！请登录 🌸')
+        
+        // 跳转到登录页
+        router.push('/login')
+      } catch (error) {
+        console.error('注册失败:', error)
+        ElMessage.error('注册失败，请重试')
+      } finally {
         registerLoading.value = false
-        ElMessage.success('注册成功！欢迎加入 🌸')
-        
-        // 跳转到首页
-        router.push('/')
-      }, 1000)
+      }
     }
   })
 }

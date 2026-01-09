@@ -11,7 +11,7 @@
       </div>
       
       <!-- 标签云 -->
-      <div class="tag-cloud card">
+      <div class="tag-cloud card" v-loading="loading">
         <div 
           class="tag-item" 
           v-for="(tag, index) in tags" 
@@ -19,7 +19,7 @@
           :style="{ fontSize: getTagSize(tag.count) + 'px' }"
           @click="viewTag(tag.id)"
         >
-          <span class="tag-name">{{ tag.name }}</span>
+          <span class="tag-name">{{ tag.tagName }}</span>
           <span class="tag-count">({{ tag.count }})</span>
         </div>
       </div>
@@ -31,7 +31,7 @@
           <div class="tag-card card" v-for="(tag, index) in sortedTags" :key="index">
             <div class="tag-header">
               <span class="tag-icon">🔖</span>
-              <span class="tag-name">{{ tag.name }}</span>
+              <span class="tag-name">{{ tag.tagName }}</span>
             </div>
             <div class="tag-info">
               <span class="tag-count">{{ tag.count }} 篇文章</span>
@@ -47,41 +47,71 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { getTagList } from '@/api/articleApi'
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 
-const tags = ref([
-  { id: 1, name: 'Vue', count: 25 },
-  { id: 2, name: 'JavaScript', count: 30 },
-  { id: 3, name: '生活', count: 45 },
-  { id: 4, name: '旅行', count: 18 },
-  { id: 5, name: '美食', count: 22 },
-  { id: 6, name: '摄影', count: 28 },
-  { id: 7, name: 'TypeScript', count: 15 },
-  { id: 8, name: 'CSS', count: 20 },
-  { id: 9, name: '读书', count: 12 },
-  { id: 10, name: '音乐', count: 16 },
-  { id: 11, name: '电影', count: 14 },
-  { id: 12, name: '健身', count: 10 },
-  { id: 13, name: 'React', count: 18 },
-  { id: 14, name: 'Node.js', count: 12 },
-  { id: 15, name: '随笔', count: 35 },
-  { id: 16, name: '前端', count: 28 },
-  { id: 17, name: '设计', count: 15 },
-  { id: 18, name: '手工', count: 8 }
-])
+interface Tag {
+  id: number
+  tagName: string
+  count?: number
+}
+
+const tags = ref<Tag[]>([])
+const loading = ref(false)
 
 const sortedTags = computed(() => {
-  return [...tags.value].sort((a, b) => b.count - a.count)
+  return [...tags.value].sort((a, b) => (b.count || 0) - (a.count || 0))
 })
 
-const getTagSize = (count: number) => {
+// 获取标签列表
+const fetchTags = async () => {
+  loading.value = true
+  try {
+    const res: any = await getTagList({
+      pageNo: 1,
+      pageSize: 3
+    })
+    
+    if (res && res.list) {
+      tags.value = res.list.map((item: any) => ({
+        id: item.id,
+        tagName: item.tagName,
+        count: item.articleCount || 0
+      }))
+    } else if (Array.isArray(res)) {
+      tags.value = res.map((item: any) => ({
+        id: item.id,
+        tagName: item.tagName,
+        count: item.articleCount || 0
+      }))
+    }
+  } catch (error) {
+    console.error('获取标签列表失败:', error)
+    ElMessage.error('获取标签列表失败')
+    // 使用默认数据
+    tags.value = [
+      { id: 1, tagName: 'Vue', count: 25 },
+      { id: 2, tagName: 'JavaScript', count: 30 },
+      { id: 3, tagName: '生活', count: 45 },
+      { id: 4, tagName: '旅行', count: 18 },
+      { id: 5, tagName: '美食', count: 22 },
+      { id: 6, tagName: '摄影', count: 28 }
+    ]
+  } finally {
+    loading.value = false
+  }
+}
+
+const getTagSize = (count: number = 0) => {
   const minSize = 14
   const maxSize = 36
-  const minCount = Math.min(...tags.value.map(t => t.count))
-  const maxCount = Math.max(...tags.value.map(t => t.count))
+  const counts = tags.value.map(t => t.count || 0)
+  const minCount = Math.min(...counts)
+  const maxCount = Math.max(...counts)
   
   if (maxCount === minCount) return (minSize + maxSize) / 2
   
@@ -89,8 +119,12 @@ const getTagSize = (count: number) => {
 }
 
 const viewTag = (id: number) => {
-  router.push(`/web/articles?tag=${id}`)
+  router.push(`/articles?tag=${id}`)
 }
+
+onMounted(() => {
+  fetchTags()
+})
 </script>
 
 <style scoped lang="scss">
