@@ -49,7 +49,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getTagList } from '@/api/articleApi'
+import { getTagList } from '@/api/article'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()

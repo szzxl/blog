@@ -152,7 +152,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus, Delete, ZoomIn, Upload } from '@element-plus/icons-vue'
-import { uploadImage, submitGuestbookMessage } from '@/api/articleApi'
+import { uploadImage, submitGuestbookMessage } from '@/api/article'
 import { useUserStore } from '@/stores/user'
 
 interface ImageItem {

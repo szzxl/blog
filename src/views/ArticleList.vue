@@ -105,7 +105,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { getArticleList } from '@/api/articleApi'
+import { getArticleList } from '@/api/article'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()

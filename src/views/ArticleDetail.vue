@@ -60,7 +60,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Comment from '@/components/Comment.vue'
-import { getArticleDetail, addArticleView } from '@/api/articleApi'
+import { getArticleDetail } from '@/api/article'
 import { ElMessage } from 'element-plus'
 
 const route = useRoute()

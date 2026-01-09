@@ -86,7 +86,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
-import { register } from '@/api/articleApi'
+import { register } from '@/api/article'
 
 const router = useRouter()
 

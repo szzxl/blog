@@ -13,10 +13,8 @@
       <!-- 分类网格 -->
       <div class="category-grid">
         <div class="category-item card" v-for="(cat, index) in categories" :key="index">
-          <div class="category-icon">{{ cat.icon }}</div>
           <div class="category-info">
             <h3 class="category-name">{{ cat.categoryName }}</h3>
-            <p class="category-desc">{{ cat.desc }}</p>
             <div class="category-count">
               <span class="count">{{ cat.count }}</span>
               <span class="label">篇文章</span>
@@ -34,7 +32,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getCategoryList } from '@/api/articleApi'
+import { getCategoryList } from '@/api/article'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
@@ -60,39 +58,30 @@ const fetchCategories = async () => {
   try {
     const res: any = await getCategoryList({
       pageNo: 1,
-      pageSize: 3
+      pageSize: 100
     })
     
-    // 处理返回的数据
-    if (res && res.list) {
-      categories.value = res.list.map((item: any) => ({
-        id: item.id,
-        categoryName: item.categoryName,
-        icon: getDefaultIcon(item.categoryName),
-        desc: item.description || `${item.categoryName}相关文章`,
-        count: item.articleCount || 0
+    // 处理返回的数据 - 适配后端返回的 {name, num} 结构
+    if (Array.isArray(res)) {
+      categories.value = res.map((item: any, index: number) => ({
+        id: item.id || index + 1,
+        categoryName: item.name || item.categoryName,
+        icon: getDefaultIcon(item.name || item.categoryName),
+        desc: item.description || `${item.name || item.categoryName}相关文章`,
+        count: item.num || item.count || item.articleCount || 0
       }))
-    } else if (Array.isArray(res)) {
-      categories.value = res.map((item: any) => ({
-        id: item.id,
-        categoryName: item.categoryName,
-        icon: getDefaultIcon(item.categoryName),
-        desc: item.description || `${item.categoryName}相关文章`,
-        count: item.articleCount || 0
+    } else if (res && res.list) {
+      categories.value = res.list.map((item: any, index: number) => ({
+        id: item.id || index + 1,
+        categoryName: item.name || item.categoryName,
+        icon: getDefaultIcon(item.name || item.categoryName),
+        desc: item.description || `${item.name || item.categoryName}相关文章`,
+        count: item.num || item.count || item.articleCount || 0
       }))
     }
   } catch (error) {
     console.error('获取分类列表失败:', error)
     ElMessage.error('获取分类列表失败')
-    // 使用默认数据
-    categories.value = [
-      { id: 1, categoryName: '生活随笔', icon: '✨', desc: '记录日常生活的美好瞬间', count: 28 },
-      { id: 2, categoryName: '技术分享', icon: '💻', desc: '前端开发技术与经验', count: 15 },
-      { id: 3, categoryName: '旅行游记', icon: '✈️', desc: '世界那么大，一起去看看', count: 12 },
-      { id: 4, categoryName: '美食日记', icon: '🍰', desc: '分享美食与烹饪心得', count: 20 },
-      { id: 5, categoryName: '读书笔记', icon: '📚', desc: '阅读感悟与书籍推荐', count: 18 },
-      { id: 6, categoryName: '摄影作品', icon: '📷', desc: '用镜头记录美好时光', count: 25 }
-    ]
   } finally {
     loading.value = false
   }

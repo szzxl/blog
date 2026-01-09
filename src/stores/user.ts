@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { login as loginApi, getUserInfo as getUserInfoApi, logout as logoutApi } from '@/api/articleApi'
+import { login as loginApi, getUserInfo as getUserInfoApi, logout as logoutApi } from '@/api/article'
 import { ElMessage } from 'element-plus'
 
 export interface User {
