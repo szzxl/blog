@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>留言板样式测试</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      padding: 40px;
+      background: #fef5f5;
+    }
+    
+    .message-list {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+    }
+    
+    .list-title {
+      font-size: 24px;
+      color: #ff9a9e;
+      margin-bottom: 25px;
+      font-weight: 700;
+    }
+    
+    .message-group {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .message-group:last-child {
+      border-bottom: none;
+    }
+    
+    .message-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    
+    .msg-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #ff9a9e;
+      flex-shrink: 0;
+    }
+    
+    .msg-right {
+      flex: 1;
+    }
+    
+    .msg-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    
+    .msg-user {
+      font-size: 15px;
+      font-weight: 700;
+      color: #5a5a5a;
+    }
+    
+    .msg-time {
+      font-size: 13px;
+      color: #999;
+    }
+    
+    .msg-text {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #666;
+    }
+    
+    .reply-list {
+      margin-left: 48px;
+      margin-top: 12px;
+      background: #f6f7f8;
+      border-radius: 8px;
+      padding: 12px;
+    }
+    
+    .reply-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    
+    .reply-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .reply-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #fecfef;
+      flex-shrink: 0;
+    }
+    
+    .reply-right {
+      flex: 1;
+    }
+    
+    .reply-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    
+    .reply-user {
+      font-size: 14px;
+      font-weight: 700;
+      color: #5a5a5a;
+    }
+    
+    .reply-user.author {
+      color: #ff7a7e;
+      background: rgba(255, 122, 126, 0.15);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    
+    .reply-user.author::after {
+      content: '作者';
+      margin-left: 4px;
+      font-size: 11px;
+      background: #ff9a9e;
+      color: #fff;
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+    
+    .reply-time {
+      font-size: 12px;
+      color: #bbb;
+    }
+    
+    .reply-text {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #666;
+    }
+    
+    .mention {
+      color: #ff9a9e;
+      font-weight: 600;
+      background: rgba(255, 154, 158, 0.12);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="message-list">
+    <h3 class="list-title">💬 留言记录</h3>
+    
+    <!-- 留言组 1 - 多层对话 -->
+    <div class="message-group">
+      <div class="message-item">
+        <div class="msg-avatar"></div>
+        <div class="msg-right">
+          <div class="msg-header">
+            <span class="msg-user">小明</span>
+            <span class="msg-time">2024-01-03 16:00</span>
+          </div>
+          <div class="msg-text">照片拍得真好看！👍</div>
+        </div>
+      </div>
+      
+      <div class="reply-list">
+        <div class="reply-item">
+          <div class="reply-avatar"></div>
+          <div class="reply-right">
+            <div class="reply-header">
+              <span class="reply-user author">博主</span>
+              <span class="reply-time">16:30</span>
+            </div>
+            <div class="reply-text">：谢谢夸奖~ 😊</div>
+          </div>
+        </div>
+        
+        <div class="reply-item">
+          <div class="reply-avatar"></div>
+          <div class="reply-right">
+            <div class="reply-header">
+              <span class="reply-user">小红</span>
+              <span class="reply-time">17:00</span>
+            </div>
+            <div class="reply-text">：<span class="mention">@博主</span> 请问用什么相机拍的？</div>
+          </div>
+        </div>
+        
+        <div class="reply-item">
+          <div class="reply-avatar"></div>
+          <div class="reply-right">
+            <div class="reply-header">
+              <span class="reply-user author">博主</span>
+              <span class="reply-time">17:30</span>
+            </div>
+            <div class="reply-text">：<span class="mention">@小红</span> 用的是手机拍的哦~</div>
+          </div>
+        </div>
+        
+        <div class="reply-item">
+          <div class="reply-avatar"></div>
+          <div class="reply-right">
+            <div class="reply-header">
+              <span class="reply-user">访客A</span>
+              <span class="reply-time">18:00</span>
+            </div>
+            <div class="reply-text">：<span class="mention">@博主</span> 什么型号的手机呀？</div>
+          </div>
+        </div>
+        
+        <div class="reply-item">
+          <div class="reply-avatar"></div>
+          <div class="reply-right">
+            <div class="reply-header">
+              <span class="reply-user author">博主</span>
+              <span class="reply-time">18:15</span>
+            </div>
+            <div class="reply-text">：<span class="mention">@访客A</span> iPhone 15 Pro Max</div>
+          </div>
+        </div>
+        
+        <div class="reply-item">
+          <div class="reply-avatar"></div>
+          <div class="reply-right">
+            <div class="reply-header">
+              <span class="reply-user">小李</span>
+              <span class="reply-time">18:30</span>
+            </div>
+            <div class="reply-text">：<span class="mention">@博主</span> 好贵啊，羡慕了！</div>
+          </div>
+        </div>
+        
+        <div class="reply-item">
+          <div class="reply-avatar"></div>
+          <div class="reply-right">
+            <div class="reply-header">
+              <span class="reply-user">访客B</span>
+              <span class="reply-time">19:00</span>
+            </div>
+            <div class="reply-text">：<span class="mention">@小李</span> 确实，不过拍照效果真的很好</div>
+          </div>
+        </div>
+        
+        <div class="reply-item">
+          <div class="reply-avatar"></div>
+          <div class="reply-right">
+            <div class="reply-header">
+              <span class="reply-user author">博主</span>
+              <span class="reply-time">19:20</span>
+            </div>
+            <div class="reply-text">：<span class="mention">@小李</span> 哈哈，分期买的~ 💸</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 留言组 2 -->
+    <div class="message-group">
+      <div class="message-item">
+        <div class="msg-avatar"></div>
+        <div class="msg-right">
+          <div class="msg-header">
+            <span class="msg-user">访客C</span>
+            <span class="msg-time">2024-01-03 15:30</span>
+          </div>
+          <div class="msg-text">网站做得很漂亮，喜欢这个粉色系的设计~ 💕</div>
+        </div>
+      </div>
+      
+      <div class="reply-list">
+        <div class="reply-item">
+          <div class="reply-avatar"></div>
+          <div class="reply-right">
+            <div class="reply-header">
+              <span class="reply-user author">博主</span>
+              <span class="reply-time">15:45</span>
+            </div>
+            <div class="reply-text">：<span class="mention">@访客C</span> 谢谢喜欢~ 😊</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 留言组 3 -->
+    <div class="message-group">
+      <div class="message-item">
+        <div class="msg-avatar"></div>
+        <div class="msg-right">
+          <div class="msg-header">
+            <span class="msg-user">张三</span>
+            <span class="msg-time">2024-01-02 20:15</span>
+          </div>
+          <div class="msg-text">路过留个脚印，祝博主越来越好！✨</div>
+        </div>
+      </div>
+      
+      <div class="reply-list">
+        <div class="reply-item">
+          <div class="reply-avatar"></div>
+          <div class="reply-right">
+            <div class="reply-header">
+              <span class="reply-user author">博主</span>
+              <span class="reply-time">20:30</span>
+            </div>
+            <div class="reply-text">：<span class="mention">@张三</span> 谢谢支持！💕</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 留言组 4 - 访客互动 -->
+    <div class="message-group">
+      <div class="message-item">
+        <div class="msg-avatar"></div>
+        <div class="msg-right">
+          <div class="msg-header">
+            <span class="msg-user">小王</span>
+            <span class="msg-time">2024-01-01 12:00</span>
+          </div>
+          <div class="msg-text">第一次来访，感觉这个博客很温馨！内容也很有趣~ 🌸</div>
+        </div>
+      </div>
+      
+      <div class="reply-list">
+        <div class="reply-item">
+          <div class="reply-avatar"></div>
+          <div class="reply-right">
+            <div class="reply-header">
+              <span class="reply-user author">博主</span>
+              <span class="reply-time">12:20</span>
+            </div>
+            <div class="reply-text">：<span class="mention">@小王</span> 欢迎常来玩~ ✨</div>
+          </div>
+        </div>
+        
+        <div class="reply-item">
+          <div class="reply-avatar"></div>
+          <div class="reply-right">
+            <div class="reply-header">
+              <span class="reply-user">访客D</span>
+              <span class="reply-time">13:00</span>
+            </div>
+            <div class="reply-text">：<span class="mention">@小王</span> 我也是第一次来，确实不错！</div>
+          </div>
+        </div>
+        
+        <div class="reply-item">
+          <div class="reply-avatar"></div>
+          <div class="reply-right">
+            <div class="reply-header">
+              <span class="reply-user">小王</span>
+              <span class="reply-time">13:30</span>
+            </div>
+            <div class="reply-text">：<span class="mention">@访客D</span> 是吧！已经收藏了~</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 留言组 5 - 无回复 -->
+    <div class="message-group">
+      <div class="message-item">
+        <div class="msg-avatar"></div>
+        <div class="msg-right">
+          <div class="msg-header">
+            <span class="msg-user">访客E</span>
+            <span class="msg-time">2023-12-30 18:00</span>
+          </div>
+          <div class="msg-text">博主更新好勤快呀！👍</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

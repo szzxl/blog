@@ -138,51 +138,76 @@
       <div class="message-list">
         <h3 class="list-title">💬 留言记录</h3>
         
-        <!-- 留言模板 1 - 带图片 -->
-        <div class="message-item card">
-          <div class="message-header">
-            <img src="/web/default-avatar.svg" alt="头像" class="avatar">
-            <div class="user-info">
-              <div class="username">访客A</div>
-              <div class="time">2024-01-03 15:30</div>
+        <!-- 留言组 1 -->
+        <div class="message-group">
+          <!-- 主留言 -->
+          <div class="message-item">
+            <img src="/web/default-avatar.svg" alt="头像" class="msg-avatar">
+            <div class="msg-right">
+              <div class="msg-header">
+                <span class="msg-user">访客A</span>
+                <span class="msg-time">2024-01-03 15:30</span>
+              </div>
+              <div class="msg-text">网站做得很漂亮，喜欢这个粉色系的设计~ 💕</div>
             </div>
           </div>
-          <div class="message-content">
-            网站做得很漂亮，喜欢这个粉色系的设计~ 💕
-          </div>
-          <div class="message-images">
-            <img src="/web/vite.svg" alt="图片" class="msg-img">
-            <img src="/web/vite.svg" alt="图片" class="msg-img">
+          
+          <!-- 回复列表 -->
+          <div class="reply-list">
+            <div class="reply-item">
+              <img src="/web/default-avatar.svg" alt="头像" class="reply-avatar">
+              <div class="reply-right">
+                <div class="reply-header">
+                  <span class="reply-user author">博主</span>
+                  <span class="reply-time">15:45</span>
+                </div>
+                <div class="reply-text"><span class="mention">@访客A</span> 谢谢喜欢~ 😊</div>
+              </div>
+            </div>
           </div>
         </div>
         
-        <!-- 留言模板 2 - 纯文字 -->
-        <div class="message-item card">
-          <div class="message-header">
-            <img src="/web/default-avatar.svg" alt="头像" class="avatar">
-            <div class="user-info">
-              <div class="username">小明</div>
-              <div class="time">2024-01-02 20:15</div>
+        <!-- 留言组 2 -->
+        <div class="message-group">
+          <div class="message-item">
+            <img src="/web/default-avatar.svg" alt="头像" class="msg-avatar">
+            <div class="msg-right">
+              <div class="msg-header">
+                <span class="msg-user">小明</span>
+                <span class="msg-time">2024-01-02 20:15</span>
+              </div>
+              <div class="msg-text">路过留个脚印，祝博主越来越好！✨</div>
             </div>
           </div>
-          <div class="message-content">
-            路过留个脚印，祝博主越来越好！✨
+          
+          <div class="reply-list">
+            <div class="reply-item">
+              <img src="/web/default-avatar.svg" alt="头像" class="reply-avatar">
+              <div class="reply-right">
+                <div class="reply-header">
+                  <span class="reply-user author">博主</span>
+                  <span class="reply-time">20:30</span>
+                </div>
+                <div class="reply-text"><span class="mention">@小明</span> 谢谢支持！💕</div>
+              </div>
+            </div>
           </div>
         </div>
         
-        <!-- 留言模板 3 - 长文本 -->
-        <div class="message-item card">
-          <div class="message-header">
-            <img src="/web/default-avatar.svg" alt="头像" class="avatar">
-            <div class="user-info">
-              <div class="username">小红</div>
-              <div class="time">2024-01-01 12:00</div>
+        <!-- 留言组 3 -->
+        <div class="message-group">
+          <div class="message-item">
+            <img src="/web/default-avatar.svg" alt="头像" class="msg-avatar">
+            <div class="msg-right">
+              <div class="msg-header">
+                <span class="msg-user">小红</span>
+                <span class="msg-time">2024-01-01 12:00</span>
+              </div>
+              <div class="msg-text">第一次来访，感觉这个博客很温馨！🌸</div>
             </div>
           </div>
-          <div class="message-content">
-            第一次来访，感觉这个博客很温馨！内容也很有趣，已经收藏了，会经常来看的~ 希望博主继续加油，期待更多精彩内容！🌸🌸🌸
-          </div>
         </div>
+        
       </div>
 
     </div>
@@ -726,68 +751,159 @@ const submitMessage = async () => {
     font-weight: 700;
   }
   
-  .message-item {
-    padding: 30px;
-    margin-bottom: 20px;
-    transition: all 0.3s;
+  .message-group {
+    margin-bottom: 30px;
     
-    &:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 30px rgba(255, 154, 158, 0.2);
+    &:last-child {
+      margin-bottom: 0;
     }
     
-    .message-header {
+    .message-item {
       display: flex;
-      align-items: center;
-      gap: 15px;
+      align-items: flex-start;
+      gap: 12px;
       margin-bottom: 15px;
       
-      .avatar {
-        width: 50px;
-        height: 50px;
+      .msg-avatar {
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
-        border: 3px solid #fff;
-        box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+        border: 2px solid #fff;
+        box-shadow: 0 2px 8px rgba(255, 154, 158, 0.2);
+        flex-shrink: 0;
       }
       
-      .user-info {
-        .username {
-          font-size: 16px;
-          font-weight: 700;
-          color: #5a5a5a;
-          margin-bottom: 5px;
+      .msg-right {
+        flex: 1;
+        
+        .msg-header {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 8px;
+          
+          .msg-user {
+            font-size: 15px;
+            font-weight: 700;
+            color: #5a5a5a;
+          }
+          
+          .msg-time {
+            font-size: 13px;
+            color: #999;
+          }
         }
         
-        .time {
-          font-size: 13px;
-          color: #999;
+        .msg-text {
+          font-size: 15px;
+          line-height: 1.7;
+          color: #666;
+          margin-bottom: 8px;
+        }
+        
+        .msg-actions {
+          display: flex;
+          gap: 15px;
+          
+          .action-btn {
+            font-size: 13px;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.2s;
+            
+            &:hover {
+              color: #ff9a9e;
+            }
+          }
         }
       }
     }
     
-    .message-content {
-      font-size: 15px;
-      line-height: 1.8;
-      color: #666;
-      margin-bottom: 15px;
-    }
-    
-    .message-images {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 10px;
+    /* 留言板回复样式 - 简单2层 */
+    .reply-list {
+      margin-left: 54px;
+      margin-top: 12px;
       
-      .msg-img {
-        width: 100%;
-        height: 120px;
-        object-fit: cover;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.3s;
+      .reply-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 12px;
+        padding: 10px;
+        background: #f9f9f9;
+        border-radius: 8px;
         
-        &:hover {
-          transform: scale(1.05);
-          box-shadow: 0 6px 20px rgba(255, 154, 158, 0.3);
+        &:last-child {
+          margin-bottom: 0;
+        }
+        
+        .reply-avatar {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 6px rgba(255, 154, 158, 0.15);
+          flex-shrink: 0;
+        }
+        
+        .reply-right {
+          flex: 1;
+          
+          .reply-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+            
+            .reply-user {
+              font-size: 14px;
+              font-weight: 700;
+              color: #5a5a5a;
+              
+              &.author {
+                color: #ff7a7e;
+                background: linear-gradient(135deg, rgba(255, 122, 126, 0.15) 0%, rgba(254, 207, 239, 0.15) 100%);
+                padding: 2px 8px;
+                border-radius: 10px;
+                
+                &::after {
+                  content: '作者';
+                  margin-left: 4px;
+                  font-size: 11px;
+                  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+                  color: #fff;
+                  padding: 1px 6px;
+                  border-radius: 8px;
+                  font-weight: 600;
+                }
+              }
+            }
+            
+            .reply-time {
+              font-size: 12px;
+              color: #999;
+            }
+          }
+          
+          .reply-text {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #666;
+            
+            .mention {
+              color: #ff9a9e;
+              font-weight: 600;
+              background: rgba(255, 154, 158, 0.12);
+              padding: 2px 6px;
+              border-radius: 4px;
+              transition: all 0.2s;
+              
+              &:hover {
+                background: rgba(255, 154, 158, 0.2);
+                cursor: pointer;
+              }
+            }
+          }
         }
       }
     }

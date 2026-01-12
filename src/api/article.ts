@@ -110,3 +110,29 @@ export const submitGuestbookMessage = (data: {
     data
   })
 }
+
+// 说说相关
+export const getTalkList = (data: {
+  userId?: number | null
+  pageNo: number
+  pageSize: number
+}) => {
+  return request({
+    url: '/web/talk/list',
+    method: 'post',
+    data
+  })
+}
+
+export const getTalkDetail = (data: {
+  userId?: number | null
+  talkId: number
+  pageNo: number
+  pageSize: number
+}) => {
+  return request({
+    url: '/web/talk/detail',
+    method: 'post',
+    data
+  })
+}

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>多层嵌套评论</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      padding: 40px;
+      background: #fef5f5;
+    }
+    
+    .message-list {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+    }
+    
+    .list-title {
+      font-size: 24px;
+      color: #ff9a9e;
+      margin-bottom: 25px;
+      font-weight: 700;
+    }
+    
+    .message-group {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .comment-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+    
+    .comment-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #ff9a9e;
+      flex-shrink: 0;
+    }
+    
+    .comment-right {
+      flex: 1;
+    }
+    
+    .comment-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    
+    .comment-user {
+      font-size: 15px;
+      font-weight: 700;
+      color: #5a5a5a;
+    }
+    
+    .comment-user.author {
+      color: #ff7a7e;
+      background: rgba(255, 122, 126, 0.15);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    
+    .comment-user.author::after {
+      content: '作者';
+      margin-left: 4px;
+      font-size: 11px;
+      background: #ff9a9e;
+      color: #fff;
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+    
+    .comment-time {
+      font-size: 13px;
+      color: #999;
+    }
+    
+    .comment-text {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .mention {
+      color: #ff9a9e;
+      font-weight: 600;
+      background: rgba(255, 154, 158, 0.12);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    .comment-actions {
+      font-size: 13px;
+      color: #999;
+      cursor: pointer;
+    }
+    
+    .comment-actions:hover {
+      color: #ff9a9e;
+    }
+    
+    /* 嵌套回复 - 每层缩进 */
+    .replies {
+      margin-left: 54px;
+      margin-top: 12px;
+    }
+    
+    /* 第2层回复 */
+    .replies .comment-item {
+      background: #f9f9f9;
+      padding: 12px;
+      border-radius: 8px;
+    }
+    
+    .replies .comment-avatar {
+      width: 36px;
+      height: 36px;
+      background: #fecfef;
+    }
+    
+    .replies .comment-user {
+      font-size: 14px;
+    }
+    
+    .replies .comment-text {
+      font-size: 14px;
+    }
+    
+    /* 第3层回复 */
+    .replies .replies .comment-item {
+      background: #f0f0f0;
+    }
+    
+    .replies .replies .comment-avatar {
+      width: 32px;
+      height: 32px;
+      background: #ffd4e5;
+    }
+    
+    /* 第4层回复 */
+    .replies .replies .replies .comment-item {
+      background: #e8e8e8;
+    }
+    
+    .replies .replies .replies .comment-avatar {
+      width: 28px;
+      height: 28px;
+      background: #ffb3d9;
+    }
+  </style>
+</head>
+<body>
+  <div class="message-list">
+    <h3 class="list-title">💬 多层嵌套评论</h3>
+    
+    <!-- 留言组 1 - 4层嵌套 -->
+    <div class="message-group">
+      <!-- 第1层：主留言 -->
+      <div class="comment-item">
+        <div class="comment-avatar"></div>
+        <div class="comment-right">
+          <div class="comment-header">
+            <span class="comment-user">小明</span>
+            <span class="comment-time">2024-01-03 16:00</span>
+          </div>
+          <div class="comment-text">照片拍得真好看！👍</div>
+          <div class="comment-actions">💬 回复</div>
+        </div>
+      </div>
+      
+      <!-- 第2层：回复 -->
+      <div class="replies">
+        <div class="comment-item">
+          <div class="comment-avatar"></div>
+          <div class="comment-right">
+            <div class="comment-header">
+              <span class="comment-user author">博主</span>
+              <span class="comment-time">16:30</span>
+            </div>
+            <div class="comment-text">谢谢夸奖~ 😊</div>
+            <div class="comment-actions">💬 回复</div>
+          </div>
+        </div>
+        
+        <div class="comment-item">
+          <div class="comment-avatar"></div>
+          <div class="comment-right">
+            <div class="comment-header">
+              <span class="comment-user">小红</span>
+              <span class="comment-time">17:00</span>
+            </div>
+            <div class="comment-text"><span class="mention">@博主</span> 请问用什么相机拍的？</div>
+            <div class="comment-actions">💬 回复</div>
+          </div>
+        </div>
+        
+        <!-- 第3层：回复的回复 -->
+        <div class="replies">
+          <div class="comment-item">
+            <div class="comment-avatar"></div>
+            <div class="comment-right">
+              <div class="comment-header">
+                <span class="comment-user author">博主</span>
+                <span class="comment-time">17:30</span>
+              </div>
+              <div class="comment-text"><span class="mention">@小红</span> 用的是手机拍的哦~</div>
+              <div class="comment-actions">💬 回复</div>
+            </div>
+          </div>
+          
+          <div class="comment-item">
+            <div class="comment-avatar"></div>
+            <div class="comment-right">
+              <div class="comment-header">
+                <span class="comment-user">访客A</span>
+                <span class="comment-time">18:00</span>
+              </div>
+              <div class="comment-text"><span class="mention">@博主</span> 什么型号的手机呀？</div>
+              <div class="comment-actions">💬 回复</div>
+            </div>
+          </div>
+          
+          <!-- 第4层：更深层的回复 -->
+          <div class="replies">
+            <div class="comment-item">
+              <div class="comment-avatar"></div>
+              <div class="comment-right">
+                <div class="comment-header">
+                  <span class="comment-user author">博主</span>
+                  <span class="comment-time">18:15</span>
+                </div>
+                <div class="comment-text"><span class="mention">@访客A</span> iPhone 15 Pro Max</div>
+                <div class="comment-actions">💬 回复</div>
+              </div>
+            </div>
+            
+            <div class="comment-item">
+              <div class="comment-avatar"></div>
+              <div class="comment-right">
+                <div class="comment-header">
+                  <span class="comment-user">小李</span>
+                  <span class="comment-time">18:30</span>
+                </div>
+                <div class="comment-text"><span class="mention">@博主</span> 好贵啊，羡慕了！</div>
+                <div class="comment-actions">💬 回复</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 留言组 2 - 3层嵌套 -->
+    <div class="message-group">
+      <!-- 第1层 -->
+      <div class="comment-item">
+        <div class="comment-avatar"></div>
+        <div class="comment-right">
+          <div class="comment-header">
+            <span class="comment-user">访客B</span>
+            <span class="comment-time">2024-01-02 20:00</span>
+          </div>
+          <div class="comment-text">网站做得很漂亮，喜欢这个粉色系的设计~ 💕</div>
+          <div class="comment-actions">💬 回复</div>
+        </div>
+      </div>
+      
+      <!-- 第2层 -->
+      <div class="replies">
+        <div class="comment-item">
+          <div class="comment-avatar"></div>
+          <div class="comment-right">
+            <div class="comment-header">
+              <span class="comment-user author">博主</span>
+              <span class="comment-time">20:15</span>
+            </div>
+            <div class="comment-text"><span class="mention">@访客B</span> 谢谢喜欢~ 😊</div>
+            <div class="comment-actions">💬 回复</div>
+          </div>
+        </div>
+        
+        <!-- 第3层 -->
+        <div class="replies">
+          <div class="comment-item">
+            <div class="comment-avatar"></div>
+            <div class="comment-right">
+              <div class="comment-header">
+                <span class="comment-user">访客B</span>
+                <span class="comment-time">20:30</span>
+              </div>
+              <div class="comment-text"><span class="mention">@博主</span> 期待更多内容！</div>
+              <div class="comment-actions">💬 回复</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 留言组 3 - 简单回复 -->
+    <div class="message-group">
+      <div class="comment-item">
+        <div class="comment-avatar"></div>
+        <div class="comment-right">
+          <div class="comment-header">
+            <span class="comment-user">张三</span>
+            <span class="comment-time">2024-01-01 12:00</span>
+          </div>
+          <div class="comment-text">路过留个脚印~ ✨</div>
+          <div class="comment-actions">💬 回复</div>
+        </div>
+      </div>
+      
+      <div class="replies">
+        <div class="comment-item">
+          <div class="comment-avatar"></div>
+          <div class="comment-right">
+            <div class="comment-header">
+              <span class="comment-user author">博主</span>
+              <span class="comment-time">12:20</span>
+            </div>
+            <div class="comment-text"><span class="mention">@张三</span> 欢迎常来！💕</div>
+            <div class="comment-actions">💬 回复</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
