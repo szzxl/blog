@@ -187,7 +187,6 @@ const fetchLinks = async () => {
   loading.value = true
   try {
     const response: any = await getFriendLinks()
-    console.log('友情链接接口返回:', response)
     
     if (response && Array.isArray(response)) {
       // 过滤状态为1的链接，并按sort排序
@@ -210,21 +209,14 @@ const goToGuestbook = () => {
 
 // 提交申请
 const submitApply = async () => {
-  console.log('点击提交按钮')
-  if (!formRef.value) {
-    console.log('formRef不存在')
-    return
-  }
+  if (!formRef.value) return
   
   try {
     const valid = await formRef.value.validate()
-    console.log('表单验证结果:', valid)
     
     if (valid) {
-      console.log('开始提交申请，表单数据:', applyForm.value)
-      
       try {
-        const result = await applyFriendLink({
+        await applyFriendLink({
           name: applyForm.value.siteName,
           author: applyForm.value.siteAuthor,
           url: applyForm.value.siteUrl,
@@ -232,7 +224,6 @@ const submitApply = async () => {
           email: applyForm.value.email
         })
         
-        console.log('申请接口返回:', result)
         ElMessage.success('友链申请已提交，请耐心等待审核~')
         showApplyDialog.value = false
         resetForm()
@@ -242,7 +233,7 @@ const submitApply = async () => {
       }
     }
   } catch (error) {
-    console.log('表单验证失败:', error)
+    console.error('表单验证失败:', error)
   }
 }
 

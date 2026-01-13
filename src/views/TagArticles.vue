@@ -97,8 +97,6 @@ const loadArticles = async () => {
       pageSize: pageSize.value
     })
     
-    console.log('标签文章列表接口返回:', response)
-    
     // 处理分页数据
     if (response) {
       // 如果返回的是分页对象 {list: [], total: 0}
@@ -120,9 +118,6 @@ const loadArticles = async () => {
       articles.value = []
       total.value = 0
     }
-    
-    console.log('处理后的文章列表:', articles.value)
-    console.log('总数:', total.value)
   } catch (error) {
     console.error('加载文章列表失败:', error)
     ElMessage.error('加载文章列表失败')

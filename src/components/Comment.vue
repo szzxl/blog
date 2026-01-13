@@ -202,18 +202,14 @@ const canDelete = (comment: any) => {
 const loadComments = async () => {
   loading.value = true
   try {
-    console.log('开始加载评论，文章ID:', props.articleId)
     const response: any = await getArticleComments({
       articleId: props.articleId,
       pageNo: currentPage.value,
       pageSize: pageSize.value
     })
     
-    console.log('评论接口返回:', response)
-    
     // 响应拦截器已经处理过，直接返回的是 data 数组
     const data = Array.isArray(response) ? response : (response?.list || response?.data || [])
-    console.log('原始评论数据:', data)
     
     // 处理评论数据，转换字段格式
     comments.value = data.map((comment: any) => {
@@ -244,11 +240,8 @@ const loadComments = async () => {
       }
     })
     
-    console.log('处理后的评论数据:', comments.value)
-    
     // 如果后端返回了 total，使用它；否则使用数组长度
     total.value = response?.total || comments.value.length
-    console.log('评论总数:', total.value)
   } catch (error) {
     console.error('加载评论失败:', error)
     ElMessage.error('加载评论失败')

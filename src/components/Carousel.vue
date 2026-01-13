@@ -28,7 +28,6 @@ const carouselItems = ref<any[]>([])
 const fetchCarousel = async () => {
   try {
     const response: any = await getCarousel()
-    console.log('轮播图接口返回:', response)
     
     if (response && Array.isArray(response)) {
       carouselItems.value = response.map((item: any) => ({
