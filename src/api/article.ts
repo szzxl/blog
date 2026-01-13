@@ -327,3 +327,26 @@ export const getWebsiteConfig = () => {
     method: 'get'
   })
 }
+
+// 友情链接
+export const getFriendLinks = () => {
+  return request({
+    url: '/config/link',
+    method: 'get'
+  })
+}
+
+// 申请友情链接
+export const applyFriendLink = (data: {
+  name: string
+  author: string
+  url: string
+  description: string
+  email: string
+}) => {
+  return request({
+    url: '/config/link/apply',
+    method: 'post',
+    data
+  })
+}
