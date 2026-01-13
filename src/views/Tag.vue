@@ -16,11 +16,11 @@
           class="tag-item" 
           v-for="(tag, index) in tags" 
           :key="index"
-          :style="{ fontSize: getTagSize(tag.useNum) + 'px' }"
-          @click="viewTag(tag.id)"
+          :style="{ fontSize: getTagSize(tag.num) + 'px' }"
+          @click="viewTag(tag.name)"
         >
-          <span class="tag-name">{{ tag.tagName }}</span>
-          <span class="tag-count">({{ tag.useNum }})</span>
+          <span class="tag-name">{{ tag.name }}</span>
+          <span class="tag-count">({{ tag.num }})</span>
         </div>
       </div>
       
@@ -31,12 +31,12 @@
           <div class="tag-card card" v-for="(tag, index) in sortedTags" :key="index">
             <div class="tag-header">
               <span class="tag-icon">🔖</span>
-              <span class="tag-name">{{ tag.tagName }}</span>
+              <span class="tag-name">{{ tag.name }}</span>
             </div>
             <div class="tag-info">
-              <span class="tag-count">{{ tag.useNum }} 篇文章</span>
+              <span class="tag-count">{{ tag.num }} 篇文章</span>
             </div>
-            <el-button class="view-btn" size="small" @click="viewTag(tag.id)">
+            <el-button class="view-btn" size="small" @click="viewTag(tag.name)">
               查看 →
             </el-button>
           </div>
@@ -49,69 +49,63 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getTagList } from '@/api/article'
+import { getTagListCount } from '@/api/article'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 
 interface Tag {
   id: string | number
-  tagName: string
-  useNum?: number
+  name: string
+  num: number
 }
 
 const tags = ref<Tag[]>([])
 const loading = ref(false)
 
 const sortedTags = computed(() => {
-  return [...tags.value].sort((a, b) => (b.useNum || 0) - (a.useNum || 0))
+  return [...tags.value].sort((a, b) => b.num - a.num)
 })
 
 // 获取标签列表
 const fetchTags = async () => {
   loading.value = true
   try {
-    const res: any = await getTagList({
+    const res: any = await getTagListCount({
+      tagStatus: 1,
       pageNo: 1,
       pageSize: 100
     })
     
-    // 处理返回的数据
-    if (res && res.list) {
-      tags.value = res.list.map((item: any) => ({
-        id: item.id,
-        tagName: item.tagName,
-        useNum: item.useNum || 0
-      }))
-    } else if (Array.isArray(res)) {
+    // 处理返回的数据 { code: 0, msg: "", data: [{name: "Java", num: 0}, ...] }
+    if (res && Array.isArray(res)) {
       tags.value = res.map((item: any) => ({
-        id: item.id,
-        tagName: item.tagName,
-        useNum: item.useNum || 0
+        id: item.name,  // 使用 name 作为 id
+        name: item.name,
+        num: item.num || 0
       }))
     }
   } catch (error) {
-    console.error('获取标签列表失败:', error)
     ElMessage.error('获取标签列表失败')
   } finally {
     loading.value = false
   }
 }
 
-const getTagSize = (useNum: number = 0) => {
+const getTagSize = (num: number = 0) => {
   const minSize = 14
   const maxSize = 36
-  const counts = tags.value.map(t => t.useNum || 0)
+  const counts = tags.value.map(t => t.num || 0)
   const minCount = Math.min(...counts)
   const maxCount = Math.max(...counts)
   
   if (maxCount === minCount) return (minSize + maxSize) / 2
   
-  return minSize + ((useNum - minCount) / (maxCount - minCount)) * (maxSize - minSize)
+  return minSize + ((num - minCount) / (maxCount - minCount)) * (maxSize - minSize)
 }
 
-const viewTag = (id: string | number) => {
-  router.push(`/articles?tag=${id}`)
+const viewTag = (name: string | number) => {
+  router.push(`/tag/articles?tag=${name}`)
 }
 
 onMounted(() => {

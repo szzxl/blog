@@ -104,6 +104,35 @@ export const getTagList = (data?: {
   })
 }
 
+// 获取标签统计（带文章数量）
+export const getTagListCount = (data?: {
+  id?: number
+  tagName?: string
+  tagStatus?: number
+  pageNo?: number
+  pageSize?: number
+}) => {
+  return request({
+    url: '/web/tag/list/count',
+    method: 'post',
+    data: data || {}
+  })
+}
+
+// 根据标签获取文章列表
+export const getArticlesByTag = (data: {
+  tagName: string
+  tagStatus?: number
+  pageNo: number
+  pageSize: number
+}) => {
+  return request({
+    url: '/web/tag/article/list',
+    method: 'post',
+    data
+  })
+}
+
 // 文件上传
 export const uploadImage = (file: File) => {
   const formData = new FormData()

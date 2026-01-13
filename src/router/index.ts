@@ -42,6 +42,11 @@ const router = createRouter({
       component: () => import('@/views/Tag.vue')
     },
     {
+      path: '/tag/articles',
+      name: 'tag-articles',
+      component: () => import('@/views/TagArticles.vue')
+    },
+    {
       path: '/talk',
       name: 'talk',
       component: () => import('@/views/Talk.vue')
