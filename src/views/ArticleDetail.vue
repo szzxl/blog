@@ -49,7 +49,7 @@
           <span class="icon">⭐</span>
           <span class="text">收藏</span>
         </el-button>
-        <el-button class="action-btn" size="large">
+        <el-button class="action-btn" size="large" @click="handleShare">
           <span class="icon">🔗</span>
           <span class="text">分享</span>
         </el-button>
@@ -165,6 +165,17 @@ const handleLikeArticle = async () => {
     }
   } catch (error) {
     ElMessage.error('操作失败，请重试')
+  }
+}
+
+// 分享文章
+const handleShare = async () => {
+  try {
+    const url = window.location.href
+    await navigator.clipboard.writeText(url)
+    ElMessage.success('链接已复制到剪贴板')
+  } catch (error) {
+    ElMessage.error('复制失败，请手动复制链接')
   }
 }
 
