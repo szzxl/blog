@@ -311,3 +311,19 @@ export const removeFavorite = (data: {
     data
   })
 }
+
+// 轮播图
+export const getCarousel = () => {
+  return request({
+    url: '/config/carouse',
+    method: 'get'
+  })
+}
+
+// 网站配置
+export const getWebsiteConfig = () => {
+  return request({
+    url: '/config/website',
+    method: 'get'
+  })
+}

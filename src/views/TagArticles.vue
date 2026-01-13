@@ -206,12 +206,21 @@ onMounted(() => {
   overflow: hidden;
   
   :deep(.el-table) {
+    font-size: 13px;
+    
     .el-table__header {
       th {
         background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
         color: #5a5a5a;
         font-weight: 700;
-        font-size: 14px;
+        font-size: 13px;
+        padding: 10px 0;
+      }
+    }
+    
+    .el-table__body {
+      td {
+        padding: 10px 0;
       }
     }
     
@@ -227,6 +236,7 @@ onMounted(() => {
         font-weight: 600;
         color: #333;
         transition: color 0.2s;
+        font-size: 14px;
         
         &:hover {
           color: #ff9a9e;
@@ -234,7 +244,7 @@ onMounted(() => {
       }
       
       .stat-item {
-        font-size: 14px;
+        font-size: 13px;
         color: #666;
       }
     }
@@ -243,8 +253,10 @@ onMounted(() => {
       background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
       border: none;
       color: #fff;
-      border-radius: 15px;
+      border-radius: 12px;
       font-weight: 600;
+      padding: 5px 12px;
+      font-size: 12px;
       
       &:hover {
         opacity: 0.9;

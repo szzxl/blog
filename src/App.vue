@@ -44,6 +44,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
+import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
 
 const announcements = ref([
   { label: '公告', text: '欢迎来到小花的日记本，一起记录美好生活~ 🌸' },
@@ -53,6 +54,19 @@ const announcements = ref([
 ])
 
 const showBackToTop = ref(false)
+
+// 获取网站配置并设置标题
+const fetchWebsiteConfig = async () => {
+  try {
+    const config = await fetchWebsiteConfigWithCache()
+    
+    if (config.seo_title) {
+      document.title = config.seo_title
+    }
+  } catch (error) {
+    console.error('获取网站配置失败:', error)
+  }
+}
 
 const handleScroll = () => {
   showBackToTop.value = window.scrollY > 300
@@ -67,6 +81,7 @@ const scrollToTop = () => {
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
+  fetchWebsiteConfig()
 })
 
 onUnmounted(() => {

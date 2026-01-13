@@ -10,10 +10,9 @@
         <div class="footer-info">
           <div class="footer-logo">
             <span class="logo-icon">🌸</span>
-            <span class="logo-text">小花的日记本</span>
+            <span class="logo-text">{{ websiteName }}</span>
           </div>
-          <p class="motto">🌸 愿你温柔且有力量 🌸</p>
-          <p class="copyright">© {{ year }} 记录美好生活的每一天</p>
+          <p class="motto" v-if="websiteMotto">🌸 {{ websiteMotto }} 🌸</p>
         </div>
         <div class="footer-links">
           <div class="link-group">
@@ -24,9 +23,12 @@
           </div>
           <div class="link-group">
             <h4>联系方式</h4>
-            <span class="contact-item">💬 QQ: 123456789</span>
-            <span class="contact-item">💚 微信: xiahua2024</span>
-            <span class="contact-item">💌 邮箱: hello@example.com</span>
+            <span class="contact-item" v-if="socialQQ">💬 QQ: {{ socialQQ }}</span>
+            <span class="contact-item" v-if="socialWechat">💚 微信: {{ socialWechat }}</span>
+            <span class="contact-item" v-if="socialEmail">💌 邮箱: {{ socialEmail }}</span>
+            <a v-if="socialGithub" :href="socialGithub" target="_blank" class="contact-link">
+              🔗 GitHub
+            </a>
           </div>
         </div>
       </div>
@@ -38,12 +40,52 @@
         <span class="deco">💗</span>
         <span class="deco">🌸</span>
       </div>
+      
+      <!-- 底部版权和备案 -->
+      <div class="footer-bottom">
+        <p class="copyright">{{ copyright }}</p>
+        <p class="icp" v-if="icpNumber">{{ icpNumber }}</p>
+      </div>
     </div>
   </footer>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
+
 const year = new Date().getFullYear()
+
+const websiteName = ref('小花的日记本')
+const websiteMotto = ref('愿你温柔且有力量')
+const copyright = ref(`© ${year} 记录美好生活的每一天`)
+const icpNumber = ref('')
+const socialQQ = ref('')
+const socialWechat = ref('')
+const socialEmail = ref('')
+const socialGithub = ref('')
+
+// 获取网站配置
+const fetchWebsiteConfig = async () => {
+  try {
+    const config = await fetchWebsiteConfigWithCache()
+    
+    if (config.site_name) websiteName.value = config.site_name
+    if (config.copyright) copyright.value = config.copyright
+    if (config.icp_number) icpNumber.value = config.icp_number
+    if (config.website_motto) websiteMotto.value = config.website_motto
+    if (config.social_qq) socialQQ.value = config.social_qq
+    if (config.social_wechat) socialWechat.value = config.social_wechat
+    if (config.social_email) socialEmail.value = config.social_email
+    if (config.social_github) socialGithub.value = config.social_github
+  } catch (error) {
+    console.error('获取网站配置失败:', error)
+  }
+}
+
+onMounted(() => {
+  fetchWebsiteConfig()
+})
 </script>
 
 <style scoped lang="scss">
@@ -121,6 +163,32 @@ const year = new Date().getFullYear()
     }
   }
   
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    padding: 20px 30px;
+    border-top: 1px solid rgba(255, 182, 193, 0.15);
+    position: relative;
+    
+    .copyright {
+      font-size: 13px;
+      color: #aaa;
+      margin: 0;
+      position: absolute;
+      left: 30px;
+    }
+    
+    .icp {
+      font-size: 13px;
+      color: #aaa;
+      margin: 0;
+    }
+  }
+  
   .footer-links {
     display: flex;
     gap: 50px;
@@ -139,6 +207,7 @@ const year = new Date().getFullYear()
         font-size: 14px;
         margin-bottom: 10px;
         transition: all 0.3s;
+        text-decoration: none;
         
         &:hover {
           color: #ff9a9e;
@@ -152,6 +221,20 @@ const year = new Date().getFullYear()
         font-size: 14px;
         margin-bottom: 10px;
         cursor: default;
+      }
+      
+      .contact-link {
+        display: block;
+        color: #888;
+        font-size: 14px;
+        margin-bottom: 10px;
+        transition: all 0.3s;
+        text-decoration: none;
+        
+        &:hover {
+          color: #ff9a9e;
+          transform: translateX(5px);
+        }
       }
     }
   }
@@ -224,6 +307,17 @@ const year = new Date().getFullYear()
       
       .deco {
         font-size: 18px;
+      }
+    }
+    
+    .footer-bottom {
+      flex-direction: column;
+      gap: 10px;
+      text-align: center;
+      padding: 15px 20px;
+      
+      .copyright {
+        position: static;
       }
     }
   }

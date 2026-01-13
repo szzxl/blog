@@ -7,8 +7,8 @@
           <span class="logo-icon">🌸</span>
         </div>
         <div class="logo-text-wrapper">
-          <span class="logo-text">小花的日记本</span>
-          <span class="logo-subtitle">记录美好生活</span>
+          <span class="logo-text">{{ siteName }}</span>
+          <span class="logo-subtitle">{{ siteDescription }}</span>
         </div>
       </div>
       <nav class="nav">
@@ -142,13 +142,33 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 const userStore = useUserStore()
+
+const siteName = ref('小花的日记本')
+const siteDescription = ref('记录美好生活')
+
+// 获取网站配置
+const fetchWebsiteConfig = async () => {
+  try {
+    const config = await fetchWebsiteConfigWithCache()
+    
+    if (config.site_name) {
+      siteName.value = config.site_name
+    }
+    if (config.site_description) {
+      siteDescription.value = config.site_description
+    }
+  } catch (error) {
+    console.error('获取网站配置失败:', error)
+  }
+}
 
 // 是否是博主或超级管理员
 const isAuthor = computed(() => {
@@ -221,6 +241,10 @@ const handleCommand = async (command: string) => {
       break
   }
 }
+
+onMounted(() => {
+  fetchWebsiteConfig()
+})
 </script>
 
 <style scoped lang="scss">
