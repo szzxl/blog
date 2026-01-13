@@ -61,9 +61,8 @@ export const useUserStore = defineStore('user', () => {
         roles: userInfo.roles || []  // 保存 roles 数据
       }
       localStorage.setItem('user', JSON.stringify(user.value))
-      console.log('用户信息已更新:', user.value)
     } catch (error) {
-      console.error('获取用户信息失败:', error)
+      // 获取用户信息失败
     }
   }
 

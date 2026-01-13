@@ -17,7 +17,7 @@ import { ref } from 'vue'
 const commentText = ref('')
 
 const submitComment = () => {
-  console.log('提交评论:', commentText.value)
+  // 提交评论逻辑
 }
 </script>
 

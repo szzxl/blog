@@ -170,3 +170,19 @@ export const deleteComment = (data: {
     data
   })
 }
+
+// 发表评论
+export const addComment = (data: {
+  talkId: number
+  userId: number
+  content: string
+  parentId?: number
+  replyToId?: number
+  replyToUserId?: number
+}) => {
+  return request({
+    url: '/web/add/comment',
+    method: 'post',
+    data
+  })
+}

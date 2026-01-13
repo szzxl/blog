@@ -50,7 +50,7 @@
                 <span class="icon">{{ talk.isLiked ? '❤️' : '💗' }}</span>
                 <span class="count">{{ talk.likeCount || 0 }}</span>
               </el-button>
-              <el-button text class="action-btn" @click="showCommentInput = !showCommentInput">
+              <el-button text class="action-btn" @click="openCommentDialog(talk)">
                 <span class="icon">💬</span>
                 <span class="count">{{ talk.commentCount || 0 }}</span>
               </el-button>
@@ -69,33 +69,63 @@
           
           <!-- 评论列表（列表页显示的简单评论） -->
           <div class="comment-list" v-if="talk.comments && talk.comments.length > 0 && !talk.commentsLoaded">
-            <div v-for="comment in talk.comments" :key="comment.id" class="comment-item-bilibili">
-              <img :src="comment.user?.avatar || '/web/default-avatar.svg'" alt="头像" class="comment-avatar">
-              <div class="comment-main">
-                <div class="comment-user" :class="{ author: comment.user?.isAuthor }">
-                  {{ comment.user?.nickname || '匿名用户' }}
-                </div>
-                <div class="comment-text">{{ comment.content }}</div>
-                <div class="comment-footer">
-                  <span class="comment-time">{{ formatCommentTime(comment.createTime) }}</span>
-                  <div class="comment-actions">
-                    <span class="action-btn">回复</span>
-                    <span 
-                      v-if="isAuthor || (userStore.user && comment.user?.id === userStore.user.id)" 
-                      class="action-btn delete"
-                      @click="handleDeleteComment(comment, talk)"
-                    >
-                      删除
-                    </span>
+            <template v-for="comment in talk.comments" :key="comment.id">
+              <div class="comment-item-bilibili">
+                <img :src="comment.user?.avatar || '/web/default-avatar.svg'" alt="头像" class="comment-avatar">
+                <div class="comment-main">
+                  <div class="comment-user" :class="{ author: comment.user?.isAuthor }">
+                    {{ comment.user?.nickname || '匿名用户' }}
+                  </div>
+                  <div class="comment-text">{{ comment.content }}</div>
+                  <div class="comment-footer">
+                    <span class="comment-time">{{ formatCommentTime(comment.createTime) }}</span>
+                    <div class="comment-actions">
+                      <span class="action-btn" @click="openCommentDialog(talk, comment)">回复</span>
+                      <span 
+                        v-if="isAuthor || (userStore.user && comment.user?.id === userStore.user.id)" 
+                        class="action-btn delete"
+                        @click="handleDeleteComment(comment, talk)"
+                      >
+                        删除
+                      </span>
+                    </div>
+                  </div>
+                  <!-- 展开/收起回复按钮 -->
+                  <div class="expand-replies" v-if="comment.isMessage" @click="toggleCommentReplies(talk, comment)">
+                    <span class="expand-text">{{ comment.repliesExpanded ? '收起回复' : '展开回复' }}</span>
+                    <span class="expand-icon" :class="{ 'expanded': comment.repliesExpanded }">▼</span>
                   </div>
                 </div>
-                <!-- 展开/收起回复按钮 -->
-                <div class="expand-replies" v-if="comment.isMessage" @click="loadCommentReplies(talk, comment)">
-                  <span class="expand-text">{{ talk.commentsLoaded ? '收起回复' : '展开回复' }}</span>
-                  <span class="expand-icon" :class="{ 'expanded': talk.commentsLoaded }">▼</span>
+              </div>
+              
+              <!-- 该评论的回复列表（展开后显示） -->
+              <div v-if="comment.repliesExpanded && comment.detailReplies && comment.detailReplies.length > 0" style="margin-left: 52px;">
+                <div v-for="reply in comment.detailReplies" :key="reply.id" class="comment-item-bilibili">
+                  <img :src="reply.user?.avatar || '/web/default-avatar.svg'" alt="头像" class="comment-avatar">
+                  <div class="comment-main">
+                    <div class="comment-user" :class="{ author: reply.user?.isAuthor }">
+                      {{ reply.user?.nickname || '匿名用户' }}
+                    </div>
+                    <div class="comment-text">
+                      <span v-if="reply.replyTo" class="mention">@{{ reply.replyTo }} </span>{{ reply.content }}
+                    </div>
+                    <div class="comment-footer">
+                      <span class="comment-time">{{ formatCommentTime(reply.createTime) }}</span>
+                      <div class="comment-actions">
+                        <span class="action-btn" @click="openCommentDialog(talk, reply)">回复</span>
+                        <span 
+                          v-if="isAuthor || (userStore.user && reply.user?.id === userStore.user.id)" 
+                          class="action-btn delete"
+                          @click="handleDeleteComment(reply, talk)"
+                        >
+                          删除
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </template>
           </div>
           
           <!-- 完整评论树（点击查看详情后显示，B站风格） -->
@@ -133,7 +163,7 @@
                       <span class="reply-text">: {{ reply.content }}</span>
                       <div class="reply-footer">
                         <span class="reply-time">{{ formatCommentTime(reply.createTime) }}</span>
-                        <span class="action-btn">回复</span>
+                        <span class="action-btn" @click="openCommentDialog(talk, reply)">回复</span>
                         <span 
                           v-if="isAuthor || (userStore.user && reply.user?.id === userStore.user.id)" 
                           class="action-btn delete"
@@ -289,13 +319,41 @@
         </el-button>
       </template>
     </el-dialog>
+    
+    <!-- 评论弹框 -->
+    <el-dialog
+      v-model="commentDialogVisible"
+      :title="replyToComment ? `回复 @${replyToComment.user?.nickname}` : '发表评论'"
+      width="500px"
+      :close-on-click-modal="false"
+    >
+      <el-input
+        v-model="commentText"
+        type="textarea"
+        :rows="5"
+        :placeholder="replyToComment ? `回复 @${replyToComment.user?.nickname}...` : '说点什么吧~'"
+        maxlength="500"
+        show-word-limit
+      />
+      
+      <template #footer>
+        <el-button @click="commentDialogVisible = false">取消</el-button>
+        <el-button 
+          type="primary" 
+          :loading="submittingComment"
+          @click="submitComment"
+        >
+          发表
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, defineComponent, h, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getTalkList, getTalkDetail, publishTalk, uploadImage, deleteTalk, deleteComment } from '@/api/article'
+import { getTalkList, getTalkDetail, publishTalk, uploadImage, deleteTalk, deleteComment, addComment } from '@/api/article'
 import { Plus, Delete, ZoomIn, Upload } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 
@@ -386,7 +444,6 @@ const uploadTalkImage = async (imageItem: ImageItem) => {
     imageItem.progress = 100
     ElMessage.success('图片上传成功')
   } catch (error) {
-    console.error('图片上传失败:', error)
     ElMessage.error('图片上传失败，请重试')
     const index = talkImageList.value.indexOf(imageItem)
     if (index > -1) {
@@ -441,7 +498,6 @@ const submitTalk = async () => {
     currentPage.value = 1
     loadTalkList()
   } catch (error) {
-    console.error('发表说说失败:', error)
     ElMessage.error('发表失败，请重试')
   } finally {
     publishing.value = false
@@ -468,7 +524,6 @@ const handleDeleteTalk = async (talk: any) => {
     loadTalkList()
   } catch (error: any) {
     if (error !== 'cancel') {
-      console.error('删除说说失败:', error)
       ElMessage.error('删除失败，请重试')
     }
   }
@@ -511,9 +566,71 @@ const handleDeleteComment = async (comment: any, talk: any) => {
     }
   } catch (error: any) {
     if (error !== 'cancel') {
-      console.error('删除评论失败:', error)
       ElMessage.error('删除失败，请重试')
     }
+  }
+}
+
+// 打开评论弹框
+const openCommentDialog = (talk: any, comment?: any) => {
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('请先登录')
+    return
+  }
+  
+  currentTalk.value = talk
+  replyToComment.value = comment || null
+  commentText.value = ''
+  commentDialogVisible.value = true
+}
+
+// 提交评论
+const submitComment = async () => {
+  if (!commentText.value.trim()) {
+    ElMessage.warning('请输入评论内容')
+    return
+  }
+  
+  if (!userStore.user?.id) {
+    ElMessage.warning('请先登录')
+    return
+  }
+  
+  submittingComment.value = true
+  
+  try {
+    const requestData: any = {
+      talkId: currentTalk.value.id,
+      userId: userStore.user.id,
+      content: commentText.value
+    }
+    
+    // 如果是回复评论，需要传递额外参数
+    if (replyToComment.value) {
+      requestData.parentId = replyToComment.value.parentId || replyToComment.value.id
+      requestData.replyToId = replyToComment.value.id
+      requestData.replyToUserId = replyToComment.value.user?.id
+    }
+    
+    await addComment(requestData)
+    ElMessage.success('评论发表成功！')
+    
+    commentDialogVisible.value = false
+    commentText.value = ''
+    
+    // 刷新评论列表
+    if (currentTalk.value.commentsLoaded) {
+      // 如果已经展开了详情，重新加载详情
+      currentTalk.value.commentsLoaded = false
+      await loadTalkComments(currentTalk.value)
+    } else {
+      // 否则刷新整个说说列表
+      loadTalkList()
+    }
+  } catch (error) {
+    ElMessage.error('发表失败，请重试')
+  } finally {
+    submittingComment.value = false
   }
 }
 
@@ -589,6 +706,13 @@ const total = ref(0)
 const pageSize = ref(10)
 const currentPage = ref(1)
 
+// 评论相关
+const commentDialogVisible = ref(false)
+const commentText = ref('')
+const currentTalk = ref<any>(null)
+const replyToComment = ref<any>(null)
+const submittingComment = ref(false)
+
 // 点赞相关
 const isLiked = ref(false)
 const likeCount = ref(12)
@@ -645,20 +769,12 @@ const loadTalkList = async () => {
       pageSize: pageSize.value
     })
     
-    console.log('=== 开始处理数据 ===')
-    console.log('完整响应:', response)
-    
     // 响应拦截器已经返回了 res.data，所以直接用 response.list
     if (response && response.list) {
       const list = response.list || []
-      console.log('原始 list:', list)
-      console.log('list 长度:', list.length)
       
       // 格式化数据
       talks.value = list.map((talk: any) => {
-        console.log('原始 talk 完整对象:', JSON.stringify(talk, null, 2))
-        console.log('talk 的所有键:', Object.keys(talk))
-        
         let images = []
         try {
           if (typeof talk.talkPic === 'string') {
@@ -671,7 +787,6 @@ const loadTalkList = async () => {
             images = talk.talkPic
           }
         } catch (e) {
-          console.error('解析图片失败:', e)
           images = []
         }
         
@@ -694,14 +809,8 @@ const loadTalkList = async () => {
       })
       
       total.value = response.total || 0
-      
-      console.log('最终 talks.value:', talks.value)
-      console.log('最终 total.value:', total.value)
-    } else {
-      console.error('响应格式错误, response:', response)
     }
   } catch (error) {
-    console.error('加载说说列表失败:', error)
     ElMessage.error('加载失败，请重试')
   } finally {
     loading.value = false
@@ -710,9 +819,6 @@ const loadTalkList = async () => {
 
 // 加载说说的评论详情
 const loadTalkComments = async (talk: any) => {
-  console.log('=== 开始加载评论 ===')
-  console.log('talk.id:', talk.id)
-  
   // 如果已经加载过，则切换折叠状态
   if (talk.commentsLoaded) {
     talk.commentsLoaded = false
@@ -726,19 +832,14 @@ const loadTalkComments = async (talk: any) => {
       pageNo: 1,
       pageSize: 1
     }
-    console.log('请求参数:', params)
-    console.log('调用 getTalkDetail')
     
     const response: any = await getTalkDetail(params)
-    console.log('评论详情响应:', response)
     
     if (response && response.comments) {
       talk.detailComments = response.comments
       talk.commentsLoaded = true
-      console.log('评论加载成功')
     }
   } catch (error) {
-    console.error('加载评论失败:', error)
     ElMessage.error('加载评论失败，请重试')
   }
 }
@@ -747,6 +848,50 @@ const loadTalkComments = async (talk: any) => {
 const loadCommentReplies = async (talk: any, _comment: any) => {
   // 直接加载整个说说的详情
   await loadTalkComments(talk)
+}
+
+// 切换单个评论的回复展开/收起状态
+const toggleCommentReplies = async (talk: any, comment: any) => {
+  // 如果已经展开，则收起
+  if (comment.repliesExpanded) {
+    comment.repliesExpanded = false
+    // 强制更新
+    talks.value = [...talks.value]
+    return
+  }
+  
+  // 如果还没有加载过回复，则加载
+  if (!comment.detailReplies) {
+    try {
+      const params = {
+        userId: 1,
+        talkId: talk.id,
+        pageNo: 1,
+        pageSize: 100
+      }
+      
+      const response: any = await getTalkDetail(params)
+      
+      if (response && response.comments) {
+        // 找到当前评论在详情中的数据
+        const detailComment = response.comments.find((c: any) => c.id === comment.id)
+        if (detailComment && detailComment.replies) {
+          // 扁平化回复列表
+          comment.detailReplies = flattenComments(detailComment.replies)
+        } else {
+          comment.detailReplies = []
+        }
+      }
+    } catch (error) {
+      ElMessage.error('加载回复失败，请重试')
+      return
+    }
+  }
+  
+  // 展开
+  comment.repliesExpanded = true
+  // 强制更新
+  talks.value = [...talks.value]
 }
 
 // 扁平化评论树
