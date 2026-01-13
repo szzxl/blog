@@ -56,11 +56,15 @@
           </div>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item command="admin">
+              <el-dropdown-item v-if="isAuthor" command="admin">
                 <span class="menu-icon">⚙️</span>
                 管理后台
               </el-dropdown-item>
-              <el-dropdown-item divided command="profile">
+              <el-dropdown-item v-if="!isAuthor" command="favorites">
+                <span class="menu-icon">⭐</span>
+                我的收藏
+              </el-dropdown-item>
+              <el-dropdown-item :divided="isAuthor || !isAuthor" command="profile">
                 <span class="menu-icon">👤</span>
                 个人中心
               </el-dropdown-item>
@@ -138,13 +142,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 const userStore = useUserStore()
+
+// 是否是博主或超级管理员
+const isAuthor = computed(() => {
+  if (!userStore.isLoggedIn || !userStore.user) return false
+  const roles = userStore.user.roles || []
+  return roles.some((role: any) => role.name === '博主' || role.name === '超级管理员')
+})
 
 // 用户标签
 const userTags = ref(['🎨', '📷', '☕', '🎵'])
@@ -182,13 +193,19 @@ const cancelAddTag = () => {
 }
 
 const goToLogin = () => {
-  router.push('/login')
+  router.push({
+    path: '/login',
+    query: { redirect: router.currentRoute.value.fullPath }
+  })
 }
 
 const handleCommand = async (command: string) => {
   switch (command) {
     case 'profile':
       showProfileDialog.value = true
+      break
+    case 'favorites':
+      router.push('/favorites')
       break
     case 'admin':
       // 跳转到管理后台 - 同域名根路径

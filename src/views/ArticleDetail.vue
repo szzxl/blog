@@ -35,8 +35,13 @@
       
       <!-- 文章操作栏 - 固定在右侧 -->
       <div class="article-actions" v-if="article">
-        <el-button class="action-btn like-btn" size="large">
-          <span class="icon">💗</span>
+        <el-button 
+          class="action-btn like-btn" 
+          size="large"
+          :class="{ liked: article.isLiked }"
+          @click="handleLikeArticle"
+        >
+          <span class="icon">{{ article.isLiked ? '💗' : '🤍' }}</span>
           <span class="text">点赞</span>
           <span class="count">{{ article.likeCount || 0 }}</span>
         </el-button>
@@ -51,19 +56,29 @@
       </div>
       
       <!-- 评论区 -->
-      <Comment v-if="article" />
+      <Comment v-if="article" :article-id="article.id" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import Comment from '@/components/Comment.vue'
-import { getArticleDetail } from '@/api/article'
+import { getArticleDetail, addArticleView, likeArticle } from '@/api/article'
 import { ElMessage } from 'element-plus'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
+const router = useRouter()
+const userStore = useUserStore()
+
+// 是否是博主
+const isAuthor = computed(() => {
+  if (!userStore.isLoggedIn || !userStore.user) return false
+  const roles = userStore.user.roles || []
+  return roles.some((role: any) => role.name === '博主' || role.name === '超级管理员')
+})
 
 interface Article {
   id: string | number
@@ -75,6 +90,7 @@ interface Article {
   readNum?: number
   likeCount?: number
   createTime?: number
+  isLiked?: boolean
 }
 
 const article = ref<Article | null>(null)
@@ -94,11 +110,12 @@ const fetchArticleDetail = async () => {
     
     if (res) {
       article.value = res
-      // 增加查看次数
-      incrementViewCount(id)
+      // 增加查看次数（博主不增加）
+      if (!isAuthor.value) {
+        incrementViewCount(id)
+      }
     }
   } catch (error) {
-    console.error('获取文章详情失败:', error)
     ElMessage.error('获取文章详情失败')
   } finally {
     loading.value = false
@@ -109,11 +126,45 @@ const fetchArticleDetail = async () => {
 const incrementViewCount = async (id: string) => {
   try {
     await addArticleView({ id })
-    // code === 0 时响应拦截器会正常返回，不需要额外处理
-    // code !== 0 时响应拦截器已经处理了错误提示
   } catch (error) {
     // 静默失败，不影响用户体验
-    console.error('增加查看次数失败:', error)
+  }
+}
+
+// 点赞文章
+const handleLikeArticle = async () => {
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('请先登录')
+    router.push({
+      path: '/login',
+      query: { redirect: route.fullPath }
+    })
+    return
+  }
+  
+  if (!article.value) return
+  
+  // 保存当前状态
+  const wasLiked = article.value.isLiked
+  
+  try {
+    await likeArticle({
+      articleId: article.value.id,
+      type: wasLiked ? 2 : 1  // 已点赞则取消(2)，未点赞则点赞(1)
+    })
+    
+    // 切换本地状态
+    if (wasLiked) {
+      // 取消点赞
+      article.value.likeCount = Math.max(0, (article.value.likeCount || 0) - 1)
+      article.value.isLiked = false
+    } else {
+      // 点赞
+      article.value.likeCount = (article.value.likeCount || 0) + 1
+      article.value.isLiked = true
+    }
+  } catch (error) {
+    ElMessage.error('操作失败，请重试')
   }
 }
 
@@ -392,6 +443,16 @@ onMounted(() => {
     }
     
     &.like-btn:hover {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      color: #fff;
+      border-color: transparent;
+      
+      .count {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+    
+    &.like-btn.liked {
       background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
       color: #fff;
       border-color: transparent;

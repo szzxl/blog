@@ -78,6 +78,12 @@ const router = createRouter({
       name: 'profile-comments',
       component: () => import('@/views/Profile.vue'),
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/favorites',
+      name: 'favorites',
+      component: () => import('@/views/Favorites.vue'),
+      meta: { requiresAuth: true }
     }
   ]
 })

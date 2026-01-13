@@ -54,6 +54,27 @@ export const getArticleDetail = (data: { id: string | number }) => {
   })
 }
 
+// 增加文章查看次数
+export const addArticleView = (data: { id: string | number }) => {
+  return request({
+    url: '/web/article/addView',
+    method: 'post',
+    data
+  })
+}
+
+// 文章点赞
+export const likeArticle = (data: {
+  articleId: number | string
+  type: 1 | 2  // 1=点赞, 2=取消点赞
+}) => {
+  return request({
+    url: '/web/article/like',
+    method: 'post',
+    data
+  })
+}
+
 // 分类相关
 export const getCategoryList = (data?: { 
   id?: number
@@ -183,6 +204,81 @@ export const addComment = (data: {
   return request({
     url: '/web/add/comment',
     method: 'post',
+    data
+  })
+}
+
+// 文章评论相关
+export const getArticleComments = (data: {
+  articleId: number | string
+  pageNo: number
+  pageSize: number
+}) => {
+  return request({
+    url: '/web/article/comment/list',
+    method: 'post',
+    data
+  })
+}
+
+export const addArticleComment = (data: {
+  username: string
+  articleId: number | string
+  content: string
+  images?: string[]
+  likeCount?: number
+  userId: number
+}) => {
+  return request({
+    url: '/web/article/comment/add',
+    method: 'post',
+    data
+  })
+}
+
+export const deleteArticleComment = (data: {
+  commentId: number
+  userId?: number
+}) => {
+  return request({
+    url: '/web/article/comment/delete',
+    method: 'delete',
+    data
+  })
+}
+
+// 文章评论点赞
+export const likeArticleComment = (data: {
+  commentArticleId: number | string
+  type: 1 | 2  // 1=点赞, 2=取消点赞
+}) => {
+  return request({
+    url: '/web/article/comment/like',
+    method: 'post',
+    data
+  })
+}
+
+// 收藏相关
+export const getUserFavorites = (data: {
+  userId: number
+  pageNo: number
+  pageSize: number
+}) => {
+  return request({
+    url: '/web/user/favorites',
+    method: 'post',
+    data
+  })
+}
+
+export const removeFavorite = (data: {
+  userId: number
+  articleId: number
+}) => {
+  return request({
+    url: '/web/user/favorite/remove',
+    method: 'delete',
     data
   })
 }

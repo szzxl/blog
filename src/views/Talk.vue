@@ -356,8 +356,10 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { getTalkList, getTalkDetail, publishTalk, uploadImage, deleteTalk, deleteComment, addComment } from '@/api/article'
 import { Plus, Delete, ZoomIn, Upload } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
 
 const userStore = useUserStore()
+const router = useRouter()
 
 // 是否是博主（检查 roles 数组中是否有 name 为 "博主" 或 "超级管理员" 的角色）
 const isAuthor = computed(() => {
@@ -575,6 +577,10 @@ const handleDeleteComment = async (comment: any, talk: any) => {
 const openCommentDialog = (talk: any, comment?: any) => {
   if (!userStore.isLoggedIn) {
     ElMessage.warning('请先登录')
+    router.push({
+      path: '/login',
+      query: { redirect: router.currentRoute.value.fullPath }
+    })
     return
   }
   
@@ -593,6 +599,10 @@ const submitComment = async () => {
   
   if (!userStore.user?.id) {
     ElMessage.warning('请先登录')
+    router.push({
+      path: '/login',
+      query: { redirect: router.currentRoute.value.fullPath }
+    })
     return
   }
   

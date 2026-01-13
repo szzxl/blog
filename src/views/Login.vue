@@ -6,7 +6,6 @@
       <div class="login-header">
         <div class="logo">🌸</div>
         <h2 class="title">欢迎回来</h2>
-        <p class="subtitle">登录后可以点赞和评论哦~</p>
       </div>
       
       <el-form :model="loginForm" :rules="rules" ref="loginFormRef" size="large">
@@ -98,8 +97,10 @@ const handleLogin = async () => {
         const success = await userStore.login(loginForm.value.username, loginForm.value.password)
         
         if (success) {
-          // 跳转到首页
-          router.push('/')
+          // 获取登录前的页面路径
+          const redirect = router.currentRoute.value.query.redirect as string
+          // 如果有重定向路径，跳转到该路径，否则跳转到首页
+          router.push(redirect || '/')
         }
       } catch (error) {
         console.error('登录失败:', error)
