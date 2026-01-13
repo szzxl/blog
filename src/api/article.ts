@@ -136,3 +136,37 @@ export const getTalkDetail = (data: {
     data
   })
 }
+
+// 发表说说
+export const publishTalk = (data: {
+  talkContent: string
+  talkPic?: string[]
+  talkStatus?: number
+}) => {
+  return request({
+    url: '/web/talk',
+    method: 'post',
+    data
+  })
+}
+
+// 删除说说
+export const deleteTalk = (talkId: number) => {
+  return request({
+    url: '/web/del/talk',
+    method: 'delete',
+    data: { talkId }
+  })
+}
+
+// 删除评论
+export const deleteComment = (data: {
+  talkCommentId: number
+  userId?: number
+}) => {
+  return request({
+    url: '/web/del/comment',
+    method: 'delete',
+    data
+  })
+}

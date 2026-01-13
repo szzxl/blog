@@ -8,6 +8,16 @@
           <h1>说说</h1>
           <p>记录生活的点点滴滴~</p>
         </div>
+        <!-- 发表说说按钮 - 仅博主可见 -->
+        <el-button 
+          v-if="isAuthor" 
+          type="primary" 
+          class="publish-btn"
+          @click="showPublishDialog = true"
+        >
+          <span class="btn-icon">✨</span>
+          发表说说
+        </el-button>
       </div>
       
       <!-- 说说列表 -->
@@ -45,13 +55,15 @@
                 <span class="count">{{ talk.commentCount || 0 }}</span>
               </el-button>
             </div>
-          </div>
-          
-          <!-- 查看回复按钮 -->
-          <div class="view-comments" v-if="talk.commentCount > 0 && !talk.commentsLoaded">
-            <el-button text class="view-btn" @click="loadTalkComments(talk)">
-              <span class="icon">💬</span>
-              查看 {{ talk.commentCount }} 条回复
+            <!-- 删除按钮 - 仅博主和超级管理员可见 -->
+            <el-button 
+              v-if="isAuthor" 
+              text 
+              class="delete-talk-btn"
+              @click="handleDeleteTalk(talk)"
+            >
+              <span class="icon">🗑️</span>
+              删除
             </el-button>
           </div>
           
@@ -68,13 +80,19 @@
                   <span class="comment-time">{{ formatCommentTime(comment.createTime) }}</span>
                   <div class="comment-actions">
                     <span class="action-btn">回复</span>
-                    <span class="action-btn delete">删除</span>
+                    <span 
+                      v-if="isAuthor || (userStore.user && comment.user?.id === userStore.user.id)" 
+                      class="action-btn delete"
+                      @click="handleDeleteComment(comment, talk)"
+                    >
+                      删除
+                    </span>
                   </div>
                 </div>
-                <!-- 展开回复按钮 -->
+                <!-- 展开/收起回复按钮 -->
                 <div class="expand-replies" v-if="comment.isMessage" @click="loadCommentReplies(talk, comment)">
-                  <span class="expand-text">展开回复</span>
-                  <span class="expand-icon">▼</span>
+                  <span class="expand-text">{{ talk.commentsLoaded ? '收起回复' : '展开回复' }}</span>
+                  <span class="expand-icon" :class="{ 'expanded': talk.commentsLoaded }">▼</span>
                 </div>
               </div>
             </div>
@@ -93,7 +111,13 @@
                   <span class="comment-time">{{ formatCommentTime(comment.createTime) }}</span>
                   <div class="comment-actions">
                     <span class="action-btn">回复</span>
-                    <span class="action-btn delete">删除</span>
+                    <span 
+                      v-if="isAuthor || (userStore.user && comment.user?.id === userStore.user.id)" 
+                      class="action-btn delete"
+                      @click="handleDeleteComment(comment, talk)"
+                    >
+                      删除
+                    </span>
                   </div>
                 </div>
                 
@@ -110,10 +134,22 @@
                       <div class="reply-footer">
                         <span class="reply-time">{{ formatCommentTime(reply.createTime) }}</span>
                         <span class="action-btn">回复</span>
-                        <span class="action-btn delete">删除</span>
+                        <span 
+                          v-if="isAuthor || (userStore.user && reply.user?.id === userStore.user.id)" 
+                          class="action-btn delete"
+                          @click="handleDeleteComment(reply, talk)"
+                        >
+                          删除
+                        </span>
                       </div>
                     </div>
                   </div>
+                </div>
+                
+                <!-- 收起回复按钮 -->
+                <div class="expand-replies" @click="loadTalkComments(talk)">
+                  <span class="expand-text">收起回复</span>
+                  <span class="expand-icon expanded">▼</span>
                 </div>
               </div>
             </div>
@@ -148,16 +184,338 @@
       @close="closeViewer"
       :hide-on-click-modal="true"
     />
+    
+    <!-- 发表说说弹框 -->
+    <el-dialog
+      v-model="showPublishDialog"
+      title="发表说说"
+      width="600px"
+      :close-on-click-modal="false"
+    >
+      <el-form :model="talkForm" label-width="0">
+        <el-form-item>
+          <el-input
+            v-model="talkForm.content"
+            type="textarea"
+            :rows="6"
+            placeholder="分享你的心情..."
+            maxlength="1000"
+            show-word-limit
+          />
+        </el-form-item>
+        
+        <el-form-item>
+          <div class="upload-section">
+            <div class="upload-title">
+              <span class="icon">📷</span>
+              上传图片（最多9张）
+            </div>
+            
+            <!-- 图片预览列表 -->
+            <div class="image-list" v-if="talkImageList.length > 0">
+              <div 
+                class="image-item" 
+                v-for="(image, index) in talkImageList" 
+                :key="index"
+              >
+                <img :src="image.url" alt="预览图">
+                <div class="image-overlay">
+                  <el-icon class="preview-icon" @click="previewTalkImage(image.url)">
+                    <ZoomIn />
+                  </el-icon>
+                  <el-icon class="delete-icon" @click="removeTalkImage(index)">
+                    <Delete />
+                  </el-icon>
+                </div>
+                <div class="upload-progress" v-if="image.uploading">
+                  <el-progress 
+                    :percentage="image.progress" 
+                    :stroke-width="3"
+                    :show-text="false"
+                  />
+                </div>
+              </div>
+              
+              <!-- 上传按钮 -->
+              <div 
+                class="upload-btn" 
+                v-if="talkImageList.length < 9"
+                @click="triggerTalkUpload"
+              >
+                <el-icon><Plus /></el-icon>
+              </div>
+            </div>
+            
+            <!-- 初始上传区域 -->
+            <div 
+              class="upload-area" 
+              v-else
+              @click="triggerTalkUpload"
+            >
+              <el-icon class="upload-icon"><Upload /></el-icon>
+              <div class="upload-text">点击上传图片</div>
+            </div>
+            
+            <input 
+              ref="talkFileInput"
+              type="file" 
+              accept="image/*"
+              multiple
+              style="display: none"
+              @change="handleTalkFileChange"
+            />
+          </div>
+        </el-form-item>
+        
+        <el-form-item>
+          <div class="status-select">
+            <span class="status-label">状态：</span>
+            <el-radio-group v-model="talkForm.status">
+              <el-radio :label="0">公开</el-radio>
+              <el-radio :label="1">私密</el-radio>
+            </el-radio-group>
+          </div>
+        </el-form-item>
+      </el-form>
+      
+      <template #footer>
+        <el-button @click="showPublishDialog = false">取消</el-button>
+        <el-button 
+          type="primary" 
+          :loading="publishing"
+          @click="submitTalk"
+        >
+          发表
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, defineComponent, h } from 'vue'
-import { ElMessage } from 'element-plus'
-import { getTalkList, getTalkDetail } from '@/api/article'
-// import { useUserStore } from '@/stores/user'
+import { ref, onMounted, defineComponent, h, computed } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { getTalkList, getTalkDetail, publishTalk, uploadImage, deleteTalk, deleteComment } from '@/api/article'
+import { Plus, Delete, ZoomIn, Upload } from '@element-plus/icons-vue'
+import { useUserStore } from '@/stores/user'
 
-// const userStore = useUserStore()
+const userStore = useUserStore()
+
+// 是否是博主（检查 roles 数组中是否有 name 为 "博主" 或 "超级管理员" 的角色）
+const isAuthor = computed(() => {
+  if (!userStore.isLoggedIn || !userStore.user) return false
+  const roles = userStore.user.roles || []
+  return roles.some((role: any) => role.name === '博主' || role.name === '超级管理员')
+})
+
+// 发表说说相关
+const showPublishDialog = ref(false)
+const publishing = ref(false)
+const talkForm = ref({
+  content: '',
+  status: 0 // 0公开 1私密
+})
+
+interface ImageItem {
+  url: string
+  file?: File
+  uploading?: boolean
+  progress?: number
+}
+
+const talkImageList = ref<ImageItem[]>([])
+const talkFileInput = ref<HTMLInputElement>()
+
+// 触发文件选择
+const triggerTalkUpload = () => {
+  talkFileInput.value?.click()
+}
+
+// 处理文件选择
+const handleTalkFileChange = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const files = target.files
+  if (files) {
+    handleTalkFiles(Array.from(files))
+  }
+  target.value = ''
+}
+
+// 处理文件
+const handleTalkFiles = (files: File[]) => {
+  const remainingSlots = 9 - talkImageList.value.length
+  if (files.length > remainingSlots) {
+    ElMessage.warning(`最多只能上传9张图片，当前还可以上传${remainingSlots}张`)
+    files = files.slice(0, remainingSlots)
+  }
+  
+  files.forEach(file => {
+    if (!file.type.startsWith('image/')) {
+      ElMessage.error(`${file.name} 不是图片文件`)
+      return
+    }
+    
+    if (file.size > 5 * 1024 * 1024) {
+      ElMessage.error(`${file.name} 大小超过 5MB`)
+      return
+    }
+    
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const imageItem: ImageItem = {
+        url: e.target?.result as string,
+        file: file,
+        uploading: true,
+        progress: 0
+      }
+      talkImageList.value.push(imageItem)
+      uploadTalkImage(imageItem)
+    }
+    reader.readAsDataURL(file)
+  })
+}
+
+// 上传图片
+const uploadTalkImage = async (imageItem: ImageItem) => {
+  if (!imageItem.file) return
+  
+  try {
+    const response = await uploadImage(imageItem.file)
+    imageItem.url = response || imageItem.url
+    imageItem.uploading = false
+    imageItem.progress = 100
+    ElMessage.success('图片上传成功')
+  } catch (error) {
+    console.error('图片上传失败:', error)
+    ElMessage.error('图片上传失败，请重试')
+    const index = talkImageList.value.indexOf(imageItem)
+    if (index > -1) {
+      talkImageList.value.splice(index, 1)
+    }
+  }
+}
+
+// 删除图片
+const removeTalkImage = (index: number) => {
+  talkImageList.value.splice(index, 1)
+}
+
+// 预览图片
+const previewTalkImage = (url: string) => {
+  previewImageList.value = talkImageList.value.map(img => img.url)
+  previewIndex.value = talkImageList.value.findIndex(img => img.url === url)
+  showViewer.value = true
+}
+
+// 提交说说
+const submitTalk = async () => {
+  if (!talkForm.value.content.trim()) {
+    ElMessage.warning('请输入说说内容')
+    return
+  }
+  
+  const uploading = talkImageList.value.some(img => img.uploading)
+  if (uploading) {
+    ElMessage.warning('图片正在上传中，请稍候...')
+    return
+  }
+  
+  publishing.value = true
+  
+  try {
+    await publishTalk({
+      talkContent: talkForm.value.content,
+      talkPic: talkImageList.value.map(img => img.url),
+      talkStatus: talkForm.value.status
+    })
+    
+    ElMessage.success('说说发表成功！')
+    showPublishDialog.value = false
+    
+    // 清空表单
+    talkForm.value.content = ''
+    talkForm.value.status = 0
+    talkImageList.value = []
+    
+    // 刷新列表
+    currentPage.value = 1
+    loadTalkList()
+  } catch (error) {
+    console.error('发表说说失败:', error)
+    ElMessage.error('发表失败，请重试')
+  } finally {
+    publishing.value = false
+  }
+}
+
+// 删除说说
+const handleDeleteTalk = async (talk: any) => {
+  try {
+    await ElMessageBox.confirm(
+      '确定要删除这条说说吗？删除后无法恢复。',
+      '删除确认',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+    
+    await deleteTalk(talk.id)
+    ElMessage.success('说说已删除')
+    
+    // 刷新列表
+    loadTalkList()
+  } catch (error: any) {
+    if (error !== 'cancel') {
+      console.error('删除说说失败:', error)
+      ElMessage.error('删除失败，请重试')
+    }
+  }
+}
+
+// 删除评论
+const handleDeleteComment = async (comment: any, talk: any) => {
+  try {
+    await ElMessageBox.confirm(
+      '确定要删除这条评论吗？删除后无法恢复。',
+      '删除确认',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+    
+    // 判断是否是博主/超级管理员
+    const requestData: any = {
+      talkCommentId: comment.id
+    }
+    
+    // 如果不是博主/超级管理员，需要传 userId
+    if (!isAuthor.value && userStore.user) {
+      requestData.userId = userStore.user.id
+    }
+    
+    await deleteComment(requestData)
+    ElMessage.success('评论已删除')
+    
+    // 刷新评论列表
+    if (talk.commentsLoaded) {
+      // 如果已经展开了详情，重新加载详情
+      talk.commentsLoaded = false
+      await loadTalkComments(talk)
+    } else {
+      // 否则刷新整个说说列表
+      loadTalkList()
+    }
+  } catch (error: any) {
+    if (error !== 'cancel') {
+      console.error('删除评论失败:', error)
+      ElMessage.error('删除失败，请重试')
+    }
+  }
+}
 
 // 递归评论组件
 const CommentItem: any = defineComponent({
@@ -327,6 +685,8 @@ const loadTalkList = async () => {
             avatar: '/web/default-avatar.svg',
             isAuthor: false
           },
+          comments: talk.comments || [],  // 确保 comments 字段存在
+          commentCount: talk.commentCount || 0,  // 确保 commentCount 存在
           commentsLoaded: false  // 标记评论是否已加载
         }
         
@@ -352,6 +712,12 @@ const loadTalkList = async () => {
 const loadTalkComments = async (talk: any) => {
   console.log('=== 开始加载评论 ===')
   console.log('talk.id:', talk.id)
+  
+  // 如果已经加载过，则切换折叠状态
+  if (talk.commentsLoaded) {
+    talk.commentsLoaded = false
+    return
+  }
   
   try {
     const params = {
@@ -452,6 +818,7 @@ onMounted(() => {
   align-items: center;
   gap: 20px;
   margin-bottom: 40px;
+  position: relative;
   
   .header-icon {
     font-size: 60px;
@@ -459,6 +826,8 @@ onMounted(() => {
   }
   
   .header-text {
+    flex: 1;
+    
     h1 {
       font-size: 42px;
       background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
@@ -473,6 +842,28 @@ onMounted(() => {
       font-size: 16px;
       color: #999;
       margin: 0;
+    }
+  }
+  
+  .publish-btn {
+    height: 44px;
+    padding: 0 24px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+    transition: all 0.3s;
+    
+    .btn-icon {
+      margin-right: 6px;
+      font-size: 16px;
+    }
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
     }
   }
 }
@@ -576,6 +967,9 @@ onMounted(() => {
     .talk-footer {
       border-top: 1px solid rgba(255, 182, 193, 0.2);
       padding-top: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       
       .actions {
         display: flex;
@@ -599,28 +993,20 @@ onMounted(() => {
           }
         }
       }
-    }
-  }
-  
-  .view-comments {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid rgba(255, 182, 193, 0.2);
-    text-align: center;
-    
-    .view-btn {
-      color: #ff9a9e;
-      font-size: 14px;
-      transition: all 0.3s;
       
-      .icon {
-        margin-right: 5px;
-        font-size: 16px;
-      }
-      
-      &:hover {
-        color: #ff7a7e;
-        transform: translateY(-2px);
+      .delete-talk-btn {
+        color: #999;
+        font-size: 14px;
+        transition: all 0.3s;
+        
+        .icon {
+          margin-right: 4px;
+          font-size: 16px;
+        }
+        
+        &:hover {
+          color: #ff6b6b;
+        }
       }
     }
   }
@@ -735,6 +1121,11 @@ onMounted(() => {
           .expand-icon {
             font-size: 10px;
             color: #ff9a9e;
+            transition: transform 0.3s;
+            
+            &.expanded {
+              transform: rotate(180deg);
+            }
           }
           
           &:hover {
@@ -885,12 +1276,224 @@ onMounted(() => {
     .header-text h1 {
       font-size: 32px;
     }
+    
+    .publish-btn {
+      width: 100%;
+    }
   }
   
   .talk-item {
     .talk-images {
       .talk-img {
         height: 150px;
+      }
+    }
+  }
+}
+
+/* 发表说说弹框样式 */
+:deep(.el-dialog) {
+  border-radius: 20px;
+  
+  .el-dialog__header {
+    padding: 25px 30px 20px;
+    border-bottom: 1px solid rgba(255, 182, 193, 0.2);
+    
+    .el-dialog__title {
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  }
+  
+  .el-dialog__body {
+    padding: 25px 30px;
+  }
+  
+  .el-dialog__footer {
+    padding: 15px 30px 25px;
+    border-top: 1px solid rgba(255, 182, 193, 0.2);
+    
+    .el-button {
+      padding: 10px 24px;
+      border-radius: 20px;
+      
+      &--primary {
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        border: none;
+      }
+    }
+  }
+}
+
+.upload-section {
+  width: 100%;
+  
+  .upload-title {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    
+    .icon {
+      font-size: 16px;
+    }
+  }
+  
+  .upload-area {
+    border: 2px dashed rgba(255, 182, 193, 0.4);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: linear-gradient(135deg, rgba(255, 154, 158, 0.03) 0%, rgba(254, 207, 239, 0.03) 100%);
+    
+    &:hover {
+      border-color: #ff9a9e;
+      background: linear-gradient(135deg, rgba(255, 154, 158, 0.08) 0%, rgba(254, 207, 239, 0.08) 100%);
+    }
+    
+    .upload-icon {
+      font-size: 40px;
+      color: #ff9a9e;
+      margin-bottom: 10px;
+    }
+    
+    .upload-text {
+      font-size: 14px;
+      color: #666;
+    }
+  }
+  
+  .image-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    
+    .image-item {
+      position: relative;
+      width: 100%;
+      padding-bottom: 100%;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #f5f5f5;
+      box-shadow: 0 2px 8px rgba(252, 182, 159, 0.15);
+      transition: all 0.3s;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 154, 158, 0.25);
+        
+        .image-overlay {
+          opacity: 1;
+        }
+      }
+      
+      img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+      .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        
+        .el-icon {
+          font-size: 20px;
+          color: #fff;
+          cursor: pointer;
+          transition: all 0.3s;
+          
+          &:hover {
+            transform: scale(1.2);
+          }
+          
+          &.delete-icon:hover {
+            color: #ff6b6b;
+          }
+        }
+      }
+      
+      .upload-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 6px;
+        background: rgba(255, 255, 255, 0.95);
+      }
+    }
+    
+    .upload-btn {
+      position: relative;
+      width: 100%;
+      padding-bottom: 100%;
+      border: 2px dashed rgba(255, 182, 193, 0.4);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: linear-gradient(135deg, rgba(255, 154, 158, 0.03) 0%, rgba(254, 207, 239, 0.03) 100%);
+      
+      &:hover {
+        border-color: #ff9a9e;
+        background: linear-gradient(135deg, rgba(255, 154, 158, 0.08) 0%, rgba(254, 207, 239, 0.08) 100%);
+      }
+      
+      .el-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 28px;
+        color: #ff9a9e;
+      }
+    }
+  }
+}
+
+.status-select {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  
+  .status-label {
+    font-size: 14px;
+    color: #666;
+    font-weight: 600;
+  }
+  
+  :deep(.el-radio-group) {
+    .el-radio {
+      margin-right: 20px;
+      
+      .el-radio__input.is-checked + .el-radio__label {
+        color: #ff9a9e;
+      }
+      
+      .el-radio__input.is-checked .el-radio__inner {
+        background-color: #ff9a9e;
+        border-color: #ff9a9e;
       }
     }
   }
