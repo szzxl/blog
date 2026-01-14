@@ -11,9 +11,16 @@ const app = createApp(App)
 
 // 全局错误处理
 app.config.errorHandler = (err, instance, info) => {
-  // 全局错误处理
   // 忽略 parentNode 相关的错误，这些通常是 Vue 内部的清理操作
   if (err instanceof Error && err.message.includes('parentNode')) {
+    return
+  }
+  
+  // 忽略一些不影响功能的错误
+  if (err instanceof Error && (
+    err.message.includes('ResizeObserver') ||
+    err.message.includes('Non-Error promise rejection')
+  )) {
     return
   }
 }
@@ -21,10 +28,12 @@ app.config.errorHandler = (err, instance, info) => {
 // 全局警告处理
 app.config.warnHandler = (msg, instance, trace) => {
   // 忽略某些不重要的警告
-  if (msg.includes('Unhandled error during execution')) {
+  if (
+    msg.includes('Unhandled error during execution') ||
+    msg.includes('Extraneous non-props attributes')
+  ) {
     return
   }
-  // Vue 警告
 }
 
 app.use(router)

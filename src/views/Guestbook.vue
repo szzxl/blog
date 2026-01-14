@@ -42,17 +42,6 @@
             />
           </el-form-item>
           
-          <!-- 未登录提示 -->
-          <el-form-item v-if="!isLoggedIn">
-            <div class="login-tip">
-              <span class="tip-icon">💡</span>
-              <span class="tip-text">
-                <router-link to="/login" class="login-link">登录</router-link>
-                后可以上传图片哦~
-              </span>
-            </div>
-          </el-form-item>
-          
           <!-- 图片上传 - 仅登录用户可见 -->
           <el-form-item v-if="isLoggedIn">
             <div class="upload-section">
