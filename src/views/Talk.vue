@@ -441,7 +441,7 @@ const uploadTalkImage = async (imageItem: ImageItem) => {
   
   try {
     const response = await uploadImage(imageItem.file)
-    imageItem.url = response || imageItem.url
+    imageItem.url = (response as unknown as string) || imageItem.url
     imageItem.uploading = false
     imageItem.progress = 100
     ElMessage.success('图片上传成功')
@@ -733,20 +733,6 @@ const handleLike = () => {
   ElMessage.success(isLiked.value ? '点赞成功 ❤️' : '取消点赞')
 }
 
-// 评论相关
-const showCommentInput = ref(false)
-// const commentText = ref('')
-
-// const submitComment = () => {
-//   if (!commentText.value.trim()) {
-//     ElMessage.warning('请输入评论内容')
-//     return
-//   }
-//   ElMessage.success('评论发表成功！')
-//   commentText.value = ''
-//   showCommentInput.value = false
-// }
-
 // 图片预览
 const showViewer = ref(false)
 const previewImageList = ref<string[]>([])
@@ -855,12 +841,7 @@ const loadTalkComments = async (talk: any) => {
 }
 
 // 加载单个评论的回复
-const loadCommentReplies = async (talk: any, _comment: any) => {
-  // 直接加载整个说说的详情
-  await loadTalkComments(talk)
-}
-
-// 切换单个评论的回复展开/收起状态
+// 直接加载整个说说的详情
 const toggleCommentReplies = async (talk: any, comment: any) => {
   // 如果已经展开，则收起
   if (comment.repliesExpanded) {

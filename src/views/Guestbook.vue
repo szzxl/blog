@@ -255,7 +255,7 @@ const uploadImageToServer = async (imageItem: ImageItem) => {
     
     // 上传成功，更新图片 URL 为服务器返回的 URL
     // 后端返回的 data 直接就是图片 URL 字符串
-    imageItem.url = response || imageItem.url
+    imageItem.url = (response as unknown as string) || imageItem.url
     imageItem.uploading = false
     imageItem.progress = 100
     

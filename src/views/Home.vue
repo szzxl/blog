@@ -66,7 +66,6 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Carousel from '@/components/Carousel.vue'
 import { getArticleList } from '@/api/article'
-import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 

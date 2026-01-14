@@ -305,7 +305,7 @@ const passwordFormRules = {
   confirmPassword: [
     { required: true, message: '请再次输入新密码', trigger: 'blur' },
     {
-      validator: (rule: any, value: string, callback: any) => {
+      validator: (_rule: any, value: string, callback: any) => {
         if (value !== passwordForm.value.newPassword) {
           callback(new Error('两次输入的密码不一致'))
         } else {
@@ -508,10 +508,17 @@ const handleCommand = async (command: string) => {
       router.push('/favorites')
       break
     case 'admin':
-      // 跳转到管理后台
+      // 跳转到管理后台 - /admin 路径
       const hostname = window.location.hostname
       const protocol = window.location.protocol
-      const adminUrl = `${protocol}//${hostname}`
+      const port = window.location.port
+      
+      // 构建管理后台 URL
+      let adminUrl = `${protocol}//${hostname}`
+      if (port) {
+        adminUrl += `:${port}`
+      }
+      adminUrl += '/admin'
       
       window.open(adminUrl, '_blank')
       ElMessage.success('正在跳转到管理后台...')

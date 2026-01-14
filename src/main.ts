@@ -3,14 +3,14 @@ import App from './App.vue'
 import router from './router'
 import pinia from './stores'
 import ElementPlus from 'element-plus'
-import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import 'element-plus/dist/index.css'
 import './styles/global.scss'
 
 const app = createApp(App)
 
 // 全局错误处理
-app.config.errorHandler = (err, instance, info) => {
+app.config.errorHandler = (err) => {
   // 忽略 parentNode 相关的错误，这些通常是 Vue 内部的清理操作
   if (err instanceof Error && err.message.includes('parentNode')) {
     return
@@ -26,7 +26,7 @@ app.config.errorHandler = (err, instance, info) => {
 }
 
 // 全局警告处理
-app.config.warnHandler = (msg, instance, trace) => {
+app.config.warnHandler = (msg) => {
   // 忽略某些不重要的警告
   if (
     msg.includes('Unhandled error during execution') ||

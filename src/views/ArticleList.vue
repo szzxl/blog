@@ -88,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getArticleList } from '@/api/article'
 import { ElMessage } from 'element-plus'
@@ -108,8 +108,6 @@ interface Article {
 }
 
 const searchKeyword = ref('')
-const selectedCategory = ref('')
-const selectedTag = ref('')
 const articles = ref<Article[]>([])
 const total = ref(0)
 const pageNo = ref(1)

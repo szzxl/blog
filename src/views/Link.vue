@@ -119,11 +119,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { getFriendLinks, applyFriendLink } from '@/api/article'
 import { ElMessage } from 'element-plus'
-
-const router = useRouter()
 
 interface Link {
   id: number
@@ -139,7 +136,6 @@ interface Link {
 const links = ref<Link[]>([])
 const loading = ref(false)
 const showApplyDialog = ref(false)
-const currentUrl = ref(window.location.origin)
 
 // 申请表单
 const applyForm = ref({
@@ -199,12 +195,6 @@ const fetchLinks = async () => {
   } finally {
     loading.value = false
   }
-}
-
-// 前往留言板
-const goToGuestbook = () => {
-  showApplyDialog.value = false
-  router.push('/guestbook')
 }
 
 // 提交申请

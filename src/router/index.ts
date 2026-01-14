@@ -131,7 +131,7 @@ router.beforeEach(async (to, _from, next) => {
 })
 
 // 路由错误处理
-router.onError((error) => {
+router.onError(() => {
   // 路由错误
 })
 
