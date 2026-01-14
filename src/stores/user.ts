@@ -18,9 +18,23 @@ export const useUserStore = defineStore('user', () => {
   const isLoggedIn = ref(false)
   const token = ref<string>('')
 
-  // 从 localStorage 恢复登录状态
+  // 从 localStorage 恢复登录状态（使用管理后台的 key）
   const savedUser = localStorage.getItem('user')
-  const savedToken = localStorage.getItem('token')
+  const savedTokenStr = localStorage.getItem('ACCESS_TOKEN')
+  
+  // 解析管理后台的 token 格式（可能是 JSON 对象）
+  let savedToken = ''
+  if (savedTokenStr) {
+    try {
+      const tokenObj = JSON.parse(savedTokenStr)
+      // 管理后台的 token 格式：{ c: 创建时间, e: 过期时间, v: token值 }
+      savedToken = tokenObj.v ? JSON.parse(tokenObj.v) : savedTokenStr
+    } catch {
+      // 如果解析失败，直接使用原始值
+      savedToken = savedTokenStr
+    }
+  }
+  
   if (savedUser && savedToken) {
     user.value = JSON.parse(savedUser)
     token.value = savedToken
@@ -32,9 +46,17 @@ export const useUserStore = defineStore('user', () => {
     try {
       const res: any = await loginApi({ username, password })
       
-      // 保存 token
-      token.value = res.token || res.accessToken || ''
-      localStorage.setItem('token', token.value)
+      // 保存 token（使用管理后台的格式）
+      const accessToken = res.token || res.accessToken || ''
+      token.value = accessToken
+      
+      // 使用管理后台的格式存储：{ c: 创建时间, e: 过期时间, v: token值 }
+      const tokenObj = {
+        c: Date.now().toString(),
+        e: '253402300799000', // 9999年的时间戳
+        v: JSON.stringify(accessToken)
+      }
+      localStorage.setItem('ACCESS_TOKEN', JSON.stringify(tokenObj))
       
       // 获取用户信息
       await fetchUserInfo()
@@ -73,8 +95,8 @@ export const useUserStore = defineStore('user', () => {
       user.value = null
       token.value = ''
       isLoggedIn.value = false
+      localStorage.removeItem('ACCESS_TOKEN')
       localStorage.removeItem('user')
-      localStorage.removeItem('token')
       ElMessage.success('已退出登录')
     }
   }

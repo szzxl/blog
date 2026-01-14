@@ -508,10 +508,11 @@ const handleCommand = async (command: string) => {
       router.push('/favorites')
       break
     case 'admin':
-      // 跳转到管理后台 - 同域名根路径
+      // 跳转到管理后台
       const hostname = window.location.hostname
       const protocol = window.location.protocol
       const adminUrl = `${protocol}//${hostname}`
+      
       window.open(adminUrl, '_blank')
       ElMessage.success('正在跳转到管理后台...')
       break

@@ -94,8 +94,32 @@ const router = createRouter({
 })
 
 // 路由守卫 - 检查登录状态
-router.beforeEach((to, _from, next) => {
+router.beforeEach(async (to, _from, next) => {
   const userStore = useUserStore()
+  
+  // 如果有 token 但没有用户信息，尝试获取用户信息
+  const tokenStr = localStorage.getItem('ACCESS_TOKEN')
+  if (tokenStr && !userStore.user) {
+    try {
+      // 解析 token
+      let token = ''
+      try {
+        const tokenObj = JSON.parse(tokenStr)
+        token = tokenObj.v ? JSON.parse(tokenObj.v) : tokenStr
+      } catch {
+        token = tokenStr
+      }
+      
+      // 设置 token 并获取用户信息
+      userStore.token = token
+      await userStore.fetchUserInfo()
+      userStore.isLoggedIn = true
+    } catch (error) {
+      // token 无效，清除
+      localStorage.removeItem('ACCESS_TOKEN')
+      localStorage.removeItem('user')
+    }
+  }
   
   // 只有明确标记 requiresAuth 的路由才需要登录
   if (to.meta.requiresAuth === true && !userStore.isLoggedIn) {

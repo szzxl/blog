@@ -41,8 +41,22 @@ const service: AxiosInstance = axios.create({
 // 请求拦截器
 service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // 从 localStorage 获取 token
-    const token = localStorage.getItem('token')
+    // 从 localStorage 获取 token（使用管理后台的 key）
+    const tokenStr = localStorage.getItem('ACCESS_TOKEN')
+    
+    // 解析管理后台的 token 格式
+    let token = ''
+    if (tokenStr) {
+      try {
+        const tokenObj = JSON.parse(tokenStr)
+        // 管理后台的 token 格式：{ c: 创建时间, e: 过期时间, v: token值 }
+        token = tokenObj.v ? JSON.parse(tokenObj.v) : tokenStr
+      } catch {
+        // 如果解析失败，直接使用原始值
+        token = tokenStr
+      }
+    }
+    
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -69,7 +83,7 @@ service.interceptors.response.use(
       
       // 401 未授权，只有非公开接口才跳转登录
       if (res.code === 401 && !isPublicApi(url)) {
-        localStorage.removeItem('token')
+        localStorage.removeItem('ACCESS_TOKEN')
         localStorage.removeItem('user')
         router.push('/login')
       }
@@ -87,7 +101,7 @@ service.interceptors.response.use(
         case 401:
           if (!isPublicApi(url)) {
             ElMessage.error('未授权，请重新登录')
-            localStorage.removeItem('token')
+            localStorage.removeItem('ACCESS_TOKEN')
             localStorage.removeItem('user')
             router.push('/login')
           } else {

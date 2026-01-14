@@ -6,9 +6,13 @@ import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 // https://vite.dev/config/
-export default defineConfig({
-  base: '/web/',
-  plugins: [
+export default defineConfig(({ mode }) => {
+  // 开发环境不使用 base，生产环境使用 /web/
+  const base = mode === 'production' ? '/web/' : '/'
+  
+  return {
+    base,
+    plugins: [
     vue(),
     AutoImport({
       resolvers: [ElementPlusResolver()],
@@ -27,7 +31,6 @@ export default defineConfig({
   server: {
     port: 80,
     host: '0.0.0.0',
-    open: '/web/',
     hmr: {
       overlay: false
     },
@@ -49,5 +52,6 @@ export default defineConfig({
   },
   css: {
     devSourcemap: false
+  }
   }
 })
