@@ -24,6 +24,30 @@ export const getUserInfo = () => {
   })
 }
 
+export const updateUserProfile = (data: { 
+  avatar?: string
+  nickname?: string
+  email?: string
+  mobile?: string
+}) => {
+  return request({
+    url: '/system/user/profile/update',
+    method: 'put',
+    data
+  })
+}
+
+export const updatePassword = (data: {
+  oldPassword: string
+  newPassword: string
+}) => {
+  return request({
+    url: '/system/user/profile/update-password',
+    method: 'put',
+    data
+  })
+}
+
 export const logout = () => {
   return request({
     url: '/system/auth/logout',
@@ -348,5 +372,13 @@ export const applyFriendLink = (data: {
     url: '/config/link/apply',
     method: 'post',
     data
+  })
+}
+
+// 获取通知列表
+export const getNotificationList = () => {
+  return request({
+    url: '/config/notification/list',
+    method: 'post'
   })
 }

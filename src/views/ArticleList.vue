@@ -140,7 +140,6 @@ const fetchArticles = async () => {
       total.value = res.length
     }
   } catch (error) {
-    console.error('获取文章列表失败:', error)
     ElMessage.error('获取文章列表失败')
   } finally {
     loading.value = false

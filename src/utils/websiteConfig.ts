@@ -33,7 +33,7 @@ export const fetchWebsiteConfigWithCache = async (): Promise<WebsiteConfig> => {
       configCache = JSON.parse(cachedData)
       return configCache as WebsiteConfig
     } catch (error) {
-      console.error('解析缓存配置失败:', error)
+      // 解析缓存配置失败
     }
   }
 
@@ -58,7 +58,6 @@ export const fetchWebsiteConfigWithCache = async (): Promise<WebsiteConfig> => {
 
     return config
   } catch (error) {
-    console.error('获取网站配置失败:', error)
     return {}
   }
 }

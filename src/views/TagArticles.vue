@@ -119,7 +119,6 @@ const loadArticles = async () => {
       total.value = 0
     }
   } catch (error) {
-    console.error('加载文章列表失败:', error)
     ElMessage.error('加载文章列表失败')
     articles.value = []
     total.value = 0

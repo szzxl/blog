@@ -103,7 +103,7 @@ const handleLogin = async () => {
           router.push(redirect || '/')
         }
       } catch (error) {
-        console.error('登录失败:', error)
+        // 登录失败
       } finally {
         loginLoading.value = false
       }

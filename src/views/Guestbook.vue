@@ -272,7 +272,6 @@ const uploadImageToServer = async (imageItem: ImageItem) => {
     
     ElMessage.success('图片上传成功')
   } catch (error) {
-    console.error('图片上传失败:', error)
     ElMessage.error('图片上传失败，请重试')
     
     // 上传失败，从列表中移除
@@ -346,7 +345,6 @@ const submitMessage = async () => {
     messageForm.value.content = ''
     imageList.value = []
   } catch (error) {
-    console.error('留言发表失败:', error)
     ElMessage.error('留言发表失败，请重试')
   } finally {
     submitting.value = false

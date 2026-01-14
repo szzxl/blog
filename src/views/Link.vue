@@ -195,7 +195,7 @@ const fetchLinks = async () => {
         .sort((a: Link, b: Link) => a.sort - b.sort)
     }
   } catch (error) {
-    console.error('获取友情链接失败:', error)
+    // 获取友情链接失败
   } finally {
     loading.value = false
   }
@@ -228,12 +228,11 @@ const submitApply = async () => {
         showApplyDialog.value = false
         resetForm()
       } catch (error: any) {
-        console.error('申请友链失败:', error)
         ElMessage.error(error.msg || error.message || '申请失败，请稍后重试')
       }
     }
   } catch (error) {
-    console.error('表单验证失败:', error)
+    // 表单验证失败
   }
 }
 

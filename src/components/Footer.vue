@@ -79,7 +79,7 @@ const fetchWebsiteConfig = async () => {
     if (config.social_email) socialEmail.value = config.social_email
     if (config.social_github) socialGithub.value = config.social_github
   } catch (error) {
-    console.error('获取网站配置失败:', error)
+    // 获取网站配置失败
   }
 }
 

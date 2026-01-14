@@ -13,15 +13,17 @@
     <Header />
     
     <!-- 全局公告栏 -->
-    <div class="announcement-bar">
+    <div class="announcement-bar" v-if="announcements.length > 0">
       <div class="announcement-icon">📢</div>
       <div class="announcement-scroll">
         <div class="announcement-content">
           <!-- 重复两次以实现无缝滚动 -->
           <template v-for="n in 2" :key="n">
             <span v-for="(item, index) in announcements" :key="`${n}-${index}`" class="announcement-item">
-              <span class="announcement-label">{{ item.label }}</span>
-              <span class="announcement-text">{{ item.text }}</span>
+              <span class="announcement-label" v-if="item.type === 'activity'">活动</span>
+              <span class="announcement-label" v-else-if="item.type === 'notice'">公告</span>
+              <span class="announcement-label" v-else>通知</span>
+              <span class="announcement-text">{{ item.content }}</span>
             </span>
           </template>
         </div>
@@ -45,15 +47,32 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
+import { getNotificationList } from '@/api/article'
 
-const announcements = ref([
-  { label: '公告', text: '欢迎来到小花的日记本，一起记录美好生活~ 🌸' },
-  { label: '更新', text: '网站持续更新中，感谢大家的支持！ ✨' },
-  { label: '活动', text: '新年特别活动即将开启，敬请期待！ 🎉' },
-  { label: '提示', text: '记得每天来看看，分享你的心情和故事 💕' }
-])
+interface Notification {
+  id: number
+  type: string
+  content: string
+  status: number
+}
 
+const announcements = ref<Notification[]>([])
 const showBackToTop = ref(false)
+
+// 获取通知列表
+const fetchNotifications = async () => {
+  try {
+    const response: any = await getNotificationList()
+    
+    if (response && Array.isArray(response)) {
+      // 只显示状态为1的通知
+      announcements.value = response.filter((item: Notification) => item.status === 1)
+    }
+  } catch (error) {
+    // 如果接口失败，使用默认通知
+    announcements.value = []
+  }
+}
 
 // 获取网站配置并设置标题
 const fetchWebsiteConfig = async () => {
@@ -64,7 +83,7 @@ const fetchWebsiteConfig = async () => {
       document.title = config.seo_title
     }
   } catch (error) {
-    console.error('获取网站配置失败:', error)
+    // 获取网站配置失败
   }
 }
 
@@ -82,6 +101,7 @@ const scrollToTop = () => {
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
   fetchWebsiteConfig()
+  fetchNotifications()
 })
 
 onUnmounted(() => {

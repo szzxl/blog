@@ -101,7 +101,7 @@ const fetchArticles = async () => {
       articles.value = res.slice(0, 3)
     }
   } catch (error) {
-    console.error('获取文章列表失败:', error)
+    // 获取文章列表失败
   } finally {
     loading.value = false
   }

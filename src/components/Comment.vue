@@ -243,7 +243,6 @@ const loadComments = async () => {
     // 如果后端返回了 total，使用它；否则使用数组长度
     total.value = response?.total || comments.value.length
   } catch (error) {
-    console.error('加载评论失败:', error)
     ElMessage.error('加载评论失败')
     comments.value = []
     total.value = 0

@@ -108,7 +108,7 @@ router.beforeEach((to, _from, next) => {
 
 // 路由错误处理
 router.onError((error) => {
-  console.error('路由错误:', error)
+  // 路由错误
 })
 
 export default router

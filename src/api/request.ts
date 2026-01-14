@@ -23,7 +23,6 @@ service.interceptors.request.use(
     return config
   },
   (error) => {
-    console.error('请求错误:', error)
     return Promise.reject(error)
   }
 )
@@ -67,8 +66,6 @@ service.interceptors.response.use(
     return res.data || res
   },
   (error) => {
-    console.error('响应错误:', error)
-    
     if (error.response) {
       const url = error.config?.url || ''
       

@@ -38,7 +38,7 @@ const fetchCarousel = async () => {
       })).sort((a: any, b: any) => a.sort - b.sort)
     }
   } catch (error) {
-    console.error('获取轮播图失败:', error)
+    // 获取轮播图失败
   }
 }
 

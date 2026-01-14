@@ -11,8 +11,7 @@ const app = createApp(App)
 
 // 全局错误处理
 app.config.errorHandler = (err, instance, info) => {
-  console.error('全局错误:', err)
-  console.error('错误信息:', info)
+  // 全局错误处理
   // 忽略 parentNode 相关的错误，这些通常是 Vue 内部的清理操作
   if (err instanceof Error && err.message.includes('parentNode')) {
     return
@@ -25,7 +24,7 @@ app.config.warnHandler = (msg, instance, trace) => {
   if (msg.includes('Unhandled error during execution')) {
     return
   }
-  console.warn('Vue 警告:', msg)
+  // Vue 警告
 }
 
 app.use(router)
