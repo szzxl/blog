@@ -67,11 +67,7 @@
                 <span class="menu-icon">⚙️</span>
                 管理后台
               </el-dropdown-item>
-              <el-dropdown-item v-if="!isAuthor" command="favorites">
-                <span class="menu-icon">⭐</span>
-                我的收藏
-              </el-dropdown-item>
-              <el-dropdown-item :divided="isAuthor || !isAuthor" command="profile">
+              <el-dropdown-item command="profile">
                 <span class="menu-icon">👤</span>
                 个人中心
               </el-dropdown-item>
@@ -157,11 +153,6 @@
         <button class="mobile-nav-item" @click="handleMobileCommand('admin')" v-if="isAuthor">
           <span class="nav-icon">⚙️</span>
           <span class="nav-text">管理后台</span>
-          <span class="nav-arrow">›</span>
-        </button>
-        <button class="mobile-nav-item" @click="handleMobileCommand('favorites')" v-if="!isAuthor">
-          <span class="nav-icon">⭐</span>
-          <span class="nav-text">我的收藏</span>
           <span class="nav-arrow">›</span>
         </button>
         <button class="mobile-nav-item" @click="handleMobileCommand('profile')">
@@ -335,8 +326,8 @@ import { ElMessage } from 'element-plus'
 const router = useRouter()
 const userStore = useUserStore()
 
-const siteName = ref('小花的日记本')
-const siteDescription = ref('记录美好生活')
+const siteName = ref('')
+const siteDescription = ref('')
 
 // 移动端菜单状态
 const showMobileMenu = ref(false)
