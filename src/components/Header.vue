@@ -9,7 +9,8 @@
       
       <div class="logo">
         <div class="logo-circle">
-          <span class="logo-icon">🌸</span>
+          <img v-if="siteLogo.startsWith('http')" :src="siteLogo" alt="logo" class="logo-image">
+          <span v-else class="logo-icon">{{ siteLogo }}</span>
         </div>
         <div class="logo-text-wrapper">
           <span class="logo-text">{{ siteName }}</span>
@@ -99,7 +100,8 @@
     <template #header>
       <div class="drawer-header">
         <div class="drawer-logo">
-          <span class="logo-icon">🌸</span>
+          <img v-if="siteLogo.startsWith('http')" :src="siteLogo" alt="logo" class="logo-image">
+          <span v-else class="logo-icon">{{ siteLogo }}</span>
           <span class="logo-text">{{ siteName }}</span>
         </div>
       </div>
@@ -328,6 +330,7 @@ const userStore = useUserStore()
 
 const siteName = ref('')
 const siteDescription = ref('')
+const siteLogo = ref('🌸')
 
 // 移动端菜单状态
 const showMobileMenu = ref(false)
@@ -342,6 +345,9 @@ const fetchWebsiteConfig = async () => {
     }
     if (config.site_description) {
       siteDescription.value = config.site_description
+    }
+    if (config.logo) {
+      siteLogo.value = config.logo
     }
   } catch (error) {
     // 获取网站配置失败
@@ -700,9 +706,16 @@ onMounted(() => {
       justify-content: center;
       box-shadow: 0 5px 20px rgba(255, 154, 158, 0.4);
       animation: pulse 2s ease-in-out infinite;
+      overflow: hidden;
       
       .logo-icon {
         font-size: 30px;
+      }
+      
+      .logo-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
     }
     
@@ -1306,6 +1319,13 @@ onMounted(() => {
     
     .logo-icon {
       font-size: 32px;
+    }
+    
+    .logo-image {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
     }
     
     .logo-text {
