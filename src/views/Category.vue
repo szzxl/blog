@@ -263,17 +263,75 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .category {
+    .container {
+      padding: 20px 15px;
+    }
+  }
+  
   .page-header {
     flex-direction: column;
     text-align: center;
+    padding: 30px 20px;
+    margin-bottom: 25px;
+    gap: 15px;
     
-    .header-text h1 {
-      font-size: 32px;
+    .header-icon {
+      font-size: 50px;
+    }
+    
+    .header-text {
+      h1 {
+        font-size: 28px;
+        margin-bottom: 8px;
+      }
+      
+      p {
+        font-size: 13px;
+      }
     }
   }
   
   .category-grid {
     grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .category-card {
+    padding: 25px 20px;
+    
+    .category-icon {
+      width: 60px;
+      height: 60px;
+      font-size: 28px;
+    }
+    
+    .category-info {
+      .category-name {
+        font-size: 18px;
+        margin-bottom: 8px;
+      }
+      
+      .category-count {
+        font-size: 13px;
+      }
+    }
+    
+    .category-arrow {
+      font-size: 20px;
+    }
+  }
+  
+  .empty-state {
+    padding: 60px 20px;
+    
+    .empty-icon {
+      font-size: 60px;
+    }
+    
+    .empty-text {
+      font-size: 14px;
+    }
   }
 }
 </style>

@@ -371,17 +371,90 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .home {
+    .container {
+      padding: 20px 15px;
+    }
+  }
+  
   .section-header {
     flex-direction: column;
     text-align: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    
+    .section-icon {
+      font-size: 40px;
+    }
     
     .section-text h2 {
-      font-size: 28px;
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+    
+    .section-text p {
+      font-size: 13px;
     }
   }
   
   .article-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .article-card {
+    .article-cover {
+      height: 200px;
+    }
+    
+    .article-info {
+      padding: 20px 15px;
+      
+      .article-title {
+        font-size: 18px;
+        margin-bottom: 12px;
+      }
+      
+      .article-desc {
+        margin-bottom: 12px;
+      }
+      
+      .article-meta {
+        flex-wrap: wrap;
+        gap: 8px;
+        
+        .meta-item {
+          font-size: 12px;
+          padding: 4px 10px;
+        }
+      }
+      
+      .article-tags {
+        margin-top: 12px;
+        
+        .tag-item {
+          font-size: 11px;
+          padding: 4px 10px;
+        }
+      }
+    }
+    
+    .article-badge {
+      font-size: 10px;
+      padding: 4px 12px;
+    }
+  }
+  
+  .empty-state {
+    padding: 60px 20px;
+    
+    .empty-icon {
+      font-size: 60px;
+    }
+    
+    .empty-text {
+      font-size: 14px;
+    }
   }
 }
 </style>

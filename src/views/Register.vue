@@ -355,16 +355,55 @@ const goBack = () => {
 }
 
 @media (max-width: 768px) {
+  .register-page {
+    padding: 20px 15px;
+  }
+  
   .register-container {
-    padding: 40px 30px 35px;
+    padding: 35px 25px 30px;
+    max-width: 100%;
     
     .register-header {
+      margin-bottom: 30px;
+      
       .logo {
-        font-size: 60px;
+        font-size: 50px;
+        margin-bottom: 15px;
       }
       
       .title {
-        font-size: 28px;
+        font-size: 24px;
+        margin-bottom: 8px;
+      }
+      
+      .subtitle {
+        font-size: 13px;
+      }
+    }
+    
+    .register-form {
+      .el-form-item {
+        margin-bottom: 20px;
+      }
+      
+      .el-input__inner {
+        height: 45px;
+        font-size: 14px;
+      }
+      
+      .register-btn {
+        height: 45px;
+        font-size: 15px;
+        margin-top: 10px;
+      }
+    }
+    
+    .register-footer {
+      margin-top: 25px;
+      font-size: 13px;
+      
+      .login-link {
+        font-size: 13px;
       }
     }
   }

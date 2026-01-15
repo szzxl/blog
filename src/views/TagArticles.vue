@@ -7,8 +7,8 @@
         <p class="tag-desc">共 {{ total }} 篇文章</p>
       </div>
       
-      <!-- 文章表格 -->
-      <div class="articles-table card">
+      <!-- 文章表格 - PC端 -->
+      <div class="articles-table card desktop-view">
         <el-table 
           :data="articles" 
           v-loading="loading"
@@ -61,6 +61,53 @@
             :page-size="pageSize"
             :current-page="currentPage"
             @current-change="handlePageChange"
+          />
+        </div>
+      </div>
+      
+      <!-- 文章卡片 - 移动端 -->
+      <div class="articles-cards mobile-view" v-loading="loading">
+        <div class="article-card card" v-for="(article, index) in articles" :key="article.id" @click="goToArticle(article)">
+          <div class="card-header">
+            <span class="card-index">{{ (currentPage - 1) * pageSize + index + 1 }}</span>
+            <h3 class="card-title">{{ article.articleName }}</h3>
+          </div>
+          <div class="card-meta">
+            <span class="meta-item">
+              <span class="icon">📅</span>
+              {{ formatTime(article.createTime) }}
+            </span>
+            <span class="meta-item">
+              <span class="icon">👁️</span>
+              {{ article.readNum || 0 }}
+            </span>
+            <span class="meta-item">
+              <span class="icon">💗</span>
+              {{ article.likeCount || 0 }}
+            </span>
+          </div>
+          <div class="card-action">
+            <span class="view-text">查看详情 →</span>
+          </div>
+        </div>
+        
+        <!-- 空状态 -->
+        <div v-if="articles.length === 0 && !loading" class="empty-state">
+          <div class="empty-icon">📝</div>
+          <div class="empty-text">该标签下暂无文章</div>
+          <el-button type="primary" @click="goBack">返回标签页</el-button>
+        </div>
+        
+        <!-- 分页 -->
+        <div class="pagination" v-if="total > 0">
+          <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="total"
+            :page-size="pageSize"
+            :current-page="currentPage"
+            @current-change="handlePageChange"
+            small
           />
         </div>
       </div>
@@ -336,28 +383,135 @@ onMounted(() => {
   }
 }
 
-@media (max-width: 768px) {
-  .container {
-    padding: 0 10px;
-  }
+// 移动端卡片视图（默认隐藏）
+.mobile-view {
+  display: none;
+}
+
+// 移动端文章卡片
+.articles-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
   
-  .tag-header {
-    .tag-name {
-      font-size: 24px;
+  .article-card {
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    
+    &:active {
+      transform: scale(0.98);
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 15px;
+      
+      .card-index {
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+      }
+      
+      .card-title {
+        flex: 1;
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        line-height: 1.5;
+        margin: 0;
+      }
+    }
+    
+    .card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 15px;
+      padding-left: 44px;
+      
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 13px;
+        color: #999;
+        
+        .icon {
+          font-size: 14px;
+        }
+      }
+    }
+    
+    .card-action {
+      padding-left: 44px;
+      
+      .view-text {
+        color: #ff9a9e;
+        font-size: 14px;
+        font-weight: 600;
+      }
     }
   }
   
-  .articles-table {
-    :deep(.el-table) {
-      font-size: 12px;
-      
-      .el-table__header th {
-        padding: 8px 0;
-      }
-      
-      .el-table__row td {
-        padding: 8px 0;
-      }
+  .pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .tag-articles {
+    .container {
+      padding: 20px 15px;
+    }
+  }
+  
+  .tag-header {
+    padding: 25px 20px;
+    margin-bottom: 20px;
+    
+    .tag-name {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    
+    .tag-desc {
+      font-size: 13px;
+    }
+  }
+  
+  // 隐藏PC端表格
+  .desktop-view {
+    display: none !important;
+  }
+  
+  // 显示移动端卡片
+  .mobile-view {
+    display: flex !important;
+  }
+  
+  .empty-state {
+    padding: 60px 20px;
+    
+    .empty-icon {
+      font-size: 60px;
+    }
+    
+    .empty-text {
+      font-size: 14px;
+      margin-bottom: 20px;
     }
   }
 }

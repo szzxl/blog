@@ -2,6 +2,11 @@
   <header class="header">
     <div class="header-bg"></div>
     <div class="container">
+      <!-- 移动端汉堡菜单按钮（左侧） -->
+      <button class="mobile-menu-btn-left" @click="showMobileMenu = true">
+        <span class="menu-icon">☰</span>
+      </button>
+      
       <div class="logo">
         <div class="logo-circle">
           <span class="logo-icon">🌸</span>
@@ -11,7 +16,9 @@
           <span class="logo-subtitle">{{ siteDescription }}</span>
         </div>
       </div>
-      <nav class="nav">
+      
+      <!-- PC 端导航 -->
+      <nav class="nav desktop-nav">
         <router-link to="/" class="nav-item">
           <span class="nav-icon">🏠</span>
           <span class="nav-text">首页</span>
@@ -47,7 +54,7 @@
       </nav>
     </div>
     
-    <!-- 用户中心 - 移到container外面 -->
+    <!-- 用户中心 -->
     <div class="user-center">
       <template v-if="userStore.isLoggedIn">
         <el-dropdown @command="handleCommand">
@@ -84,6 +91,100 @@
       </template>
     </div>
   </header>
+  
+  <!-- 移动端导航抽屉 -->
+  <el-drawer
+    v-model="showMobileMenu"
+    direction="ltr"
+    size="280px"
+    :show-close="false"
+    class="mobile-nav-drawer"
+  >
+    <template #header>
+      <div class="drawer-header">
+        <div class="drawer-logo">
+          <span class="logo-icon">🌸</span>
+          <span class="logo-text">{{ siteName }}</span>
+        </div>
+      </div>
+    </template>
+    
+    <nav class="mobile-nav">
+      <router-link to="/" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-text">首页</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+      <router-link to="/articles" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">✨</span>
+        <span class="nav-text">文章</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+      <router-link to="/category" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">🎀</span>
+        <span class="nav-text">分类</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+      <router-link to="/tag" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">🏷️</span>
+        <span class="nav-text">标签</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+      <router-link to="/talk" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">💕</span>
+        <span class="nav-text">说说</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+      <router-link to="/guestbook" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">💌</span>
+        <span class="nav-text">留言板</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+      <router-link to="/link" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">🌈</span>
+        <span class="nav-text">友链</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+      <router-link to="/about" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">🦋</span>
+        <span class="nav-text">关于</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+      
+      <!-- 移动端用户操作 -->
+      <div class="mobile-user-actions" v-if="userStore.isLoggedIn">
+        <div class="divider"></div>
+        <button class="mobile-nav-item" @click="handleMobileCommand('admin')" v-if="isAuthor">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-text">管理后台</span>
+          <span class="nav-arrow">›</span>
+        </button>
+        <button class="mobile-nav-item" @click="handleMobileCommand('favorites')" v-if="!isAuthor">
+          <span class="nav-icon">⭐</span>
+          <span class="nav-text">我的收藏</span>
+          <span class="nav-arrow">›</span>
+        </button>
+        <button class="mobile-nav-item" @click="handleMobileCommand('profile')">
+          <span class="nav-icon">👤</span>
+          <span class="nav-text">个人中心</span>
+          <span class="nav-arrow">›</span>
+        </button>
+        <button class="mobile-nav-item" @click="handleMobileCommand('logout')">
+          <span class="nav-icon">🚪</span>
+          <span class="nav-text">退出登录</span>
+          <span class="nav-arrow">›</span>
+        </button>
+      </div>
+      <div class="mobile-user-actions" v-else>
+        <div class="divider"></div>
+        <button class="mobile-nav-item login-btn" @click="handleMobileLogin">
+          <span class="nav-icon">🌸</span>
+          <span class="nav-text">登录</span>
+          <span class="nav-arrow">›</span>
+        </button>
+      </div>
+    </nav>
+  </el-drawer>
   
   <!-- 个人中心弹窗 -->
   <el-dialog 
@@ -237,6 +338,9 @@ const userStore = useUserStore()
 const siteName = ref('小花的日记本')
 const siteDescription = ref('记录美好生活')
 
+// 移动端菜单状态
+const showMobileMenu = ref(false)
+
 // 获取网站配置
 const fetchWebsiteConfig = async () => {
   try {
@@ -273,6 +377,7 @@ const editForm = ref({
   email: ''
 })
 
+// @ts-ignore - 在模板中使用
 const editFormRules = {
   nickname: [
     { required: true, message: '请输入昵称', trigger: 'blur' }
@@ -294,6 +399,7 @@ const passwordForm = ref({
   confirmPassword: ''
 })
 
+// @ts-ignore - 在模板中使用
 const passwordFormRules = {
   oldPassword: [
     { required: true, message: '请输入旧密码', trigger: 'blur' }
@@ -318,6 +424,7 @@ const passwordFormRules = {
 }
 
 // 显示修改密码弹窗
+// @ts-ignore - 在模板中使用
 const showChangePasswordDialog = () => {
   passwordForm.value = {
     oldPassword: '',
@@ -328,6 +435,7 @@ const showChangePasswordDialog = () => {
 }
 
 // 显示修改资料弹窗
+// @ts-ignore - 在模板中使用
 const showEditProfileDialog = () => {
   editForm.value = {
     nickname: userStore.user?.nickname || userStore.user?.username || '',
@@ -338,6 +446,7 @@ const showEditProfileDialog = () => {
 }
 
 // 提交修改资料
+// @ts-ignore - 在模板中使用
 const submitEditForm = async () => {
   if (!editFormRef.value) return
   
@@ -369,6 +478,7 @@ const submitEditForm = async () => {
 }
 
 // 提交修改密码
+// @ts-ignore - 在模板中使用
 const submitPasswordForm = async () => {
   if (!passwordFormRef.value) return
   
@@ -402,11 +512,13 @@ const submitPasswordForm = async () => {
 }
 
 // 触发头像上传
+// @ts-ignore - 在模板中使用
 const triggerAvatarUpload = () => {
   avatarInput.value?.click()
 }
 
 // 处理头像上传
+// @ts-ignore - 在模板中使用
 const handleAvatarUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
@@ -528,6 +640,18 @@ const handleCommand = async (command: string) => {
       router.push('/')
       break
   }
+}
+
+// 移动端菜单命令处理
+const handleMobileCommand = async (command: string) => {
+  showMobileMenu.value = false
+  await handleCommand(command)
+}
+
+// 移动端登录
+const handleMobileLogin = () => {
+  showMobileMenu.value = false
+  goToLogin()
 }
 
 onMounted(() => {
@@ -750,6 +874,12 @@ onMounted(() => {
   :deep(.el-dialog) {
     border-radius: 25px;
     overflow: hidden;
+    
+    @media (max-width: 768px) {
+      width: 95vw !important;
+      margin: 0 auto;
+      border-radius: 20px;
+    }
   }
   
   :deep(.el-dialog__header) {
@@ -769,6 +899,13 @@ onMounted(() => {
     border-top: 1px solid rgba(255, 182, 193, 0.15);
     margin-top: 30px;
     
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 10px;
+      padding: 15px 0 0;
+      margin-top: 20px;
+    }
+    
     .action-btn {
       border-radius: 15px;
       font-size: 13px;
@@ -777,6 +914,12 @@ onMounted(() => {
       background: #fff;
       border: 2px solid rgba(255, 182, 193, 0.3);
       color: #ff9a9e;
+      
+      @media (max-width: 768px) {
+        width: 100%;
+        padding: 12px 24px;
+        font-size: 14px;
+      }
       
       &:hover {
         background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
@@ -803,11 +946,19 @@ onMounted(() => {
       padding: 50px;
       text-align: center;
       
+      @media (max-width: 768px) {
+        padding: 30px 20px;
+      }
+      
       .intro-avatar {
         position: relative;
         display: inline-block;
         margin-bottom: 30px;
         cursor: pointer;
+        
+        @media (max-width: 768px) {
+          margin-bottom: 20px;
+        }
         
         img {
           width: 120px;
@@ -816,6 +967,12 @@ onMounted(() => {
           border: 5px solid #fff;
           box-shadow: 0 8px 25px rgba(255, 154, 158, 0.3);
           transition: all 0.3s;
+          
+          @media (max-width: 768px) {
+            width: 90px;
+            height: 90px;
+            border: 3px solid #fff;
+          }
         }
         
         .avatar-decoration {
@@ -825,6 +982,12 @@ onMounted(() => {
           font-size: 30px;
           animation: rotate 3s linear infinite;
           pointer-events: none;
+          
+          @media (max-width: 768px) {
+            font-size: 24px;
+            top: -3px;
+            right: -3px;
+          }
         }
         
         .avatar-overlay {
@@ -845,12 +1008,20 @@ onMounted(() => {
           
           .upload-icon {
             font-size: 32px;
+            
+            @media (max-width: 768px) {
+              font-size: 24px;
+            }
           }
           
           .upload-text {
             color: #fff;
             font-size: 14px;
             font-weight: 600;
+            
+            @media (max-width: 768px) {
+              font-size: 12px;
+            }
           }
         }
         
@@ -861,6 +1032,15 @@ onMounted(() => {
           
           .avatar-overlay {
             opacity: 1;
+          }
+        }
+        
+        // 移动端点击显示上传提示
+        @media (max-width: 768px) {
+          &:active {
+            .avatar-overlay {
+              opacity: 1;
+            }
           }
         }
       }
@@ -874,12 +1054,21 @@ onMounted(() => {
           background-clip: text;
           margin: 0 0 25px 0;
           font-weight: 700;
+          
+          @media (max-width: 768px) {
+            font-size: 22px;
+            margin: 0 0 20px 0;
+          }
         }
         
         .user-info {
           display: flex;
           flex-direction: column;
           gap: 15px;
+          
+          @media (max-width: 768px) {
+            gap: 12px;
+          }
           
           .info-item {
             display: flex;
@@ -890,20 +1079,37 @@ onMounted(() => {
             border-radius: 15px;
             border: 2px solid rgba(255, 182, 193, 0.15);
             
+            @media (max-width: 768px) {
+              padding: 10px 15px;
+              border-radius: 12px;
+            }
+            
             .info-icon {
               font-size: 20px;
+              
+              @media (max-width: 768px) {
+                font-size: 18px;
+              }
             }
             
             .info-label {
               font-size: 14px;
               color: #ff9a9e;
               font-weight: 600;
+              
+              @media (max-width: 768px) {
+                font-size: 13px;
+              }
             }
             
             .info-value {
               font-size: 14px;
               color: #666;
               flex: 1;
+              
+              @media (max-width: 768px) {
+                font-size: 13px;
+              }
             }
           }
         }
@@ -936,21 +1142,38 @@ onMounted(() => {
 :deep(.edit-dialog) {
   .el-dialog {
     border-radius: 15px;
+    
+    @media (max-width: 768px) {
+      width: 95vw !important;
+      margin: 0 auto;
+    }
   }
   
   .el-dialog__header {
     padding: 20px 40px !important;
     background: linear-gradient(135deg, rgba(255, 154, 158, 0.05) 0%, rgba(254, 207, 239, 0.05) 100%);
+    
+    @media (max-width: 768px) {
+      padding: 15px 20px !important;
+    }
   }
   
   .el-dialog__body {
     padding: 30px 40px !important;
+    
+    @media (max-width: 768px) {
+      padding: 20px 15px !important;
+    }
   }
   
   .el-dialog__footer {
     padding: 20px 40px 30px !important;
     text-align: center;
     border-top: 1px solid rgba(255, 182, 193, 0.1);
+    
+    @media (max-width: 768px) {
+      padding: 15px 20px 20px !important;
+    }
   }
   
   .el-form-item__label {
@@ -967,21 +1190,38 @@ onMounted(() => {
 :deep(.password-dialog) {
   .el-dialog {
     border-radius: 15px;
+    
+    @media (max-width: 768px) {
+      width: 95vw !important;
+      margin: 0 auto;
+    }
   }
   
   .el-dialog__header {
     padding: 20px 40px !important;
     background: linear-gradient(135deg, rgba(255, 154, 158, 0.05) 0%, rgba(254, 207, 239, 0.05) 100%);
+    
+    @media (max-width: 768px) {
+      padding: 15px 20px !important;
+    }
   }
   
   .el-dialog__body {
     padding: 30px 40px !important;
+    
+    @media (max-width: 768px) {
+      padding: 20px 15px !important;
+    }
   }
   
   .el-dialog__footer {
     padding: 20px 40px 30px !important;
     text-align: center;
     border-top: 1px solid rgba(255, 182, 193, 0.1);
+    
+    @media (max-width: 768px) {
+      padding: 15px 20px 20px !important;
+    }
   }
   
   .el-form-item__label {
@@ -994,22 +1234,197 @@ onMounted(() => {
   }
 }
 
+// 移动端汉堡菜单按钮（左侧）
+.mobile-menu-btn-left {
+  display: none;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  border: none;
+  border-radius: 12px;
+  width: 45px;
+  height: 45px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+  transition: all 0.3s;
+  flex-shrink: 0;
+  margin-right: 12px;
+  
+  .menu-icon {
+    font-size: 24px;
+    color: #fff;
+  }
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// 移动端汉堡菜单按钮（右侧 - 废弃）
+.mobile-menu-btn {
+  display: none;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  border: none;
+  border-radius: 12px;
+  width: 45px;
+  height: 45px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+  transition: all 0.3s;
+  position: fixed !important;
+  right: 15px !important;
+  top: 12px !important;
+  z-index: 1001 !important;
+  
+  .menu-icon {
+    font-size: 24px;
+    color: #fff;
+  }
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// 移动端导航抽屉样式
+:deep(.mobile-nav-drawer) {
+  .el-drawer__header {
+    margin-bottom: 0;
+    padding: 25px 20px;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  }
+  
+  .el-drawer__body {
+    padding: 0;
+  }
+}
+
+.drawer-header {
+  .drawer-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    .logo-icon {
+      font-size: 32px;
+    }
+    
+    .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+    }
+  }
+}
+
+.mobile-nav {
+  display: flex;
+  flex-direction: column;
+  
+  .mobile-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 18px 20px;
+    color: #5a5a5a;
+    border-bottom: 1px solid rgba(255, 182, 193, 0.1);
+    transition: all 0.3s;
+    background: none;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-size: 16px;
+    
+    .nav-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    
+    .nav-text {
+      flex: 1;
+      font-weight: 500;
+    }
+    
+    .nav-arrow {
+      font-size: 20px;
+      color: #ccc;
+      transition: transform 0.3s;
+    }
+    
+    &:hover {
+      background: linear-gradient(135deg, rgba(255, 154, 158, 0.05) 0%, rgba(254, 207, 239, 0.05) 100%);
+      padding-left: 25px;
+      
+      .nav-arrow {
+        transform: translateX(5px);
+        color: #ff9a9e;
+      }
+    }
+    
+    &:active {
+      background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
+    }
+    
+    &.router-link-active {
+      background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
+      color: #ff9a9e;
+      border-left: 4px solid #ff9a9e;
+      padding-left: 16px;
+      
+      .nav-arrow {
+        color: #ff9a9e;
+      }
+    }
+  }
+  
+  .mobile-user-actions {
+    margin-top: 10px;
+    
+    .divider {
+      height: 8px;
+      background: rgba(255, 182, 193, 0.05);
+      margin: 10px 0;
+    }
+    
+    .login-btn {
+      background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
+      color: #ff9a9e;
+      font-weight: 600;
+    }
+  }
+}
+
 @media (max-width: 768px) {
   .header {
     .container {
       padding: 0 15px;
       min-height: 70px;
-      flex-wrap: wrap;
+      justify-content: flex-start;
+      align-items: center;
+    }
+    
+    // 显示左侧汉堡菜单按钮
+    .mobile-menu-btn-left {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
     }
     
     .logo {
+      // 隐藏小花图标
       .logo-circle {
-        width: 45px;
-        height: 45px;
-        
-        .logo-icon {
-          font-size: 24px;
-        }
+        display: none;
       }
       
       .logo-text-wrapper {
@@ -1023,36 +1438,31 @@ onMounted(() => {
       }
     }
     
-    .nav {
-      flex-wrap: wrap;
-      gap: 5px;
-      order: 2;
-      width: 100%;
-      justify-content: flex-start;
-      
-      .nav-item {
-        padding: 8px 12px;
-        
-        .nav-icon {
-          font-size: 18px;
-        }
-        
-        .nav-text {
-          display: none;
-        }
-      }
+    // 隐藏 PC 端导航
+    .desktop-nav {
+      display: none !important;
     }
     
     .user-center {
-      position: fixed;
-      right: 15px;
-      top: 12px;
+      right: 15px !important;
+      top: 12px !important;
       
       .user-info {
         width: 45px;
         height: 45px;
       }
+      
+      .el-button {
+        padding: 10px 20px;
+        font-size: 14px;
+      }
     }
   }
+  
+  // 隐藏右侧汉堡菜单按钮（废弃）
+  .mobile-menu-btn {
+    display: none !important;
+  }
 }
+
 </style>

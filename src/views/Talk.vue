@@ -1405,23 +1405,206 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .talk {
+    .container {
+      padding: 20px 15px;
+    }
+  }
+  
   .page-header {
     flex-direction: column;
     text-align: center;
+    padding: 30px 20px;
+    margin-bottom: 25px;
+    gap: 15px;
     
-    .header-text h1 {
-      font-size: 32px;
+    .header-icon {
+      font-size: 50px;
+    }
+    
+    .header-text {
+      h1 {
+        font-size: 28px;
+        margin-bottom: 8px;
+      }
+      
+      p {
+        font-size: 13px;
+      }
     }
     
     .publish-btn {
       width: 100%;
+      padding: 12px;
+      font-size: 15px;
     }
   }
   
+  .talk-list {
+    gap: 15px;
+  }
+  
   .talk-item {
-    .talk-images {
-      .talk-img {
-        height: 150px;
+    padding: 20px 15px;
+    
+    .talk-avatar {
+      width: 45px;
+      height: 45px;
+    }
+    
+    .talk-content {
+      .talk-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 12px;
+        
+        .talk-user {
+          font-size: 15px;
+        }
+        
+        .talk-time {
+          font-size: 11px;
+        }
+      }
+      
+      .talk-text {
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 12px;
+      }
+      
+      .talk-images {
+        gap: 8px;
+        margin-bottom: 12px;
+        
+        .talk-img {
+          height: 100px;
+          
+          &.single {
+            height: 200px;
+          }
+          
+          &.double {
+            height: 150px;
+          }
+        }
+      }
+      
+      .talk-footer {
+        flex-direction: column;
+        gap: 12px;
+        
+        .talk-stats {
+          width: 100%;
+          justify-content: flex-start;
+          gap: 15px;
+          
+          .stat-item {
+            font-size: 12px;
+            
+            .icon {
+              font-size: 14px;
+            }
+          }
+        }
+        
+        .talk-actions {
+          width: 100%;
+          justify-content: flex-start;
+          gap: 15px;
+          
+          .action-btn {
+            font-size: 12px;
+            padding: 5px 12px;
+            
+            .icon {
+              font-size: 14px;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .pagination-wrapper {
+    margin-top: 25px;
+    
+    :deep(.el-pagination) {
+      justify-content: center;
+      
+      .el-pager li {
+        min-width: 32px;
+        height: 32px;
+        line-height: 32px;
+        font-size: 13px;
+      }
+      
+      button {
+        padding: 0 8px;
+        font-size: 13px;
+      }
+    }
+  }
+  
+  .empty-state {
+    padding: 60px 20px;
+    
+    .empty-icon {
+      font-size: 60px;
+    }
+    
+    .empty-text {
+      font-size: 14px;
+    }
+  }
+}
+
+// 发表说说弹窗移动端样式
+:deep(.publish-dialog) {
+  @media (max-width: 768px) {
+    .el-dialog {
+      width: 95vw !important;
+      margin: 0 auto;
+    }
+    
+    .el-dialog__header {
+      padding: 15px 20px !important;
+    }
+    
+    .el-dialog__body {
+      padding: 20px 15px !important;
+    }
+    
+    .el-dialog__footer {
+      padding: 15px 20px 20px !important;
+    }
+    
+    .image-list {
+      gap: 10px;
+      
+      .image-item {
+        width: calc(33.333% - 7px);
+        height: 80px;
+        
+        .remove-btn {
+          width: 24px;
+          height: 24px;
+          font-size: 14px;
+        }
+      }
+    }
+    
+    .upload-trigger {
+      width: calc(33.333% - 7px);
+      height: 80px;
+      
+      .upload-icon {
+        font-size: 24px;
+      }
+      
+      .upload-text {
+        font-size: 12px;
       }
     }
   }
@@ -1460,6 +1643,39 @@ onMounted(() => {
       &--primary {
         background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
         border: none;
+      }
+    }
+  }
+  
+  @media (max-width: 768px) {
+    width: 95vw !important;
+    margin: 0 auto;
+    border-radius: 15px;
+    
+    .el-dialog__header {
+      padding: 20px 15px 15px;
+      
+      .el-dialog__title {
+        font-size: 18px;
+      }
+    }
+    
+    .el-dialog__body {
+      padding: 20px 15px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    
+    .el-dialog__footer {
+      padding: 12px 15px 20px;
+      
+      .el-button {
+        padding: 10px 20px;
+        font-size: 14px;
+        
+        &:first-child {
+          margin-right: 10px;
+        }
       }
     }
   }
@@ -1603,6 +1819,46 @@ onMounted(() => {
         transform: translate(-50%, -50%);
         font-size: 28px;
         color: #ff9a9e;
+      }
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .upload-area {
+      padding: 20px;
+      
+      .upload-icon {
+        font-size: 32px;
+      }
+      
+      .upload-text {
+        font-size: 13px;
+      }
+    }
+    
+    .image-list {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      
+      .image-item {
+        border-radius: 8px;
+        
+        .image-overlay {
+          opacity: 1;
+          background: rgba(0, 0, 0, 0.3);
+          
+          .el-icon {
+            font-size: 18px;
+          }
+        }
+      }
+      
+      .upload-btn {
+        border-radius: 8px;
+        
+        .el-icon {
+          font-size: 24px;
+        }
       }
     }
   }
