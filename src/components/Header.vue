@@ -4,7 +4,8 @@
     <div class="container">
       <div class="logo">
         <div class="logo-circle">
-          <span class="logo-icon">🌸</span>
+          <img v-if="siteLogo.startsWith('http')" :src="siteLogo" alt="logo" class="logo-image">
+          <span v-else class="logo-icon">{{ siteLogo }}</span>
         </div>
         <div class="logo-text-wrapper">
           <span class="logo-text">{{ siteName }}</span>
@@ -236,6 +237,7 @@ const userStore = useUserStore()
 
 const siteName = ref('小花的日记本')
 const siteDescription = ref('记录美好生活')
+const siteLogo = ref('🌸')
 
 // 获取网站配置
 const fetchWebsiteConfig = async () => {
@@ -247,6 +249,9 @@ const fetchWebsiteConfig = async () => {
     }
     if (config.site_description) {
       siteDescription.value = config.site_description
+    }
+    if (config.logo) {
+      siteLogo.value = config.logo
     }
   } catch (error) {
     // 获取网站配置失败
@@ -585,9 +590,16 @@ onMounted(() => {
       justify-content: center;
       box-shadow: 0 5px 20px rgba(255, 154, 158, 0.4);
       animation: pulse 2s ease-in-out infinite;
+      overflow: hidden;
       
       .logo-icon {
         font-size: 30px;
+      }
+      
+      .logo-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
     }
     
