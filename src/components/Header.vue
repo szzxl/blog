@@ -25,7 +25,7 @@
           <span class="nav-text">首页</span>
         </router-link>
         <router-link to="/articles" class="nav-item">
-          <span class="nav-icon">�</span>
+          <span class="nav-icon">📝</span>
           <span class="nav-text">文章</span>
         </router-link>
         <router-link to="/category" class="nav-item">
@@ -37,7 +37,7 @@
           <span class="nav-text">标签</span>
         </router-link>
         <router-link to="/talk" class="nav-item">
-          <span class="nav-icon">�</span>
+          <span class="nav-icon">💬</span>
           <span class="nav-text">说说</span>
         </router-link>
         <router-link to="/guestbook" class="nav-item">
@@ -49,7 +49,7 @@
           <span class="nav-text">友链</span>
         </router-link>
         <router-link to="/about" class="nav-item">
-          <span class="nav-icon">�‍💻</span>
+          <span class="nav-icon">👨‍💻</span>
           <span class="nav-text">关于</span>
         </router-link>
       </nav>
@@ -82,7 +82,6 @@
       </template>
       <template v-else>
         <el-button type="primary" round @click="goToLogin">
-          <span class="btn-icon">🌸</span>
           登录
         </el-button>
       </template>
@@ -114,7 +113,7 @@
         <span class="nav-arrow">›</span>
       </router-link>
       <router-link to="/articles" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">�</span>
+        <span class="nav-icon">📝</span>
         <span class="nav-text">文章</span>
         <span class="nav-arrow">›</span>
       </router-link>
@@ -129,7 +128,7 @@
         <span class="nav-arrow">›</span>
       </router-link>
       <router-link to="/talk" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">�</span>
+        <span class="nav-icon">💬</span>
         <span class="nav-text">说说</span>
         <span class="nav-arrow">›</span>
       </router-link>
@@ -144,7 +143,7 @@
         <span class="nav-arrow">›</span>
       </router-link>
       <router-link to="/about" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">�‍💻</span>
+        <span class="nav-icon">👨‍💻</span>
         <span class="nav-text">关于</span>
         <span class="nav-arrow">›</span>
       </router-link>
@@ -171,9 +170,8 @@
       <div class="mobile-user-actions" v-else>
         <div class="divider"></div>
         <button class="mobile-nav-item login-btn" @click="handleMobileLogin">
-          <span class="nav-icon">🌸</span>
           <span class="nav-text">登录</span>
-          <span class="nav-arrow">›</span>
+          <span class="nav-arrow"></span>
         </button>
       </div>
     </nav>

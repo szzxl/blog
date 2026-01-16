@@ -80,7 +80,7 @@ export const useUserStore = defineStore('user', () => {
       await fetchUserInfo()
       
       isLoggedIn.value = true
-      ElMessage.success('登录成功！欢迎回来 🌸')
+      ElMessage.success('登录成功！欢迎回来')
       return true
     } catch (error) {
       ElMessage.error('登录失败，请检查用户名和密码')

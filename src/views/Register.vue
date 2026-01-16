@@ -158,7 +158,7 @@ const handleRegister = async () => {
           password: registerForm.value.password
         })
         
-        ElMessage.success('注册成功！请登录 🌸')
+        ElMessage.success('注册成功！请登录')
         
         // 跳转到登录页
         router.push('/login')

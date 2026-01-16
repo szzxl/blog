@@ -4,7 +4,6 @@
       <button class="close-btn" @click="goBack">×</button>
       
       <div class="login-header">
-        <div class="logo">🌸</div>
         <h2 class="title">欢迎回来</h2>
       </div>
       
