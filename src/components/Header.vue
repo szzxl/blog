@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <header class="header">
     <div class="header-bg"></div>
     <div class="container">
@@ -535,8 +535,18 @@ const handleCommand = async (command: string) => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   fetchWebsiteConfig()
+  
+  // 如果已登录，自动刷新用户信息
+  if (userStore.isLoggedIn && userStore.token) {
+    try {
+      await userStore.fetchUserInfo()
+    } catch (error) {
+      // 如果获取用户信息失败（比如 token 过期），清除登录状态
+      console.error('获取用户信息失败:', error)
+    }
+  }
 })
 </script>
 
