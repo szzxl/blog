@@ -102,6 +102,7 @@ onMounted(() => {
     width: 100%;
     height: 60px;
     overflow: hidden;
+    display: none;
     
     svg {
       width: 100%;
@@ -110,11 +111,10 @@ onMounted(() => {
   }
   
   .container {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
     padding: 60px 30px 30px;
-    border-top: 3px solid transparent;
-    border-image: linear-gradient(90deg, #8b5cf6, #6366f1, #ffd0d0) 1;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
   }
   
   .footer-content {
@@ -140,26 +140,22 @@ onMounted(() => {
       .logo-text {
         font-size: 24px;
         font-weight: 700;
-        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #fff;
+        text-shadow: 0 2px 10px rgba(139, 92, 246, 0.8);
       }
     }
     
     .motto {
       font-size: 18px;
-      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #fff;
+      text-shadow: 0 2px 8px rgba(139, 92, 246, 0.6);
       margin-bottom: 12px;
       font-weight: 600;
     }
     
     .copyright {
       font-size: 14px;
-      color: #999;
+      color: rgba(255, 255, 255, 0.8);
     }
   }
   
@@ -176,7 +172,7 @@ onMounted(() => {
     
     .copyright {
       font-size: 13px;
-      color: #aaa;
+      color: rgba(255, 255, 255, 0.7);
       margin: 0;
       position: absolute;
       left: 30px;
@@ -184,7 +180,7 @@ onMounted(() => {
     
     .icp {
       font-size: 13px;
-      color: #aaa;
+      color: rgba(255, 255, 255, 0.7);
       margin: 0;
     }
   }
@@ -196,28 +192,30 @@ onMounted(() => {
     .link-group {
       h4 {
         font-size: 16px;
-        color: #8b5cf6;
+        color: #fff;
         margin-bottom: 15px;
         font-weight: 700;
+        text-shadow: 0 2px 8px rgba(139, 92, 246, 0.6);
       }
       
       a {
         display: block;
-        color: #888;
+        color: rgba(255, 255, 255, 0.8);
         font-size: 14px;
         margin-bottom: 10px;
         transition: all 0.3s;
         text-decoration: none;
         
         &:hover {
-          color: #8b5cf6;
+          color: #fff;
           transform: translateX(5px);
+          text-shadow: 0 2px 8px rgba(139, 92, 246, 0.8);
         }
       }
       
       .contact-item {
         display: block;
-        color: #888;
+        color: rgba(255, 255, 255, 0.8);
         font-size: 14px;
         margin-bottom: 10px;
         cursor: default;
@@ -225,15 +223,16 @@ onMounted(() => {
       
       .contact-link {
         display: block;
-        color: #888;
+        color: rgba(255, 255, 255, 0.8);
         font-size: 14px;
         margin-bottom: 10px;
         transition: all 0.3s;
         text-decoration: none;
         
         &:hover {
-          color: #8b5cf6;
+          color: #fff;
           transform: translateX(5px);
+          text-shadow: 0 2px 8px rgba(139, 92, 246, 0.8);
         }
       }
     }

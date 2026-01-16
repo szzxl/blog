@@ -1,15 +1,8 @@
 <template>
   <div id="app">
-    <!-- 程序员主题装饰 -->
-    <div class="bg-decorations">
-      <div class="decoration code" style="top: 10%; left: 5%;">💻</div>
-      <div class="decoration terminal" style="top: 20%; right: 10%;">🖥️</div>
-      <div class="decoration keyboard" style="top: 55%; left: 8%;">⌨️</div>
-      <div class="decoration bug" style="top: 40%; right: 8%;">🐛</div>
-      <div class="decoration rocket" style="top: 75%; left: 15%;">🚀</div>
-      <div class="decoration chip" style="top: 65%; right: 12%;">🔧</div>
-      <div class="decoration database" style="top: 30%; left: 20%;">💾</div>
-      <div class="decoration network" style="top: 50%; right: 20%;">🌐</div>
+    <!-- 宇宙星辰装饰 -->
+    <div class="bg-decorations" style="display: none;">
+      <!-- 装饰已隐藏 -->
     </div>
     
     <Header />
@@ -116,85 +109,65 @@ onUnmounted(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #0a0e27;
-  background-image: 
-    linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
-  background-attachment: fixed;
+  background: url('@/assets/images/backgrounds/星球.png') center/cover no-repeat fixed;
   position: relative;
   isolation: isolate;
-  
-  /* 渐变光效 */
-  &::before {
-    content: '';
-    position: fixed;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(
-      circle at 30% 50%,
-      rgba(139, 92, 246, 0.15) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 70% 50%,
-      rgba(59, 130, 246, 0.15) 0%,
-      transparent 50%
-    );
-    animation: glow 20s ease-in-out infinite;
-    pointer-events: none;
-    z-index: 0;
-  }
-  
-  /* 代码雨效果 */
-  &::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-      repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0, 255, 255, 0.03) 2px,
-        rgba(0, 255, 255, 0.03) 4px
-      );
-    animation: scan 8s linear infinite;
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.5;
-  }
-}
-
-@keyframes glow {
-  0%, 100% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  50% {
-    transform: translate(10%, 10%) rotate(180deg);
-  }
-}
-
-@keyframes scan {
-  0% {
-    transform: translateY(0);
-  }
-  100% {
-    transform: translateY(50px);
-  }
+  overflow-x: hidden;
 }
 
 @keyframes stars {
   0% {
-    background-position: 0% 0%;
+    background-position: 0 0;
   }
   100% {
-    background-position: 100% 100%;
+    background-position: -550px -300px;
+  }
+}
+
+@keyframes shooting-star {
+  0% {
+    box-shadow: 
+      100vw -10vh 2px 1px rgba(255, 255, 255, 0),
+      80vw 20vh 2px 1px rgba(255, 255, 255, 0);
+  }
+  10% {
+    box-shadow: 
+      100vw -10vh 2px 1px rgba(255, 255, 255, 0.8),
+      80vw 20vh 2px 1px rgba(255, 255, 255, 0);
+  }
+  20% {
+    box-shadow: 
+      -10vw 50vh 2px 1px rgba(255, 255, 255, 0),
+      80vw 20vh 2px 1px rgba(255, 255, 255, 0.8);
+  }
+  30% {
+    box-shadow: 
+      -10vw 50vh 2px 1px rgba(255, 255, 255, 0),
+      -10vw 80vh 2px 1px rgba(255, 255, 255, 0);
+  }
+  40% {
+    box-shadow: 
+      -10vw 50vh 2px 1px rgba(255, 255, 255, 0),
+      -10vw 80vh 2px 1px rgba(255, 255, 255, 0.8);
+  }
+  50% {
+    box-shadow: 
+      -10vw 50vh 2px 1px rgba(255, 255, 255, 0),
+      -10vw 120vh 2px 1px rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 
+      -10vw 50vh 2px 1px rgba(255, 255, 255, 0),
+      -10vw 120vh 2px 1px rgba(255, 255, 255, 0);
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
   }
 }
 
@@ -207,47 +180,132 @@ onUnmounted(() => {
   pointer-events: none;
   z-index: 0;
   
+  /* 行星样式 */
+  .planet {
+    position: absolute;
+    font-size: 60px;
+    opacity: 0.7;
+    animation: orbit 30s ease-in-out infinite;
+    filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.9));
+    
+    &.mercury {
+      font-size: 35px;
+      animation: orbit 15s ease-in-out infinite;
+      filter: drop-shadow(0 0 15px rgba(169, 169, 169, 0.8));
+    }
+    
+    &.venus {
+      font-size: 45px;
+      animation: orbit 20s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(255, 198, 73, 0.9));
+    }
+    
+    &.earth {
+      font-size: 50px;
+      animation: orbit 25s ease-in-out infinite, spin 20s linear infinite;
+      filter: drop-shadow(0 0 25px rgba(100, 149, 237, 1));
+    }
+    
+    &.mars {
+      font-size: 40px;
+      animation: orbit 28s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(255, 69, 0, 0.9));
+    }
+    
+    &.jupiter {
+      font-size: 80px;
+      animation: orbit 35s ease-in-out infinite, rotate 30s linear infinite;
+      filter: drop-shadow(0 0 35px rgba(255, 215, 0, 1));
+    }
+    
+    &.saturn {
+      font-size: 75px;
+      animation: orbit 40s ease-in-out infinite, rotate 35s linear infinite;
+      filter: drop-shadow(0 0 30px rgba(238, 232, 170, 1));
+    }
+    
+    &.uranus {
+      font-size: 55px;
+      animation: orbit 45s ease-in-out infinite;
+      filter: drop-shadow(0 0 25px rgba(64, 224, 208, 0.9));
+    }
+    
+    &.neptune {
+      font-size: 55px;
+      animation: orbit 50s ease-in-out infinite;
+      filter: drop-shadow(0 0 25px rgba(30, 144, 255, 1));
+    }
+    
+    &.pluto {
+      font-size: 30px;
+      animation: orbit 55s ease-in-out infinite;
+      filter: drop-shadow(0 0 15px rgba(192, 192, 192, 0.8));
+    }
+  }
+  
+  /* 其他宇宙装饰 */
   .decoration {
     position: absolute;
-    font-size: 50px;
-    opacity: 0.3;
+    font-size: 45px;
+    opacity: 0.5;
     animation: float 12s ease-in-out infinite;
-    filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.6));
-    
-    &.code {
-      animation: typing 4s ease-in-out infinite;
-    }
-    
-    &.terminal {
-      animation: blink 2s ease-in-out infinite;
-    }
-    
-    &.keyboard {
-      animation: press 3s ease-in-out infinite;
-    }
-    
-    &.bug {
-      animation: crawl 8s ease-in-out infinite;
-    }
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
     
     &.rocket {
-      animation: fly 15s ease-in-out infinite;
+      font-size: 50px;
+      animation: fly 20s ease-in-out infinite;
+      filter: drop-shadow(0 0 30px rgba(255, 200, 100, 1));
     }
     
-    &.chip {
-      animation: rotate 20s linear infinite;
+    &.satellite {
+      font-size: 40px;
+      animation: orbit 25s ease-in-out infinite, rotate 15s linear infinite;
+      filter: drop-shadow(0 0 20px rgba(192, 192, 192, 0.9));
     }
     
-    &.database {
+    &.moon {
+      font-size: 55px;
+      animation: orbit 20s ease-in-out infinite;
+      filter: drop-shadow(0 0 30px rgba(255, 255, 224, 1));
+    }
+    
+    &.star {
+      font-size: 40px;
       animation: pulse 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 25px rgba(255, 255, 0, 1));
     }
     
-    &.network {
-      animation: spin 10s linear infinite;
+    &.comet {
+      font-size: 45px;
+      animation: comet-fly 15s ease-in-out infinite;
+      filter: drop-shadow(0 0 25px rgba(255, 140, 0, 1));
+    }
+    
+    &.alien {
+      font-size: 50px;
+      animation: float 10s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(0, 255, 0, 0.8));
     }
   }
 }
 
+/* 行星轨道运动 */
+@keyframes orbit {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(30px, -20px) rotate(90deg);
+  }
+  50% {
+    transform: translate(0, -40px) rotate(180deg);
+  }
+  75% {
+    transform: translate(-30px, -20px) rotate(270deg);
+  }
+}
+
+/* 漂浮动画 */
 @keyframes float {
   0%, 100% {
     transform: translateY(0) rotate(0deg);
@@ -263,6 +321,7 @@ onUnmounted(() => {
   }
 }
 
+/* 旋转动画 */
 @keyframes rotate {
   0% {
     transform: rotate(0deg);
@@ -272,79 +331,51 @@ onUnmounted(() => {
   }
 }
 
+/* 自转动画 */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 火箭飞行 */
 @keyframes fly {
   0%, 100% {
     transform: translateY(0) translateX(0) rotate(-45deg);
   }
   50% {
-    transform: translateY(-20px) translateX(20px) rotate(-45deg);
+    transform: translateY(-30px) translateX(30px) rotate(-45deg);
   }
 }
 
-@keyframes typing {
-  0%, 100% {
-    opacity: 0.3;
-    transform: scale(1);
+/* 彗星飞行 */
+@keyframes comet-fly {
+  0% {
+    transform: translate(0, 0) rotate(-45deg);
+    opacity: 0.5;
   }
   50% {
-    opacity: 0.7;
-    transform: scale(1.1);
-  }
-}
-
-@keyframes blink {
-  0%, 100% {
-    opacity: 0.3;
-  }
-  50% {
+    transform: translate(100px, 100px) rotate(-45deg);
     opacity: 0.8;
   }
-}
-
-@keyframes press {
-  0%, 100% {
-    transform: translateY(0);
+  100% {
+    transform: translate(200px, 200px) rotate(-45deg);
     opacity: 0.3;
   }
-  50% {
-    transform: translateY(5px);
-    opacity: 0.6;
-  }
 }
 
-@keyframes crawl {
-  0%, 100% {
-    transform: translateX(0) rotate(0deg);
-    opacity: 0.3;
-  }
-  50% {
-    transform: translateX(20px) rotate(10deg);
-    opacity: 0.6;
-  }
-}
-
+/* 脉冲动画 */
 @keyframes pulse {
   0%, 100% {
     transform: scale(1);
-    opacity: 0.3;
+    opacity: 0.5;
   }
   50% {
-    transform: scale(1.15);
-    opacity: 0.7;
-  }
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 0.6;
-  }
-  100% {
-    transform: rotate(360deg);
-    opacity: 0.3;
+    transform: scale(1.2);
+    opacity: 0.9;
   }
 }
 
@@ -358,23 +389,25 @@ onUnmounted(() => {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border-bottom: 2px solid rgba(59, 130, 246, 0.2);
-  padding: 12px 0;
+  padding: 8px 0;
   position: relative;
   z-index: 998;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 15px;
   overflow: hidden;
   
   .announcement-icon {
-    font-size: 24px;
-    padding: 0 20px;
+    font-size: 20px;
+    padding: 0 15px;
     flex-shrink: 0;
     animation: swing 2s ease-in-out infinite;
   }
   
   .announcement-scroll {
     flex: 1;
+    max-width: 1200px;
     overflow: hidden;
     position: relative;
     
@@ -419,16 +452,16 @@ onUnmounted(() => {
     .announcement-label {
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
       color: #fff;
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-size: 11px;
       font-weight: 700;
       flex-shrink: 0;
     }
     
     .announcement-text {
       color: #666;
-      font-size: 14px;
+      font-size: 13px;
     }
   }
 }

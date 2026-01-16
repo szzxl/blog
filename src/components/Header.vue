@@ -666,14 +666,13 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .header {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
-  box-shadow: 0 4px 25px rgba(252, 182, 159, 0.2);
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
   z-index: 999;
-  border-bottom: 3px solid transparent;
-  border-image: linear-gradient(90deg, #8b5cf6, #6366f1, #ffd0d0) 1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   overflow: visible;
   
   .header-bg {
@@ -682,7 +681,7 @@ onMounted(async () => {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(99, 102, 241, 0.05) 100%);
+    background: transparent;
     pointer-events: none;
   }
   
@@ -692,7 +691,7 @@ onMounted(async () => {
     padding: 0 30px;
     display: flex;
     align-items: center;
-    min-height: 80px;
+    min-height: 60px;
     position: relative;
     z-index: 2;
     gap: 20px;
@@ -705,8 +704,8 @@ onMounted(async () => {
     flex-shrink: 0;
     
     .logo-circle {
-      width: 55px;
-      height: 55px;
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
       background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       display: flex;
@@ -717,7 +716,7 @@ onMounted(async () => {
       overflow: hidden;
       
       .logo-icon {
-        font-size: 30px;
+        font-size: 24px;
       }
       
       .logo-image {
@@ -733,19 +732,18 @@ onMounted(async () => {
       gap: 3px;
       
       .logo-text {
-        font-size: 22px;
+        font-size: 18px;
         font-weight: 700;
-        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #fff;
+        text-shadow: 0 2px 10px rgba(139, 92, 246, 0.8);
         letter-spacing: 1px;
       }
       
       .logo-subtitle {
-        font-size: 12px;
-        color: #8b5cf6;
-        opacity: 0.8;
+        font-size: 11px;
+        color: #fff;
+        opacity: 0.9;
+        text-shadow: 0 1px 5px rgba(139, 92, 246, 0.6);
       }
     }
   }
@@ -760,12 +758,12 @@ onMounted(async () => {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 5px;
-      padding: 12px 20px;
-      color: #7a7a7a;
+      gap: 3px;
+      padding: 8px 16px;
+      color: rgba(255, 255, 255, 0.9);
       border-radius: 20px;
       transition: all 0.3s;
-      font-size: 14px;
+      font-size: 13px;
       position: relative;
       
       &::before {
@@ -782,7 +780,7 @@ onMounted(async () => {
       }
       
       .nav-icon {
-        font-size: 22px;
+        font-size: 18px;
         transition: transform 0.3s;
       }
       
@@ -791,8 +789,8 @@ onMounted(async () => {
       }
       
       &:hover {
-        background: linear-gradient(135deg, rgba(255, 240, 246, 0.8) 0%, rgba(255, 232, 240, 0.8) 100%);
-        color: #8b5cf6;
+        background: rgba(139, 92, 246, 0.3);
+        color: #fff;
         transform: translateY(-3px);
         
         .nav-icon {
@@ -823,15 +821,15 @@ onMounted(async () => {
   .user-center {
     position: fixed;
     right: 30px;
-    top: 15px;
+    top: 10px;
     z-index: 1000;
     
     .user-info {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 50px;
-      height: 50px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
       cursor: pointer;

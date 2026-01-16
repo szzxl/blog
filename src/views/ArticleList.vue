@@ -191,7 +191,7 @@ onMounted(() => {
 .article-list {
   min-height: 100vh;
   padding: 30px 0 0;
-  background: #f8f9fa;
+  background: transparent;
   display: flex;
   flex-direction: column;
 }
@@ -211,15 +211,17 @@ onMounted(() => {
   
   h1 {
     font-size: 28px;
-    color: #2c3e50;
+    color: #fff;
     margin: 0 0 8px 0;
     font-weight: 700;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   }
   
   .subtitle {
     font-size: 13px;
-    color: #95a5a6;
+    color: rgba(255, 255, 255, 0.8);
     margin: 0;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -409,8 +411,8 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   padding: 20px 0;
-  background: #f8f9fa;
-  border-top: 1px solid #e9ecef;
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   margin-top: auto;
   
   :deep(.el-pagination) {
