@@ -97,8 +97,13 @@
               </div>
               
               <!-- 该评论的回复列表（展开后显示） -->
-              <div v-if="comment.repliesExpanded && comment.detailReplies && comment.detailReplies.length > 0" style="margin-left: 52px;">
-                <div v-for="reply in comment.detailReplies" :key="reply.id" class="comment-item-bilibili">
+              <div v-if="comment.repliesExpanded && comment.detailReplies && comment.detailReplies.length > 0">
+                <div 
+                  v-for="reply in comment.detailReplies" 
+                  :key="reply.id" 
+                  class="comment-item-bilibili"
+                  :style="{ marginLeft: (reply.level || 1) * 52 + 'px' }"
+                >
                   <img :src="reply.user?.avatar || '/default-avatar.svg'" alt="头像" class="comment-avatar">
                   <div class="comment-main">
                     <div class="comment-user" :class="{ author: reply.user?.isAuthor }">
@@ -154,11 +159,12 @@
                   <div class="reply-item" v-for="reply in flattenComments(comment.replies)" :key="reply.id">
                     <img :src="reply.user?.avatar || '/default-avatar.svg'" alt="头像" class="reply-avatar">
                     <div class="reply-content">
-                      <span class="reply-user" :class="{ author: reply.user?.isAuthor }">
+                      <div class="reply-user" :class="{ author: reply.user?.isAuthor }">
                         {{ reply.user?.nickname || '匿名用户' }}
-                      </span>
-                      <span v-if="reply.replyTo" class="reply-to">回复 <span class="mention">@{{ reply.replyTo }}</span></span>
-                      <span class="reply-text">: {{ reply.content }}</span>
+                      </div>
+                      <div class="reply-text">
+                        <span v-if="reply.replyTo" class="mention">@{{ reply.replyTo }} </span>{{ reply.content }}
+                      </div>
                       <div class="reply-footer">
                         <span class="reply-time">{{ formatCommentTime(reply.createTime) }}</span>
                         <span class="action-btn" @click="openCommentDialog(talk, reply)">回复</span>
@@ -914,8 +920,8 @@ const toggleCommentReplies = async (talk: any, comment: any) => {
         // 找到当前评论在详情中的数据
         const detailComment = response.comments.find((c: any) => c.id === comment.id)
         if (detailComment && detailComment.replies) {
-          // 扁平化回复列表
-          comment.detailReplies = flattenComments(detailComment.replies)
+          // 扁平化回复列表，并添加层级信息
+          comment.detailReplies = flattenCommentsWithLevel(detailComment.replies, 1)
         } else {
           comment.detailReplies = []
         }
@@ -946,6 +952,26 @@ const flattenComments = (comments: any[]): any[] => {
   }
   
   flatten(comments)
+  return result
+}
+
+// 扁平化评论树并添加层级信息
+const flattenCommentsWithLevel = (comments: any[], level: number = 1): any[] => {
+  const result: any[] = []
+  
+  const flatten = (commentList: any[], currentLevel: number) => {
+    commentList.forEach(comment => {
+      result.push({
+        ...comment,
+        level: currentLevel
+      })
+      if (comment.replies && comment.replies.length > 0) {
+        flatten(comment.replies, currentLevel + 1)
+      }
+    })
+  }
+  
+  flatten(comments, level)
   return result
 }
 
@@ -1353,6 +1379,8 @@ onMounted(() => {
               .reply-user {
                 color: #666;
                 font-weight: 600;
+                display: block;
+                margin-bottom: 4px;
                 
                 &.author {
                   color: #6366f1;
@@ -1370,19 +1398,15 @@ onMounted(() => {
                 }
               }
               
-              .reply-to {
-                color: #999;
-                font-size: 13px;
-                margin: 0 4px;
+              .reply-text {
+                color: #333;
+                display: block;
+                margin-bottom: 6px;
                 
                 .mention {
                   color: #8b5cf6;
                   font-weight: 600;
                 }
-              }
-              
-              .reply-text {
-                color: #333;
               }
               
               .reply-footer {
