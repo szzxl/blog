@@ -139,7 +139,7 @@ onMounted(() => {
   .header-text {
     h1 {
       font-size: 42px;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -169,8 +169,8 @@ onMounted(() => {
     cursor: pointer;
     padding: 8px 16px;
     border-radius: 20px;
-    background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
-    color: #ff9a9e;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+    color: #8b5cf6;
     font-weight: 600;
     transition: all 0.3s;
     display: inline-flex;
@@ -178,10 +178,10 @@ onMounted(() => {
     gap: 5px;
     
     &:hover {
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       color: #fff;
       transform: scale(1.1);
-      box-shadow: 0 8px 20px rgba(255, 154, 158, 0.3);
+      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
     }
     
     .tag-count {
@@ -194,7 +194,7 @@ onMounted(() => {
 .tag-list {
   .list-title {
     font-size: 28px;
-    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -217,7 +217,7 @@ onMounted(() => {
     
     &:hover {
       transform: translateY(-5px);
-      box-shadow: 0 12px 30px rgba(255, 154, 158, 0.2);
+      box-shadow: 0 12px 30px rgba(139, 92, 246, 0.2);
     }
     
     .tag-header {
@@ -244,7 +244,7 @@ onMounted(() => {
     }
     
     .view-btn {
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       border: none;
       color: #fff;
       border-radius: 15px;

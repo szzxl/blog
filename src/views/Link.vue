@@ -265,7 +265,7 @@ onMounted(() => {
   .header-text {
     h1 {
       font-size: 42px;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -287,7 +287,7 @@ onMounted(() => {
   
   .card-title {
     font-size: 24px;
-    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -303,10 +303,10 @@ onMounted(() => {
   }
   
   .my-info {
-    background: linear-gradient(135deg, rgba(255, 154, 158, 0.05) 0%, rgba(254, 207, 239, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(99, 102, 241, 0.05) 100%);
     padding: 25px;
     border-radius: 15px;
-    border: 2px solid rgba(255, 182, 193, 0.2);
+    border: 2px solid rgba(139, 92, 246, 0.2);
     
     .info-item {
       display: flex;
@@ -314,12 +314,12 @@ onMounted(() => {
       padding: 10px 0;
       
       &:not(:last-child) {
-        border-bottom: 1px solid rgba(255, 182, 193, 0.1);
+        border-bottom: 1px solid rgba(139, 92, 246, 0.1);
       }
       
       .label {
         font-weight: 600;
-        color: #ff9a9e;
+        color: #8b5cf6;
         min-width: 100px;
       }
       
@@ -339,12 +339,12 @@ onMounted(() => {
     margin-bottom: 30px;
     
     .apply-btn {
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       border: none;
       border-radius: 20px;
       padding: 12px 24px;
       font-weight: 600;
-      box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
       
       .btn-icon {
         margin-right: 6px;
@@ -352,14 +352,14 @@ onMounted(() => {
       
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
+        box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
       }
     }
   }
   
   .section-title {
     font-size: 28px;
-    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -390,13 +390,13 @@ onMounted(() => {
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 154, 158, 0.1), transparent);
+      background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
       transition: left 0.5s;
     }
     
     &:hover {
       transform: translateY(-5px);
-      box-shadow: 0 12px 30px rgba(255, 154, 158, 0.2);
+      box-shadow: 0 12px 30px rgba(139, 92, 246, 0.2);
       
       &::before {
         left: 100%;
@@ -412,11 +412,11 @@ onMounted(() => {
       width: 80px;
       height: 80px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
       
       .avatar-text {
         font-size: 32px;
@@ -437,7 +437,7 @@ onMounted(() => {
       
       .link-author {
         font-size: 12px;
-        color: #ff9a9e;
+        color: #8b5cf6;
         margin: 0 0 5px 0;
       }
       
@@ -455,7 +455,7 @@ onMounted(() => {
     
     .link-icon {
       font-size: 24px;
-      color: #ff9a9e;
+      color: #8b5cf6;
       transition: transform 0.3s;
     }
   }
@@ -682,15 +682,15 @@ onMounted(() => {
   }
   
   .my-info {
-    background: linear-gradient(135deg, rgba(255, 154, 158, 0.05) 0%, rgba(254, 207, 239, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(99, 102, 241, 0.05) 100%);
     padding: 20px;
     border-radius: 12px;
-    border: 2px solid rgba(255, 182, 193, 0.2);
+    border: 2px solid rgba(139, 92, 246, 0.2);
     margin-bottom: 20px;
     
     .info-title {
       font-size: 16px;
-      color: #ff9a9e;
+      color: #8b5cf6;
       margin: 0 0 15px 0;
       font-weight: 700;
     }
@@ -701,12 +701,12 @@ onMounted(() => {
       padding: 8px 0;
       
       &:not(:last-child) {
-        border-bottom: 1px solid rgba(255, 182, 193, 0.1);
+        border-bottom: 1px solid rgba(139, 92, 246, 0.1);
       }
       
       .label {
         font-weight: 600;
-        color: #ff9a9e;
+        color: #8b5cf6;
         min-width: 90px;
         font-size: 14px;
       }
@@ -721,14 +721,14 @@ onMounted(() => {
   }
   
   .apply-tips {
-    background: linear-gradient(135deg, rgba(255, 154, 158, 0.03) 0%, rgba(254, 207, 239, 0.03) 100%);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(99, 102, 241, 0.03) 100%);
     padding: 20px;
     border-radius: 12px;
-    border: 1px solid rgba(255, 182, 193, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.15);
     
     .tips-title {
       font-size: 16px;
-      color: #ff9a9e;
+      color: #8b5cf6;
       margin: 0 0 12px 0;
       font-weight: 700;
     }
@@ -743,7 +743,7 @@ onMounted(() => {
         line-height: 2;
         
         &::marker {
-          color: #ff9a9e;
+          color: #8b5cf6;
         }
       }
     }
@@ -753,37 +753,37 @@ onMounted(() => {
     margin: 20px 0;
     
     :deep(.el-form-item__label) {
-      color: #ff9a9e;
+      color: #8b5cf6;
       font-weight: 600;
     }
     
     :deep(.el-input__wrapper) {
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(252, 182, 159, 0.08);
-      border: 1px solid rgba(255, 182, 193, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.15);
       
       &:hover {
         border-color: rgba(255, 182, 193, 0.3);
       }
       
       &.is-focus {
-        border-color: #ff9a9e;
-        box-shadow: 0 2px 12px rgba(255, 154, 158, 0.15);
+        border-color: #8b5cf6;
+        box-shadow: 0 2px 12px rgba(139, 92, 246, 0.15);
       }
     }
     
     :deep(.el-textarea__inner) {
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(252, 182, 159, 0.08);
-      border: 1px solid rgba(255, 182, 193, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.15);
       
       &:hover {
         border-color: rgba(255, 182, 193, 0.3);
       }
       
       &:focus {
-        border-color: #ff9a9e;
-        box-shadow: 0 2px 12px rgba(255, 154, 158, 0.15);
+        border-color: #8b5cf6;
+        box-shadow: 0 2px 12px rgba(139, 92, 246, 0.15);
       }
     }
   }
@@ -798,7 +798,7 @@ onMounted(() => {
     .el-dialog__title {
       font-size: 20px;
       font-weight: 700;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -817,7 +817,7 @@ onMounted(() => {
       padding: 10px 20px;
       
       &[type="primary"] {
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
         border: none;
         
         &:hover {

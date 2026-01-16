@@ -163,7 +163,7 @@ onMounted(() => {
   .section-text {
     h2 {
       font-size: 36px;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -193,13 +193,13 @@ onMounted(() => {
     position: absolute;
     top: -10px;
     right: -10px;
-    background: linear-gradient(135deg, #ff6b6b 0%, #ff9a9e 100%);
+    background: linear-gradient(135deg, #4338ca 0%, #8b5cf6 100%);
     color: #fff;
     padding: 5px 15px;
     border-radius: 15px;
     font-size: 12px;
     font-weight: 700;
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
     z-index: 10;
     animation: pulse 2s ease-in-out infinite;
   }
@@ -225,7 +225,7 @@ onMounted(() => {
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, rgba(255, 154, 158, 0.85) 0%, rgba(254, 207, 239, 0.85) 100%);
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.85) 0%, rgba(99, 102, 241, 0.85) 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -283,8 +283,8 @@ onMounted(() => {
         display: inline-block;
         padding: 4px 12px;
         border-radius: 12px;
-        background: linear-gradient(135deg, rgba(255, 154, 158, 0.15) 0%, rgba(254, 207, 239, 0.15) 100%);
-        color: #ff9a9e;
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%);
+        color: #8b5cf6;
         font-size: 13px;
         font-weight: 600;
       }
@@ -314,12 +314,12 @@ onMounted(() => {
       flex-wrap: wrap;
       
       .tag-item {
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
         color: #fff;
         padding: 6px 15px;
         border-radius: 15px;
         font-size: 12px;
-        box-shadow: 0 3px 10px rgba(255, 154, 158, 0.3);
+        box-shadow: 0 3px 10px rgba(139, 92, 246, 0.3);
         font-weight: 600;
       }
     }

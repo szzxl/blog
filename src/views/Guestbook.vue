@@ -367,7 +367,7 @@ const submitMessage = async () => {
   .header-text {
     h1 {
       font-size: 42px;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -389,7 +389,7 @@ const submitMessage = async () => {
   
   .form-title {
     font-size: 24px;
-    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -405,23 +405,23 @@ const submitMessage = async () => {
     :deep(.el-input__wrapper) {
       padding: 12px 18px;
       border-radius: 15px;
-      box-shadow: 0 2px 12px rgba(252, 182, 159, 0.1);
-      border: 2px solid rgba(255, 182, 193, 0.2);
+      box-shadow: 0 2px 12px rgba(139, 92, 246, 0.1);
+      border: 2px solid rgba(139, 92, 246, 0.2);
       transition: all 0.3s;
       
       &:hover {
-        box-shadow: 0 4px 20px rgba(252, 182, 159, 0.15);
-        border-color: rgba(255, 182, 193, 0.3);
+        box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
+        border-color: rgba(139, 92, 246, 0.3);
       }
       
       &.is-focus {
-        border-color: #ff9a9e;
-        box-shadow: 0 4px 20px rgba(255, 154, 158, 0.25);
+        border-color: #8b5cf6;
+        box-shadow: 0 4px 20px rgba(139, 92, 246, 0.25);
       }
     }
     
     :deep(.el-input__prefix) {
-      color: #ff9a9e;
+      color: #8b5cf6;
     }
   }
   
@@ -429,18 +429,18 @@ const submitMessage = async () => {
     :deep(.el-textarea__inner) {
       padding: 15px;
       border-radius: 15px;
-      box-shadow: 0 2px 12px rgba(252, 182, 159, 0.1);
-      border: 2px solid rgba(255, 182, 193, 0.2);
+      box-shadow: 0 2px 12px rgba(139, 92, 246, 0.1);
+      border: 2px solid rgba(139, 92, 246, 0.2);
       transition: all 0.3s;
       
       &:hover {
-        box-shadow: 0 4px 20px rgba(252, 182, 159, 0.15);
-        border-color: rgba(255, 182, 193, 0.3);
+        box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
+        border-color: rgba(139, 92, 246, 0.3);
       }
       
       &:focus {
-        border-color: #ff9a9e;
-        box-shadow: 0 4px 20px rgba(255, 154, 158, 0.25);
+        border-color: #8b5cf6;
+        box-shadow: 0 4px 20px rgba(139, 92, 246, 0.25);
       }
     }
   }
@@ -449,11 +449,11 @@ const submitMessage = async () => {
     width: 100%;
     height: 48px;
     border-radius: 24px;
-    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
     border: none;
     font-size: 16px;
     font-weight: 700;
-    box-shadow: 0 8px 25px rgba(255, 154, 158, 0.4);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
     transition: all 0.3s;
     
     .btn-icon {
@@ -463,7 +463,7 @@ const submitMessage = async () => {
     
     &:hover {
       transform: translateY(-3px);
-      box-shadow: 0 12px 35px rgba(255, 154, 158, 0.5);
+      box-shadow: 0 12px 35px rgba(139, 92, 246, 0.5);
     }
   }
   
@@ -472,9 +472,9 @@ const submitMessage = async () => {
     align-items: center;
     gap: 10px;
     padding: 15px 20px;
-    background: linear-gradient(135deg, rgba(255, 154, 158, 0.08) 0%, rgba(254, 207, 239, 0.08) 100%);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
     border-radius: 15px;
-    border: 2px solid rgba(255, 182, 193, 0.2);
+    border: 2px solid rgba(139, 92, 246, 0.2);
     
     .tip-icon {
       font-size: 20px;
@@ -485,13 +485,13 @@ const submitMessage = async () => {
       color: #666;
       
       .login-link {
-        color: #ff9a9e;
+        color: #8b5cf6;
         font-weight: 700;
         text-decoration: none;
         transition: all 0.3s;
         
         &:hover {
-          color: #ff7a7e;
+          color: #6366f1;
           text-decoration: underline;
         }
       }
@@ -516,23 +516,23 @@ const submitMessage = async () => {
     }
     
     .upload-area {
-      border: 2px dashed rgba(255, 182, 193, 0.4);
+      border: 2px dashed rgba(139, 92, 246, 0.4);
       border-radius: 15px;
       padding: 40px;
       text-align: center;
       cursor: pointer;
       transition: all 0.3s;
-      background: linear-gradient(135deg, rgba(255, 154, 158, 0.03) 0%, rgba(254, 207, 239, 0.03) 100%);
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(99, 102, 241, 0.03) 100%);
       
       &:hover {
-        border-color: #ff9a9e;
-        background: linear-gradient(135deg, rgba(255, 154, 158, 0.08) 0%, rgba(254, 207, 239, 0.08) 100%);
+        border-color: #8b5cf6;
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
         transform: translateY(-2px);
       }
       
       .upload-icon {
         font-size: 48px;
-        color: #ff9a9e;
+        color: #8b5cf6;
         margin-bottom: 15px;
       }
       
@@ -561,12 +561,12 @@ const submitMessage = async () => {
         border-radius: 12px;
         overflow: hidden;
         background: #f5f5f5;
-        box-shadow: 0 2px 12px rgba(252, 182, 159, 0.15);
+        box-shadow: 0 2px 12px rgba(139, 92, 246, 0.15);
         transition: all 0.3s;
         
         &:hover {
           transform: translateY(-3px);
-          box-shadow: 0 6px 20px rgba(255, 154, 158, 0.25);
+          box-shadow: 0 6px 20px rgba(139, 92, 246, 0.25);
           
           .image-overlay {
             opacity: 1;
@@ -607,7 +607,7 @@ const submitMessage = async () => {
             }
             
             &.delete-icon:hover {
-              color: #ff6b6b;
+              color: #4338ca;
             }
           }
         }
@@ -626,15 +626,15 @@ const submitMessage = async () => {
         position: relative;
         width: 100%;
         padding-bottom: 100%;
-        border: 2px dashed rgba(255, 182, 193, 0.4);
+        border: 2px dashed rgba(139, 92, 246, 0.4);
         border-radius: 12px;
         cursor: pointer;
         transition: all 0.3s;
-        background: linear-gradient(135deg, rgba(255, 154, 158, 0.03) 0%, rgba(254, 207, 239, 0.03) 100%);
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(99, 102, 241, 0.03) 100%);
         
         &:hover {
-          border-color: #ff9a9e;
-          background: linear-gradient(135deg, rgba(255, 154, 158, 0.08) 0%, rgba(254, 207, 239, 0.08) 100%);
+          border-color: #8b5cf6;
+          background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
           transform: translateY(-3px);
         }
         
@@ -644,7 +644,7 @@ const submitMessage = async () => {
           left: 50%;
           transform: translate(-50%, -50%);
           font-size: 32px;
-          color: #ff9a9e;
+          color: #8b5cf6;
         }
       }
     }

@@ -9,10 +9,10 @@
       <div class="footer-content">
         <div class="footer-info">
           <div class="footer-logo">
-            <span class="logo-icon">🌸</span>
+            <span class="logo-icon">💻</span>
             <span class="logo-text">{{ websiteName }}</span>
           </div>
-          <p class="motto" v-if="websiteMotto">🌸 {{ websiteMotto }} 🌸</p>
+          <p class="motto" v-if="websiteMotto">✨ {{ websiteMotto }} ✨</p>
         </div>
         <div class="footer-links">
           <div class="link-group">
@@ -24,8 +24,8 @@
           <div class="link-group">
             <h4>联系方式</h4>
             <span class="contact-item" v-if="socialQQ">💬 QQ: {{ socialQQ }}</span>
-            <span class="contact-item" v-if="socialWechat">💚 微信: {{ socialWechat }}</span>
-            <span class="contact-item" v-if="socialEmail">💌 邮箱: {{ socialEmail }}</span>
+            <span class="contact-item" v-if="socialWechat">📱 微信: {{ socialWechat }}</span>
+            <span class="contact-item" v-if="socialEmail">📧 邮箱: {{ socialEmail }}</span>
             <a v-if="socialGithub" :href="socialGithub" target="_blank" class="contact-link">
               🔗 GitHub
             </a>
@@ -33,12 +33,12 @@
         </div>
       </div>
       <div class="footer-decoration">
-        <span class="deco">🌸</span>  
-        <span class="deco">💕</span>
-        <span class="deco">✨</span>
-        <span class="deco">🦋</span>
-        <span class="deco">💗</span>
-        <span class="deco">🌸</span>
+        <span class="deco">💻</span>  
+        <span class="deco">⌨️</span>
+        <span class="deco">🖱️</span>
+        <span class="deco">🖥️</span>
+        <span class="deco">💾</span>
+        <span class="deco">🔧</span>
       </div>
       
       <!-- 底部版权和备案 -->
@@ -114,7 +114,7 @@ onMounted(() => {
     backdrop-filter: blur(20px);
     padding: 60px 30px 30px;
     border-top: 3px solid transparent;
-    border-image: linear-gradient(90deg, #ff9a9e, #fecfef, #ffd0d0) 1;
+    border-image: linear-gradient(90deg, #8b5cf6, #6366f1, #ffd0d0) 1;
   }
   
   .footer-content {
@@ -140,7 +140,7 @@ onMounted(() => {
       .logo-text {
         font-size: 24px;
         font-weight: 700;
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -149,7 +149,7 @@ onMounted(() => {
     
     .motto {
       font-size: 18px;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -171,7 +171,7 @@ onMounted(() => {
     align-items: center;
     gap: 40px;
     padding: 20px 30px;
-    border-top: 1px solid rgba(255, 182, 193, 0.15);
+    border-top: 1px solid rgba(139, 92, 246, 0.15);
     position: relative;
     
     .copyright {
@@ -196,7 +196,7 @@ onMounted(() => {
     .link-group {
       h4 {
         font-size: 16px;
-        color: #ff9a9e;
+        color: #8b5cf6;
         margin-bottom: 15px;
         font-weight: 700;
       }
@@ -210,7 +210,7 @@ onMounted(() => {
         text-decoration: none;
         
         &:hover {
-          color: #ff9a9e;
+          color: #8b5cf6;
           transform: translateX(5px);
         }
       }
@@ -232,7 +232,7 @@ onMounted(() => {
         text-decoration: none;
         
         &:hover {
-          color: #ff9a9e;
+          color: #8b5cf6;
           transform: translateX(5px);
         }
       }
@@ -246,7 +246,7 @@ onMounted(() => {
     justify-content: center;
     gap: 30px;
     padding-top: 30px;
-    border-top: 2px solid rgba(255, 182, 193, 0.2);
+    border-top: 2px solid rgba(139, 92, 246, 0.2);
     
     .deco {
       font-size: 24px;
@@ -363,7 +363,7 @@ onMounted(() => {
       gap: 8px;
       text-align: center;
       padding: 20px 15px;
-      border-top: 1px solid rgba(255, 182, 193, 0.15);
+      border-top: 1px solid rgba(139, 92, 246, 0.15);
       
       .copyright {
         position: static;

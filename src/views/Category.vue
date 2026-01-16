@@ -145,7 +145,7 @@ onMounted(() => {
   .header-text {
     h1 {
       font-size: 42px;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -177,7 +177,7 @@ onMounted(() => {
   
   &:hover {
     transform: translateY(-8px);
-    box-shadow: 0 15px 40px rgba(255, 154, 158, 0.25);
+    box-shadow: 0 15px 40px rgba(139, 92, 246, 0.25);
   }
   
   .category-icon {
@@ -212,7 +212,7 @@ onMounted(() => {
       .count {
         font-size: 32px;
         font-weight: 700;
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -229,17 +229,17 @@ onMounted(() => {
     width: 100%;
     height: 42px;
     border-radius: 21px;
-    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
     border: none;
     color: #fff;
     font-size: 15px;
     font-weight: 600;
-    box-shadow: 0 6px 20px rgba(255, 154, 158, 0.3);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
     transition: all 0.3s;
     
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(255, 154, 158, 0.4);
+      box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
     }
   }
 }

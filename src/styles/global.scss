@@ -1,4 +1,4 @@
-* {
+﻿* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -44,7 +44,7 @@ button, a, input, textarea {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 25px;
   padding: 25px;
-  box-shadow: 0 10px 35px rgba(252, 182, 159, 0.15);
+  box-shadow: 0 10px 35px rgba(59, 130, 246, 0.15);
   transition: transform 0.3s, box-shadow 0.3s;
   border: 2px solid rgba(255, 255, 255, 0.9);
   position: relative;
@@ -57,7 +57,7 @@ button, a, input, textarea {
     right: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255, 182, 193, 0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
     pointer-events: none;
   }
   
@@ -70,7 +70,7 @@ button, a, input, textarea {
 
 .card:hover {
   transform: translateY(-10px) scale(1.02);
-  box-shadow: 0 15px 45px rgba(252, 182, 159, 0.25);
+  box-shadow: 0 15px 45px rgba(59, 130, 246, 0.25);
   
   /* 移动端减少悬停效果 */
   @media (max-width: 768px) {

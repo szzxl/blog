@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <header class="header">
     <div class="header-bg"></div>
     <div class="container">
@@ -25,11 +25,11 @@
           <span class="nav-text">首页</span>
         </router-link>
         <router-link to="/articles" class="nav-item">
-          <span class="nav-icon">✨</span>
+          <span class="nav-icon">�</span>
           <span class="nav-text">文章</span>
         </router-link>
         <router-link to="/category" class="nav-item">
-          <span class="nav-icon">🎀</span>
+          <span class="nav-icon">📂</span>
           <span class="nav-text">分类</span>
         </router-link>
         <router-link to="/tag" class="nav-item">
@@ -37,19 +37,19 @@
           <span class="nav-text">标签</span>
         </router-link>
         <router-link to="/talk" class="nav-item">
-          <span class="nav-icon">💕</span>
+          <span class="nav-icon">�</span>
           <span class="nav-text">说说</span>
         </router-link>
         <router-link to="/guestbook" class="nav-item">
-          <span class="nav-icon">💌</span>
+          <span class="nav-icon">✍️</span>
           <span class="nav-text">留言板</span>
         </router-link>
         <router-link to="/link" class="nav-item">
-          <span class="nav-icon">🌈</span>
+          <span class="nav-icon">🔗</span>
           <span class="nav-text">友链</span>
         </router-link>
         <router-link to="/about" class="nav-item">
-          <span class="nav-icon">🦋</span>
+          <span class="nav-icon">�‍💻</span>
           <span class="nav-text">关于</span>
         </router-link>
       </nav>
@@ -114,12 +114,12 @@
         <span class="nav-arrow">›</span>
       </router-link>
       <router-link to="/articles" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">✨</span>
+        <span class="nav-icon">�</span>
         <span class="nav-text">文章</span>
         <span class="nav-arrow">›</span>
       </router-link>
       <router-link to="/category" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">🎀</span>
+        <span class="nav-icon">📂</span>
         <span class="nav-text">分类</span>
         <span class="nav-arrow">›</span>
       </router-link>
@@ -129,22 +129,22 @@
         <span class="nav-arrow">›</span>
       </router-link>
       <router-link to="/talk" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">💕</span>
+        <span class="nav-icon">�</span>
         <span class="nav-text">说说</span>
         <span class="nav-arrow">›</span>
       </router-link>
       <router-link to="/guestbook" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">💌</span>
+        <span class="nav-icon">✍️</span>
         <span class="nav-text">留言板</span>
         <span class="nav-arrow">›</span>
       </router-link>
       <router-link to="/link" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">🌈</span>
+        <span class="nav-icon">🔗</span>
         <span class="nav-text">友链</span>
         <span class="nav-arrow">›</span>
       </router-link>
       <router-link to="/about" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">🦋</span>
+        <span class="nav-icon">�‍💻</span>
         <span class="nav-text">关于</span>
         <span class="nav-arrow">›</span>
       </router-link>
@@ -651,8 +651,18 @@ const handleMobileLogin = () => {
   goToLogin()
 }
 
-onMounted(() => {
+onMounted(async () => {
   fetchWebsiteConfig()
+  
+  // 如果已登录，自动刷新用户信息
+  if (userStore.isLoggedIn && userStore.token) {
+    try {
+      await userStore.fetchUserInfo()
+    } catch (error) {
+      // 如果获取用户信息失败（比如 token 过期），清除登录状态
+      console.error('获取用户信息失败:', error)
+    }
+  }
 })
 </script>
 
@@ -665,7 +675,7 @@ onMounted(() => {
   top: 0;
   z-index: 999;
   border-bottom: 3px solid transparent;
-  border-image: linear-gradient(90deg, #ff9a9e, #fecfef, #ffd0d0) 1;
+  border-image: linear-gradient(90deg, #8b5cf6, #6366f1, #ffd0d0) 1;
   overflow: visible;
   
   .header-bg {
@@ -674,7 +684,7 @@ onMounted(() => {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(255, 154, 158, 0.05) 0%, rgba(254, 207, 239, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(99, 102, 241, 0.05) 100%);
     pointer-events: none;
   }
   
@@ -700,11 +710,11 @@ onMounted(() => {
       width: 55px;
       height: 55px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 5px 20px rgba(255, 154, 158, 0.4);
+      box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
       animation: pulse 2s ease-in-out infinite;
       overflow: hidden;
       
@@ -727,7 +737,7 @@ onMounted(() => {
       .logo-text {
         font-size: 22px;
         font-weight: 700;
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -736,7 +746,7 @@ onMounted(() => {
       
       .logo-subtitle {
         font-size: 12px;
-        color: #ff9a9e;
+        color: #8b5cf6;
         opacity: 0.8;
       }
     }
@@ -768,7 +778,7 @@ onMounted(() => {
         transform: translateX(-50%);
         width: 0;
         height: 3px;
-        background: linear-gradient(90deg, #ff9a9e, #fecfef);
+        background: linear-gradient(90deg, #8b5cf6, #6366f1);
         border-radius: 2px;
         transition: width 0.3s;
       }
@@ -784,7 +794,7 @@ onMounted(() => {
       
       &:hover {
         background: linear-gradient(135deg, rgba(255, 240, 246, 0.8) 0%, rgba(255, 232, 240, 0.8) 100%);
-        color: #ff9a9e;
+        color: #8b5cf6;
         transform: translateY(-3px);
         
         .nav-icon {
@@ -797,9 +807,9 @@ onMounted(() => {
       }
       
       &.router-link-active {
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
         color: #fff;
-        box-shadow: 0 8px 25px rgba(255, 154, 158, 0.4);
+        box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
         
         .nav-icon {
           transform: scale(1.1);
@@ -825,30 +835,30 @@ onMounted(() => {
       width: 50px;
       height: 50px;
       border-radius: 50%;
-      background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
       cursor: pointer;
       transition: all 0.3s;
       padding: 3px;
       
       &:hover {
-        background: linear-gradient(135deg, rgba(255, 154, 158, 0.2) 0%, rgba(254, 207, 239, 0.2) 100%);
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%);
         transform: translateY(-2px) scale(1.05);
-        box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
       }
       
       .user-avatar {
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        border: 2px solid #ff9a9e;
+        border: 2px solid #8b5cf6;
         object-fit: cover;
       }
     }
     
     .el-button {
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       border: none;
-      box-shadow: 0 5px 20px rgba(255, 154, 158, 0.3);
+      box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3);
       
       .btn-icon {
         margin-right: 5px;
@@ -856,7 +866,7 @@ onMounted(() => {
       
       &:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(255, 154, 158, 0.4);
+        box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
       }
     }
   }
@@ -900,7 +910,7 @@ onMounted(() => {
     justify-content: center;
     gap: 15px;
     padding: 20px 0 0;
-    border-top: 1px solid rgba(255, 182, 193, 0.15);
+    border-top: 1px solid rgba(139, 92, 246, 0.15);
     margin-top: 30px;
     
     @media (max-width: 768px) {
@@ -916,8 +926,8 @@ onMounted(() => {
       padding: 10px 24px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       background: #fff;
-      border: 2px solid rgba(255, 182, 193, 0.3);
-      color: #ff9a9e;
+      border: 2px solid rgba(139, 92, 246, 0.3);
+      color: #8b5cf6;
       
       @media (max-width: 768px) {
         width: 100%;
@@ -926,20 +936,20 @@ onMounted(() => {
       }
       
       &:hover {
-        background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
-        border-color: #ff9a9e;
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+        border-color: #8b5cf6;
         transform: translateY(-2px);
       }
       
       &[type="primary"] {
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
         border: none;
         color: #fff;
         
         &:hover {
           opacity: 0.9;
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(255, 154, 158, 0.4);
+          box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
         }
       }
     }
@@ -969,7 +979,7 @@ onMounted(() => {
           height: 120px;
           border-radius: 50%;
           border: 5px solid #fff;
-          box-shadow: 0 8px 25px rgba(255, 154, 158, 0.3);
+          box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
           transition: all 0.3s;
           
           @media (max-width: 768px) {
@@ -1052,7 +1062,7 @@ onMounted(() => {
       .intro-content {
         .intro-title {
           font-size: 28px;
-          background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+          background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -1079,9 +1089,9 @@ onMounted(() => {
             align-items: center;
             gap: 8px;
             padding: 12px 20px;
-            background: linear-gradient(135deg, rgba(255, 154, 158, 0.08) 0%, rgba(254, 207, 239, 0.08) 100%);
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
             border-radius: 15px;
-            border: 2px solid rgba(255, 182, 193, 0.15);
+            border: 2px solid rgba(139, 92, 246, 0.15);
             
             @media (max-width: 768px) {
               padding: 10px 15px;
@@ -1098,7 +1108,7 @@ onMounted(() => {
             
             .info-label {
               font-size: 14px;
-              color: #ff9a9e;
+              color: #8b5cf6;
               font-weight: 600;
               
               @media (max-width: 768px) {
@@ -1134,7 +1144,7 @@ onMounted(() => {
 @keyframes pulse {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 5px 20px rgba(255, 154, 158, 0.4);
+    box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
   }
   50% {
     transform: scale(1.05);
@@ -1155,7 +1165,7 @@ onMounted(() => {
   
   .el-dialog__header {
     padding: 20px 40px !important;
-    background: linear-gradient(135deg, rgba(255, 154, 158, 0.05) 0%, rgba(254, 207, 239, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(99, 102, 241, 0.05) 100%);
     
     @media (max-width: 768px) {
       padding: 15px 20px !important;
@@ -1181,7 +1191,7 @@ onMounted(() => {
   }
   
   .el-form-item__label {
-    color: #ff9a9e;
+    color: #8b5cf6;
     font-weight: 600;
   }
   
@@ -1203,7 +1213,7 @@ onMounted(() => {
   
   .el-dialog__header {
     padding: 20px 40px !important;
-    background: linear-gradient(135deg, rgba(255, 154, 158, 0.05) 0%, rgba(254, 207, 239, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(99, 102, 241, 0.05) 100%);
     
     @media (max-width: 768px) {
       padding: 15px 20px !important;
@@ -1229,7 +1239,7 @@ onMounted(() => {
   }
   
   .el-form-item__label {
-    color: #ff9a9e;
+    color: #8b5cf6;
     font-weight: 600;
   }
   
@@ -1241,13 +1251,13 @@ onMounted(() => {
 // 移动端汉堡菜单按钮（左侧）
 .mobile-menu-btn-left {
   display: none;
-  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
   border: none;
   border-radius: 12px;
   width: 45px;
   height: 45px;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
   transition: all 0.3s;
   flex-shrink: 0;
   margin-right: 12px;
@@ -1259,7 +1269,7 @@ onMounted(() => {
   
   &:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
   }
   
   &:active {
@@ -1270,13 +1280,13 @@ onMounted(() => {
 // 移动端汉堡菜单按钮（右侧 - 废弃）
 .mobile-menu-btn {
   display: none;
-  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
   border: none;
   border-radius: 12px;
   width: 45px;
   height: 45px;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
   transition: all 0.3s;
   position: fixed !important;
   right: 15px !important;
@@ -1290,7 +1300,7 @@ onMounted(() => {
   
   &:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
   }
   
   &:active {
@@ -1303,7 +1313,7 @@ onMounted(() => {
   .el-drawer__header {
     margin-bottom: 0;
     padding: 25px 20px;
-    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
   }
   
   .el-drawer__body {
@@ -1374,27 +1384,27 @@ onMounted(() => {
     }
     
     &:hover {
-      background: linear-gradient(135deg, rgba(255, 154, 158, 0.05) 0%, rgba(254, 207, 239, 0.05) 100%);
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(99, 102, 241, 0.05) 100%);
       padding-left: 25px;
       
       .nav-arrow {
         transform: translateX(5px);
-        color: #ff9a9e;
+        color: #8b5cf6;
       }
     }
     
     &:active {
-      background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
     }
     
     &.router-link-active {
-      background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
-      color: #ff9a9e;
-      border-left: 4px solid #ff9a9e;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+      color: #8b5cf6;
+      border-left: 4px solid #8b5cf6;
       padding-left: 16px;
       
       .nav-arrow {
-        color: #ff9a9e;
+        color: #8b5cf6;
       }
     }
   }
@@ -1409,8 +1419,8 @@ onMounted(() => {
     }
     
     .login-btn {
-      background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
-      color: #ff9a9e;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+      color: #8b5cf6;
       font-weight: 600;
     }
   }

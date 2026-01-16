@@ -85,7 +85,7 @@ onMounted(() => {
       }
       
       &.is-active button {
-        background: #ff9a9e;
+        background: #8b5cf6;
         width: 30px;
         border-radius: 6px;
       }

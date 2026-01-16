@@ -966,7 +966,7 @@ onMounted(() => {
     
     h1 {
       font-size: 42px;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -985,11 +985,11 @@ onMounted(() => {
     height: 44px;
     padding: 0 24px;
     border-radius: 22px;
-    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
     border: none;
     font-size: 15px;
     font-weight: 600;
-    box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
     transition: all 0.3s;
     
     .btn-icon {
@@ -999,7 +999,7 @@ onMounted(() => {
     
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
     }
   }
 }
@@ -1038,7 +1038,7 @@ onMounted(() => {
         height: 60px;
         border-radius: 50%;
         border: 3px solid #fff;
-        box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
       }
       
       .user-info {
@@ -1095,13 +1095,13 @@ onMounted(() => {
         
         &:hover {
           transform: scale(1.05);
-          box-shadow: 0 8px 25px rgba(255, 154, 158, 0.3);
+          box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
         }
       }
     }
     
     .talk-footer {
-      border-top: 1px solid rgba(255, 182, 193, 0.2);
+      border-top: 1px solid rgba(139, 92, 246, 0.2);
       padding-top: 15px;
       display: flex;
       align-items: center;
@@ -1112,7 +1112,7 @@ onMounted(() => {
         gap: 20px;
         
         .action-btn {
-          color: #ff9a9e;
+          color: #8b5cf6;
           font-size: 15px;
           
           .icon {
@@ -1125,7 +1125,7 @@ onMounted(() => {
           }
           
           &:hover {
-            color: #ff7a7e;
+            color: #6366f1;
           }
         }
       }
@@ -1141,7 +1141,7 @@ onMounted(() => {
         }
         
         &:hover {
-          color: #ff6b6b;
+          color: #4338ca;
         }
       }
     }
@@ -1150,7 +1150,7 @@ onMounted(() => {
   .comment-list {
     margin-top: 20px;
     padding-top: 20px;
-    border-top: 1px solid rgba(255, 182, 193, 0.2);
+    border-top: 1px solid rgba(139, 92, 246, 0.2);
     
     .comment-item-bilibili {
       display: flex;
@@ -1182,13 +1182,13 @@ onMounted(() => {
           margin-bottom: 8px;
           
           &.author {
-            color: #ff7a7e;
+            color: #6366f1;
             
             &::after {
               content: '博主';
               margin-left: 8px;
               font-size: 11px;
-              background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+              background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
               color: #fff;
               padding: 2px 8px;
               border-radius: 10px;
@@ -1227,11 +1227,11 @@ onMounted(() => {
               transition: all 0.2s;
               
               &:hover {
-                color: #ff9a9e;
+                color: #8b5cf6;
               }
               
               &.delete:hover {
-                color: #ff6b6b;
+                color: #4338ca;
               }
             }
           }
@@ -1242,7 +1242,7 @@ onMounted(() => {
           align-items: center;
           gap: 6px;
           padding: 6px 12px;
-          background: rgba(255, 154, 158, 0.08);
+          background: rgba(139, 92, 246, 0.08);
           border-radius: 6px;
           cursor: pointer;
           transition: all 0.2s;
@@ -1250,13 +1250,13 @@ onMounted(() => {
           
           .expand-text {
             font-size: 13px;
-            color: #ff9a9e;
+            color: #8b5cf6;
             font-weight: 500;
           }
           
           .expand-icon {
             font-size: 10px;
-            color: #ff9a9e;
+            color: #8b5cf6;
             transition: transform 0.3s;
             
             &.expanded {
@@ -1308,13 +1308,13 @@ onMounted(() => {
                 font-weight: 600;
                 
                 &.author {
-                  color: #ff7a7e;
+                  color: #6366f1;
                   
                   &::after {
                     content: '博主';
                     margin-left: 6px;
                     font-size: 10px;
-                    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+                    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
                     color: #fff;
                     padding: 2px 6px;
                     border-radius: 8px;
@@ -1329,7 +1329,7 @@ onMounted(() => {
                 margin: 0 4px;
                 
                 .mention {
-                  color: #ff9a9e;
+                  color: #8b5cf6;
                   font-weight: 600;
                 }
               }
@@ -1356,11 +1356,11 @@ onMounted(() => {
                   transition: all 0.2s;
                   
                   &:hover {
-                    color: #ff9a9e;
+                    color: #8b5cf6;
                   }
                   
                   &.delete:hover {
-                    color: #ff6b6b;
+                    color: #4338ca;
                   }
                 }
               }
@@ -1384,11 +1384,11 @@ onMounted(() => {
       box-shadow: 0 2px 12px rgba(252, 182, 159, 0.1);
       
       &:hover {
-        color: #ff9a9e;
+        color: #8b5cf6;
       }
       
       &.is-active {
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
         color: #fff;
       }
     }
@@ -1616,12 +1616,12 @@ onMounted(() => {
   
   .el-dialog__header {
     padding: 25px 30px 20px;
-    border-bottom: 1px solid rgba(255, 182, 193, 0.2);
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2);
     
     .el-dialog__title {
       font-size: 20px;
       font-weight: 700;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -1634,14 +1634,14 @@ onMounted(() => {
   
   .el-dialog__footer {
     padding: 15px 30px 25px;
-    border-top: 1px solid rgba(255, 182, 193, 0.2);
+    border-top: 1px solid rgba(139, 92, 246, 0.2);
     
     .el-button {
       padding: 10px 24px;
       border-radius: 20px;
       
       &--primary {
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
         border: none;
       }
     }
@@ -1699,22 +1699,22 @@ onMounted(() => {
   }
   
   .upload-area {
-    border: 2px dashed rgba(255, 182, 193, 0.4);
+    border: 2px dashed rgba(139, 92, 246, 0.4);
     border-radius: 12px;
     padding: 30px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s;
-    background: linear-gradient(135deg, rgba(255, 154, 158, 0.03) 0%, rgba(254, 207, 239, 0.03) 100%);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(99, 102, 241, 0.03) 100%);
     
     &:hover {
-      border-color: #ff9a9e;
-      background: linear-gradient(135deg, rgba(255, 154, 158, 0.08) 0%, rgba(254, 207, 239, 0.08) 100%);
+      border-color: #8b5cf6;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
     }
     
     .upload-icon {
       font-size: 40px;
-      color: #ff9a9e;
+      color: #8b5cf6;
       margin-bottom: 10px;
     }
     
@@ -1736,12 +1736,12 @@ onMounted(() => {
       border-radius: 10px;
       overflow: hidden;
       background: #f5f5f5;
-      box-shadow: 0 2px 8px rgba(252, 182, 159, 0.15);
+      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
       transition: all 0.3s;
       
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(255, 154, 158, 0.25);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
         
         .image-overlay {
           opacity: 1;
@@ -1782,7 +1782,7 @@ onMounted(() => {
           }
           
           &.delete-icon:hover {
-            color: #ff6b6b;
+            color: #4338ca;
           }
         }
       }
@@ -1801,15 +1801,15 @@ onMounted(() => {
       position: relative;
       width: 100%;
       padding-bottom: 100%;
-      border: 2px dashed rgba(255, 182, 193, 0.4);
+      border: 2px dashed rgba(139, 92, 246, 0.4);
       border-radius: 10px;
       cursor: pointer;
       transition: all 0.3s;
-      background: linear-gradient(135deg, rgba(255, 154, 158, 0.03) 0%, rgba(254, 207, 239, 0.03) 100%);
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(99, 102, 241, 0.03) 100%);
       
       &:hover {
-        border-color: #ff9a9e;
-        background: linear-gradient(135deg, rgba(255, 154, 158, 0.08) 0%, rgba(254, 207, 239, 0.08) 100%);
+        border-color: #8b5cf6;
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
       }
       
       .el-icon {
@@ -1818,7 +1818,7 @@ onMounted(() => {
         left: 50%;
         transform: translate(-50%, -50%);
         font-size: 28px;
-        color: #ff9a9e;
+        color: #8b5cf6;
       }
     }
   }
@@ -1880,12 +1880,12 @@ onMounted(() => {
       margin-right: 20px;
       
       .el-radio__input.is-checked + .el-radio__label {
-        color: #ff9a9e;
+        color: #8b5cf6;
       }
       
       .el-radio__input.is-checked .el-radio__inner {
-        background-color: #ff9a9e;
-        border-color: #ff9a9e;
+        background-color: #8b5cf6;
+        border-color: #8b5cf6;
       }
     }
   }

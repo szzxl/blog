@@ -18,28 +18,46 @@ export const useUserStore = defineStore('user', () => {
   const isLoggedIn = ref(false)
   const token = ref<string>('')
 
-  // 从 localStorage 恢复登录状态（使用管理后台的 key）
-  const savedUser = localStorage.getItem('user')
-  const savedTokenStr = localStorage.getItem('ACCESS_TOKEN')
-  
-  // 解析管理后台的 token 格式（可能是 JSON 对象）
-  let savedToken = ''
-  if (savedTokenStr) {
-    try {
-      const tokenObj = JSON.parse(savedTokenStr)
-      // 管理后台的 token 格式：{ c: 创建时间, e: 过期时间, v: token值 }
-      savedToken = tokenObj.v ? JSON.parse(tokenObj.v) : savedTokenStr
-    } catch {
-      // 如果解析失败，直接使用原始值
-      savedToken = savedTokenStr
+  // 初始化函数：从 localStorage 恢复登录状态
+  const initFromStorage = () => {
+    const savedUser = localStorage.getItem('user')
+    const savedTokenStr = localStorage.getItem('ACCESS_TOKEN')
+    
+    // 解析管理后台的 token 格式（可能是 JSON 对象）
+    let savedToken = ''
+    if (savedTokenStr) {
+      try {
+        const tokenObj = JSON.parse(savedTokenStr)
+        // 管理后台的 token 格式：{ c: 创建时间, e: 过期时间, v: token值 }
+        if (tokenObj.v) {
+          // v 字段可能是字符串或 JSON 字符串
+          try {
+            savedToken = JSON.parse(tokenObj.v)
+          } catch {
+            savedToken = tokenObj.v
+          }
+        } else {
+          savedToken = savedTokenStr
+        }
+      } catch {
+        // 如果解析失败，直接使用原始值
+        savedToken = savedTokenStr
+      }
+    }
+    
+    if (savedUser && savedToken) {
+      try {
+        user.value = JSON.parse(savedUser)
+        token.value = savedToken
+        isLoggedIn.value = true
+      } catch (error) {
+        console.error('Failed to parse user data:', error)
+      }
     }
   }
   
-  if (savedUser && savedToken) {
-    user.value = JSON.parse(savedUser)
-    token.value = savedToken
-    isLoggedIn.value = true
-  }
+  // 立即初始化
+  initFromStorage()
 
   // 登录
   const login = async (username: string, password: string) => {

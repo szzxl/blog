@@ -1,13 +1,15 @@
 <template>
   <div id="app">
-    <!-- 可爱的背景装饰 -->
+    <!-- 程序员主题装饰 -->
     <div class="bg-decorations">
-      <div class="decoration heart" style="top: 10%; left: 5%;">💗</div>
-      <div class="decoration star" style="top: 20%; right: 10%;">⭐</div>
-      <div class="decoration flower" style="top: 60%; left: 8%;">🌸</div>
-      <div class="decoration butterfly" style="top: 40%; right: 5%;">🦋</div>
-      <div class="decoration sparkle" style="top: 80%; left: 15%;">✨</div>
-      <div class="decoration heart" style="top: 70%; right: 12%;">💕</div>
+      <div class="decoration code" style="top: 10%; left: 5%;">💻</div>
+      <div class="decoration terminal" style="top: 20%; right: 10%;">🖥️</div>
+      <div class="decoration keyboard" style="top: 55%; left: 8%;">⌨️</div>
+      <div class="decoration bug" style="top: 40%; right: 8%;">🐛</div>
+      <div class="decoration rocket" style="top: 75%; left: 15%;">🚀</div>
+      <div class="decoration chip" style="top: 65%; right: 12%;">🔧</div>
+      <div class="decoration database" style="top: 30%; left: 20%;">💾</div>
+      <div class="decoration network" style="top: 50%; right: 20%;">🌐</div>
     </div>
     
     <Header />
@@ -114,10 +116,86 @@ onUnmounted(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ffd1dc 100%);
+  background: #0a0e27;
+  background-image: 
+    linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
   background-attachment: fixed;
   position: relative;
   isolation: isolate;
+  
+  /* 渐变光效 */
+  &::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+      circle at 30% 50%,
+      rgba(139, 92, 246, 0.15) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 70% 50%,
+      rgba(59, 130, 246, 0.15) 0%,
+      transparent 50%
+    );
+    animation: glow 20s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  /* 代码雨效果 */
+  &::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 255, 0.03) 2px,
+        rgba(0, 255, 255, 0.03) 4px
+      );
+    animation: scan 8s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(10%, 10%) rotate(180deg);
+  }
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(50px);
+  }
+}
+
+@keyframes stars {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
 }
 
 .bg-decorations {
@@ -131,28 +209,41 @@ onUnmounted(() => {
   
   .decoration {
     position: absolute;
-    font-size: 40px;
-    opacity: 0.2;
-    animation: float 8s ease-in-out infinite;
+    font-size: 50px;
+    opacity: 0.3;
+    animation: float 12s ease-in-out infinite;
+    filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.6));
     
-    &.heart {
-      animation-delay: 0s;
+    &.code {
+      animation: typing 4s ease-in-out infinite;
     }
     
-    &.star {
-      animation-delay: 1s;
+    &.terminal {
+      animation: blink 2s ease-in-out infinite;
     }
     
-    &.flower {
-      animation-delay: 2s;
+    &.keyboard {
+      animation: press 3s ease-in-out infinite;
     }
     
-    &.butterfly {
-      animation-delay: 3s;
+    &.bug {
+      animation: crawl 8s ease-in-out infinite;
     }
     
-    &.sparkle {
-      animation-delay: 4s;
+    &.rocket {
+      animation: fly 15s ease-in-out infinite;
+    }
+    
+    &.chip {
+      animation: rotate 20s linear infinite;
+    }
+    
+    &.database {
+      animation: pulse 3s ease-in-out infinite;
+    }
+    
+    &.network {
+      animation: spin 10s linear infinite;
     }
   }
 }
@@ -172,6 +263,91 @@ onUnmounted(() => {
   }
 }
 
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fly {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(-45deg);
+  }
+  50% {
+    transform: translateY(-20px) translateX(20px) rotate(-45deg);
+  }
+}
+
+@keyframes typing {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes press {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(5px);
+    opacity: 0.6;
+  }
+}
+
+@keyframes crawl {
+  0%, 100% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateX(20px) rotate(10deg);
+    opacity: 0.6;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.7;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: rotate(360deg);
+    opacity: 0.3;
+  }
+}
+
 .main-content {
   flex: 1;
   position: relative;
@@ -181,7 +357,7 @@ onUnmounted(() => {
 .announcement-bar {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
-  border-bottom: 2px solid rgba(255, 182, 193, 0.2);
+  border-bottom: 2px solid rgba(59, 130, 246, 0.2);
   padding: 12px 0;
   position: relative;
   z-index: 998;
@@ -241,7 +417,7 @@ onUnmounted(() => {
     gap: 12px;
     
     .announcement-label {
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
       color: #fff;
       padding: 4px 12px;
       border-radius: 12px;
@@ -307,12 +483,12 @@ onUnmounted(() => {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   border: none;
   color: #fff;
   font-size: 24px;
   cursor: pointer;
-  box-shadow: 0 8px 25px rgba(255, 154, 158, 0.4);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
   transition: all 0.3s;
   z-index: 997;
   display: flex;
@@ -330,7 +506,7 @@ onUnmounted(() => {
   
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 35px rgba(255, 154, 158, 0.5);
+    box-shadow: 0 12px 35px rgba(59, 130, 246, 0.5);
   }
   
   &:active {

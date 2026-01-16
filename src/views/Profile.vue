@@ -112,7 +112,7 @@ const cancelAddTag = () => {
   
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 45px rgba(252, 182, 159, 0.25);
+    box-shadow: 0 15px 45px rgba(139, 92, 246, 0.25);
   }
   
   .intro-avatar {
@@ -125,7 +125,7 @@ const cancelAddTag = () => {
       height: 140px;
       border-radius: 50%;
       border: 5px solid #fff;
-      box-shadow: 0 8px 25px rgba(255, 154, 158, 0.3);
+      box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
     }
     
     .avatar-decoration {
@@ -140,7 +140,7 @@ const cancelAddTag = () => {
   .intro-content {
     .intro-title {
       font-size: 32px;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -167,12 +167,12 @@ const cancelAddTag = () => {
         margin-bottom: 20px;
         
         .tag {
-          background: linear-gradient(135deg, rgba(255, 154, 158, 0.15) 0%, rgba(254, 207, 239, 0.15) 100%);
-          color: #ff9a9e;
+          background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%);
+          color: #8b5cf6;
           padding: 10px 18px;
           border-radius: 20px;
           font-size: 15px;
-          border: 2px solid rgba(255, 154, 158, 0.2);
+          border: 2px solid rgba(139, 92, 246, 0.2);
           transition: all 0.3s;
           font-weight: 600;
           display: flex;
@@ -180,10 +180,10 @@ const cancelAddTag = () => {
           gap: 8px;
           
           &:hover {
-            background: linear-gradient(135deg, rgba(255, 154, 158, 0.2) 0%, rgba(254, 207, 239, 0.2) 100%);
-            border-color: #ff9a9e;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%);
+            border-color: #8b5cf6;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 154, 158, 0.2);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
           }
           
           .tag-remove {
@@ -195,24 +195,24 @@ const cancelAddTag = () => {
             
             &:hover {
               opacity: 1;
-              color: #ff6b6b;
+              color: #4338ca;
               transform: scale(1.2);
             }
           }
         }
         
         .add-tag-btn {
-          background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+          background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
           color: #fff;
           border: none;
           border-radius: 20px;
           padding: 10px 18px;
           font-weight: 600;
-          box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+          box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
           
           &:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
           }
         }
       }
@@ -230,16 +230,16 @@ const cancelAddTag = () => {
           
           :deep(.el-input__wrapper) {
             border-radius: 15px;
-            box-shadow: 0 2px 12px rgba(252, 182, 159, 0.1);
-            border: 2px solid rgba(255, 182, 193, 0.2);
+            box-shadow: 0 2px 12px rgba(139, 92, 246, 0.1);
+            border: 2px solid rgba(139, 92, 246, 0.2);
             
             &:hover {
-              border-color: rgba(255, 182, 193, 0.3);
+              border-color: rgba(139, 92, 246, 0.3);
             }
             
             &.is-focus {
-              border-color: #ff9a9e;
-              box-shadow: 0 4px 20px rgba(255, 154, 158, 0.25);
+              border-color: #8b5cf6;
+              box-shadow: 0 4px 20px rgba(139, 92, 246, 0.25);
             }
           }
         }
@@ -248,9 +248,9 @@ const cancelAddTag = () => {
           border-radius: 15px;
           
           &[type="primary"] {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
             border: none;
-            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
             
             &:hover {
               opacity: 0.9;

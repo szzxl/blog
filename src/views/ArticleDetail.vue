@@ -239,7 +239,7 @@ onMounted(() => {
     color: #888;
     padding-bottom: 30px;
     margin-bottom: 30px;
-    border-bottom: 2px solid rgba(255, 182, 193, 0.15);
+    border-bottom: 2px solid rgba(139, 92, 246, 0.15);
     
     .info-item {
       display: inline-flex;
@@ -259,17 +259,17 @@ onMounted(() => {
         .tag {
           padding: 4px 12px;
           border-radius: 12px;
-          background: linear-gradient(135deg, rgba(255, 154, 158, 0.12) 0%, rgba(254, 207, 239, 0.12) 100%);
-          color: #ff9a9e;
+          background: linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, rgba(99, 102, 241, 0.12) 100%);
+          color: #8b5cf6;
           font-size: 13px;
           font-weight: 600;
           transition: all 0.3s;
           
           &:hover {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
             color: #fff;
             transform: translateY(-2px);
-            box-shadow: 0 3px 10px rgba(255, 154, 158, 0.3);
+            box-shadow: 0 3px 10px rgba(139, 92, 246, 0.3);
           }
         }
       }
@@ -303,7 +303,7 @@ onMounted(() => {
       font-size: 28px;
       padding-bottom: 15px;
       border-bottom: 3px solid;
-      border-image: linear-gradient(90deg, #ff9a9e 0%, #fecfef 100%) 1;
+      border-image: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%) 1;
       
       &::before {
         content: '💖 ';
@@ -315,7 +315,7 @@ onMounted(() => {
       
       &::before {
         content: '✨ ';
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -330,15 +330,15 @@ onMounted(() => {
     :deep(img) {
       max-width: 100%;
       border-radius: 20px;
-      box-shadow: 0 8px 30px rgba(255, 154, 158, 0.15);
+      box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
       margin: 30px 0;
     }
     
     :deep(blockquote) {
       margin: 30px 0;
       padding: 25px 30px;
-      background: linear-gradient(135deg, rgba(255, 154, 158, 0.08) 0%, rgba(254, 207, 239, 0.08) 100%);
-      border-left: 5px solid #ff9a9e;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
+      border-left: 5px solid #8b5cf6;
       border-radius: 0 20px 20px 0;
       font-style: italic;
       color: #666;
@@ -350,11 +350,11 @@ onMounted(() => {
     
     :deep(code) {
       padding: 3px 8px;
-      background: rgba(255, 154, 158, 0.1);
+      background: rgba(139, 92, 246, 0.1);
       border-radius: 6px;
       font-family: 'Consolas', 'Monaco', monospace;
       font-size: 0.9em;
-      color: #ff9a9e;
+      color: #8b5cf6;
     }
     
     :deep(pre) {
@@ -363,7 +363,7 @@ onMounted(() => {
       background: #f8f8f8;
       border-radius: 20px;
       overflow-x: auto;
-      border: 2px solid rgba(255, 182, 193, 0.2);
+      border: 2px solid rgba(139, 92, 246, 0.2);
       
       code {
         padding: 0;
@@ -384,13 +384,13 @@ onMounted(() => {
     }
     
     :deep(a) {
-      color: #ff9a9e;
+      color: #8b5cf6;
       text-decoration: none;
-      border-bottom: 2px solid rgba(255, 154, 158, 0.3);
+      border-bottom: 2px solid rgba(139, 92, 246, 0.3);
       transition: all 0.3s;
       
       &:hover {
-        border-bottom-color: #ff9a9e;
+        border-bottom-color: #8b5cf6;
       }
     }
   }
@@ -412,9 +412,9 @@ onMounted(() => {
     height: 70px;
     padding: 0;
     border-radius: 50%;
-    border: 2px solid rgba(255, 182, 193, 0.3);
+    border: 2px solid rgba(139, 92, 246, 0.3);
     background: #fff;
-    color: #ff9a9e;
+    color: #8b5cf6;
     font-size: 14px;
     font-weight: 600;
     transition: all 0.3s;
@@ -423,7 +423,7 @@ onMounted(() => {
     align-items: center;
     justify-content: center;
     gap: 4px;
-    box-shadow: 0 4px 20px rgba(255, 154, 158, 0.15);
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
     position: relative;
     
     .icon {
@@ -439,22 +439,22 @@ onMounted(() => {
       top: -5px;
       right: -5px;
       padding: 2px 8px;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       color: #fff;
       border-radius: 12px;
       font-size: 11px;
-      box-shadow: 0 2px 8px rgba(255, 154, 158, 0.4);
+      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
     }
     
     &:hover {
-      background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
-      border-color: #ff9a9e;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+      border-color: #8b5cf6;
       transform: scale(1.1);
-      box-shadow: 0 6px 25px rgba(255, 154, 158, 0.3);
+      box-shadow: 0 6px 25px rgba(139, 92, 246, 0.3);
     }
     
     &.like-btn:hover {
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       color: #fff;
       border-color: transparent;
       
@@ -464,7 +464,7 @@ onMounted(() => {
     }
     
     &.like-btn.liked {
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       color: #fff;
       border-color: transparent;
       
@@ -611,7 +611,7 @@ onMounted(() => {
     .action-btn {
       width: 50px;
       height: 50px;
-      box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4);
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
       
       .icon {
         font-size: 20px;
