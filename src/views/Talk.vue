@@ -764,11 +764,6 @@ const loadTalkList = async () => {
       pageSize: pageSize.value
     }
     
-    // 如果用户已登录，传入用户ID
-    if (userStore.user?.id) {
-      params.userId = userStore.user.id
-    }
-    
     const response: any = await getTalkList(params)
     
     // 响应拦截器已经返回了 res.data，所以直接用 response.list
