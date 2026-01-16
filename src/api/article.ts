@@ -225,6 +225,19 @@ export const publishTalk = (data: {
   })
 }
 
+// 说说点赞
+export const likeTalk = (data: {
+  talkId: number
+  userId: number
+  type: 1 | 2  // 1=点赞, 2=取消点赞
+}) => {
+  return request({
+    url: '/web/like',
+    method: 'post',
+    data
+  })
+}
+
 // 删除说说
 export const deleteTalk = (talkId: number) => {
   return request({

@@ -25,7 +25,7 @@
         <!-- 遍历说说列表 -->
         <div class="talk-item card" v-for="talk in talks" :key="talk.id">
           <div class="talk-header">
-            <img :src="talk.user?.avatar || '/web/default-avatar.svg'" alt="头像" class="avatar">
+            <img :src="talk.user?.avatar || '/default-avatar.svg'" alt="头像" class="avatar">
             <div class="user-info">
               <div class="username">{{ talk.user?.nickname || '匿名用户' }}</div>
               <div class="time">{{ talk.createTime }}</div>
@@ -46,13 +46,11 @@
           </div>
           <div class="talk-footer">
             <div class="actions">
-              <el-button text class="action-btn" @click="handleLike">
+              <el-button text class="action-btn" @click="handleLike(talk)">
                 <span class="icon">{{ talk.isLiked ? '❤️' : '💗' }}</span>
-                <span class="count">{{ talk.likeCount || 0 }}</span>
               </el-button>
               <el-button text class="action-btn" @click="openCommentDialog(talk)">
                 <span class="icon">💬</span>
-                <span class="count">{{ talk.commentCount || 0 }}</span>
               </el-button>
             </div>
             <!-- 删除按钮 - 仅博主和超级管理员可见 -->
@@ -71,7 +69,7 @@
           <div class="comment-list" v-if="talk.comments && talk.comments.length > 0 && !talk.commentsLoaded">
             <template v-for="comment in talk.comments" :key="comment.id">
               <div class="comment-item-bilibili">
-                <img :src="comment.user?.avatar || '/web/default-avatar.svg'" alt="头像" class="comment-avatar">
+                <img :src="comment.user?.avatar || '/default-avatar.svg'" alt="头像" class="comment-avatar">
                 <div class="comment-main">
                   <div class="comment-user" :class="{ author: comment.user?.isAuthor }">
                     {{ comment.user?.nickname || '匿名用户' }}
@@ -101,7 +99,7 @@
               <!-- 该评论的回复列表（展开后显示） -->
               <div v-if="comment.repliesExpanded && comment.detailReplies && comment.detailReplies.length > 0" style="margin-left: 52px;">
                 <div v-for="reply in comment.detailReplies" :key="reply.id" class="comment-item-bilibili">
-                  <img :src="reply.user?.avatar || '/web/default-avatar.svg'" alt="头像" class="comment-avatar">
+                  <img :src="reply.user?.avatar || '/default-avatar.svg'" alt="头像" class="comment-avatar">
                   <div class="comment-main">
                     <div class="comment-user" :class="{ author: reply.user?.isAuthor }">
                       {{ reply.user?.nickname || '匿名用户' }}
@@ -131,7 +129,7 @@
           <!-- 完整评论树（点击查看详情后显示，B站风格） -->
           <div class="comment-list" v-if="talk.commentsLoaded && talk.detailComments && talk.detailComments.length > 0">
             <div v-for="comment in talk.detailComments" :key="comment.id" class="comment-item-bilibili">
-              <img :src="comment.user?.avatar || '/web/default-avatar.svg'" alt="头像" class="comment-avatar">
+              <img :src="comment.user?.avatar || '/default-avatar.svg'" alt="头像" class="comment-avatar">
               <div class="comment-main">
                 <div class="comment-user" :class="{ author: comment.user?.isAuthor }">
                   {{ comment.user?.nickname || '匿名用户' }}
@@ -154,7 +152,7 @@
                 <!-- 回复列表 -->
                 <div class="replies-container" v-if="comment.replies && comment.replies.length > 0">
                   <div class="reply-item" v-for="reply in flattenComments(comment.replies)" :key="reply.id">
-                    <img :src="reply.user?.avatar || '/web/default-avatar.svg'" alt="头像" class="reply-avatar">
+                    <img :src="reply.user?.avatar || '/default-avatar.svg'" alt="头像" class="reply-avatar">
                     <div class="reply-content">
                       <span class="reply-user" :class="{ author: reply.user?.isAuthor }">
                         {{ reply.user?.nickname || '匿名用户' }}
@@ -353,7 +351,7 @@
 <script setup lang="ts">
 import { ref, onMounted, defineComponent, h, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getTalkList, getTalkDetail, publishTalk, uploadImage, deleteTalk, deleteComment, addComment } from '@/api/article'
+import { getTalkList, getTalkDetail, publishTalk, uploadImage, deleteTalk, deleteComment, addComment, likeTalk } from '@/api/article'
 import { Plus, Delete, ZoomIn, Upload } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
@@ -685,7 +683,7 @@ const CommentItem: any = defineComponent({
         // 评论项
         h('div', { class: 'comment-item' }, [
           h('img', {
-            src: comment.user?.avatar || '/web/default-avatar.svg',
+            src: comment.user?.avatar || '/default-avatar.svg',
             alt: '头像',
             class: 'comment-avatar',
             style: 'width: 32px; height: 32px;'
@@ -734,13 +732,38 @@ const replyToComment = ref<any>(null)
 const submittingComment = ref(false)
 
 // 点赞相关
-const isLiked = ref(false)
-const likeCount = ref(12)
-
-const handleLike = () => {
-  isLiked.value = !isLiked.value
-  likeCount.value = isLiked.value ? likeCount.value + 1 : likeCount.value - 1
-  ElMessage.success(isLiked.value ? '点赞成功 ❤️' : '取消点赞')
+const handleLike = async (talk: any) => {
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('请先登录')
+    router.push({
+      path: '/login',
+      query: { redirect: router.currentRoute.value.fullPath }
+    })
+    return
+  }
+  
+  if (!userStore.user?.id) {
+    ElMessage.warning('用户信息异常，请重新登录')
+    return
+  }
+  
+  try {
+    const type = talk.isLiked ? 2 : 1  // 1=点赞, 2=取消点赞
+    
+    await likeTalk({
+      talkId: talk.id,
+      userId: Number(userStore.user.id),
+      type
+    })
+    
+    // 更新本地状态
+    talk.isLiked = !talk.isLiked
+    talk.likeCount = talk.isLiked ? (talk.likeCount || 0) + 1 : (talk.likeCount || 0) - 1
+    
+    ElMessage.success(talk.isLiked ? '点赞成功 ❤️' : '取消点赞')
+  } catch (error) {
+    ElMessage.error('操作失败，请重试')
+  }
 }
 
 // 图片预览
@@ -809,7 +832,7 @@ const loadTalkList = async () => {
           user: talk.user || {
             id: 0,
             nickname: '匿名用户',
-            avatar: '/web/default-avatar.svg',
+            avatar: '/default-avatar.svg',
             isAuthor: false
           },
           comments: talk.comments || [],  // 确保 comments 字段存在
