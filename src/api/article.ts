@@ -213,6 +213,7 @@ export const getTalkDetail = (data: {
 
 // 发表说说
 export const publishTalk = (data: {
+  userId?: number
   talkContent: string
   talkPic?: string[]
   talkStatus?: number
