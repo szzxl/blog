@@ -473,6 +473,15 @@ const submitTalk = async () => {
     return
   }
   
+  if (!userStore.user?.id) {
+    ElMessage.warning('请先登录')
+    router.push({
+      path: '/login',
+      query: { redirect: router.currentRoute.value.fullPath }
+    })
+    return
+  }
+  
   const uploading = talkImageList.value.some(img => img.uploading)
   if (uploading) {
     ElMessage.warning('图片正在上传中，请稍候...')
@@ -483,6 +492,7 @@ const submitTalk = async () => {
   
   try {
     await publishTalk({
+      userId: Number(userStore.user.id),
       talkContent: talkForm.value.content,
       talkPic: talkImageList.value.map(img => img.url),
       talkStatus: talkForm.value.status
@@ -551,7 +561,7 @@ const handleDeleteComment = async (comment: any, talk: any) => {
     
     // 如果不是博主/超级管理员，需要传 userId
     if (!isAuthor.value && userStore.user) {
-      requestData.userId = userStore.user.id
+      requestData.userId = Number(userStore.user.id)
     }
     
     await deleteComment(requestData)
@@ -611,7 +621,7 @@ const submitComment = async () => {
   try {
     const requestData: any = {
       talkId: currentTalk.value.id,
-      userId: userStore.user.id,
+      userId: Number(userStore.user.id),
       content: commentText.value
     }
     
@@ -764,6 +774,11 @@ const loadTalkList = async () => {
       pageSize: pageSize.value
     }
     
+    // 如果用户已登录，传入用户ID
+    if (userStore.user?.id) {
+      params.userId = Number(userStore.user.id)
+    }
+    
     const response: any = await getTalkList(params)
     
     // 响应拦截器已经返回了 res.data，所以直接用 response.list
@@ -831,7 +846,7 @@ const loadTalkComments = async (talk: any) => {
     
     // 如果用户已登录，传入用户ID
     if (userStore.user?.id) {
-      params.userId = userStore.user.id
+      params.userId = Number(userStore.user.id)
     }
     
     const response: any = await getTalkDetail(params)
@@ -867,7 +882,7 @@ const toggleCommentReplies = async (talk: any, comment: any) => {
       
       // 如果用户已登录，传入用户ID
       if (userStore.user?.id) {
-        params.userId = userStore.user.id
+        params.userId = Number(userStore.user.id)
       }
       
       const response: any = await getTalkDetail(params)
@@ -949,24 +964,24 @@ onMounted(() => {
 <style scoped lang="scss">
 .talk {
   min-height: calc(100vh - 200px);
-  padding: 40px 0;
+  padding: 30px 0;
 }
 
 .container {
-  max-width: 900px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 0 30px;
+  padding: 0 20px;
 }
 
 .page-header {
   display: flex;
   align-items: center;
-  gap: 20px;
-  margin-bottom: 40px;
+  gap: 15px;
+  margin-bottom: 30px;
   position: relative;
   
   .header-icon {
-    font-size: 60px;
+    font-size: 45px;
     animation: float 3s ease-in-out infinite;
   }
   
@@ -974,36 +989,36 @@ onMounted(() => {
     flex: 1;
     
     h1 {
-      font-size: 42px;
+      font-size: 32px;
       background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin: 0 0 8px 0;
+      margin: 0 0 5px 0;
       font-weight: 700;
     }
     
     p {
-      font-size: 16px;
+      font-size: 14px;
       color: #999;
       margin: 0;
     }
   }
   
   .publish-btn {
-    height: 44px;
-    padding: 0 24px;
-    border-radius: 22px;
+    height: 38px;
+    padding: 0 20px;
+    border-radius: 19px;
     background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
     border: none;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
     transition: all 0.3s;
     
     .btn-icon {
-      margin-right: 6px;
-      font-size: 16px;
+      margin-right: 5px;
+      font-size: 14px;
     }
     
     &:hover {
@@ -1033,43 +1048,43 @@ onMounted(() => {
   }
   
   .talk-item {
-    padding: 30px;
-    margin-bottom: 25px;
+    padding: 20px;
+    margin-bottom: 20px;
     
     .talk-header {
       display: flex;
       align-items: center;
-      gap: 15px;
-      margin-bottom: 20px;
+      gap: 12px;
+      margin-bottom: 15px;
       
       .avatar {
-        width: 60px;
-        height: 60px;
+        width: 45px;
+        height: 45px;
         border-radius: 50%;
-        border: 3px solid #fff;
-        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        border: 2px solid #fff;
+        box-shadow: 0 2px 10px rgba(139, 92, 246, 0.2);
       }
       
       .user-info {
         .username {
-          font-size: 18px;
+          font-size: 15px;
           font-weight: 700;
           color: #5a5a5a;
-          margin-bottom: 5px;
+          margin-bottom: 3px;
         }
         
         .time {
-          font-size: 14px;
+          font-size: 12px;
           color: #999;
         }
       }
     }
     
     .talk-content {
-      font-size: 16px;
-      line-height: 1.8;
+      font-size: 14px;
+      line-height: 1.6;
       color: #666;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
     
     .talk-images {
