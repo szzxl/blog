@@ -70,6 +70,18 @@ export const getArticleList = (data: {
   })
 }
 
+// 获取月度文章列表（首页使用）
+export const getMonthArticleList = (data: {
+  pageNo: number
+  pageSize: number
+}) => {
+  return request({
+    url: '/web/month/article',
+    method: 'post',
+    data
+  })
+}
+
 export const getArticleDetail = (data: { id: string | number }) => {
   return request({
     url: '/web/article/detail',
