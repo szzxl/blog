@@ -759,11 +759,17 @@ const handlePageChange = (page: number) => {
 const loadTalkList = async () => {
   loading.value = true
   try {
-    const response: any = await getTalkList({
-      userId: 1,
+    const params: any = {
       pageNo: currentPage.value,
       pageSize: pageSize.value
-    })
+    }
+    
+    // 如果用户已登录，传入用户ID
+    if (userStore.user?.id) {
+      params.userId = userStore.user.id
+    }
+    
+    const response: any = await getTalkList(params)
     
     // 响应拦截器已经返回了 res.data，所以直接用 response.list
     if (response && response.list) {
@@ -822,11 +828,15 @@ const loadTalkComments = async (talk: any) => {
   }
   
   try {
-    const params = {
-      userId: 1,
+    const params: any = {
       talkId: talk.id,
       pageNo: 1,
       pageSize: 1
+    }
+    
+    // 如果用户已登录，传入用户ID
+    if (userStore.user?.id) {
+      params.userId = userStore.user.id
     }
     
     const response: any = await getTalkDetail(params)
@@ -854,11 +864,15 @@ const toggleCommentReplies = async (talk: any, comment: any) => {
   // 如果还没有加载过回复，则加载
   if (!comment.detailReplies) {
     try {
-      const params = {
-        userId: 1,
+      const params: any = {
         talkId: talk.id,
         pageNo: 1,
         pageSize: 100
+      }
+      
+      // 如果用户已登录，传入用户ID
+      if (userStore.user?.id) {
+        params.userId = userStore.user.id
       }
       
       const response: any = await getTalkDetail(params)
