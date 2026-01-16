@@ -60,7 +60,7 @@
       <template v-if="userStore.isLoggedIn">
         <el-dropdown @command="handleCommand">
           <div class="user-info">
-            <img :src="userStore.user?.avatar" alt="头像" class="user-avatar">
+            <img :src="userStore.user?.avatar || '/default-avatar.svg'" alt="头像" class="user-avatar">
           </div>
           <template #dropdown>
             <el-dropdown-menu>
@@ -850,7 +850,7 @@ onMounted(async () => {
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        border: 2px solid #ff9a9e;
+        border: 2px solid #4facfe;
         object-fit: cover;
       }
     }
