@@ -167,28 +167,6 @@ time-blog-web/
 - 👨‍💻 关于页面
 - 📢 公告栏
 
-## ⚡ 性能优化
-
-### 构建优化
-- **代码分割** - 第三方库独立打包
-- **Tree Shaking** - 移除未使用代码
-- **压缩优化** - 生产环境自动压缩
-- **资源优化** - 图片、字体分类存放
-
-### 运行时优化
-- **路由懒加载** - 按需加载页面组件
-- **组件懒加载** - 大组件异步加载
-- **图片懒加载** - 可视区域才加载图片
-- **请求优化** - 接口缓存、防抖节流
-
-### 性能指标
-| 指标 | 优化前 | 优化后 | 提升 |
-|------|--------|--------|------|
-| 首屏加载 | ~2.5s | ~1.2s | ⬆️ 52% |
-| 主包体积 | ~800KB | ~350KB | ⬇️ 56% |
-| 构建时间 | ~45s | ~32s | ⬆️ 29% |
-
-## 🔒 安全防护
 
 ### XSS 防护
 - HTML 转义
@@ -306,7 +284,7 @@ server: {
 
 ## 👨‍💻 作者
 
-Time Blog Team
+suz_zxl@163.com
 
 ## 🙏 致谢
 
@@ -317,12 +295,11 @@ Time Blog Team
 
 ## 📞 联系方式
 
-- 项目地址：[GitHub](https://github.com/your-repo/time-blog-web)
-- 问题反馈：[Issues](https://github.com/your-repo/time-blog-web/issues)
+- 项目地址：[GitHub](https://zhuxiaoliang.cn/gitea/suz_zxl/time-blog-web)
+- 问题反馈：[Issues](https://zhuxiaoliang.cn/gitea/suz_zxl/time-blog-web/issues)
 
 ---
 
-**最后更新：** 2026-01-20  
 **版本：** v1.0.0
 
 ⭐ 如果这个项目对你有帮助，请给一个 Star！
