@@ -2,6 +2,8 @@ import axios from 'axios'
 import type { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
+import { showLoading, hideLoading } from '@/utils/loading'
+import { sanitizeInput } from '@/utils/security'
 
 // 公开接口列表（不需要登录的接口）
 const PUBLIC_APIS = [
@@ -19,6 +21,12 @@ const SILENT_APIS = [
   '/web/article/addView'
 ]
 
+// 不显示 Loading 的接口
+const NO_LOADING_APIS = [
+  '/web/article/addView',
+  '/web/article/like'
+]
+
 // 检查是否是公开接口
 const isPublicApi = (url: string): boolean => {
   return PUBLIC_APIS.some(api => url.includes(api))
@@ -27,6 +35,11 @@ const isPublicApi = (url: string): boolean => {
 // 检查是否是静默接口
 const isSilentApi = (url: string): boolean => {
   return SILENT_APIS.some(api => url.includes(api))
+}
+
+// 检查是否需要显示 Loading
+const needLoading = (url: string): boolean => {
+  return !NO_LOADING_APIS.some(api => url.includes(api))
 }
 
 // 创建 axios 实例
@@ -41,6 +54,11 @@ const service: AxiosInstance = axios.create({
 // 请求拦截器
 service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    // 显示 Loading
+    if (needLoading(config.url || '')) {
+      showLoading()
+    }
+    
     // 从 localStorage 获取 token（使用管理后台的 key）
     const tokenStr = localStorage.getItem('ACCESS_TOKEN')
     
@@ -60,9 +78,16 @@ service.interceptors.request.use(
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`
     }
+    
+    // XSS 防护：清理请求数据
+    if (config.data && typeof config.data === 'object') {
+      config.data = sanitizeRequestData(config.data)
+    }
+    
     return config
   },
   (error) => {
+    hideLoading()
     return Promise.reject(error)
   }
 )
@@ -70,6 +95,9 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   (response: AxiosResponse) => {
+    // 隐藏 Loading
+    hideLoading()
+    
     const res = response.data
     const url = response.config.url || ''
     
@@ -94,6 +122,9 @@ service.interceptors.response.use(
     return res.data || res
   },
   (error) => {
+    // 隐藏 Loading
+    hideLoading()
+    
     if (error.response) {
       const url = error.config?.url || ''
       
@@ -117,9 +148,20 @@ service.interceptors.response.use(
         case 500:
           ElMessage.error('服务器错误')
           break
+        case 502:
+          ElMessage.error('网关错误')
+          break
+        case 503:
+          ElMessage.error('服务不可用')
+          break
+        case 504:
+          ElMessage.error('网关超时')
+          break
         default:
           ElMessage.error(error.response.data?.message || error.response.data?.msg || '请求失败')
       }
+    } else if (error.code === 'ECONNABORTED') {
+      ElMessage.error('请求超时，请稍后重试')
     } else {
       ElMessage.error('网络错误，请检查网络连接')
     }
@@ -127,5 +169,30 @@ service.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+/**
+ * 清理请求数据，防止 XSS
+ */
+const sanitizeRequestData = (data: any): any => {
+  if (typeof data === 'string') {
+    return sanitizeInput(data)
+  }
+  
+  if (Array.isArray(data)) {
+    return data.map(item => sanitizeRequestData(item))
+  }
+  
+  if (typeof data === 'object' && data !== null) {
+    const cleaned: any = {}
+    for (const key in data) {
+      if (Object.prototype.hasOwnProperty.call(data, key)) {
+        cleaned[key] = sanitizeRequestData(data[key])
+      }
+    }
+    return cleaned
+  }
+  
+  return data
+}
 
 export default service

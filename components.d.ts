@@ -32,6 +32,7 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     EmojiPicker: typeof import('./src/components/EmojiPicker.vue')['default']
+    ErrorBoundary: typeof import('./src/components/ErrorBoundary.vue')['default']
     Footer: typeof import('./src/components/Footer.vue')['default']
     Header: typeof import('./src/components/Header.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

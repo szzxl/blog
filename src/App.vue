@@ -1,46 +1,49 @@
 <template>
-  <div id="app">
-    <!-- 宇宙星辰装饰 -->
-    <div class="bg-decorations" style="display: none;">
-      <!-- 装饰已隐藏 -->
-    </div>
-    
-    <Header />
-    
-    <!-- 全局公告栏 -->
-    <div class="announcement-bar" v-if="announcements.length > 0">
-      <div class="announcement-icon">📢</div>
-      <div class="announcement-scroll">
-        <div class="announcement-content">
-          <!-- 重复两次以实现无缝滚动 -->
-          <template v-for="n in 2" :key="n">
-            <span v-for="(item, index) in announcements" :key="`${n}-${index}`" class="announcement-item">
-              <span class="announcement-label" v-if="item.type === 'activity'">活动</span>
-              <span class="announcement-label" v-else-if="item.type === 'notice'">公告</span>
-              <span class="announcement-label" v-else>通知</span>
-              <span class="announcement-text">{{ item.content }}</span>
-            </span>
-          </template>
+  <ErrorBoundary>
+    <div id="app">
+      <!-- 宇宙星辰装饰 -->
+      <div class="bg-decorations" style="display: none;">
+        <!-- 装饰已隐藏 -->
+      </div>
+      
+      <Header />
+      
+      <!-- 全局公告栏 -->
+      <div class="announcement-bar" v-if="announcements.length > 0">
+        <div class="announcement-icon">📢</div>
+        <div class="announcement-scroll">
+          <div class="announcement-content">
+            <!-- 重复两次以实现无缝滚动 -->
+            <template v-for="n in 2" :key="n">
+              <span v-for="(item, index) in announcements" :key="`${n}-${index}`" class="announcement-item">
+                <span class="announcement-label" v-if="item.type === 'activity'">活动</span>
+                <span class="announcement-label" v-else-if="item.type === 'notice'">公告</span>
+                <span class="announcement-label" v-else>通知</span>
+                <span class="announcement-text">{{ item.content }}</span>
+              </span>
+            </template>
+          </div>
         </div>
       </div>
+      
+      <!-- 回到顶部按钮 -->
+      <button class="back-to-top" :class="{ show: showBackToTop }" @click="scrollToTop">
+        ↑
+      </button>
+      
+      <main class="main-content">
+        <router-view />
+      </main>
+      <Footer />
     </div>
-    
-    <!-- 回到顶部按钮 -->
-    <button class="back-to-top" :class="{ show: showBackToTop }" @click="scrollToTop">
-      ↑
-    </button>
-    
-    <main class="main-content">
-      <router-view />
-    </main>
-    <Footer />
-  </div>
+  </ErrorBoundary>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
+import ErrorBoundary from './components/ErrorBoundary.vue'
 import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
 import { getNotificationList } from '@/api/article'
 
