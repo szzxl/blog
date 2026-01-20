@@ -386,9 +386,9 @@ onUnmounted(() => {
 }
 
 .announcement-bar {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--announcement-bg);
   backdrop-filter: blur(20px);
-  border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+  border-bottom: 2px solid var(--border-color);
   padding: 8px 0;
   position: relative;
   z-index: 998;
@@ -397,6 +397,7 @@ onUnmounted(() => {
   justify-content: center;
   gap: 15px;
   overflow: hidden;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
   
   .announcement-icon {
     font-size: 20px;
@@ -450,7 +451,7 @@ onUnmounted(() => {
     gap: 12px;
     
     .announcement-label {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      background: var(--gradient-primary);
       color: #fff;
       padding: 3px 10px;
       border-radius: 10px;
@@ -460,7 +461,7 @@ onUnmounted(() => {
     }
     
     .announcement-text {
-      color: #666;
+      color: var(--announcement-text);
       font-size: 13px;
     }
   }
@@ -516,7 +517,7 @@ onUnmounted(() => {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: var(--gradient-primary);
   border: none;
   color: #fff;
   font-size: 24px;

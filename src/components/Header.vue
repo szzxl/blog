@@ -57,6 +57,11 @@
     
     <!-- 用户中心 -->
     <div class="user-center">
+      <!-- 主题切换按钮 -->
+      <button class="theme-toggle" @click="toggleTheme" :title="themeTooltip">
+        <span class="theme-icon">{{ themeIcon }}</span>
+      </button>
+      
       <template v-if="userStore.isLoggedIn">
         <el-dropdown @command="handleCommand">
           <div class="user-info">
@@ -151,6 +156,11 @@
       <!-- 移动端用户操作 -->
       <div class="mobile-user-actions" v-if="userStore.isLoggedIn">
         <div class="divider"></div>
+        <button class="mobile-nav-item" @click="handleMobileThemeToggle">
+          <span class="nav-icon">{{ themeIcon }}</span>
+          <span class="nav-text">{{ themeStore.appliedTheme === 'dark' ? '浅色模式' : '深色模式' }}</span>
+          <span class="nav-arrow">›</span>
+        </button>
         <button class="mobile-nav-item" @click="handleMobileCommand('admin')" v-if="isAuthor">
           <span class="nav-icon">⚙️</span>
           <span class="nav-text">管理后台</span>
@@ -169,6 +179,11 @@
       </div>
       <div class="mobile-user-actions" v-else>
         <div class="divider"></div>
+        <button class="mobile-nav-item" @click="handleMobileThemeToggle">
+          <span class="nav-icon">{{ themeIcon }}</span>
+          <span class="nav-text">{{ themeStore.appliedTheme === 'dark' ? '浅色模式' : '深色模式' }}</span>
+          <span class="nav-arrow">›</span>
+        </button>
         <button class="mobile-nav-item login-btn" @click="handleMobileLogin">
           <span class="nav-text">登录</span>
           <span class="nav-arrow"></span>
@@ -319,12 +334,14 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { useThemeStore } from '@/stores/theme'
 import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
 import { uploadImage, updateUserProfile, getUserInfo, updatePassword } from '@/api/article'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 const userStore = useUserStore()
+const themeStore = useThemeStore()
 
 const siteName = ref('')
 const siteDescription = ref('')
@@ -332,6 +349,19 @@ const siteLogo = ref('🌸')
 
 // 移动端菜单状态
 const showMobileMenu = ref(false)
+
+// 主题切换
+const themeIcon = computed(() => {
+  return themeStore.appliedTheme === 'dark' ? '🌙' : '☀️'
+})
+
+const themeTooltip = computed(() => {
+  return themeStore.appliedTheme === 'dark' ? '切换到浅色模式' : '切换到深色模式'
+})
+
+const toggleTheme = () => {
+  themeStore.toggleTheme()
+}
 
 // 获取网站配置
 const fetchWebsiteConfig = async () => {
@@ -649,6 +679,11 @@ const handleMobileLogin = () => {
   goToLogin()
 }
 
+// 移动端主题切换
+const handleMobileThemeToggle = () => {
+  toggleTheme()
+}
+
 onMounted(async () => {
   fetchWebsiteConfig()
   
@@ -666,14 +701,15 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .header {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-header);
   backdrop-filter: blur(20px);
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   position: sticky;
   top: 0;
   z-index: 999;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid var(--border-light);
   overflow: visible;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
   
   .header-bg {
     position: absolute;
@@ -823,6 +859,41 @@ onMounted(async () => {
     right: 30px;
     top: 10px;
     z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    .theme-toggle {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+      border: 2px solid rgba(139, 92, 246, 0.2);
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      .theme-icon {
+        font-size: 20px;
+        transition: transform 0.3s;
+      }
+      
+      &:hover {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%);
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        
+        .theme-icon {
+          transform: rotate(20deg) scale(1.1);
+        }
+      }
+      
+      &:active {
+        transform: translateY(0) scale(0.95);
+      }
+    }
     
     .user-info {
       display: flex;

@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import pinia from './stores'
+import { useThemeStore } from './stores/theme'
 import ElementPlus from 'element-plus'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import 'element-plus/dist/index.css'
@@ -41,3 +42,8 @@ app.use(pinia)
 app.use(ElementPlus, { locale: zhCn })
 
 app.mount('#app')
+
+// 初始化主题
+const themeStore = useThemeStore()
+themeStore.initFromStorage()
+themeStore.setupSystemThemeListener()
