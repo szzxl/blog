@@ -6,6 +6,7 @@
     <div class="comment-form">
       <template v-if="userStore.isLoggedIn">
         <el-input 
+          ref="commentInputRef"
           v-model="commentText" 
           type="textarea" 
           :rows="4" 
@@ -13,6 +14,11 @@
           maxlength="500"
           show-word-limit
         />
+        
+        <!-- 工具栏 -->
+        <div class="comment-toolbar">
+          <EmojiPicker @select="insertEmoji" />
+        </div>
         
         <!-- 图片上传区域 -->
         <div class="image-upload-section">
@@ -165,6 +171,7 @@ import { Plus, Delete, Upload } from '@element-plus/icons-vue'
 import { getArticleComments, addArticleComment, deleteArticleComment, uploadImage, likeArticleComment } from '@/api/article'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
+import EmojiPicker from './EmojiPicker.vue'
 
 const props = defineProps<{
   articleId: string | number
@@ -174,6 +181,7 @@ const userStore = useUserStore()
 const router = useRouter()
 
 const commentText = ref('')
+const commentInputRef = ref()
 const commentImages = ref<string[]>([])
 const comments = ref<any[]>([])
 const loading = ref(false)
@@ -183,6 +191,27 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 
 const commentFileInput = ref<HTMLInputElement>()
+
+// 插入表情
+const insertEmoji = (emoji: string) => {
+  const textarea = commentInputRef.value?.textarea
+  if (!textarea) {
+    commentText.value += emoji
+    return
+  }
+  
+  const start = textarea.selectionStart
+  const end = textarea.selectionEnd
+  const text = commentText.value
+  
+  commentText.value = text.substring(0, start) + emoji + text.substring(end)
+  
+  // 设置光标位置
+  setTimeout(() => {
+    textarea.selectionStart = textarea.selectionEnd = start + emoji.length
+    textarea.focus()
+  }, 0)
+}
 
 // 是否是博主
 const isAuthor = computed(() => {
@@ -472,6 +501,13 @@ onMounted(() => {
           border-color: #8b5cf6;
         }
       }
+    }
+    
+    .comment-toolbar {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
     }
     
     .form-actions {
