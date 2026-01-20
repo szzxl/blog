@@ -70,6 +70,18 @@ export const getArticleList = (data: {
   })
 }
 
+// 获取月度文章列表（首页使用）
+export const getMonthArticleList = (data: {
+  pageNo: number
+  pageSize: number
+}) => {
+  return request({
+    url: '/web/month/article/',
+    method: 'post',
+    data
+  })
+}
+
 export const getArticleDetail = (data: { id: string | number }) => {
   return request({
     url: '/web/article/detail',
@@ -213,12 +225,26 @@ export const getTalkDetail = (data: {
 
 // 发表说说
 export const publishTalk = (data: {
+  userId?: number
   talkContent: string
   talkPic?: string[]
   talkStatus?: number
 }) => {
   return request({
     url: '/web/talk',
+    method: 'post',
+    data
+  })
+}
+
+// 说说点赞
+export const likeTalk = (data: {
+  talkId: number
+  userId: number
+  type: 1 | 2  // 1=点赞, 2=取消点赞
+}) => {
+  return request({
+    url: '/web/like',
     method: 'post',
     data
   })

@@ -291,33 +291,89 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .footer {
+    margin-top: 60px;
+    
+    .footer-wave {
+      top: -30px;
+      height: 40px;
+    }
+    
+    .container {
+      padding: 40px 20px 20px;
+    }
+    
     .footer-content {
       grid-template-columns: 1fr;
       gap: 30px;
       text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .footer-info {
+      .footer-logo {
+        justify-content: center;
+        
+        .logo-icon {
+          font-size: 28px;
+        }
+        
+        .logo-text {
+          font-size: 20px;
+        }
+      }
+      
+      .motto {
+        font-size: 15px;
+      }
     }
     
     .footer-links {
-      justify-content: center;
-      gap: 30px;
+      flex-direction: column;
+      gap: 25px;
+      align-items: center;
+      
+      .link-group {
+        width: 100%;
+        max-width: 300px;
+        
+        h4 {
+          font-size: 15px;
+          margin-bottom: 12px;
+        }
+        
+        a, .contact-item, .contact-link {
+          font-size: 13px;
+          margin-bottom: 8px;
+        }
+      }
     }
     
     .footer-decoration {
       gap: 15px;
+      padding-top: 25px;
+      margin-bottom: 25px;
       
       .deco {
-        font-size: 18px;
+        font-size: 20px;
       }
     }
     
     .footer-bottom {
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       text-align: center;
-      padding: 15px 20px;
+      padding: 20px 15px;
+      border-top: 1px solid rgba(255, 182, 193, 0.15);
       
       .copyright {
         position: static;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+      
+      .icp {
+        font-size: 12px;
+        line-height: 1.6;
       }
     }
   }

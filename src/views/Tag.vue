@@ -270,21 +270,82 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .tag {
+    .container {
+      padding: 20px 15px;
+    }
+  }
+  
   .page-header {
     flex-direction: column;
     text-align: center;
+    padding: 30px 20px;
+    margin-bottom: 25px;
+    gap: 15px;
     
-    .header-text h1 {
-      font-size: 32px;
+    .header-icon {
+      font-size: 50px;
+    }
+    
+    .header-text {
+      h1 {
+        font-size: 28px;
+        margin-bottom: 8px;
+      }
+      
+      p {
+        font-size: 13px;
+      }
     }
   }
   
   .tag-cloud {
-    padding: 30px 20px;
+    padding: 25px 15px;
+    margin-bottom: 25px;
+    
+    .cloud-title {
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+    
+    .tag-item {
+      font-size: 13px;
+      padding: 6px 14px;
+    }
   }
   
   .tag-grid {
     grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .tag-card {
+    padding: 20px 18px;
+    
+    .tag-name {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    
+    .tag-count {
+      font-size: 13px;
+    }
+    
+    .tag-arrow {
+      font-size: 18px;
+    }
+  }
+  
+  .empty-state {
+    padding: 60px 20px;
+    
+    .empty-icon {
+      font-size: 60px;
+    }
+    
+    .empty-text {
+      font-size: 14px;
+    }
   }
 }
 </style>

@@ -16,6 +16,13 @@
       <div class="article-grid" v-loading="loading">
         <div class="article-card card" v-for="article in articles" :key="article.id" @click="viewArticle(article.id)">
           <div class="article-badge">NEW</div>
+          
+          <!-- 标识标签 -->
+          <div class="badges" v-if="article.isTop === 1 || article.isRecommend === 1">
+            <span class="badge badge-top" v-if="article.isTop === 1">📌 置顶</span>
+            <span class="badge badge-recommend" v-if="article.isRecommend === 1">⭐ 推荐</span>
+          </div>
+          
           <div class="article-cover">
             <img :src="article.articleCover || '/web/default-cover.svg'" alt="文章封面">
             <div class="cover-overlay">
@@ -65,7 +72,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Carousel from '@/components/Carousel.vue'
-import { getArticleList } from '@/api/article'
+import { getMonthArticleList } from '@/api/article'
 
 const router = useRouter()
 
@@ -80,6 +87,8 @@ interface Article {
   likeCount?: number
   commentCount?: number
   createTime?: number
+  isRecommend?: number  // 是否推荐 1=是 0=否
+  isTop?: number  // 是否置顶 1=是 0=否
 }
 
 const articles = ref<Article[]>([])
@@ -89,7 +98,7 @@ const loading = ref(false)
 const fetchArticles = async () => {
   loading.value = true
   try {
-    const res: any = await getArticleList({
+    const res: any = await getMonthArticleList({
       pageNo: 1,
       pageSize: 3
     })
@@ -202,6 +211,34 @@ onMounted(() => {
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
     z-index: 10;
     animation: pulse 2s ease-in-out infinite;
+  }
+  
+  .badges {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+    
+    .badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      
+      &.badge-top {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        color: #fff;
+      }
+      
+      &.badge-recommend {
+        background: linear-gradient(135deg, #ffd93d 0%, #ffb800 100%);
+        color: #333;
+      }
+    }
   }
   
   .article-cover {
@@ -371,17 +408,90 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .home {
+    .container {
+      padding: 20px 15px;
+    }
+  }
+  
   .section-header {
     flex-direction: column;
     text-align: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    
+    .section-icon {
+      font-size: 40px;
+    }
     
     .section-text h2 {
-      font-size: 28px;
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+    
+    .section-text p {
+      font-size: 13px;
     }
   }
   
   .article-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .article-card {
+    .article-cover {
+      height: 200px;
+    }
+    
+    .article-info {
+      padding: 20px 15px;
+      
+      .article-title {
+        font-size: 18px;
+        margin-bottom: 12px;
+      }
+      
+      .article-desc {
+        margin-bottom: 12px;
+      }
+      
+      .article-meta {
+        flex-wrap: wrap;
+        gap: 8px;
+        
+        .meta-item {
+          font-size: 12px;
+          padding: 4px 10px;
+        }
+      }
+      
+      .article-tags {
+        margin-top: 12px;
+        
+        .tag-item {
+          font-size: 11px;
+          padding: 4px 10px;
+        }
+      }
+    }
+    
+    .article-badge {
+      font-size: 10px;
+      padding: 4px 12px;
+    }
+  }
+  
+  .empty-state {
+    padding: 60px 20px;
+    
+    .empty-icon {
+      font-size: 60px;
+    }
+    
+    .empty-text {
+      font-size: 14px;
+    }
   }
 }
 </style>

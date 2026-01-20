@@ -7,11 +7,14 @@
 body {
   font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: #5a5a5a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
   text-decoration: none;
   color: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
 
 ul, ol {
@@ -21,6 +24,19 @@ ul, ol {
 img {
   max-width: 100%;
   height: auto;
+}
+
+/* 移动端触摸优化 */
+button, a, input, textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 确保触摸目标至少 44x44px */
+@media (max-width: 768px) {
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
 
 /* 卡片通用样式 */
@@ -44,11 +60,22 @@ img {
     background: radial-gradient(circle, rgba(255, 182, 193, 0.1) 0%, transparent 70%);
     pointer-events: none;
   }
+  
+  /* 移动端减小内边距 */
+  @media (max-width: 768px) {
+    padding: 20px 15px;
+    border-radius: 20px;
+  }
 }
 
 .card:hover {
   transform: translateY(-10px) scale(1.02);
   box-shadow: 0 15px 45px rgba(252, 182, 159, 0.25);
+  
+  /* 移动端减少悬停效果 */
+  @media (max-width: 768px) {
+    transform: translateY(-5px) scale(1.01);
+  }
 }
 
 /* 可爱的装饰元素 */
@@ -58,6 +85,12 @@ img {
   z-index: 1;
   opacity: 0.3;
   animation: float 6s ease-in-out infinite;
+  
+  /* 移动端减小装饰元素 */
+  @media (max-width: 768px) {
+    font-size: 30px;
+    opacity: 0.2;
+  }
 }
 
 @keyframes float {

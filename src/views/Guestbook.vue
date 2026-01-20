@@ -661,17 +661,180 @@ const submitMessage = async () => {
 }
 
 @media (max-width: 768px) {
+  .guestbook {
+    .container {
+      padding: 20px 15px;
+    }
+  }
+  
   .page-header {
     flex-direction: column;
     text-align: center;
+    padding: 30px 20px;
+    margin-bottom: 25px;
+    gap: 15px;
     
-    .header-text h1 {
-      font-size: 32px;
+    .header-icon {
+      font-size: 50px;
+    }
+    
+    .header-text {
+      h1 {
+        font-size: 28px;
+        margin-bottom: 8px;
+      }
+      
+      p {
+        font-size: 13px;
+      }
     }
   }
   
   .message-form {
-    padding: 25px;
+    padding: 20px 15px;
+    margin-bottom: 25px;
+    
+    .form-title {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+    
+    .image-list {
+      gap: 10px;
+      
+      .image-item {
+        width: calc(33.333% - 7px);
+        height: 80px;
+        
+        .remove-btn {
+          width: 24px;
+          height: 24px;
+          font-size: 14px;
+        }
+      }
+    }
+    
+    .upload-trigger {
+      width: calc(33.333% - 7px);
+      height: 80px;
+      
+      .upload-icon {
+        font-size: 24px;
+      }
+      
+      .upload-text {
+        font-size: 12px;
+      }
+    }
+    
+    .form-footer {
+      flex-direction: column;
+      gap: 10px;
+      
+      .char-count {
+        order: -1;
+        width: 100%;
+        text-align: right;
+        font-size: 12px;
+      }
+      
+      .submit-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 15px;
+      }
+    }
+  }
+  
+  .message-list {
+    gap: 15px;
+  }
+  
+  .message-item {
+    padding: 20px 15px;
+    
+    .message-avatar {
+      width: 45px;
+      height: 45px;
+    }
+    
+    .message-content {
+      .message-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 12px;
+        
+        .message-user {
+          font-size: 15px;
+        }
+        
+        .message-time {
+          font-size: 11px;
+        }
+      }
+      
+      .message-text {
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 12px;
+      }
+      
+      .message-images {
+        gap: 8px;
+        margin-bottom: 12px;
+        
+        .message-image {
+          width: calc(33.333% - 6px);
+          height: 80px;
+        }
+      }
+      
+      .message-actions {
+        gap: 15px;
+        
+        .action-btn {
+          font-size: 12px;
+          padding: 5px 12px;
+          
+          .icon {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+  
+  .pagination-wrapper {
+    margin-top: 25px;
+    
+    :deep(.el-pagination) {
+      justify-content: center;
+      
+      .el-pager li {
+        min-width: 32px;
+        height: 32px;
+        line-height: 32px;
+        font-size: 13px;
+      }
+      
+      button {
+        padding: 0 8px;
+        font-size: 13px;
+      }
+    }
+  }
+  
+  .empty-state {
+    padding: 60px 20px;
+    
+    .empty-icon {
+      font-size: 60px;
+    }
+    
+    .empty-text {
+      font-size: 14px;
+    }
   }
 }
 </style>

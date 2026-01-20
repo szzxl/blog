@@ -27,6 +27,12 @@
       <!-- 文章列表 -->
       <div class="articles" v-loading="loading">
         <div class="article-card" v-for="article in articles" :key="article.id" @click="viewArticle(article.id)">
+          <!-- 标识标签 -->
+          <div class="badges" v-if="article.isTop === 1 || article.isRecommend === 1">
+            <span class="badge badge-top" v-if="article.isTop === 1">📌 置顶</span>
+            <span class="badge badge-recommend" v-if="article.isRecommend === 1">⭐ 推荐</span>
+          </div>
+          
           <div class="card-left">
             <div class="article-cover">
               <img :src="article.articleCover || '/web/default-cover.svg'" alt="封面">
@@ -105,6 +111,8 @@ interface Article {
   readNum?: number
   likeCount?: number
   createTime?: number
+  isRecommend?: number  // 是否推荐 1=是 0=否
+  isTop?: number  // 是否置顶 1=是 0=否
 }
 
 const searchKeyword = ref('')
@@ -271,6 +279,35 @@ onMounted(() => {
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   height: 180px;
+  position: relative;
+  
+  .badges {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+    
+    .badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      
+      &.badge-top {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        color: #fff;
+      }
+      
+      &.badge-recommend {
+        background: linear-gradient(135deg, #ffd93d 0%, #ffb800 100%);
+        color: #333;
+      }
+    }
+  }
   
   &:hover {
     transform: translateY(-4px);
@@ -433,8 +470,35 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
-  .page-header h1 {
-    font-size: 24px;
+  .article-list {
+    .container {
+      padding: 20px 15px;
+    }
+  }
+  
+  .page-header {
+    padding: 30px 20px;
+    margin-bottom: 25px;
+    
+    h1 {
+      font-size: 24px;
+    }
+    
+    p {
+      font-size: 13px;
+    }
+  }
+  
+  .search-bar {
+    margin-bottom: 25px;
+    
+    .el-input {
+      font-size: 14px;
+    }
+  }
+  
+  .article-list-container {
+    gap: 20px;
   }
   
   .article-card {
@@ -443,24 +507,75 @@ onMounted(() => {
     .card-left {
       width: 100%;
       height: 200px;
+      border-radius: 20px 20px 0 0;
     }
     
     .card-right {
-      padding: 16px;
+      padding: 20px 15px;
       
       .article-title {
         font-size: 18px;
+        margin-bottom: 12px;
+      }
+      
+      .article-abstract {
+        font-size: 13px;
+        line-height: 1.6;
+        margin-bottom: 12px;
+        -webkit-line-clamp: 2;
+      }
+      
+      .article-meta {
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 15px;
+        
+        .meta-item {
+          font-size: 12px;
+        }
       }
       
       .article-footer {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
         gap: 12px;
+        
+        .article-tags {
+          justify-content: flex-start;
+          
+          .tag {
+            font-size: 11px;
+            padding: 4px 10px;
+          }
+        }
         
         .read-btn {
           width: 100%;
           text-align: center;
+          justify-content: center;
+          padding: 10px 20px;
+          font-size: 14px;
         }
+      }
+    }
+  }
+  
+  .pagination-wrapper {
+    margin-top: 30px;
+    
+    :deep(.el-pagination) {
+      justify-content: center;
+      
+      .el-pager li {
+        min-width: 32px;
+        height: 32px;
+        line-height: 32px;
+        font-size: 13px;
+      }
+      
+      button {
+        padding: 0 8px;
+        font-size: 13px;
       }
     }
   }

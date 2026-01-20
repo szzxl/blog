@@ -2,6 +2,11 @@
   <header class="header">
     <div class="header-bg"></div>
     <div class="container">
+      <!-- 移动端汉堡菜单按钮（左侧） -->
+      <button class="mobile-menu-btn-left" @click="showMobileMenu = true">
+        <span class="menu-icon">☰</span>
+      </button>
+
       <div class="logo">
         <div class="logo-circle">
           <img v-if="siteLogo.startsWith('http')" :src="siteLogo" alt="logo" class="logo-image">
@@ -12,7 +17,9 @@
           <span class="logo-subtitle">{{ siteDescription }}</span>
         </div>
       </div>
-      <nav class="nav">
+
+      <!-- PC 端导航 -->
+      <nav class="nav desktop-nav">
         <router-link to="/" class="nav-item">
           <span class="nav-icon">🏠</span>
           <span class="nav-text">首页</span>
@@ -47,13 +54,13 @@
         </router-link>
       </nav>
     </div>
-    
-    <!-- 用户中心 - 移到container外面 -->
+
+    <!-- 用户中心 -->
     <div class="user-center">
       <template v-if="userStore.isLoggedIn">
         <el-dropdown @command="handleCommand">
           <div class="user-info">
-            <img :src="userStore.user?.avatar" alt="头像" class="user-avatar">
+            <img :src="userStore.user?.avatar || '/default-avatar.svg'" alt="头像" class="user-avatar">
           </div>
           <template #dropdown>
             <el-dropdown-menu>
@@ -61,11 +68,7 @@
                 <span class="menu-icon">⚙️</span>
                 管理后台
               </el-dropdown-item>
-              <el-dropdown-item v-if="!isAuthor" command="favorites">
-                <span class="menu-icon">⭐</span>
-                我的收藏
-              </el-dropdown-item>
-              <el-dropdown-item :divided="isAuthor || !isAuthor" command="profile">
+              <el-dropdown-item command="profile">
                 <span class="menu-icon">👤</span>
                 个人中心
               </el-dropdown-item>
@@ -85,11 +88,101 @@
       </template>
     </div>
   </header>
-  
+
+  <!-- 移动端导航抽屉 -->
+  <el-drawer
+    v-model="showMobileMenu"
+    direction="ltr"
+    size="280px"
+    :show-close="false"
+    class="mobile-nav-drawer"
+  >
+    <template #header>
+      <div class="drawer-header">
+        <div class="drawer-logo">
+          <img v-if="siteLogo.startsWith('http')" :src="siteLogo" alt="logo" class="logo-image">
+          <span v-else class="logo-icon">{{ siteLogo }}</span>
+          <span class="logo-text">{{ siteName }}</span>
+        </div>
+      </div>
+    </template>
+
+    <nav class="mobile-nav">
+      <router-link to="/" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-text">首页</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+      <router-link to="/articles" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">✨</span>
+        <span class="nav-text">文章</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+      <router-link to="/category" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">🎀</span>
+        <span class="nav-text">分类</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+      <router-link to="/tag" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">🏷️</span>
+        <span class="nav-text">标签</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+      <router-link to="/talk" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">💕</span>
+        <span class="nav-text">说说</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+      <router-link to="/guestbook" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">💌</span>
+        <span class="nav-text">留言板</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+      <router-link to="/link" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">🌈</span>
+        <span class="nav-text">友链</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+      <router-link to="/about" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">🦋</span>
+        <span class="nav-text">关于</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+
+      <!-- 移动端用户操作 -->
+      <div class="mobile-user-actions" v-if="userStore.isLoggedIn">
+        <div class="divider"></div>
+        <button class="mobile-nav-item" @click="handleMobileCommand('admin')" v-if="isAuthor">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-text">管理后台</span>
+          <span class="nav-arrow">›</span>
+        </button>
+        <button class="mobile-nav-item" @click="handleMobileCommand('profile')">
+          <span class="nav-icon">👤</span>
+          <span class="nav-text">个人中心</span>
+          <span class="nav-arrow">›</span>
+        </button>
+        <button class="mobile-nav-item" @click="handleMobileCommand('logout')">
+          <span class="nav-icon">🚪</span>
+          <span class="nav-text">退出登录</span>
+          <span class="nav-arrow">›</span>
+        </button>
+      </div>
+      <div class="mobile-user-actions" v-else>
+        <div class="divider"></div>
+        <button class="mobile-nav-item login-btn" @click="handleMobileLogin">
+          <span class="nav-icon">🌸</span>
+          <span class="nav-text">登录</span>
+          <span class="nav-arrow">›</span>
+        </button>
+      </div>
+    </nav>
+  </el-drawer>
+
   <!-- 个人中心弹窗 -->
-  <el-dialog 
-    v-model="showProfileDialog" 
-    title="" 
+  <el-dialog
+    v-model="showProfileDialog"
+    title=""
     width="500px"
     :show-close="true"
     class="profile-dialog"
@@ -104,16 +197,16 @@
             <span class="upload-text">更换头像</span>
           </div>
         </div>
-        <input 
-          ref="avatarInput" 
-          type="file" 
-          accept="image/*" 
-          style="display: none" 
+        <input
+          ref="avatarInput"
+          type="file"
+          accept="image/*"
+          style="display: none"
           @change="handleAvatarUpload"
         />
         <div class="intro-content">
           <h2 class="intro-title">{{ userStore.user?.nickname || userStore.user?.username || 'zxl123' }}</h2>
-          
+
           <!-- 用户信息 -->
           <div class="user-info">
             <div class="info-item">
@@ -129,7 +222,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 底部按钮 -->
       <div class="dialog-actions">
         <el-button class="action-btn" size="small" @click="showChangePasswordDialog">
@@ -141,7 +234,7 @@
       </div>
     </div>
   </el-dialog>
-  
+
   <!-- 修改资料弹窗 -->
   <el-dialog
     v-model="showEditDialog"
@@ -159,22 +252,22 @@
       <el-form-item label="昵称" prop="nickname">
         <el-input v-model="editForm.nickname" placeholder="请输入昵称" />
       </el-form-item>
-      
+
       <el-form-item label="手机号码" prop="mobile">
         <el-input v-model="editForm.mobile" placeholder="请输入手机号码" />
       </el-form-item>
-      
+
       <el-form-item label="邮箱" prop="email">
         <el-input v-model="editForm.email" placeholder="请输入邮箱" />
       </el-form-item>
     </el-form>
-    
+
     <template #footer>
       <el-button @click="showEditDialog = false">取消</el-button>
       <el-button type="primary" @click="submitEditForm">保存</el-button>
     </template>
   </el-dialog>
-  
+
   <!-- 修改密码弹窗 -->
   <el-dialog
     v-model="showPasswordDialog"
@@ -197,7 +290,7 @@
           show-password
         />
       </el-form-item>
-      
+
       <el-form-item label="新密码" prop="newPassword">
         <el-input
           v-model="passwordForm.newPassword"
@@ -206,7 +299,7 @@
           show-password
         />
       </el-form-item>
-      
+
       <el-form-item label="确认密码" prop="confirmPassword">
         <el-input
           v-model="passwordForm.confirmPassword"
@@ -216,7 +309,7 @@
         />
       </el-form-item>
     </el-form>
-    
+
     <template #footer>
       <el-button @click="showPasswordDialog = false">取消</el-button>
       <el-button type="primary" @click="submitPasswordForm">确定</el-button>
@@ -235,15 +328,18 @@ import { ElMessage } from 'element-plus'
 const router = useRouter()
 const userStore = useUserStore()
 
-const siteName = ref('小花的日记本')
-const siteDescription = ref('记录美好生活')
+const siteName = ref('')
+const siteDescription = ref('')
 const siteLogo = ref('🌸')
+
+// 移动端菜单状态
+const showMobileMenu = ref(false)
 
 // 获取网站配置
 const fetchWebsiteConfig = async () => {
   try {
     const config = await fetchWebsiteConfigWithCache()
-    
+
     if (config.site_name) {
       siteName.value = config.site_name
     }
@@ -278,6 +374,7 @@ const editForm = ref({
   email: ''
 })
 
+// @ts-ignore - 在模板中使用
 const editFormRules = {
   nickname: [
     { required: true, message: '请输入昵称', trigger: 'blur' }
@@ -299,6 +396,7 @@ const passwordForm = ref({
   confirmPassword: ''
 })
 
+// @ts-ignore - 在模板中使用
 const passwordFormRules = {
   oldPassword: [
     { required: true, message: '请输入旧密码', trigger: 'blur' }
@@ -323,6 +421,7 @@ const passwordFormRules = {
 }
 
 // 显示修改密码弹窗
+// @ts-ignore - 在模板中使用
 const showChangePasswordDialog = () => {
   passwordForm.value = {
     oldPassword: '',
@@ -333,6 +432,7 @@ const showChangePasswordDialog = () => {
 }
 
 // 显示修改资料弹窗
+// @ts-ignore - 在模板中使用
 const showEditProfileDialog = () => {
   editForm.value = {
     nickname: userStore.user?.nickname || userStore.user?.username || '',
@@ -343,19 +443,20 @@ const showEditProfileDialog = () => {
 }
 
 // 提交修改资料
+// @ts-ignore - 在模板中使用
 const submitEditForm = async () => {
   if (!editFormRef.value) return
-  
+
   try {
     await editFormRef.value.validate()
-    
+
     // 调用修改资料接口
     await updateUserProfile({
       nickname: editForm.value.nickname,
       mobile: editForm.value.mobile,
       email: editForm.value.email
     })
-    
+
     // 更新本地用户信息
     if (userStore.user) {
       userStore.user.nickname = editForm.value.nickname
@@ -363,7 +464,7 @@ const submitEditForm = async () => {
       userStore.user.email = editForm.value.email
       localStorage.setItem('user', JSON.stringify(userStore.user))
     }
-    
+
     ElMessage.success('资料修改成功')
     showEditDialog.value = false
   } catch (error: any) {
@@ -374,26 +475,27 @@ const submitEditForm = async () => {
 }
 
 // 提交修改密码
+// @ts-ignore - 在模板中使用
 const submitPasswordForm = async () => {
   if (!passwordFormRef.value) return
-  
+
   try {
     await passwordFormRef.value.validate()
-    
+
     // 调用修改密码接口
     await updatePassword({
       oldPassword: passwordForm.value.oldPassword,
       newPassword: passwordForm.value.newPassword
     })
-    
+
     // 关闭修改密码弹窗
     showPasswordDialog.value = false
     // 关闭个人中心弹窗
     showProfileDialog.value = false
-    
+
     // 先显示成功提示
     ElMessage.success('密码修改成功，请重新登录')
-    
+
     // 等待提示显示后再跳转
     setTimeout(async () => {
       await userStore.logout()
@@ -407,64 +509,66 @@ const submitPasswordForm = async () => {
 }
 
 // 触发头像上传
+// @ts-ignore - 在模板中使用
 const triggerAvatarUpload = () => {
   avatarInput.value?.click()
 }
 
 // 处理头像上传
+// @ts-ignore - 在模板中使用
 const handleAvatarUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
-  
+
   if (!file) return
-  
+
   // 验证文件类型
   if (!file.type.startsWith('image/')) {
     ElMessage.error('请选择图片文件')
     return
   }
-  
+
   // 验证文件大小（限制5MB）
   if (file.size > 5 * 1024 * 1024) {
     ElMessage.error('图片大小不能超过5MB')
     return
   }
-  
+
   // 显示加载提示
   const loadingMessage = ElMessage.info({
     message: '正在上传头像...',
     duration: 0 // 不自动关闭
   })
-  
+
   try {
     // 1. 上传图片
     const uploadResponse: any = await uploadImage(file)
-    
+
     // 尝试多种可能的字段名
     const avatarUrl = uploadResponse?.url || uploadResponse?.data?.url || uploadResponse?.path || uploadResponse?.data?.path || uploadResponse
-    
+
     if (!avatarUrl || typeof avatarUrl !== 'string') {
       loadingMessage.close()
       ElMessage.error('上传失败，请重试')
       return
     }
-    
+
     // 2. 调用更新用户资料接口
     await updateUserProfile({ avatar: avatarUrl })
-    
+
     // 3. 更新本地用户信息
     if (userStore.user) {
       userStore.user.avatar = avatarUrl
       // 保存到 localStorage
       localStorage.setItem('user', JSON.stringify(userStore.user))
-      
+
       // 强制触发响应式更新
       userStore.user = { ...userStore.user }
     }
-    
+
     loadingMessage.close()
     ElMessage.success('头像更换成功')
-    
+
     // 延迟关闭弹窗，让用户看到新头像
     setTimeout(() => {
       showProfileDialog.value = false
@@ -493,7 +597,7 @@ const handleCommand = async (command: string) => {
       // 打开个人中心前，重新获取用户信息
       try {
         const userInfo: any = await getUserInfo()
-        
+
         if (userInfo && userStore.user) {
           // 更新用户信息
           userStore.user = {
@@ -506,7 +610,7 @@ const handleCommand = async (command: string) => {
       } catch (error) {
         // 获取用户信息失败
       }
-      
+
       showProfileDialog.value = true
       break
     case 'favorites':
@@ -517,14 +621,14 @@ const handleCommand = async (command: string) => {
       const hostname = window.location.hostname
       const protocol = window.location.protocol
       const port = window.location.port
-      
+
       // 构建管理后台 URL
       let adminUrl = `${protocol}//${hostname}`
       if (port) {
         adminUrl += `:${port}`
       }
       adminUrl += '/admin'
-      
+
       window.open(adminUrl, '_blank')
       ElMessage.success('正在跳转到管理后台...')
       break
@@ -535,9 +639,21 @@ const handleCommand = async (command: string) => {
   }
 }
 
+// 移动端菜单命令处理
+const handleMobileCommand = async (command: string) => {
+  showMobileMenu.value = false
+  await handleCommand(command)
+}
+
+// 移动端登录
+const handleMobileLogin = () => {
+  showMobileMenu.value = false
+  goToLogin()
+}
+
 onMounted(async () => {
   fetchWebsiteConfig()
-  
+
   // 如果已登录，自动刷新用户信息
   if (userStore.isLoggedIn && userStore.token) {
     try {
@@ -561,7 +677,7 @@ onMounted(async () => {
   border-bottom: 3px solid transparent;
   border-image: linear-gradient(90deg, #ff9a9e, #fecfef, #ffd0d0) 1;
   overflow: visible;
-  
+
   .header-bg {
     position: absolute;
     top: 0;
@@ -571,7 +687,7 @@ onMounted(async () => {
     background: linear-gradient(135deg, rgba(255, 154, 158, 0.05) 0%, rgba(254, 207, 239, 0.05) 100%);
     pointer-events: none;
   }
-  
+
   .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -583,13 +699,13 @@ onMounted(async () => {
     z-index: 2;
     gap: 20px;
   }
-  
+
   .logo {
     display: flex;
     align-items: center;
     gap: 15px;
     flex-shrink: 0;
-    
+
     .logo-circle {
       width: 55px;
       height: 55px;
@@ -601,23 +717,23 @@ onMounted(async () => {
       box-shadow: 0 5px 20px rgba(255, 154, 158, 0.4);
       animation: pulse 2s ease-in-out infinite;
       overflow: hidden;
-      
+
       .logo-icon {
         font-size: 30px;
       }
-      
+
       .logo-image {
         width: 100%;
         height: 100%;
         object-fit: cover;
       }
     }
-    
+
     .logo-text-wrapper {
       display: flex;
       flex-direction: column;
       gap: 3px;
-      
+
       .logo-text {
         font-size: 22px;
         font-weight: 700;
@@ -627,7 +743,7 @@ onMounted(async () => {
         background-clip: text;
         letter-spacing: 1px;
       }
-      
+
       .logo-subtitle {
         font-size: 12px;
         color: #ff9a9e;
@@ -635,13 +751,13 @@ onMounted(async () => {
       }
     }
   }
-  
+
   .nav {
     display: flex;
     gap: 10px;
     justify-content: center;
     flex: 1;
-    
+
     .nav-item {
       display: flex;
       flex-direction: column;
@@ -653,7 +769,7 @@ onMounted(async () => {
       transition: all 0.3s;
       font-size: 14px;
       position: relative;
-      
+
       &::before {
         content: '';
         position: absolute;
@@ -666,52 +782,52 @@ onMounted(async () => {
         border-radius: 2px;
         transition: width 0.3s;
       }
-      
+
       .nav-icon {
         font-size: 22px;
         transition: transform 0.3s;
       }
-      
+
       .nav-text {
         font-weight: 500;
       }
-      
+
       &:hover {
         background: linear-gradient(135deg, rgba(255, 240, 246, 0.8) 0%, rgba(255, 232, 240, 0.8) 100%);
         color: #ff9a9e;
         transform: translateY(-3px);
-        
+
         .nav-icon {
           transform: scale(1.2) rotate(10deg);
         }
-        
+
         &::before {
           width: 60%;
         }
       }
-      
+
       &.router-link-active {
         background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
         color: #fff;
         box-shadow: 0 8px 25px rgba(255, 154, 158, 0.4);
-        
+
         .nav-icon {
           transform: scale(1.1);
         }
-        
+
         &::before {
           display: none;
         }
       }
     }
   }
-  
+
   .user-center {
     position: fixed;
     right: 30px;
     top: 15px;
     z-index: 1000;
-    
+
     .user-info {
       display: flex;
       align-items: center;
@@ -723,31 +839,31 @@ onMounted(async () => {
       cursor: pointer;
       transition: all 0.3s;
       padding: 3px;
-      
+
       &:hover {
         background: linear-gradient(135deg, rgba(255, 154, 158, 0.2) 0%, rgba(254, 207, 239, 0.2) 100%);
         transform: translateY(-2px) scale(1.05);
         box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
       }
-      
+
       .user-avatar {
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        border: 2px solid #ff9a9e;
+        border: 2px solid #4facfe;
         object-fit: cover;
       }
     }
-    
+
     .el-button {
       background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
       border: none;
       box-shadow: 0 5px 20px rgba(255, 154, 158, 0.3);
-      
+
       .btn-icon {
         margin-right: 5px;
       }
-      
+
       &:hover {
         transform: translateY(-3px);
         box-shadow: 0 8px 25px rgba(255, 154, 158, 0.4);
@@ -772,17 +888,23 @@ onMounted(async () => {
   :deep(.el-dialog) {
     border-radius: 25px;
     overflow: hidden;
+
+    @media (max-width: 768px) {
+      width: 95vw !important;
+      margin: 0 auto;
+      border-radius: 20px;
+    }
   }
-  
+
   :deep(.el-dialog__header) {
     display: none;
   }
-  
+
   :deep(.el-dialog__body) {
     padding: 0;
     position: relative;
   }
-  
+
   .dialog-actions {
     display: flex;
     justify-content: center;
@@ -790,7 +912,14 @@ onMounted(async () => {
     padding: 20px 0 0;
     border-top: 1px solid rgba(255, 182, 193, 0.15);
     margin-top: 30px;
-    
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 10px;
+      padding: 15px 0 0;
+      margin-top: 20px;
+    }
+
     .action-btn {
       border-radius: 15px;
       font-size: 13px;
@@ -799,18 +928,24 @@ onMounted(async () => {
       background: #fff;
       border: 2px solid rgba(255, 182, 193, 0.3);
       color: #ff9a9e;
-      
+
+      @media (max-width: 768px) {
+        width: 100%;
+        padding: 12px 24px;
+        font-size: 14px;
+      }
+
       &:hover {
         background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
         border-color: #ff9a9e;
         transform: translateY(-2px);
       }
-      
+
       &[type="primary"] {
         background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
         border: none;
         color: #fff;
-        
+
         &:hover {
           opacity: 0.9;
           transform: translateY(-2px);
@@ -819,18 +954,26 @@ onMounted(async () => {
       }
     }
   }
-  
+
   .dialog-profile {
     .intro-card {
       padding: 50px;
       text-align: center;
-      
+
+      @media (max-width: 768px) {
+        padding: 30px 20px;
+      }
+
       .intro-avatar {
         position: relative;
         display: inline-block;
         margin-bottom: 30px;
         cursor: pointer;
-        
+
+        @media (max-width: 768px) {
+          margin-bottom: 20px;
+        }
+
         img {
           width: 120px;
           height: 120px;
@@ -838,8 +981,14 @@ onMounted(async () => {
           border: 5px solid #fff;
           box-shadow: 0 8px 25px rgba(255, 154, 158, 0.3);
           transition: all 0.3s;
+
+          @media (max-width: 768px) {
+            width: 90px;
+            height: 90px;
+            border: 3px solid #fff;
+          }
         }
-        
+
         .avatar-decoration {
           position: absolute;
           top: -5px;
@@ -847,8 +996,14 @@ onMounted(async () => {
           font-size: 30px;
           animation: rotate 3s linear infinite;
           pointer-events: none;
+
+          @media (max-width: 768px) {
+            font-size: 24px;
+            top: -3px;
+            right: -3px;
+          }
         }
-        
+
         .avatar-overlay {
           position: absolute;
           top: 0;
@@ -864,29 +1019,46 @@ onMounted(async () => {
           gap: 5px;
           opacity: 0;
           transition: opacity 0.3s;
-          
+
           .upload-icon {
             font-size: 32px;
+
+            @media (max-width: 768px) {
+              font-size: 24px;
+            }
           }
-          
+
           .upload-text {
             color: #fff;
             font-size: 14px;
             font-weight: 600;
+
+            @media (max-width: 768px) {
+              font-size: 12px;
+            }
           }
         }
-        
+
         &:hover {
           img {
             transform: scale(1.05);
           }
-          
+
           .avatar-overlay {
             opacity: 1;
           }
         }
+
+        // 移动端点击显示上传提示
+        @media (max-width: 768px) {
+          &:active {
+            .avatar-overlay {
+              opacity: 1;
+            }
+          }
+        }
       }
-      
+
       .intro-content {
         .intro-title {
           font-size: 28px;
@@ -896,13 +1068,22 @@ onMounted(async () => {
           background-clip: text;
           margin: 0 0 25px 0;
           font-weight: 700;
+
+          @media (max-width: 768px) {
+            font-size: 22px;
+            margin: 0 0 20px 0;
+          }
         }
-        
+
         .user-info {
           display: flex;
           flex-direction: column;
           gap: 15px;
-          
+
+          @media (max-width: 768px) {
+            gap: 12px;
+          }
+
           .info-item {
             display: flex;
             align-items: center;
@@ -911,21 +1092,38 @@ onMounted(async () => {
             background: linear-gradient(135deg, rgba(255, 154, 158, 0.08) 0%, rgba(254, 207, 239, 0.08) 100%);
             border-radius: 15px;
             border: 2px solid rgba(255, 182, 193, 0.15);
-            
+
+            @media (max-width: 768px) {
+              padding: 10px 15px;
+              border-radius: 12px;
+            }
+
             .info-icon {
               font-size: 20px;
+
+              @media (max-width: 768px) {
+                font-size: 18px;
+              }
             }
-            
+
             .info-label {
               font-size: 14px;
               color: #ff9a9e;
               font-weight: 600;
+
+              @media (max-width: 768px) {
+                font-size: 13px;
+              }
             }
-            
+
             .info-value {
               font-size: 14px;
               color: #666;
               flex: 1;
+
+              @media (max-width: 768px) {
+                font-size: 13px;
+              }
             }
           }
         }
@@ -958,28 +1156,45 @@ onMounted(async () => {
 :deep(.edit-dialog) {
   .el-dialog {
     border-radius: 15px;
+
+    @media (max-width: 768px) {
+      width: 95vw !important;
+      margin: 0 auto;
+    }
   }
-  
+
   .el-dialog__header {
     padding: 20px 40px !important;
     background: linear-gradient(135deg, rgba(255, 154, 158, 0.05) 0%, rgba(254, 207, 239, 0.05) 100%);
+
+    @media (max-width: 768px) {
+      padding: 15px 20px !important;
+    }
   }
-  
+
   .el-dialog__body {
     padding: 30px 40px !important;
+
+    @media (max-width: 768px) {
+      padding: 20px 15px !important;
+    }
   }
-  
+
   .el-dialog__footer {
     padding: 20px 40px 30px !important;
     text-align: center;
     border-top: 1px solid rgba(255, 182, 193, 0.1);
+
+    @media (max-width: 768px) {
+      padding: 15px 20px 20px !important;
+    }
   }
-  
+
   .el-form-item__label {
     color: #ff9a9e;
     font-weight: 600;
   }
-  
+
   .el-input__wrapper {
     border-radius: 8px;
   }
@@ -989,30 +1204,225 @@ onMounted(async () => {
 :deep(.password-dialog) {
   .el-dialog {
     border-radius: 15px;
+
+    @media (max-width: 768px) {
+      width: 95vw !important;
+      margin: 0 auto;
+    }
   }
-  
+
   .el-dialog__header {
     padding: 20px 40px !important;
     background: linear-gradient(135deg, rgba(255, 154, 158, 0.05) 0%, rgba(254, 207, 239, 0.05) 100%);
+
+    @media (max-width: 768px) {
+      padding: 15px 20px !important;
+    }
   }
-  
+
   .el-dialog__body {
     padding: 30px 40px !important;
+
+    @media (max-width: 768px) {
+      padding: 20px 15px !important;
+    }
   }
-  
+
   .el-dialog__footer {
     padding: 20px 40px 30px !important;
     text-align: center;
     border-top: 1px solid rgba(255, 182, 193, 0.1);
+
+    @media (max-width: 768px) {
+      padding: 15px 20px 20px !important;
+    }
   }
-  
+
   .el-form-item__label {
     color: #ff9a9e;
     font-weight: 600;
   }
-  
+
   .el-input__wrapper {
     border-radius: 8px;
+  }
+}
+
+// 移动端汉堡菜单按钮（左侧）
+.mobile-menu-btn-left {
+  display: none;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  border: none;
+  border-radius: 12px;
+  width: 45px;
+  height: 45px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+  transition: all 0.3s;
+  flex-shrink: 0;
+  margin-right: 12px;
+
+  .menu-icon {
+    font-size: 24px;
+    color: #fff;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// 移动端汉堡菜单按钮（右侧 - 废弃）
+.mobile-menu-btn {
+  display: none;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  border: none;
+  border-radius: 12px;
+  width: 45px;
+  height: 45px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+  transition: all 0.3s;
+  position: fixed !important;
+  right: 15px !important;
+  top: 12px !important;
+  z-index: 1001 !important;
+
+  .menu-icon {
+    font-size: 24px;
+    color: #fff;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// 移动端导航抽屉样式
+:deep(.mobile-nav-drawer) {
+  .el-drawer__header {
+    margin-bottom: 0;
+    padding: 25px 20px;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  }
+
+  .el-drawer__body {
+    padding: 0;
+  }
+}
+
+.drawer-header {
+  .drawer-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .logo-icon {
+      font-size: 32px;
+    }
+
+    .logo-image {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+    }
+  }
+}
+
+.mobile-nav {
+  display: flex;
+  flex-direction: column;
+
+  .mobile-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 18px 20px;
+    color: #5a5a5a;
+    border-bottom: 1px solid rgba(255, 182, 193, 0.1);
+    transition: all 0.3s;
+    background: none;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-size: 16px;
+
+    .nav-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .nav-text {
+      flex: 1;
+      font-weight: 500;
+    }
+
+    .nav-arrow {
+      font-size: 20px;
+      color: #ccc;
+      transition: transform 0.3s;
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, rgba(255, 154, 158, 0.05) 0%, rgba(254, 207, 239, 0.05) 100%);
+      padding-left: 25px;
+
+      .nav-arrow {
+        transform: translateX(5px);
+        color: #ff9a9e;
+      }
+    }
+
+    &:active {
+      background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
+    }
+
+    &.router-link-active {
+      background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
+      color: #ff9a9e;
+      border-left: 4px solid #ff9a9e;
+      padding-left: 16px;
+
+      .nav-arrow {
+        color: #ff9a9e;
+      }
+    }
+  }
+
+  .mobile-user-actions {
+    margin-top: 10px;
+
+    .divider {
+      height: 8px;
+      background: rgba(255, 182, 193, 0.05);
+      margin: 10px 0;
+    }
+
+    .login-btn {
+      background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
+      color: #ff9a9e;
+      font-weight: 600;
+    }
   }
 }
 
@@ -1021,60 +1431,59 @@ onMounted(async () => {
     .container {
       padding: 0 15px;
       min-height: 70px;
-      flex-wrap: wrap;
+      justify-content: flex-start;
+      align-items: center;
     }
-    
+
+    // 显示左侧汉堡菜单按钮
+    .mobile-menu-btn-left {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+    }
+
     .logo {
+      // 隐藏小花图标
       .logo-circle {
-        width: 45px;
-        height: 45px;
-        
-        .logo-icon {
-          font-size: 24px;
-        }
+        display: none;
       }
-      
+
       .logo-text-wrapper {
         .logo-text {
           font-size: 18px;
         }
-        
+
         .logo-subtitle {
           font-size: 10px;
         }
       }
     }
-    
-    .nav {
-      flex-wrap: wrap;
-      gap: 5px;
-      order: 2;
-      width: 100%;
-      justify-content: flex-start;
-      
-      .nav-item {
-        padding: 8px 12px;
-        
-        .nav-icon {
-          font-size: 18px;
-        }
-        
-        .nav-text {
-          display: none;
-        }
-      }
+
+    // 隐藏 PC 端导航
+    .desktop-nav {
+      display: none !important;
     }
-    
+
     .user-center {
-      position: fixed;
-      right: 15px;
-      top: 12px;
-      
+      right: 15px !important;
+      top: 12px !important;
+
       .user-info {
         width: 45px;
         height: 45px;
       }
+
+      .el-button {
+        padding: 10px 20px;
+        font-size: 14px;
+      }
     }
   }
+
+  // 隐藏右侧汉堡菜单按钮（废弃）
+  .mobile-menu-btn {
+    display: none !important;
+  }
 }
+
 </style>

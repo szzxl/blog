@@ -483,28 +483,43 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .article-detail {
+    .container {
+      padding: 0;
+    }
+  }
+  
   .article-content {
-    padding: 30px 20px;
+    padding: 25px 15px;
+    border-radius: 0;
+    margin-bottom: 20px;
     
     .article-title {
       font-size: 22px;
+      line-height: 1.4;
+      margin-bottom: 20px;
     }
     
     .article-info {
-      gap: 12px;
-      font-size: 13px;
-      padding-bottom: 20px;
+      gap: 10px;
+      font-size: 12px;
+      padding-bottom: 15px;
       margin-bottom: 20px;
       flex-direction: column;
       align-items: flex-start;
       
       .info-item {
+        .icon {
+          font-size: 14px;
+        }
+        
         &.tags {
           width: 100%;
+          flex-wrap: wrap;
           
           .tag {
-            font-size: 12px;
-            padding: 3px 10px;
+            font-size: 11px;
+            padding: 4px 10px;
           }
         }
       }
@@ -512,7 +527,7 @@ onMounted(() => {
       .info-right {
         width: 100%;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 10px;
       }
       
       .info-divider {
@@ -521,31 +536,82 @@ onMounted(() => {
     }
     
     .content {
-      font-size: 16px;
-      line-height: 2;
+      font-size: 15px;
+      line-height: 1.8;
+      
+      :deep(h1) {
+        font-size: 24px;
+        margin: 25px 0 15px;
+      }
       
       :deep(h2) {
         font-size: 22px;
+        margin: 20px 0 12px;
       }
       
       :deep(h3) {
         font-size: 20px;
+        margin: 18px 0 10px;
+      }
+      
+      :deep(p) {
+        margin-bottom: 15px;
+      }
+      
+      :deep(img) {
+        border-radius: 12px;
+        margin: 15px 0;
+      }
+      
+      :deep(pre) {
+        border-radius: 12px;
+        padding: 15px;
+        font-size: 13px;
+        overflow-x: auto;
+      }
+      
+      :deep(code) {
+        font-size: 13px;
+        padding: 2px 6px;
+      }
+      
+      :deep(blockquote) {
+        padding: 12px 15px;
+        margin: 15px 0;
+        border-radius: 12px;
+      }
+      
+      :deep(ul), :deep(ol) {
+        padding-left: 25px;
+        margin: 15px 0;
+      }
+      
+      :deep(table) {
+        font-size: 13px;
+        display: block;
+        overflow-x: auto;
+        
+        th, td {
+          padding: 10px 12px;
+        }
       }
     }
   }
   
   .article-actions {
     position: fixed;
-    right: 10px;
-    bottom: 80px;
+    right: 15px;
+    bottom: 90px;
     top: auto;
     transform: none;
     flex-direction: row;
-    gap: 10px;
+    gap: 12px;
+    z-index: 100;
     
     .action-btn {
-      width: 55px;
-      height: 55px;
+      width: 50px;
+      height: 50px;
+      box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4);
       
       .icon {
         font-size: 20px;
@@ -556,10 +622,12 @@ onMounted(() => {
       }
       
       .count {
-        top: -3px;
-        right: -3px;
-        padding: 1px 6px;
+        top: -5px;
+        right: -5px;
+        padding: 2px 6px;
         font-size: 10px;
+        min-width: 18px;
+        height: 18px;
       }
     }
   }

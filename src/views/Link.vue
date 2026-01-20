@@ -471,24 +471,78 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .link {
+    .container {
+      padding: 20px 15px;
+    }
+  }
+  
   .page-header {
     flex-direction: column;
     text-align: center;
+    padding: 30px 20px;
+    margin-bottom: 25px;
+    gap: 15px;
     
-    .header-text h1 {
-      font-size: 32px;
+    .header-icon {
+      font-size: 50px;
+    }
+    
+    .header-text {
+      h1 {
+        font-size: 28px;
+        margin-bottom: 8px;
+      }
+      
+      p {
+        font-size: 13px;
+      }
     }
   }
   
   .apply-card {
-    padding: 25px;
+    padding: 20px 15px;
+    margin-bottom: 25px;
+    
+    .card-title {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+    
+    .card-desc {
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
     
     .my-info {
+      padding: 15px;
+      
+      .info-title {
+        font-size: 15px;
+        margin-bottom: 12px;
+      }
+      
       .info-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 5px;
+        font-size: 13px;
+        
+        .label {
+          font-size: 12px;
+        }
+        
+        .value {
+          font-size: 13px;
+        }
       }
+    }
+    
+    .apply-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 15px;
     }
   }
   
@@ -497,31 +551,123 @@ onMounted(() => {
       flex-direction: column;
       gap: 15px;
       align-items: stretch;
+      margin-bottom: 20px;
+      
+      h2 {
+        font-size: 20px;
+        text-align: center;
+      }
       
       .apply-btn {
         width: 100%;
+        padding: 12px;
+        font-size: 15px;
       }
     }
   }
   
   .links-grid {
     grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .link-card {
+    padding: 20px 15px;
+    
+    .link-avatar {
+      width: 50px;
+      height: 50px;
+    }
+    
+    .link-info {
+      .link-name {
+        font-size: 16px;
+        margin-bottom: 6px;
+      }
+      
+      .link-desc {
+        font-size: 12px;
+        line-height: 1.5;
+        -webkit-line-clamp: 2;
+      }
+    }
+    
+    .link-arrow {
+      font-size: 20px;
+    }
   }
   
   .empty-state {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 80px 20px;
+    padding: 60px 20px;
     
     .empty-icon {
-      font-size: 64px;
-      margin-bottom: 16px;
+      font-size: 60px;
+      margin-bottom: 15px;
       opacity: 0.5;
     }
     
     .empty-text {
-      font-size: 16px;
+      font-size: 14px;
       color: #999;
+    }
+  }
+}
+
+// 申请弹窗移动端样式
+:deep(.apply-dialog) {
+  @media (max-width: 768px) {
+    .el-dialog {
+      width: 95vw !important;
+      margin: 0 auto;
+    }
+    
+    .el-dialog__header {
+      padding: 15px 20px !important;
+    }
+    
+    .el-dialog__body {
+      padding: 20px 15px !important;
+    }
+    
+    .el-dialog__footer {
+      padding: 15px 20px 20px !important;
+    }
+    
+    .dialog-desc {
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+    
+    .my-info {
+      padding: 15px;
+      margin-bottom: 15px;
+      
+      .info-title {
+        font-size: 14px;
+        margin-bottom: 12px;
+      }
+      
+      .info-item {
+        font-size: 12px;
+        
+        .label {
+          font-size: 11px;
+        }
+      }
+    }
+    
+    .el-form-item__label {
+      font-size: 13px;
+    }
+    
+    .el-input__inner {
+      font-size: 14px;
+    }
+    
+    .el-textarea__inner {
+      font-size: 14px;
     }
   }
 }
@@ -677,6 +823,32 @@ onMounted(() => {
         &:hover {
           opacity: 0.9;
         }
+      }
+    }
+  }
+  
+  @media (max-width: 768px) {
+    width: 95vw !important;
+    margin: 0 auto;
+    
+    .el-dialog__header {
+      padding: 15px 15px 10px;
+      
+      .el-dialog__title {
+        font-size: 18px;
+      }
+    }
+    
+    .el-dialog__body {
+      padding: 15px;
+    }
+    
+    .el-dialog__footer {
+      padding: 10px 15px 15px;
+      
+      .el-button {
+        padding: 10px 20px;
+        font-size: 14px;
       }
     }
   }

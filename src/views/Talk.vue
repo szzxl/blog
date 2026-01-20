@@ -25,7 +25,7 @@
         <!-- 遍历说说列表 -->
         <div class="talk-item card" v-for="talk in talks" :key="talk.id">
           <div class="talk-header">
-            <img :src="talk.user?.avatar || '/web/default-avatar.svg'" alt="头像" class="avatar">
+            <img :src="talk.user?.avatar || '/default-avatar.svg'" alt="头像" class="avatar">
             <div class="user-info">
               <div class="username">{{ talk.user?.nickname || '匿名用户' }}</div>
               <div class="time">{{ talk.createTime }}</div>
@@ -46,13 +46,11 @@
           </div>
           <div class="talk-footer">
             <div class="actions">
-              <el-button text class="action-btn" @click="handleLike">
+              <el-button text class="action-btn" @click="handleLike(talk)">
                 <span class="icon">{{ talk.isLiked ? '❤️' : '💗' }}</span>
-                <span class="count">{{ talk.likeCount || 0 }}</span>
               </el-button>
               <el-button text class="action-btn" @click="openCommentDialog(talk)">
                 <span class="icon">💬</span>
-                <span class="count">{{ talk.commentCount || 0 }}</span>
               </el-button>
             </div>
             <!-- 删除按钮 - 仅博主和超级管理员可见 -->
@@ -71,7 +69,7 @@
           <div class="comment-list" v-if="talk.comments && talk.comments.length > 0 && !talk.commentsLoaded">
             <template v-for="comment in talk.comments" :key="comment.id">
               <div class="comment-item-bilibili">
-                <img :src="comment.user?.avatar || '/web/default-avatar.svg'" alt="头像" class="comment-avatar">
+                <img :src="comment.user?.avatar || '/default-avatar.svg'" alt="头像" class="comment-avatar">
                 <div class="comment-main">
                   <div class="comment-user" :class="{ author: comment.user?.isAuthor }">
                     {{ comment.user?.nickname || '匿名用户' }}
@@ -99,9 +97,14 @@
               </div>
               
               <!-- 该评论的回复列表（展开后显示） -->
-              <div v-if="comment.repliesExpanded && comment.detailReplies && comment.detailReplies.length > 0" style="margin-left: 52px;">
-                <div v-for="reply in comment.detailReplies" :key="reply.id" class="comment-item-bilibili">
-                  <img :src="reply.user?.avatar || '/web/default-avatar.svg'" alt="头像" class="comment-avatar">
+              <div v-if="comment.repliesExpanded && comment.detailReplies && comment.detailReplies.length > 0">
+                <div 
+                  v-for="reply in comment.detailReplies" 
+                  :key="reply.id" 
+                  class="comment-item-bilibili"
+                  :style="{ marginLeft: (reply.level || 1) * 52 + 'px' }"
+                >
+                  <img :src="reply.user?.avatar || '/default-avatar.svg'" alt="头像" class="comment-avatar">
                   <div class="comment-main">
                     <div class="comment-user" :class="{ author: reply.user?.isAuthor }">
                       {{ reply.user?.nickname || '匿名用户' }}
@@ -131,7 +134,7 @@
           <!-- 完整评论树（点击查看详情后显示，B站风格） -->
           <div class="comment-list" v-if="talk.commentsLoaded && talk.detailComments && talk.detailComments.length > 0">
             <div v-for="comment in talk.detailComments" :key="comment.id" class="comment-item-bilibili">
-              <img :src="comment.user?.avatar || '/web/default-avatar.svg'" alt="头像" class="comment-avatar">
+              <img :src="comment.user?.avatar || '/default-avatar.svg'" alt="头像" class="comment-avatar">
               <div class="comment-main">
                 <div class="comment-user" :class="{ author: comment.user?.isAuthor }">
                   {{ comment.user?.nickname || '匿名用户' }}
@@ -154,7 +157,7 @@
                 <!-- 回复列表 -->
                 <div class="replies-container" v-if="comment.replies && comment.replies.length > 0">
                   <div class="reply-item" v-for="reply in flattenComments(comment.replies)" :key="reply.id">
-                    <img :src="reply.user?.avatar || '/web/default-avatar.svg'" alt="头像" class="reply-avatar">
+                    <img :src="reply.user?.avatar || '/default-avatar.svg'" alt="头像" class="reply-avatar">
                     <div class="reply-content">
                       <span class="reply-user" :class="{ author: reply.user?.isAuthor }">
                         {{ reply.user?.nickname || '匿名用户' }}
@@ -353,7 +356,7 @@
 <script setup lang="ts">
 import { ref, onMounted, defineComponent, h, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getTalkList, getTalkDetail, publishTalk, uploadImage, deleteTalk, deleteComment, addComment } from '@/api/article'
+import { getTalkList, getTalkDetail, publishTalk, uploadImage, deleteTalk, deleteComment, addComment, likeTalk } from '@/api/article'
 import { Plus, Delete, ZoomIn, Upload } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
@@ -473,6 +476,15 @@ const submitTalk = async () => {
     return
   }
   
+  if (!userStore.user?.id) {
+    ElMessage.warning('请先登录')
+    router.push({
+      path: '/login',
+      query: { redirect: router.currentRoute.value.fullPath }
+    })
+    return
+  }
+  
   const uploading = talkImageList.value.some(img => img.uploading)
   if (uploading) {
     ElMessage.warning('图片正在上传中，请稍候...')
@@ -483,6 +495,7 @@ const submitTalk = async () => {
   
   try {
     await publishTalk({
+      userId: Number(userStore.user.id),
       talkContent: talkForm.value.content,
       talkPic: talkImageList.value.map(img => img.url),
       talkStatus: talkForm.value.status
@@ -551,7 +564,7 @@ const handleDeleteComment = async (comment: any, talk: any) => {
     
     // 如果不是博主/超级管理员，需要传 userId
     if (!isAuthor.value && userStore.user) {
-      requestData.userId = userStore.user.id
+      requestData.userId = Number(userStore.user.id)
     }
     
     await deleteComment(requestData)
@@ -611,7 +624,7 @@ const submitComment = async () => {
   try {
     const requestData: any = {
       talkId: currentTalk.value.id,
-      userId: userStore.user.id,
+      userId: Number(userStore.user.id),
       content: commentText.value
     }
     
@@ -675,7 +688,7 @@ const CommentItem: any = defineComponent({
         // 评论项
         h('div', { class: 'comment-item' }, [
           h('img', {
-            src: comment.user?.avatar || '/web/default-avatar.svg',
+            src: comment.user?.avatar || '/default-avatar.svg',
             alt: '头像',
             class: 'comment-avatar',
             style: 'width: 32px; height: 32px;'
@@ -724,13 +737,38 @@ const replyToComment = ref<any>(null)
 const submittingComment = ref(false)
 
 // 点赞相关
-const isLiked = ref(false)
-const likeCount = ref(12)
-
-const handleLike = () => {
-  isLiked.value = !isLiked.value
-  likeCount.value = isLiked.value ? likeCount.value + 1 : likeCount.value - 1
-  ElMessage.success(isLiked.value ? '点赞成功 ❤️' : '取消点赞')
+const handleLike = async (talk: any) => {
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('请先登录')
+    router.push({
+      path: '/login',
+      query: { redirect: router.currentRoute.value.fullPath }
+    })
+    return
+  }
+  
+  if (!userStore.user?.id) {
+    ElMessage.warning('用户信息异常，请重新登录')
+    return
+  }
+  
+  try {
+    const type = talk.isLiked ? 2 : 1  // 1=点赞, 2=取消点赞
+    
+    await likeTalk({
+      talkId: talk.id,
+      userId: Number(userStore.user.id),
+      type
+    })
+    
+    // 更新本地状态
+    talk.isLiked = !talk.isLiked
+    talk.likeCount = talk.isLiked ? (talk.likeCount || 0) + 1 : (talk.likeCount || 0) - 1
+    
+    ElMessage.success(talk.isLiked ? '点赞成功 ❤️' : '取消点赞')
+  } catch (error) {
+    ElMessage.error('操作失败，请重试')
+  }
 }
 
 // 图片预览
@@ -759,11 +797,17 @@ const handlePageChange = (page: number) => {
 const loadTalkList = async () => {
   loading.value = true
   try {
-    const response: any = await getTalkList({
-      userId: 1,
+    const params: any = {
       pageNo: currentPage.value,
       pageSize: pageSize.value
-    })
+    }
+    
+    // 如果用户已登录，传入用户ID
+    if (userStore.user?.id) {
+      params.userId = Number(userStore.user.id)
+    }
+    
+    const response: any = await getTalkList(params)
     
     // 响应拦截器已经返回了 res.data，所以直接用 response.list
     if (response && response.list) {
@@ -793,7 +837,7 @@ const loadTalkList = async () => {
           user: talk.user || {
             id: 0,
             nickname: '匿名用户',
-            avatar: '/web/default-avatar.svg',
+            avatar: '/default-avatar.svg',
             isAuthor: false
           },
           comments: talk.comments || [],  // 确保 comments 字段存在
@@ -822,11 +866,15 @@ const loadTalkComments = async (talk: any) => {
   }
   
   try {
-    const params = {
-      userId: 1,
+    const params: any = {
       talkId: talk.id,
       pageNo: 1,
       pageSize: 1
+    }
+    
+    // 如果用户已登录，传入用户ID
+    if (userStore.user?.id) {
+      params.userId = Number(userStore.user.id)
     }
     
     const response: any = await getTalkDetail(params)
@@ -854,11 +902,15 @@ const toggleCommentReplies = async (talk: any, comment: any) => {
   // 如果还没有加载过回复，则加载
   if (!comment.detailReplies) {
     try {
-      const params = {
-        userId: 1,
+      const params: any = {
         talkId: talk.id,
         pageNo: 1,
         pageSize: 100
+      }
+      
+      // 如果用户已登录，传入用户ID
+      if (userStore.user?.id) {
+        params.userId = Number(userStore.user.id)
       }
       
       const response: any = await getTalkDetail(params)
@@ -867,8 +919,8 @@ const toggleCommentReplies = async (talk: any, comment: any) => {
         // 找到当前评论在详情中的数据
         const detailComment = response.comments.find((c: any) => c.id === comment.id)
         if (detailComment && detailComment.replies) {
-          // 扁平化回复列表
-          comment.detailReplies = flattenComments(detailComment.replies)
+          // 扁平化回复列表，并添加层级信息
+          comment.detailReplies = flattenCommentsWithLevel(detailComment.replies, 1)
         } else {
           comment.detailReplies = []
         }
@@ -899,6 +951,26 @@ const flattenComments = (comments: any[]): any[] => {
   }
   
   flatten(comments)
+  return result
+}
+
+// 扁平化评论树并添加层级信息
+const flattenCommentsWithLevel = (comments: any[], level: number = 1): any[] => {
+  const result: any[] = []
+  
+  const flatten = (commentList: any[], currentLevel: number) => {
+    commentList.forEach(comment => {
+      result.push({
+        ...comment,
+        level: currentLevel
+      })
+      if (comment.replies && comment.replies.length > 0) {
+        flatten(comment.replies, currentLevel + 1)
+      }
+    })
+  }
+  
+  flatten(comments, level)
   return result
 }
 
@@ -940,24 +1012,24 @@ onMounted(() => {
 <style scoped lang="scss">
 .talk {
   min-height: calc(100vh - 200px);
-  padding: 40px 0;
+  padding: 30px 0;
 }
 
 .container {
-  max-width: 900px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 0 30px;
+  padding: 0 20px;
 }
 
 .page-header {
   display: flex;
   align-items: center;
-  gap: 20px;
-  margin-bottom: 40px;
+  gap: 15px;
+  margin-bottom: 30px;
   position: relative;
   
   .header-icon {
-    font-size: 60px;
+    font-size: 45px;
     animation: float 3s ease-in-out infinite;
   }
   
@@ -965,36 +1037,36 @@ onMounted(() => {
     flex: 1;
     
     h1 {
-      font-size: 42px;
+      font-size: 32px;
       background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin: 0 0 8px 0;
+      margin: 0 0 5px 0;
       font-weight: 700;
     }
     
     p {
-      font-size: 16px;
+      font-size: 14px;
       color: #999;
       margin: 0;
     }
   }
   
   .publish-btn {
-    height: 44px;
-    padding: 0 24px;
-    border-radius: 22px;
+    height: 38px;
+    padding: 0 20px;
+    border-radius: 19px;
     background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
     border: none;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
     transition: all 0.3s;
     
     .btn-icon {
-      margin-right: 6px;
-      font-size: 16px;
+      margin-right: 5px;
+      font-size: 14px;
     }
     
     &:hover {
@@ -1024,43 +1096,43 @@ onMounted(() => {
   }
   
   .talk-item {
-    padding: 30px;
-    margin-bottom: 25px;
+    padding: 20px;
+    margin-bottom: 20px;
     
     .talk-header {
       display: flex;
       align-items: center;
-      gap: 15px;
-      margin-bottom: 20px;
+      gap: 12px;
+      margin-bottom: 15px;
       
       .avatar {
-        width: 60px;
-        height: 60px;
+        width: 45px;
+        height: 45px;
         border-radius: 50%;
-        border: 3px solid #fff;
-        box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+        border: 2px solid #fff;
+        box-shadow: 0 2px 10px rgba(255, 154, 158, 0.2);
       }
       
       .user-info {
         .username {
-          font-size: 18px;
+          font-size: 15px;
           font-weight: 700;
           color: #5a5a5a;
-          margin-bottom: 5px;
+          margin-bottom: 3px;
         }
         
         .time {
-          font-size: 14px;
+          font-size: 12px;
           color: #999;
         }
       }
     }
     
     .talk-content {
-      font-size: 16px;
-      line-height: 1.8;
+      font-size: 14px;
+      line-height: 1.6;
       color: #666;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
     
     .talk-images {
@@ -1405,23 +1477,206 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .talk {
+    .container {
+      padding: 20px 15px;
+    }
+  }
+  
   .page-header {
     flex-direction: column;
     text-align: center;
+    padding: 30px 20px;
+    margin-bottom: 25px;
+    gap: 15px;
     
-    .header-text h1 {
-      font-size: 32px;
+    .header-icon {
+      font-size: 50px;
+    }
+    
+    .header-text {
+      h1 {
+        font-size: 28px;
+        margin-bottom: 8px;
+      }
+      
+      p {
+        font-size: 13px;
+      }
     }
     
     .publish-btn {
       width: 100%;
+      padding: 12px;
+      font-size: 15px;
     }
   }
   
+  .talk-list {
+    gap: 15px;
+  }
+  
   .talk-item {
-    .talk-images {
-      .talk-img {
-        height: 150px;
+    padding: 20px 15px;
+    
+    .talk-avatar {
+      width: 45px;
+      height: 45px;
+    }
+    
+    .talk-content {
+      .talk-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 12px;
+        
+        .talk-user {
+          font-size: 15px;
+        }
+        
+        .talk-time {
+          font-size: 11px;
+        }
+      }
+      
+      .talk-text {
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 12px;
+      }
+      
+      .talk-images {
+        gap: 8px;
+        margin-bottom: 12px;
+        
+        .talk-img {
+          height: 100px;
+          
+          &.single {
+            height: 200px;
+          }
+          
+          &.double {
+            height: 150px;
+          }
+        }
+      }
+      
+      .talk-footer {
+        flex-direction: column;
+        gap: 12px;
+        
+        .talk-stats {
+          width: 100%;
+          justify-content: flex-start;
+          gap: 15px;
+          
+          .stat-item {
+            font-size: 12px;
+            
+            .icon {
+              font-size: 14px;
+            }
+          }
+        }
+        
+        .talk-actions {
+          width: 100%;
+          justify-content: flex-start;
+          gap: 15px;
+          
+          .action-btn {
+            font-size: 12px;
+            padding: 5px 12px;
+            
+            .icon {
+              font-size: 14px;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .pagination-wrapper {
+    margin-top: 25px;
+    
+    :deep(.el-pagination) {
+      justify-content: center;
+      
+      .el-pager li {
+        min-width: 32px;
+        height: 32px;
+        line-height: 32px;
+        font-size: 13px;
+      }
+      
+      button {
+        padding: 0 8px;
+        font-size: 13px;
+      }
+    }
+  }
+  
+  .empty-state {
+    padding: 60px 20px;
+    
+    .empty-icon {
+      font-size: 60px;
+    }
+    
+    .empty-text {
+      font-size: 14px;
+    }
+  }
+}
+
+// 发表说说弹窗移动端样式
+:deep(.publish-dialog) {
+  @media (max-width: 768px) {
+    .el-dialog {
+      width: 95vw !important;
+      margin: 0 auto;
+    }
+    
+    .el-dialog__header {
+      padding: 15px 20px !important;
+    }
+    
+    .el-dialog__body {
+      padding: 20px 15px !important;
+    }
+    
+    .el-dialog__footer {
+      padding: 15px 20px 20px !important;
+    }
+    
+    .image-list {
+      gap: 10px;
+      
+      .image-item {
+        width: calc(33.333% - 7px);
+        height: 80px;
+        
+        .remove-btn {
+          width: 24px;
+          height: 24px;
+          font-size: 14px;
+        }
+      }
+    }
+    
+    .upload-trigger {
+      width: calc(33.333% - 7px);
+      height: 80px;
+      
+      .upload-icon {
+        font-size: 24px;
+      }
+      
+      .upload-text {
+        font-size: 12px;
       }
     }
   }
@@ -1460,6 +1715,39 @@ onMounted(() => {
       &--primary {
         background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
         border: none;
+      }
+    }
+  }
+  
+  @media (max-width: 768px) {
+    width: 95vw !important;
+    margin: 0 auto;
+    border-radius: 15px;
+    
+    .el-dialog__header {
+      padding: 20px 15px 15px;
+      
+      .el-dialog__title {
+        font-size: 18px;
+      }
+    }
+    
+    .el-dialog__body {
+      padding: 20px 15px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    
+    .el-dialog__footer {
+      padding: 12px 15px 20px;
+      
+      .el-button {
+        padding: 10px 20px;
+        font-size: 14px;
+        
+        &:first-child {
+          margin-right: 10px;
+        }
       }
     }
   }
@@ -1603,6 +1891,46 @@ onMounted(() => {
         transform: translate(-50%, -50%);
         font-size: 28px;
         color: #ff9a9e;
+      }
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .upload-area {
+      padding: 20px;
+      
+      .upload-icon {
+        font-size: 32px;
+      }
+      
+      .upload-text {
+        font-size: 13px;
+      }
+    }
+    
+    .image-list {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      
+      .image-item {
+        border-radius: 8px;
+        
+        .image-overlay {
+          opacity: 1;
+          background: rgba(0, 0, 0, 0.3);
+          
+          .el-icon {
+            font-size: 18px;
+          }
+        }
+      }
+      
+      .upload-btn {
+        border-radius: 8px;
+        
+        .el-icon {
+          font-size: 24px;
+        }
       }
     }
   }
