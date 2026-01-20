@@ -4,7 +4,6 @@
       <button class="close-btn" @click="goBack">×</button>
       
       <div class="login-header">
-        <div class="logo">🌸</div>
         <h2 class="title">欢迎回来</h2>
       </div>
       
@@ -147,8 +146,8 @@ const goBack = () => {
     height: 36px;
     border-radius: 50%;
     border: none;
-    background: linear-gradient(135deg, rgba(255, 154, 158, 0.15) 0%, rgba(254, 207, 239, 0.15) 100%);
-    color: #ff9a9e;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%);
+    color: #8b5cf6;
     font-size: 24px;
     line-height: 1;
     cursor: pointer;
@@ -159,7 +158,7 @@ const goBack = () => {
     justify-content: center;
     
     &:hover {
-      background: linear-gradient(135deg, rgba(255, 154, 158, 0.25) 0%, rgba(254, 207, 239, 0.25) 100%);
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(99, 102, 241, 0.25) 100%);
       transform: rotate(90deg) scale(1.1);
     }
   }
@@ -172,12 +171,12 @@ const goBack = () => {
       font-size: 60px;
       margin-bottom: 15px;
       animation: bounce 2s ease-in-out infinite;
-      filter: drop-shadow(0 5px 15px rgba(255, 154, 158, 0.3));
+      filter: drop-shadow(0 5px 15px rgba(139, 92, 246, 0.3));
     }
     
     .title {
       font-size: 28px;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -203,18 +202,18 @@ const goBack = () => {
         padding: 12px 18px;
         border-radius: 20px;
         background: rgba(255, 255, 255, 0.9);
-        box-shadow: 0 4px 15px rgba(252, 182, 159, 0.12);
-        border: 2px solid rgba(255, 182, 193, 0.2);
+        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.12);
+        border: 2px solid rgba(139, 92, 246, 0.2);
         transition: all 0.3s;
         
         &:hover {
-          box-shadow: 0 6px 20px rgba(252, 182, 159, 0.18);
-          border-color: rgba(255, 182, 193, 0.3);
+          box-shadow: 0 6px 20px rgba(139, 92, 246, 0.18);
+          border-color: rgba(139, 92, 246, 0.3);
         }
         
         &.is-focus {
-          border-color: #ff9a9e;
-          box-shadow: 0 6px 25px rgba(255, 154, 158, 0.3);
+          border-color: #8b5cf6;
+          box-shadow: 0 6px 25px rgba(139, 92, 246, 0.3);
           background: #fff;
         }
       }
@@ -229,7 +228,7 @@ const goBack = () => {
       }
       
       :deep(.el-input__prefix) {
-        color: #ff9a9e;
+        color: #8b5cf6;
       }
     }
     
@@ -241,8 +240,8 @@ const goBack = () => {
       
       .el-checkbox {
         :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-          background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-          border-color: #ff9a9e;
+          background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+          border-color: #8b5cf6;
         }
         
         :deep(.el-checkbox__label) {
@@ -253,10 +252,10 @@ const goBack = () => {
       
       .el-link {
         font-size: 15px;
-        color: #ff9a9e;
+        color: #8b5cf6;
         
         &:hover {
-          color: #ff7a7e;
+          color: #6366f1;
         }
       }
     }
@@ -265,19 +264,19 @@ const goBack = () => {
       width: 100%;
       height: 48px;
       border-radius: 24px;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       border: none;
       font-size: 18px;
       font-weight: 700;
       color: #fff;
-      box-shadow: 0 10px 30px rgba(255, 154, 158, 0.4);
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
       transition: all 0.3s;
       letter-spacing: 3px;
       
       &:hover {
         transform: translateY(-4px);
-        box-shadow: 0 15px 40px rgba(255, 154, 158, 0.5);
-        background: linear-gradient(135deg, #ff8a8e 0%, #fedcdf 100%);
+        box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5);
+        background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
       }
       
       &:active {
@@ -292,12 +291,12 @@ const goBack = () => {
       width: 100%;
       
       .el-link {
-        color: #ff9a9e;
+        color: #8b5cf6;
         font-weight: 700;
         margin-left: 5px;
         
         &:hover {
-          color: #ff7a7e;
+          color: #6366f1;
         }
       }
     }

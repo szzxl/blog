@@ -76,7 +76,7 @@ export const getMonthArticleList = (data: {
   pageSize: number
 }) => {
   return request({
-    url: '/web/month/article/',
+    url: '/web/month/article',
     method: 'post',
     data
   })

@@ -251,7 +251,7 @@ onMounted(() => {
     
     .el-table__header {
       th {
-        background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
         color: #5a5a5a;
         font-weight: 700;
         font-size: 13px;
@@ -270,7 +270,7 @@ onMounted(() => {
       transition: all 0.2s;
       
       &:hover {
-        background: rgba(255, 154, 158, 0.05);
+        background: rgba(139, 92, 246, 0.05);
       }
       
       .article-title {
@@ -280,7 +280,7 @@ onMounted(() => {
         font-size: 14px;
         
         &:hover {
-          color: #ff9a9e;
+          color: #8b5cf6;
         }
       }
       
@@ -291,7 +291,7 @@ onMounted(() => {
     }
     
     .el-button {
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       border: none;
       color: #fff;
       border-radius: 12px;
@@ -324,7 +324,7 @@ onMounted(() => {
     .el-button {
       border-radius: 20px;
       padding: 10px 25px;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       border: none;
     }
   }
@@ -341,11 +341,11 @@ onMounted(() => {
         border-radius: 8px;
         
         &:hover {
-          color: #ff9a9e;
+          color: #8b5cf6;
         }
         
         &.is-active {
-          background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+          background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
           color: #fff;
         }
       }
@@ -368,11 +368,11 @@ onMounted(() => {
       border-radius: 8px;
       
       &:hover {
-        color: #ff9a9e;
+        color: #8b5cf6;
       }
       
       &.is-active {
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
         color: #fff;
       }
     }
@@ -414,7 +414,7 @@ onMounted(() => {
         width: 32px;
         height: 32px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
         color: #fff;
         display: flex;
         align-items: center;
@@ -457,7 +457,7 @@ onMounted(() => {
       padding-left: 44px;
       
       .view-text {
-        color: #ff9a9e;
+        color: #8b5cf6;
         font-size: 14px;
         font-weight: 600;
       }

@@ -9,10 +9,10 @@
       <div class="footer-content">
         <div class="footer-info">
           <div class="footer-logo">
-            <span class="logo-icon">🌸</span>
+            <span class="logo-icon">💻</span>
             <span class="logo-text">{{ websiteName }}</span>
           </div>
-          <p class="motto" v-if="websiteMotto">🌸 {{ websiteMotto }} 🌸</p>
+          <p class="motto" v-if="websiteMotto">✨ {{ websiteMotto }} ✨</p>
         </div>
         <div class="footer-links">
           <div class="link-group">
@@ -24,8 +24,8 @@
           <div class="link-group">
             <h4>联系方式</h4>
             <span class="contact-item" v-if="socialQQ">💬 QQ: {{ socialQQ }}</span>
-            <span class="contact-item" v-if="socialWechat">💚 微信: {{ socialWechat }}</span>
-            <span class="contact-item" v-if="socialEmail">💌 邮箱: {{ socialEmail }}</span>
+            <span class="contact-item" v-if="socialWechat">📱 微信: {{ socialWechat }}</span>
+            <span class="contact-item" v-if="socialEmail">📧 邮箱: {{ socialEmail }}</span>
             <a v-if="socialGithub" :href="socialGithub" target="_blank" class="contact-link">
               🔗 GitHub
             </a>
@@ -33,12 +33,12 @@
         </div>
       </div>
       <div class="footer-decoration">
-        <span class="deco">🌸</span>  
-        <span class="deco">💕</span>
-        <span class="deco">✨</span>
-        <span class="deco">🦋</span>
-        <span class="deco">💗</span>
-        <span class="deco">🌸</span>
+        <span class="deco">💻</span>  
+        <span class="deco">⌨️</span>
+        <span class="deco">🖱️</span>
+        <span class="deco">🖥️</span>
+        <span class="deco">💾</span>
+        <span class="deco">🔧</span>
       </div>
       
       <!-- 底部版权和备案 -->
@@ -102,6 +102,7 @@ onMounted(() => {
     width: 100%;
     height: 60px;
     overflow: hidden;
+    display: none;
     
     svg {
       width: 100%;
@@ -110,11 +111,10 @@ onMounted(() => {
   }
   
   .container {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
     padding: 60px 30px 30px;
-    border-top: 3px solid transparent;
-    border-image: linear-gradient(90deg, #ff9a9e, #fecfef, #ffd0d0) 1;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
   }
   
   .footer-content {
@@ -140,26 +140,22 @@ onMounted(() => {
       .logo-text {
         font-size: 24px;
         font-weight: 700;
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #fff;
+        text-shadow: 0 2px 10px rgba(139, 92, 246, 0.8);
       }
     }
     
     .motto {
       font-size: 18px;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #fff;
+      text-shadow: 0 2px 8px rgba(139, 92, 246, 0.6);
       margin-bottom: 12px;
       font-weight: 600;
     }
     
     .copyright {
       font-size: 14px;
-      color: #999;
+      color: rgba(255, 255, 255, 0.8);
     }
   }
   
@@ -171,12 +167,12 @@ onMounted(() => {
     align-items: center;
     gap: 40px;
     padding: 20px 30px;
-    border-top: 1px solid rgba(255, 182, 193, 0.15);
+    border-top: 1px solid rgba(139, 92, 246, 0.15);
     position: relative;
     
     .copyright {
       font-size: 13px;
-      color: #aaa;
+      color: rgba(255, 255, 255, 0.7);
       margin: 0;
       position: absolute;
       left: 30px;
@@ -184,7 +180,7 @@ onMounted(() => {
     
     .icp {
       font-size: 13px;
-      color: #aaa;
+      color: rgba(255, 255, 255, 0.7);
       margin: 0;
     }
   }
@@ -196,28 +192,30 @@ onMounted(() => {
     .link-group {
       h4 {
         font-size: 16px;
-        color: #ff9a9e;
+        color: #fff;
         margin-bottom: 15px;
         font-weight: 700;
+        text-shadow: 0 2px 8px rgba(139, 92, 246, 0.6);
       }
       
       a {
         display: block;
-        color: #888;
+        color: rgba(255, 255, 255, 0.8);
         font-size: 14px;
         margin-bottom: 10px;
         transition: all 0.3s;
         text-decoration: none;
         
         &:hover {
-          color: #ff9a9e;
+          color: #fff;
           transform: translateX(5px);
+          text-shadow: 0 2px 8px rgba(139, 92, 246, 0.8);
         }
       }
       
       .contact-item {
         display: block;
-        color: #888;
+        color: rgba(255, 255, 255, 0.8);
         font-size: 14px;
         margin-bottom: 10px;
         cursor: default;
@@ -225,15 +223,16 @@ onMounted(() => {
       
       .contact-link {
         display: block;
-        color: #888;
+        color: rgba(255, 255, 255, 0.8);
         font-size: 14px;
         margin-bottom: 10px;
         transition: all 0.3s;
         text-decoration: none;
         
         &:hover {
-          color: #ff9a9e;
+          color: #fff;
           transform: translateX(5px);
+          text-shadow: 0 2px 8px rgba(139, 92, 246, 0.8);
         }
       }
     }
@@ -246,7 +245,7 @@ onMounted(() => {
     justify-content: center;
     gap: 30px;
     padding-top: 30px;
-    border-top: 2px solid rgba(255, 182, 193, 0.2);
+    border-top: 2px solid rgba(139, 92, 246, 0.2);
     
     .deco {
       font-size: 24px;
@@ -363,7 +362,7 @@ onMounted(() => {
       gap: 8px;
       text-align: center;
       padding: 20px 15px;
-      border-top: 1px solid rgba(255, 182, 193, 0.15);
+      border-top: 1px solid rgba(139, 92, 246, 0.15);
       
       .copyright {
         position: static;

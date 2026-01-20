@@ -6,6 +6,7 @@
     <div class="comment-form">
       <template v-if="userStore.isLoggedIn">
         <el-input 
+          ref="commentInputRef"
           v-model="commentText" 
           type="textarea" 
           :rows="4" 
@@ -13,6 +14,11 @@
           maxlength="500"
           show-word-limit
         />
+        
+        <!-- 工具栏 -->
+        <div class="comment-toolbar">
+          <EmojiPicker @select="insertEmoji" />
+        </div>
         
         <!-- 图片上传区域 -->
         <div class="image-upload-section">
@@ -165,6 +171,7 @@ import { Plus, Delete, Upload } from '@element-plus/icons-vue'
 import { getArticleComments, addArticleComment, deleteArticleComment, uploadImage, likeArticleComment } from '@/api/article'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
+import EmojiPicker from './EmojiPicker.vue'
 
 const props = defineProps<{
   articleId: string | number
@@ -174,6 +181,7 @@ const userStore = useUserStore()
 const router = useRouter()
 
 const commentText = ref('')
+const commentInputRef = ref()
 const commentImages = ref<string[]>([])
 const comments = ref<any[]>([])
 const loading = ref(false)
@@ -183,6 +191,27 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 
 const commentFileInput = ref<HTMLInputElement>()
+
+// 插入表情
+const insertEmoji = (emoji: string) => {
+  const textarea = commentInputRef.value?.textarea
+  if (!textarea) {
+    commentText.value += emoji
+    return
+  }
+  
+  const start = textarea.selectionStart
+  const end = textarea.selectionEnd
+  const text = commentText.value
+  
+  commentText.value = text.substring(0, start) + emoji + text.substring(end)
+  
+  // 设置光标位置
+  setTimeout(() => {
+    textarea.selectionStart = textarea.selectionEnd = start + emoji.length
+    textarea.focus()
+  }, 0)
+}
 
 // 是否是博主
 const isAuthor = computed(() => {
@@ -451,7 +480,7 @@ onMounted(() => {
   
   .section-title {
     font-size: 24px;
-    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -465,13 +494,20 @@ onMounted(() => {
     .el-textarea {
       :deep(.el-textarea__inner) {
         border-radius: 12px;
-        border: 2px solid rgba(255, 182, 193, 0.2);
+        border: 2px solid rgba(139, 92, 246, 0.2);
         font-size: 15px;
         
         &:focus {
-          border-color: #ff9a9e;
+          border-color: #8b5cf6;
         }
       }
+    }
+    
+    .comment-toolbar {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
     }
     
     .form-actions {
@@ -483,7 +519,7 @@ onMounted(() => {
         height: 42px;
         padding: 0 28px;
         border-radius: 21px;
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
         border: none;
         font-size: 15px;
         font-weight: 600;
@@ -512,23 +548,23 @@ onMounted(() => {
       }
       
       .upload-area {
-        border: 2px dashed rgba(255, 182, 193, 0.4);
+        border: 2px dashed rgba(139, 92, 246, 0.4);
         border-radius: 12px;
         padding: 30px;
         text-align: center;
         cursor: pointer;
         transition: all 0.3s;
-        background: linear-gradient(135deg, rgba(255, 154, 158, 0.03) 0%, rgba(254, 207, 239, 0.03) 100%);
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(99, 102, 241, 0.03) 100%);
         
         &:hover {
-          border-color: #ff9a9e;
-          background: linear-gradient(135deg, rgba(255, 154, 158, 0.08) 0%, rgba(254, 207, 239, 0.08) 100%);
+          border-color: #8b5cf6;
+          background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
           transform: translateY(-2px);
         }
         
         .upload-icon {
           font-size: 36px;
-          color: #ff9a9e;
+          color: #8b5cf6;
           margin-bottom: 10px;
         }
         
@@ -551,12 +587,12 @@ onMounted(() => {
           border-radius: 10px;
           overflow: hidden;
           background: #f5f5f5;
-          box-shadow: 0 2px 10px rgba(252, 182, 159, 0.15);
+          box-shadow: 0 2px 10px rgba(139, 92, 246, 0.15);
           transition: all 0.3s;
           
           &:hover {
             transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.25);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.25);
             
             .image-overlay {
               opacity: 1;
@@ -593,7 +629,7 @@ onMounted(() => {
               
               &:hover {
                 transform: scale(1.2);
-                color: #ff6b6b;
+                color: #4338ca;
               }
             }
           }
@@ -603,15 +639,15 @@ onMounted(() => {
           position: relative;
           width: 100%;
           padding-bottom: 100%;
-          border: 2px dashed rgba(255, 182, 193, 0.4);
+          border: 2px dashed rgba(139, 92, 246, 0.4);
           border-radius: 10px;
           cursor: pointer;
           transition: all 0.3s;
-          background: linear-gradient(135deg, rgba(255, 154, 158, 0.03) 0%, rgba(254, 207, 239, 0.03) 100%);
+          background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(99, 102, 241, 0.03) 100%);
           
           &:hover {
-            border-color: #ff9a9e;
-            background: linear-gradient(135deg, rgba(255, 154, 158, 0.08) 0%, rgba(254, 207, 239, 0.08) 100%);
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
             transform: translateY(-3px);
           }
           
@@ -621,7 +657,7 @@ onMounted(() => {
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 28px;
-            color: #ff9a9e;
+            color: #8b5cf6;
           }
         }
       }
@@ -632,9 +668,9 @@ onMounted(() => {
       align-items: center;
       gap: 12px;
       padding: 20px 25px;
-      background: linear-gradient(135deg, rgba(255, 154, 158, 0.08) 0%, rgba(254, 207, 239, 0.08) 100%);
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
       border-radius: 15px;
-      border: 2px solid rgba(255, 182, 193, 0.2);
+      border: 2px solid rgba(139, 92, 246, 0.2);
       
       .tip-icon {
         font-size: 24px;
@@ -645,13 +681,13 @@ onMounted(() => {
         color: #666;
         
         .login-link {
-          color: #ff9a9e;
+          color: #8b5cf6;
           font-weight: 700;
           text-decoration: none;
           transition: all 0.3s;
           
           &:hover {
-            color: #ff7a7e;
+            color: #6366f1;
             text-decoration: underline;
           }
         }
@@ -671,7 +707,7 @@ onMounted(() => {
       display: flex;
       gap: 15px;
       padding: 20px 0;
-      border-bottom: 1px solid rgba(255, 182, 193, 0.15);
+      border-bottom: 1px solid rgba(139, 92, 246, 0.15);
       
       &:last-child {
         border-bottom: none;
@@ -688,13 +724,13 @@ onMounted(() => {
           margin-bottom: 8px;
           
           &.author {
-            color: #ff7a7e;
+            color: #6366f1;
             
             &::after {
               content: '作者';
               margin-left: 8px;
               font-size: 11px;
-              background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+              background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
               color: #fff;
               padding: 2px 8px;
               border-radius: 10px;
@@ -724,11 +760,11 @@ onMounted(() => {
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
-            border: 2px solid rgba(255, 182, 193, 0.2);
+            border: 2px solid rgba(139, 92, 246, 0.2);
             
             &:hover {
               transform: scale(1.05);
-              box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+              box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
             }
           }
         }
@@ -757,7 +793,7 @@ onMounted(() => {
               gap: 5px;
               
               &:hover {
-                color: #ff9a9e;
+                color: #8b5cf6;
               }
               
               &.like-btn {
@@ -770,10 +806,10 @@ onMounted(() => {
                 }
                 
                 &.liked {
-                  color: #ff6b6b;
+                  color: #4338ca;
                   
                   .count {
-                    color: #ff6b6b;
+                    color: #4338ca;
                   }
                   
                   &:hover {
@@ -787,7 +823,7 @@ onMounted(() => {
               }
               
               &.delete:hover {
-                color: #ff6b6b;
+                color: #4338ca;
               }
             }
           }
@@ -796,7 +832,7 @@ onMounted(() => {
         .replies {
           margin-top: 15px;
           padding-left: 20px;
-          border-left: 3px solid rgba(255, 182, 193, 0.2);
+          border-left: 3px solid rgba(139, 92, 246, 0.2);
           
           .reply-item {
             display: flex;
@@ -843,11 +879,11 @@ onMounted(() => {
           border-radius: 8px;
           
           &:hover {
-            color: #ff9a9e;
+            color: #8b5cf6;
           }
           
           &.is-active {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
             color: #fff;
           }
         }

@@ -60,20 +60,32 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .carousel {
-  width: 100%;
-  margin-bottom: 40px;
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  padding: 0 20px;
   
   :deep(.el-carousel) {
     position: relative;
     z-index: 1;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     
     .el-carousel__container {
       position: relative;
       z-index: 1;
+      border-radius: 20px;
+      overflow: hidden;
     }
     
     .el-carousel__arrow {
       z-index: 2;
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.5);
+      }
     }
     
     .el-carousel__indicator {
@@ -85,7 +97,7 @@ onMounted(() => {
       }
       
       &.is-active button {
-        background: #ff9a9e;
+        background: #8b5cf6;
         width: 30px;
         border-radius: 6px;
       }
@@ -105,14 +117,22 @@ onMounted(() => {
       object-fit: cover;
       object-position: center;
       display: block;
+      transition: transform 0.3s;
+    }
+    
+    &:hover .carousel-image {
+      transform: scale(1.05);
     }
   }
 }
 
 @media (max-width: 768px) {
   .carousel {
+    padding: 0 15px;
+    
     :deep(.el-carousel) {
       height: 250px !important;
+      border-radius: 15px;
     }
   }
 }
