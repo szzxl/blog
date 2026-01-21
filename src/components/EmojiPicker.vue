@@ -68,9 +68,6 @@ const categories = [
   { key: 'symbol', icon: '❤️', name: '符号' }
 ]
 
-// 版本标识 - 用于强制更新
-const EMOJI_VERSION = '2.0.0'
-
 // 表情数据
 const emojiData: Record<string, string[]> = {
   smile: [
