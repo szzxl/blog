@@ -1,8 +1,11 @@
 <template>
   <div class="article-detail">
-    <div class="container" v-loading="loading">
+    <div class="container">
+      <!-- 骨架屏 -->
+      <Skeleton v-if="loading" type="article-detail" />
+      
       <!-- 文章内容（包含标题和信息） -->
-      <article class="article-content card" v-if="article">
+      <article v-else class="article-content card" v-if="article">
         <h1 class="article-title">{{ article.articleName }}</h1>
         
         <div class="article-info">
@@ -65,6 +68,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Comment from '@/components/Comment.vue'
+import Skeleton from '@/components/Skeleton.vue'
 import { getArticleDetail, addArticleView, likeArticle } from '@/api/article'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'

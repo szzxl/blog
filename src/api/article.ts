@@ -1,4 +1,5 @@
 import request from './request'
+import { cache, generateCacheKey } from '@/utils/cache'
 
 // 用户认证相关
 export const login = (data: { username: string; password: string }) => {
@@ -56,38 +57,68 @@ export const logout = () => {
 }
 
 // 文章相关
-export const getArticleList = (data: { 
+export const getArticleList = async (data: { 
   articleName?: string
   articleCategory?: string
   articleTag?: string
   pageNo?: number
   pageSize?: number
 }) => {
-  return request({
+  // 生成缓存键
+  const cacheKey = generateCacheKey('article_list', data)
+  
+  // 尝试从缓存获取
+  const cached = cache.get(cacheKey)
+  if (cached) {
+    return cached
+  }
+  
+  // 请求数据
+  const result = await request({
     url: '/web/article/list',
     method: 'post',
     data
   })
+  
+  // 缓存结果（5分钟）
+  cache.set(cacheKey, result, 5 * 60 * 1000)
+  
+  return result
 }
 
 // 获取月度文章列表（首页使用）
-export const getMonthArticleList = (data: {
+export const getMonthArticleList = async (data: {
   pageNo: number
   pageSize: number
 }) => {
-  return request({
+  const cacheKey = generateCacheKey('month_article', data)
+  const cached = cache.get(cacheKey)
+  if (cached) return cached
+  
+  const result = await request({
     url: '/web/month/article',
     method: 'post',
     data
   })
+  
+  cache.set(cacheKey, result, 5 * 60 * 1000)
+  return result
 }
 
-export const getArticleDetail = (data: { id: string | number }) => {
-  return request({
+export const getArticleDetail = async (data: { id: string | number }) => {
+  const cacheKey = generateCacheKey('article_detail', data)
+  const cached = cache.get(cacheKey)
+  if (cached) return cached
+  
+  const result = await request({
     url: '/web/article/detail',
     method: 'post',
     data
   })
+  
+  // 文章详情缓存10分钟
+  cache.set(cacheKey, result, 10 * 60 * 1000)
+  return result
 }
 
 // 增加文章查看次数
@@ -112,32 +143,48 @@ export const likeArticle = (data: {
 }
 
 // 分类相关
-export const getCategoryList = (data?: { 
+export const getCategoryList = async (data?: { 
   id?: number
   categoryName?: string
   categoryStatus?: number
   pageNo?: number
   pageSize?: number
 }) => {
-  return request({ 
+  const cacheKey = generateCacheKey('category_list', data)
+  const cached = cache.get(cacheKey)
+  if (cached) return cached
+  
+  const result = await request({ 
     url: '/web/category/list', 
     method: 'post', 
     data: data || {} 
   })
+  
+  // 分类列表缓存15分钟
+  cache.set(cacheKey, result, 15 * 60 * 1000)
+  return result
 }
 
 // 标签相关
-export const getTagList = (data?: { 
+export const getTagList = async (data?: { 
   id?: number
   tagName?: string
   pageNo?: number
   pageSize?: number
 }) => {
-  return request({ 
+  const cacheKey = generateCacheKey('tag_list', data)
+  const cached = cache.get(cacheKey)
+  if (cached) return cached
+  
+  const result = await request({ 
     url: '/web/tag/list', 
     method: 'post', 
     data: data || {} 
   })
+  
+  // 标签列表缓存15分钟
+  cache.set(cacheKey, result, 15 * 60 * 1000)
+  return result
 }
 
 // 获取标签统计（带文章数量）

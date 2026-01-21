@@ -3,12 +3,17 @@ import App from './App.vue'
 import router from './router'
 import pinia from './stores'
 import { useThemeStore } from './stores/theme'
+import { lazyload, lazyBg } from './directives/lazyload'
 import ElementPlus from 'element-plus'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import 'element-plus/dist/index.css'
 import './styles/global.scss'
 
 const app = createApp(App)
+
+// 注册全局指令
+app.directive('lazyload', lazyload)
+app.directive('lazy-bg', lazyBg)
 
 // 全局错误处理
 app.config.errorHandler = (err) => {

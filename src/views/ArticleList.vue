@@ -25,8 +25,12 @@
       </div>
       
       <!-- 文章列表 -->
-      <div class="articles" v-loading="loading">
-        <div class="article-card" v-for="article in articles" :key="article.id" @click="viewArticle(article.id)">
+      <div class="articles">
+        <!-- 骨架屏 -->
+        <Skeleton v-if="loading" type="article-list" :count="6" />
+        
+        <!-- 文章列表 -->
+        <div v-else class="article-card" v-for="article in articles" :key="article.id" @click="viewArticle(article.id)">
           <!-- 标识标签 -->
           <div class="badges" v-if="article.isTop === 1 || article.isRecommend === 1">
             <span class="badge badge-top" v-if="article.isTop === 1">📌 置顶</span>
@@ -35,7 +39,7 @@
           
           <div class="card-left">
             <div class="article-cover">
-              <img :src="article.articleCover || '/web/default-cover.svg'" alt="封面">
+              <img v-lazyload="article.articleCover || '/web/default-cover.svg'" alt="封面">
             </div>
           </div>
           <div class="card-right">
@@ -98,6 +102,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getArticleList } from '@/api/article'
 import { ElMessage } from 'element-plus'
+import Skeleton from '@/components/Skeleton.vue'
 
 const router = useRouter()
 
@@ -344,6 +349,14 @@ onMounted(() => {
         height: 100%;
         object-fit: cover;
         transition: transform 0.4s ease;
+        
+        &.lazy-loading {
+          filter: blur(10px);
+        }
+        
+        &.lazy-loaded {
+          filter: none;
+        }
       }
     }
   }

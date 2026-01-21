@@ -263,6 +263,7 @@ server: {
 - [详细优化说明](./OPTIMIZATION_GUIDE.md) - 完整的优化方案和实现细节
 - [优化总结](./OPTIMIZATION_SUMMARY.md) - 优化内容概览
 - [快速参考](./QUICK_REFERENCE.md) - 常用 API 快速查询
+- [性能优化功能](./PERFORMANCE_FEATURES.md) - 骨架屏、缓存、懒加载使用指南
 - [表情包功能](./EMOJI_FEATURE.md) - 表情包功能说明
 - [用户使用指南](./用户使用指南.md) - 用户操作手册
 - [用户操作手册](./用户操作手册.md) - 详细操作说明
