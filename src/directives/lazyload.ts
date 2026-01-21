@@ -53,7 +53,7 @@ function loadImage(el: HTMLImageElement, src: string, options: LazyLoadOptions):
 /**
  * 创建观察器
  */
-function createObserver(el: HTMLImageElement, binding: any): IntersectionObserver {
+function createObserver(binding: any): IntersectionObserver {
   const options: LazyLoadOptions = {
     ...defaultOptions,
     ...(typeof binding.value === 'object' ? binding.value : {})
@@ -116,7 +116,7 @@ export const lazyload = {
     }
     
     // 创建并启动观察器
-    const observer = createObserver(el, binding)
+    const observer = createObserver(binding)
     observer.observe(el)
     
     // 保存观察器实例
@@ -136,7 +136,7 @@ export const lazyload = {
       }
       
       // 创建新的观察器
-      const observer = createObserver(el, binding)
+      const observer = createObserver(binding)
       observer.observe(el)
       observerMap.set(el, observer)
     }
