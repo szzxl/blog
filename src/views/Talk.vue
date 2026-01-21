@@ -229,6 +229,7 @@
       <el-form :model="talkForm" label-width="0">
         <el-form-item>
           <el-input
+            ref="talkTextareaRef"
             v-model="talkForm.content"
             type="textarea"
             :rows="6"
@@ -236,6 +237,11 @@
             maxlength="1000"
             show-word-limit
           />
+        </el-form-item>
+        
+        <!-- 表情选择器 -->
+        <el-form-item>
+          <EmojiPicker @select="insertTalkEmoji" />
         </el-form-item>
         
         <el-form-item>
@@ -332,6 +338,7 @@
       :close-on-click-modal="false"
     >
       <el-input
+        ref="commentTextareaRef"
         v-model="commentText"
         type="textarea"
         :rows="5"
@@ -339,6 +346,11 @@
         maxlength="500"
         show-word-limit
       />
+      
+      <!-- 表情选择器 -->
+      <div style="margin-top: 12px;">
+        <EmojiPicker @select="insertCommentEmoji" />
+      </div>
       
       <template #footer>
         <el-button @click="commentDialogVisible = false">取消</el-button>
@@ -361,6 +373,7 @@ import { getTalkList, getTalkDetail, publishTalk, uploadImage, deleteTalk, delet
 import { Plus, Delete, ZoomIn, Upload } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
+import EmojiPicker from '@/components/EmojiPicker.vue'
 
 const userStore = useUserStore()
 const router = useRouter()
@@ -389,6 +402,8 @@ interface ImageItem {
 
 const talkImageList = ref<ImageItem[]>([])
 const talkFileInput = ref<HTMLInputElement>()
+const talkTextareaRef = ref<any>()
+const commentTextareaRef = ref<any>()
 
 // 触发文件选择
 const triggerTalkUpload = () => {
@@ -1002,6 +1017,50 @@ const formatCommentTime = (timestamp: number) => {
   
   // 否则显示完整日期时间
   return formatTimestamp(timestamp)
+}
+
+// 插入表情到说说文本框
+const insertTalkEmoji = (emoji: string) => {
+  const textarea = talkTextareaRef.value?.textarea || talkTextareaRef.value?.$el?.querySelector('textarea')
+  if (textarea) {
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const text = talkForm.value.content
+    
+    talkForm.value.content = text.substring(0, start) + emoji + text.substring(end)
+    
+    // 恢复光标位置
+    setTimeout(() => {
+      textarea.focus()
+      const newPos = start + emoji.length
+      textarea.setSelectionRange(newPos, newPos)
+    }, 0)
+  } else {
+    // 如果无法获取 textarea，直接追加到末尾
+    talkForm.value.content += emoji
+  }
+}
+
+// 插入表情到评论文本框
+const insertCommentEmoji = (emoji: string) => {
+  const textarea = commentTextareaRef.value?.textarea || commentTextareaRef.value?.$el?.querySelector('textarea')
+  if (textarea) {
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const text = commentText.value
+    
+    commentText.value = text.substring(0, start) + emoji + text.substring(end)
+    
+    // 恢复光标位置
+    setTimeout(() => {
+      textarea.focus()
+      const newPos = start + emoji.length
+      textarea.setSelectionRange(newPos, newPos)
+    }, 0)
+  } else {
+    // 如果无法获取 textarea，直接追加到末尾
+    commentText.value += emoji
+  }
 }
 
 // 初始化加载
