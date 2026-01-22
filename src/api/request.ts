@@ -79,8 +79,8 @@ service.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`
     }
     
-    // XSS 防护：清理请求数据
-    if (config.data && typeof config.data === 'object') {
+    // XSS 防护：清理请求数据（跳过 FormData）
+    if (config.data && typeof config.data === 'object' && !(config.data instanceof FormData)) {
       config.data = sanitizeRequestData(config.data)
     }
     

@@ -572,12 +572,22 @@ const handleAvatarUpload = async (event: Event) => {
     // 1. 上传图片
     const uploadResponse: any = await uploadImage(file)
     
+    console.log('上传响应:', uploadResponse) // 调试日志
+    
     // 尝试多种可能的字段名
-    const avatarUrl = uploadResponse?.url || uploadResponse?.data?.url || uploadResponse?.path || uploadResponse?.data?.path || uploadResponse
+    const avatarUrl = uploadResponse?.url || 
+                     uploadResponse?.data?.url || 
+                     uploadResponse?.path || 
+                     uploadResponse?.data?.path || 
+                     uploadResponse?.data || 
+                     uploadResponse
+    
+    console.log('解析的头像URL:', avatarUrl) // 调试日志
     
     if (!avatarUrl || typeof avatarUrl !== 'string') {
       loadingMessage.close()
-      ElMessage.error('上传失败，请重试')
+      console.error('无效的上传响应:', uploadResponse)
+      ElMessage.error('上传失败：无法获取图片地址')
       return
     }
     
@@ -597,12 +607,10 @@ const handleAvatarUpload = async (event: Event) => {
     loadingMessage.close()
     ElMessage.success('头像更换成功')
     
-    // 延迟关闭弹窗，让用户看到新头像
-    setTimeout(() => {
-      showProfileDialog.value = false
-    }, 1000)
+    // 不自动关闭弹窗，让用户继续查看或编辑其他信息
   } catch (error: any) {
     loadingMessage.close()
+    console.error('头像上传错误:', error)
     ElMessage.error(error.msg || error.message || '上传失败，请重试')
   } finally {
     // 清空 input，允许重复选择同一文件

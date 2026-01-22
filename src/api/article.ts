@@ -226,7 +226,8 @@ export const uploadImage = (file: File) => {
     data: formData,
     headers: {
       'Content-Type': 'multipart/form-data'
-    }
+    },
+    timeout: 30000 // 增加超时时间到30秒
   })
 }
 
