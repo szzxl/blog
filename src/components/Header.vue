@@ -653,17 +653,24 @@ const handleCommand = async (command: string) => {
       router.push('/favorites')
       break
     case 'admin':
-      // 跳转到管理后台 - /admin 路径
+      // 跳转到管理后台 - 根据环境动态设置路径
       const hostname = window.location.hostname
       const protocol = window.location.protocol
       const port = window.location.port
+      
+      // 根据当前环境判断管理后台路径
+      const mode = import.meta.env.MODE
+      let adminPath = '/admin'
+      if (mode === 'test') {
+        adminPath = '/test-admin/'
+      }
       
       // 构建管理后台 URL
       let adminUrl = `${protocol}//${hostname}`
       if (port) {
         adminUrl += `:${port}`
       }
-      adminUrl += '/admin'
+      adminUrl += adminPath
       
       window.open(adminUrl, '_blank')
       ElMessage.success('正在跳转到管理后台...')
