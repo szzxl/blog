@@ -7,8 +7,13 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  // 开发环境不使用 base，生产环境使用 /web/
-  const base = mode === 'production' ? '/web/' : '/'
+  // 开发环境不使用 base，生产环境使用 /web/，测试环境使用 /test/
+  let base = '/'
+  if (mode === 'production') {
+    base = '/web/'
+  } else if (mode === 'test') {
+    base = '/test/'
+  }
   
   return {
     base,

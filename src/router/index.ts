@@ -3,8 +3,19 @@ import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
 import Home from '@/views/Home.vue'
 
+// 根据构建模式动态设置 base 路径
+const getBasePath = () => {
+  const mode = import.meta.env.MODE
+  if (mode === 'production') {
+    return '/web/'
+  } else if (mode === 'test') {
+    return '/test/'
+  }
+  return '/'
+}
+
 const router = createRouter({
-  history: createWebHistory('/web/'),
+  history: createWebHistory(getBasePath()),
   routes: [
     {
       path: '/',
