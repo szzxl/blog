@@ -62,6 +62,11 @@ const router = createRouter({
       component: () => import('@/views/Talk.vue')
     },
     {
+      path: '/album',
+      name: 'album',
+      component: () => import('@/views/Album.vue')
+    },
+    {
       path: '/guestbook',
       name: 'guestbook',
       component: () => import('@/views/Guestbook.vue')

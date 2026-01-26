@@ -52,3 +52,4 @@ app.mount('#app')
 const themeStore = useThemeStore()
 themeStore.initFromStorage()
 themeStore.setupSystemThemeListener()
+

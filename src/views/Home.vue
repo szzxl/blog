@@ -87,14 +87,14 @@ interface Article {
   likeCount?: number
   commentCount?: number
   createTime?: number
-  isRecommend?: number  // 是否推荐 1=是 0=否
-  isTop?: number  // 是否置顶 1=是 0=否
+  isRecommend?: number
+  isTop?: number
 }
 
 const articles = ref<Article[]>([])
 const loading = ref(false)
 
-// 获取最新文章（首页只显示3篇）
+// 获取最新文章
 const fetchArticles = async () => {
   loading.value = true
   try {
@@ -115,7 +115,6 @@ const fetchArticles = async () => {
   }
 }
 
-// 格式化时间
 const formatTime = (timestamp?: number) => {
   if (!timestamp) return ''
   const date = new Date(timestamp)
@@ -125,7 +124,6 @@ const formatTime = (timestamp?: number) => {
   return `${year}-${month}-${day}`
 }
 
-// 解析标签字符串为数组
 const parseTags = (tagStr?: string) => {
   if (!tagStr) return []
   return tagStr.split(',').map(t => t.trim()).filter(t => t)
@@ -153,50 +151,56 @@ onMounted(() => {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 60px 30px;
+  padding: 40px 60px;
 }
 
 .section-header {
   display: flex;
   align-items: center;
-  gap: 20px;
-  margin-bottom: 50px;
+  gap: 15px;
+  margin-bottom: 30px;
   
   .section-icon {
-    font-size: 50px;
+    font-size: 36px;
     animation: bounce 2s ease-in-out infinite;
   }
   
   .section-text {
     h2 {
-      font-size: 36px;
+      font-size: 28px;
       background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: 5px;
+      margin-bottom: 0;
       font-weight: 700;
     }
     
     p {
       color: #999;
-      font-size: 16px;
+      font-size: 14px;
     }
   }
 }
 
 .article-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 40px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
 }
 
 .article-card {
   overflow: visible;
   cursor: pointer;
   position: relative;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(139, 92, 246, 0.2);
+  }
   
   .article-badge {
     position: absolute;
@@ -244,10 +248,10 @@ onMounted(() => {
   .article-cover {
     position: relative;
     width: 100%;
-    height: 220px;
+    height: 180px;
     overflow: hidden;
-    border-radius: 20px;
-    margin-bottom: 20px;
+    border-radius: 15px;
+    margin-bottom: 15px;
     
     img {
       width: 100%;
@@ -296,9 +300,9 @@ onMounted(() => {
   
   .article-info {
     .article-title {
-      font-size: 20px;
+      font-size: 18px;
       color: #5a5a5a;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       font-weight: 700;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -307,9 +311,9 @@ onMounted(() => {
     
     .article-desc {
       color: #888;
-      font-size: 14px;
-      line-height: 1.8;
-      margin-bottom: 18px;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 12px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       line-clamp: 2;
@@ -318,45 +322,45 @@ onMounted(() => {
       
       .category-badge {
         display: inline-block;
-        padding: 4px 12px;
-        border-radius: 12px;
+        padding: 3px 10px;
+        border-radius: 10px;
         background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%);
         color: #8b5cf6;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 600;
       }
     }
     
     .article-meta {
       display: flex;
-      gap: 20px;
-      margin-bottom: 18px;
+      gap: 15px;
+      margin-bottom: 12px;
       
       .meta-item {
         display: flex;
         align-items: center;
-        gap: 6px;
-        font-size: 13px;
+        gap: 5px;
+        font-size: 12px;
         color: #aaa;
         
         .icon {
-          font-size: 14px;
+          font-size: 13px;
         }
       }
     }
     
     .article-tags {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
       
       .tag-item {
         background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
         color: #fff;
-        padding: 6px 15px;
-        border-radius: 15px;
-        font-size: 12px;
-        box-shadow: 0 3px 10px rgba(139, 92, 246, 0.3);
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 11px;
+        box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
         font-weight: 600;
       }
     }

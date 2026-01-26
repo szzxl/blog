@@ -37,6 +37,7 @@ declare module 'vue' {
     Header: typeof import('./src/components/Header.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Sidebar: typeof import('./src/components/Sidebar.vue')['default']
     Skeleton: typeof import('./src/components/Skeleton.vue')['default']
   }
   export interface ComponentCustomProperties {

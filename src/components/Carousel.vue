@@ -3,7 +3,7 @@
     <el-carousel 
       v-if="carouselItems.length > 0"
       :interval="5000" 
-      height="400px" 
+      height="320px" 
       arrow="always" 
       indicator-position="outside"
     >
@@ -60,21 +60,21 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .carousel {
-  max-width: 1200px;
-  margin: 0 auto 40px;
+  max-width: 1400px;
+  margin: 0 auto 30px;
   padding: 0 20px;
   
   :deep(.el-carousel) {
     position: relative;
     z-index: 1;
-    border-radius: 20px;
+    border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
     
     .el-carousel__container {
       position: relative;
       z-index: 1;
-      border-radius: 20px;
+      border-radius: 15px;
       overflow: hidden;
     }
     
@@ -82,6 +82,8 @@ onMounted(() => {
       z-index: 2;
       background: rgba(255, 255, 255, 0.3);
       backdrop-filter: blur(10px);
+      width: 36px;
+      height: 36px;
       
       &:hover {
         background: rgba(255, 255, 255, 0.5);
@@ -91,15 +93,15 @@ onMounted(() => {
     .el-carousel__indicator {
       button {
         background: rgba(255, 255, 255, 0.5);
-        width: 12px;
-        height: 12px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
       }
       
       &.is-active button {
         background: #8b5cf6;
-        width: 30px;
-        border-radius: 6px;
+        width: 24px;
+        border-radius: 5px;
       }
     }
   }
@@ -129,10 +131,11 @@ onMounted(() => {
 @media (max-width: 768px) {
   .carousel {
     padding: 0 15px;
+    margin-bottom: 20px;
     
     :deep(.el-carousel) {
-      height: 250px !important;
-      border-radius: 15px;
+      height: 200px !important;
+      border-radius: 12px;
     }
   }
 }

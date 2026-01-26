@@ -40,6 +40,10 @@
           <span class="nav-icon">💬</span>
           <span class="nav-text">说说</span>
         </router-link>
+        <router-link to="/album" class="nav-item">
+          <span class="nav-icon">📷</span>
+          <span class="nav-text">相册</span>
+        </router-link>
         <router-link to="/guestbook" class="nav-item">
           <span class="nav-icon">✍️</span>
           <span class="nav-text">留言板</span>
@@ -135,6 +139,11 @@
       <router-link to="/talk" class="mobile-nav-item" @click="showMobileMenu = false">
         <span class="nav-icon">💬</span>
         <span class="nav-text">说说</span>
+        <span class="nav-arrow">›</span>
+      </router-link>
+      <router-link to="/album" class="mobile-nav-item" @click="showMobileMenu = false">
+        <span class="nav-icon">📷</span>
+        <span class="nav-text">相册</span>
         <span class="nav-arrow">›</span>
       </router-link>
       <router-link to="/guestbook" class="mobile-nav-item" @click="showMobileMenu = false">
@@ -660,7 +669,8 @@ const handleCommand = async (command: string) => {
       // 构建管理后台 URL
       const adminUrl = `${protocol}//${hostname}${port ? ':' + port : ''}${adminPath}`
       
-      window.open(adminUrl, '_blank')
+      // 当前页面跳转
+      window.location.href = adminUrl
       ElMessage.success('正在跳转到管理后台...')
       break
     case 'logout':

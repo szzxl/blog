@@ -101,8 +101,8 @@ button, a, input, textarea {
 /* 卡片通用样式 */
 .card {
   background: var(--bg-card);
-  border-radius: 25px;
-  padding: 25px;
+  border-radius: 18px;
+  padding: 20px;
   box-shadow: var(--shadow-card);
   transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
   border: 2px solid var(--border-light);
@@ -122,18 +122,18 @@ button, a, input, textarea {
   
   /* 移动端减小内边距 */
   @media (max-width: 768px) {
-    padding: 20px 15px;
-    border-radius: 20px;
+    padding: 15px;
+    border-radius: 15px;
   }
 }
 
 .card:hover {
-  transform: translateY(-10px) scale(1.02);
-  box-shadow: 0 15px 45px rgba(59, 130, 246, 0.25);
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 12px 35px rgba(59, 130, 246, 0.2);
   
   /* 移动端减少悬停效果 */
   @media (max-width: 768px) {
-    transform: translateY(-5px) scale(1.01);
+    transform: translateY(-4px) scale(1.005);
   }
 }
 
