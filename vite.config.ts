@@ -7,13 +7,13 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  // 开发环境不使用 base，生产环境使用 /web/，测试环境使用 /test/
-  let base = '/'
-  if (mode === 'production') {
-    base = '/web/'
-  } else if (mode === 'test') {
-    base = '/test/'
+  // 根据环境设置 base 路径
+  const basePathMap = {
+    production: '/web/',
+    test: '/test/',
+    development: '/'
   }
+  const base = basePathMap[mode as keyof typeof basePathMap] || '/'
   
   return {
     base,
