@@ -456,3 +456,11 @@ export const getNotificationList = () => {
     method: 'post'
   })
 }
+
+// 获取背景图列表
+export const getBackgroundList = () => {
+  return request({
+    url: '/config/background/list',
+    method: 'get'
+  })
+}

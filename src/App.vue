@@ -1,6 +1,15 @@
 <template>
   <ErrorBoundary>
     <div id="app" :class="{ 'has-video-bg': isVideoBackground }">
+      <!-- 调试信息 -->
+      <div style="position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; z-index: 9999; font-size: 12px; max-width: 300px; word-break: break-all;">
+        <div>背景数量: {{ backgrounds.length }}</div>
+        <div>当前索引: {{ currentBgIndex }}</div>
+        <div>当前背景名: {{ currentBackground.name }}</div>
+        <div>当前背景URL: {{ currentBackground.url }}</div>
+        <div>背景类型: {{ currentBackground.type }}</div>
+      </div>
+      
       <!-- 视频背景 -->
       <video 
         v-if="isVideoBackground" 
@@ -94,7 +103,7 @@ import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
-import { getNotificationList } from '@/api/article'
+import { getNotificationList, getBackgroundList } from '@/api/article'
 
 interface Notification {
   id: number
@@ -103,21 +112,79 @@ interface Notification {
   status: number
 }
 
+interface Background {
+  id: number
+  name: string
+  url: string
+  type: 'image' | 'video'
+  sort?: number
+}
+
 const announcements = ref<Notification[]>([])
 const showBackToTop = ref(false)
 
 // 背景图管理
-const backgrounds = ref([
-  { name: '地球', url: new URL('@/assets/images/backgrounds/地球.png', import.meta.url).href, type: 'image' },
-  { name: '星空', url: new URL('@/assets/images/backgrounds/星空.png', import.meta.url).href, type: 'image' },
-  { name: '古风美女', url: new URL('@/assets/images/backgrounds/【哲风壁纸】光点-动态-古风美女.mp4', import.meta.url).href, type: 'video' }
-])
-
+const backgrounds = ref<Background[]>([])
 const currentBgIndex = ref(0)
 const showBgSelector = ref(false)
 
-const currentBackground = computed(() => backgrounds.value[currentBgIndex.value])
+const currentBackground = computed(() => {
+  if (backgrounds.value.length === 0) {
+    // 如果没有背景图，返回一个默认渐变背景
+    return {
+      id: 0,
+      name: '默认背景',
+      url: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg"%3E%3Cdefs%3E%3ClinearGradient id="grad" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" style="stop-color:rgb(99,102,241);stop-opacity:1" /%3E%3Cstop offset="100%25" style="stop-color:rgb(139,92,246);stop-opacity:1" /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="100%25" height="100%25" fill="url(%23grad)" /%3E%3C/svg%3E',
+      type: 'image' as const
+    }
+  }
+  
+  // 确保索引在有效范围内
+  const index = currentBgIndex.value >= backgrounds.value.length ? 0 : currentBgIndex.value
+  return backgrounds.value[index]
+})
+
 const isVideoBackground = computed(() => currentBackground.value?.type === 'video')
+
+// 获取背景图列表
+const fetchBackgrounds = async () => {
+  try {
+    const response: any = await getBackgroundList()
+    
+    console.log('背景图接口返回:', response)
+    
+    // request 拦截器已经返回了 res.data，所以 response 直接就是数组
+    if (Array.isArray(response) && response.length > 0) {
+      backgrounds.value = response.map((item: any) => {
+        // 获取URL - 接口返回的字段是 image
+        const imageUrl = item.image || item.url || item.path || item.src || ''
+        
+        // 判断是否是视频
+        const isVideo = imageUrl.toLowerCase().endsWith('.mp4') || 
+                       imageUrl.toLowerCase().endsWith('.webm') ||
+                       item.type === 'video'
+        
+        return {
+          id: item.id,
+          name: item.title || item.name || `背景${item.id}`,  // 接口返回的字段是 title
+          url: imageUrl,
+          type: isVideo ? 'video' : 'image',
+          sort: item.sort || 0
+        }
+      }).sort((a: Background, b: Background) => (a.sort || 0) - (b.sort || 0))
+      
+      console.log('解析后的背景图列表:', backgrounds.value)
+      console.log('当前背景索引:', currentBgIndex.value)
+      console.log('当前背景:', currentBackground.value)
+    } else {
+      console.log('接口未返回有效数据，响应:', response)
+    }
+  } catch (error) {
+    console.error('获取背景图列表失败:', error)
+  }
+}
+
+
 
 // 切换背景
 const changeBackground = (index: number) => {
@@ -170,11 +237,18 @@ onMounted(() => {
   fetchWebsiteConfig()
   fetchNotifications()
   
-  // 恢复上次选择的背景
-  const savedBg = localStorage.getItem('selectedBackground')
-  if (savedBg) {
-    currentBgIndex.value = parseInt(savedBg)
-  }
+  // 先获取背景图列表
+  fetchBackgrounds().then(() => {
+    // 背景图加载完成后，恢复上次选择的背景
+    const savedBg = localStorage.getItem('selectedBackground')
+    if (savedBg) {
+      const index = parseInt(savedBg)
+      // 确保索引在有效范围内
+      if (index >= 0 && index < backgrounds.value.length) {
+        currentBgIndex.value = index
+      }
+    }
+  })
 })
 
 onUnmounted(() => {
