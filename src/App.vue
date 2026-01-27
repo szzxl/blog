@@ -5,7 +5,7 @@
       <video 
         v-if="isVideoBackground" 
         class="video-background" 
-        :src="currentBackground.url" 
+        :src="currentBackground?.url" 
         autoplay 
         loop 
         muted
@@ -16,7 +16,7 @@
       <div 
         v-else 
         class="image-background" 
-        :style="{ backgroundImage: `url(${currentBackground.url})` }"
+        :style="{ backgroundImage: `url(${currentBackground?.url || ''})` }"
       ></div>
       
       <!-- 全局雪花效果 -->
@@ -154,10 +154,10 @@ const fetchBackgrounds = async () => {
           id: item.id,
           name: item.title || item.name || `背景${item.id}`,
           url: imageUrl,
-          type: isVideo ? 'video' : 'image',
+          type: (isVideo ? 'video' : 'image') as 'image' | 'video',
           sort: item.sort || 0
         }
-      }).sort((a: Background, b: Background) => (a.sort || 0) - (b.sort || 0))
+      }).sort((a, b) => (a.sort || 0) - (b.sort || 0))
     }
   } catch (error) {
     // 静默失败

@@ -86,6 +86,7 @@ const fetchPhotos = async () => {
         title: '美丽的日落',
         description: '在海边拍摄的日落美景',
         url: 'https://picsum.photos/400/300?random=1',
+        type: 'image' as const,
         createTime: Date.now()
       },
       {
@@ -93,6 +94,7 @@ const fetchPhotos = async () => {
         title: '城市夜景',
         description: '繁华的都市夜晚',
         url: 'https://picsum.photos/400/300?random=2',
+        type: 'image' as const,
         createTime: Date.now()
       },
       {
@@ -100,6 +102,7 @@ const fetchPhotos = async () => {
         title: '自然风光',
         description: '山间的清晨',
         url: 'https://picsum.photos/400/300?random=3',
+        type: 'image' as const,
         createTime: Date.now()
       }
     ]
