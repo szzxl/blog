@@ -1,15 +1,6 @@
 <template>
   <ErrorBoundary>
     <div id="app" :class="{ 'has-video-bg': isVideoBackground }">
-      <!-- 调试信息 -->
-      <div style="position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; z-index: 9999; font-size: 12px; max-width: 300px; word-break: break-all;">
-        <div>背景数量: {{ backgrounds.length }}</div>
-        <div>当前索引: {{ currentBgIndex }}</div>
-        <div>当前背景名: {{ currentBackground.name }}</div>
-        <div>当前背景URL: {{ currentBackground.url }}</div>
-        <div>背景类型: {{ currentBackground.type }}</div>
-      </div>
-      
       <!-- 视频背景 -->
       <video 
         v-if="isVideoBackground" 
@@ -151,36 +142,25 @@ const fetchBackgrounds = async () => {
   try {
     const response: any = await getBackgroundList()
     
-    console.log('背景图接口返回:', response)
-    
     // request 拦截器已经返回了 res.data，所以 response 直接就是数组
     if (Array.isArray(response) && response.length > 0) {
       backgrounds.value = response.map((item: any) => {
-        // 获取URL - 接口返回的字段是 image
         const imageUrl = item.image || item.url || item.path || item.src || ''
-        
-        // 判断是否是视频
         const isVideo = imageUrl.toLowerCase().endsWith('.mp4') || 
                        imageUrl.toLowerCase().endsWith('.webm') ||
                        item.type === 'video'
         
         return {
           id: item.id,
-          name: item.title || item.name || `背景${item.id}`,  // 接口返回的字段是 title
+          name: item.title || item.name || `背景${item.id}`,
           url: imageUrl,
           type: isVideo ? 'video' : 'image',
           sort: item.sort || 0
         }
       }).sort((a: Background, b: Background) => (a.sort || 0) - (b.sort || 0))
-      
-      console.log('解析后的背景图列表:', backgrounds.value)
-      console.log('当前背景索引:', currentBgIndex.value)
-      console.log('当前背景:', currentBackground.value)
-    } else {
-      console.log('接口未返回有效数据，响应:', response)
     }
   } catch (error) {
-    console.error('获取背景图列表失败:', error)
+    // 静默失败
   }
 }
 
