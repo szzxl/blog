@@ -464,3 +464,28 @@ export const getBackgroundList = () => {
     method: 'get'
   })
 }
+
+// 相册相关
+export const getAlbumList = (data?: {
+  id?: number
+  albumName?: string
+  albumStatus?: number
+  pageNo?: number
+  pageSize?: number
+}) => {
+  return request({
+    url: '/album/list',
+    method: 'post',
+    data: data || {}
+  })
+}
+
+export const getAlbumPhotos = (data: {
+  id: number
+}) => {
+  return request({
+    url: '/album/photo/list',
+    method: 'post',
+    data
+  })
+}

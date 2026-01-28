@@ -6,6 +6,21 @@
         <p class="page-desc">记录生活中的美好瞬间</p>
       </div>
 
+      <!-- 相册选择器 -->
+      <div class="album-selector" v-if="albums.length > 0">
+        <div 
+          class="album-tab"
+          v-for="album in albums"
+          :key="album.id"
+          :class="{ active: currentAlbum?.id === album.id }"
+          @click="loadAlbumPhotos(album)"
+        >
+          <span class="album-name">{{ album.albumName }}</span>
+          <span class="photo-count">{{ album.photoCount }} 张</span>
+        </div>
+      </div>
+
+      <!-- 照片网格 -->
       <div class="album-grid" v-loading="loading">
         <div 
           class="album-item card" 
@@ -14,27 +29,21 @@
           @click="viewPhoto(photo)"
         >
           <div class="photo-wrapper">
-            <img :src="photo.url" :alt="photo.title" class="photo-img">
+            <img :src="photo.photoUrl" :alt="photo.photoName" class="photo-img">
             <div class="photo-overlay">
               <span class="view-icon">🔍</span>
             </div>
           </div>
           <div class="photo-info">
-            <h3 class="photo-title">{{ photo.title }}</h3>
-            <p class="photo-desc" v-if="photo.description">{{ photo.description }}</p>
-            <div class="photo-meta">
-              <span class="meta-item">
-                <span class="icon">📅</span>
-                {{ formatDate(photo.createTime) }}
-              </span>
-            </div>
+            <h3 class="photo-title">{{ photo.photoName }}</h3>
+            <p class="photo-desc" v-if="photo.photoDesc">{{ photo.photoDesc }}</p>
           </div>
         </div>
 
         <!-- 空状态 -->
         <div v-if="!loading && photos.length === 0" class="empty-state">
           <div class="empty-icon">📷</div>
-          <div class="empty-text">暂无照片</div>
+          <div class="empty-text">该相册暂无照片</div>
         </div>
       </div>
     </div>
@@ -46,10 +55,10 @@
       width="90%"
       class="photo-preview-dialog"
     >
-      <img :src="currentPhoto?.url" :alt="currentPhoto?.title" class="preview-img">
+      <img :src="currentPhoto?.photoUrl" :alt="currentPhoto?.photoName" class="preview-img">
       <div class="preview-info">
-        <h3>{{ currentPhoto?.title }}</h3>
-        <p v-if="currentPhoto?.description">{{ currentPhoto?.description }}</p>
+        <h3>{{ currentPhoto?.photoName }}</h3>
+        <p v-if="currentPhoto?.photoDesc">{{ currentPhoto?.photoDesc }}</p>
       </div>
     </el-dialog>
   </div>
@@ -57,68 +66,71 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { getAlbumList, getAlbumPhotos } from '@/api/article'
+
+interface Album {
+  id: number
+  albumName: string
+  albumDesc?: string
+  albumCover: string
+  albumStatus: number
+  photoCount: number
+}
 
 interface Photo {
   id: number
-  title: string
-  description?: string
-  url: string
-  type: 'image' | 'video'  // 添加类型字段
-  createTime: number
+  photoName: string
+  photoDesc?: string
+  photoUrl: string
+  albumId: number
 }
 
+const albums = ref<Album[]>([])
+const currentAlbum = ref<Album | null>(null)
 const photos = ref<Photo[]>([])
 const loading = ref(false)
 const showPreview = ref(false)
 const currentPhoto = ref<Photo | null>(null)
 
-// 模拟数据，后续可以接入API
-const fetchPhotos = async () => {
+// 获取相册列表
+const fetchAlbums = async () => {
   loading.value = true
   try {
-    // TODO: 调用相册API
-    // const res = await getAlbumList()
+    const response: any = await getAlbumList({
+      albumStatus: 0  // 只获取已发布的相册
+    })
     
-    // 模拟数据
-    photos.value = [
-      {
-        id: 1,
-        title: '美丽的日落',
-        description: '在海边拍摄的日落美景',
-        url: 'https://picsum.photos/400/300?random=1',
-        type: 'image' as const,
-        createTime: Date.now()
-      },
-      {
-        id: 2,
-        title: '城市夜景',
-        description: '繁华的都市夜晚',
-        url: 'https://picsum.photos/400/300?random=2',
-        type: 'image' as const,
-        createTime: Date.now()
-      },
-      {
-        id: 3,
-        title: '自然风光',
-        description: '山间的清晨',
-        url: 'https://picsum.photos/400/300?random=3',
-        type: 'image' as const,
-        createTime: Date.now()
+    if (Array.isArray(response) && response.length > 0) {
+      albums.value = response
+      // 默认加载第一个相册的照片
+      if (albums.value.length > 0) {
+        loadAlbumPhotos(albums.value[0])
       }
-    ]
+    }
   } catch (error) {
-    console.error('获取相册失败:', error)
+    // 静默失败
   } finally {
     loading.value = false
   }
 }
 
-const formatDate = (timestamp: number) => {
-  const date = new Date(timestamp)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
+// 加载某个相册的照片
+const loadAlbumPhotos = async (album: Album) => {
+  currentAlbum.value = album
+  loading.value = true
+  try {
+    const response: any = await getAlbumPhotos({ id: album.id })
+    
+    if (Array.isArray(response) && response.length > 0) {
+      photos.value = response
+    } else {
+      photos.value = []
+    }
+  } catch (error) {
+    photos.value = []
+  } finally {
+    loading.value = false
+  }
 }
 
 const viewPhoto = (photo: Photo) => {
@@ -127,7 +139,7 @@ const viewPhoto = (photo: Photo) => {
 }
 
 onMounted(() => {
-  fetchPhotos()
+  fetchAlbums()
 })
 </script>
 
@@ -160,6 +172,60 @@ onMounted(() => {
   .page-desc {
     font-size: 16px;
     color: var(--text-secondary);
+  }
+}
+
+.album-selector {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  justify-content: center;
+  
+  .album-tab {
+    padding: 12px 24px;
+    border-radius: 25px;
+    background: var(--bg-card);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    .album-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .photo-count {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      background: rgba(139, 92, 246, 0.1);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
+      border-color: rgba(139, 92, 246, 0.3);
+    }
+    
+    &.active {
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+      border-color: #8b5cf6;
+      
+      .album-name {
+        color: #fff;
+      }
+      
+      .photo-count {
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+      }
+    }
   }
 }
 
