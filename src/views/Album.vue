@@ -103,8 +103,9 @@ const fetchAlbums = async () => {
     if (Array.isArray(response) && response.length > 0) {
       albums.value = response
       // 默认加载第一个相册的照片
-      if (albums.value.length > 0) {
-        loadAlbumPhotos(albums.value[0])
+      const firstAlbum = albums.value[0]
+      if (firstAlbum) {
+        await loadAlbumPhotos(firstAlbum)
       }
     }
   } catch (error) {
