@@ -700,8 +700,7 @@ onMounted(async () => {
     try {
       await userStore.fetchUserInfo()
     } catch (error) {
-      // 如果获取用户信息失败（比如 token 过期），清除登录状态
-      console.error('Token已失效，清除登录状态')
+      // 如果获取用户信息失败（比如 token 过期），静默清除登录状态
       userStore.user = null
       userStore.token = ''
       userStore.isLoggedIn = false
