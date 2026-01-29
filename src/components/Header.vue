@@ -662,11 +662,9 @@ const handleCommand = async (command: string) => {
       router.push('/favorites')
       break
     case 'admin':
-      // 跳转到管理后台 - 使用环境变量配置
+      // 跳转到管理后台 - 新开页面
       const adminPath = import.meta.env.VITE_ADMIN_PATH || '/admin'
-      
-      // 在当前窗口打开管理后台
-      window.location.href = adminPath
+      window.open(adminPath, '_blank')
       break
     case 'logout':
       await userStore.logout()
