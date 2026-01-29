@@ -664,14 +664,9 @@ const handleCommand = async (command: string) => {
     case 'admin':
       // 跳转到管理后台 - 使用环境变量配置
       const adminPath = import.meta.env.VITE_ADMIN_PATH || '/admin'
-      const { protocol, hostname, port } = window.location
       
-      // 构建管理后台 URL
-      const adminUrl = `${protocol}//${hostname}${port ? ':' + port : ''}${adminPath}`
-      
-      // 当前页面跳转
-      window.location.href = adminUrl
-      ElMessage.success('正在跳转到管理后台...')
+      // 在当前窗口打开管理后台
+      window.location.href = adminPath
       break
     case 'logout':
       await userStore.logout()
@@ -700,13 +695,18 @@ const handleMobileThemeToggle = () => {
 onMounted(async () => {
   fetchWebsiteConfig()
   
-  // 如果已登录，自动刷新用户信息
+  // 如果已登录，验证token是否有效
   if (userStore.isLoggedIn && userStore.token) {
     try {
       await userStore.fetchUserInfo()
     } catch (error) {
       // 如果获取用户信息失败（比如 token 过期），清除登录状态
-      console.error('获取用户信息失败:', error)
+      console.error('Token已失效，清除登录状态')
+      userStore.user = null
+      userStore.token = ''
+      userStore.isLoggedIn = false
+      localStorage.removeItem('ACCESS_TOKEN')
+      localStorage.removeItem('user')
     }
   }
 })
