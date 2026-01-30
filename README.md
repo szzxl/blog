@@ -10,7 +10,7 @@
 
 **一个功能完善、设计精美的现代化博客系统前端**
 
-[在线演示](https://zhuxiaoliang.cn) | [功能特性](#-功能特性) | [快速开始](#-快速开始) | [技术支持](#-技术支持)
+[在线演示](http://81.68.239.14/test/) | [功能特性](#-功能特性) | [快速开始](#-快速开始) | [技术支持](#-技术支持)
 
 </div>
 
@@ -317,49 +317,6 @@ npm run build:test
 npm run build
 ```
 
-#### 2. 上传文件
-
-将 `dist` 目录下的所有文件上传到服务器对应目录。
-
-#### 3. Nginx 配置
-
-```nginx
-# 生产环境
-location /web/ {
-    alias /var/www/blog/;
-    try_files $uri $uri/ /web/index.html;
-}
-
-# 测试环境
-location /test/ {
-    alias /var/www/blog-test/;
-    try_files $uri $uri/ /test/index.html;
-}
-
-# API 代理
-location /admin-api/ {
-    proxy_pass http://localhost:48080/admin-api/;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-}
-
-# 测试环境 API 代理
-location /test/admin-api/ {
-    proxy_pass http://localhost:48080/admin-api/;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-}
-```
-
-#### 4. 重启 Nginx
-
-```bash
-nginx -t
-nginx -s reload
-```
-
 ---
 
 ## � 后端服务
@@ -395,22 +352,12 @@ nginx -s reload
 - 功能定制（1次）
 - 部署协助
 
-#### � 企业版
-- 完整后端源码
-- 数据库设计文档
-- 详细部署文档
-- 长期技术支持（1年）
-- 功能定制（不限次数）
-- 部署协助
-- 性能优化建议
-- 安全加固方案
-
 ### � 获取后端服务
 
 如需获取后端代码或了解详细报价，请联系作者：
 
 - 📧 **邮箱**：suz_zxl@163.com
-- 🌐 **个人网站**：https://zhuxiaoliang.cn
+- 🌐 **微信**：suzzxl_123
 - 💬 **备注**：请说明您的需求和使用场景
 
 > 💡 **提示**：我们提供完整的技术支持和部署指导，确保您能够顺利上线运行。
@@ -581,7 +528,6 @@ chore: 构建/工具相关
 
 <div align="center">
 
-**版本：** v1.0.0
 
 ⭐ **如果这个项目对你有帮助，请给一个 Star！**
 
