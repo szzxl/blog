@@ -21,7 +21,7 @@
 Time Blog 是一个基于 **Vue 3 + TypeScript + Vite** 构建的现代化个人博客系统前端项目。采用最新的前端技术栈，提供完整的博客功能，包括文章管理、评论互动、用户系统、主题切换等。界面设计精美，用户体验流畅，支持 PC 和移动端完美适配。
 
 #### 测试账号
-- 地址：http://81.68.239.14/test/
+- 地址：[博客首页](http://81.68.239.14/test/)
 - 用户名：zxl123
 - 密码：zxl@zxl@zxl
 
@@ -277,39 +277,6 @@ time-blog-web/
 ---
 
 ## 🌐 部署指南
-
-### 环境配置
-
-项目支持多环境部署，通过环境变量配置不同的 API 地址和访问路径：
-
-#### 开发环境 (`.env.development`)
-```env
-VITE_API_BASE_URL=/admin-api
-VITE_ADMIN_PATH=/admin
-```
-- 访问路径：`/`
-- API 地址：`/admin-api`
-- 管理后台：`/admin`
-
-#### 测试环境 (`.env.test`)
-```env
-VITE_API_BASE_URL=/test/admin-api
-VITE_ADMIN_PATH=/test-admin/
-```
-- 访问路径：`/test/`
-- API 地址：`/test/admin-api`
-- 管理后台：`/test-admin/`
-
-#### 生产环境 (`.env.production`)
-```env
-VITE_API_BASE_URL=/admin-api
-VITE_ADMIN_PATH=/admin
-```
-- 访问路径：`/web/`
-- API 地址：`/admin-api`
-- 管理后台：`/admin`
-
-### 部署步骤
 
 #### 1. 构建项目
 
