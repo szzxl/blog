@@ -120,7 +120,7 @@ Time Blog 是一个基于 **Vue 3 + TypeScript + Vite** 构建的现代化个人
 
 ---
 
-## �️ 技术栈
+##  技术栈
 
 ### 核心技术
 
@@ -499,8 +499,8 @@ chore: 构建/工具相关
 ### 联系方式
 
 - 📧 **邮箱**：suz_zxl@163.com
-- 🌐 **个人网站**：https://zhuxiaoliang.cn
-- 💻 **项目地址**：[Gitea](https://zhuxiaoliang.cn/gitea/suz_zxl/time-blog-web)
+- 🌐 **微信**：suzxl_123
+- 💻 **项目地址**：[gitHub](https://github.com/szzxl/blog.git)
 
 ---
 
