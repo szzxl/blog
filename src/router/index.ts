@@ -6,7 +6,7 @@ import Home from '@/views/Home.vue'
 // 根据构建模式动态设置 base 路径
 const getBasePath = () => {
   const basePathMap = {
-    production: '/web/',
+    production: '/',
     test: '/test/',
     development: '/'
   }

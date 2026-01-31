@@ -39,7 +39,7 @@
           
           <div class="card-left">
             <div class="article-cover">
-              <img v-lazyload="article.articleCover || '/web/default-cover.svg'" alt="封面">
+              <img v-lazyload="article.articleCover || '/default-cover.svg'" alt="封面">
             </div>
           </div>
           <div class="card-right">

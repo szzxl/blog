@@ -24,7 +24,7 @@
           </div>
           
           <div class="article-cover">
-            <img :src="article.articleCover || '/web/default-cover.svg'" alt="文章封面">
+            <img :src="article.articleCover || '/default-cover.svg'" alt="文章封面">
             <div class="cover-overlay">
               <span class="read-more">阅读全文 →</span>
             </div>
