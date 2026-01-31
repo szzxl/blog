@@ -9,7 +9,7 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 export default defineConfig(({ mode }) => {
   // 根据环境设置 base 路径
   const basePathMap = {
-    production: '/web/',
+    production: '/',
     test: '/test/',
     development: '/'
   }
