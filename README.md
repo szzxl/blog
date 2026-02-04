@@ -281,9 +281,11 @@ server: {
 
 ## 📄 许可证
 
-[MIT License](LICENSE)
+本项目前端代码采用 [MIT License](LICENSE) 开源协议。
 
-## 👨‍💻 作者
+**注意**：后端服务采用商业授权，不包含在开源范围内。
+
+---
 
 suz_zxl@163.com
 
