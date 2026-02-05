@@ -10,9 +10,8 @@ interface WebsiteConfig {
   copyright?: string
   icp_number?: string
   website_motto?: string
-  social_qq?: string
-  social_wechat?: string
   social_email?: string
+  social_gitee?: string
   social_github?: string
 }
 

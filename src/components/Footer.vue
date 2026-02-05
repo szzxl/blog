@@ -23,11 +23,12 @@
           </div>
           <div class="link-group">
             <h4>联系方式</h4>
-            <span class="contact-item" v-if="socialQQ">💬 QQ: {{ socialQQ }}</span>
-            <span class="contact-item" v-if="socialWechat">📱 微信: {{ socialWechat }}</span>
             <span class="contact-item" v-if="socialEmail">📧 邮箱: {{ socialEmail }}</span>
+            <a v-if="socialGitee" :href="socialGitee" target="_blank" class="contact-link">
+              🔗 Gitee: {{ socialGitee }}
+            </a>
             <a v-if="socialGithub" :href="socialGithub" target="_blank" class="contact-link">
-              🔗 GitHub
+              🔗 GitHub: {{ socialGithub }}
             </a>
           </div>
         </div>
@@ -44,6 +45,7 @@
       <!-- 底部版权和备案 -->
       <div class="footer-bottom">
         <p class="copyright">{{ copyright }}</p>
+        <p class="runtime">⏰ 网站已运行：{{ runtimeText }}</p>
         <p class="icp" v-if="icpNumber">{{ icpNumber }}</p>
       </div>
     </div>
@@ -51,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
 
 const year = new Date().getFullYear()
@@ -60,10 +62,28 @@ const websiteName = ref('小花的日记本')
 const websiteMotto = ref('愿你温柔且有力量')
 const copyright = ref(`© ${year} 记录美好生活的每一天`)
 const icpNumber = ref('')
-const socialQQ = ref('')
-const socialWechat = ref('')
 const socialEmail = ref('')
+const socialGitee = ref('')
 const socialGithub = ref('')
+const runtimeText = ref('')
+
+// 网站启动时间
+const startTime = new Date('2026-01-01 00:00:00').getTime()
+
+// 计算运行时间
+const calculateRuntime = () => {
+  const now = new Date().getTime()
+  const diff = now - startTime
+  
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+  
+  runtimeText.value = `${days} 天 ${hours} 小时 ${minutes} 分钟 ${seconds} 秒`
+}
+
+let timer: number | null = null
 
 // 获取网站配置
 const fetchWebsiteConfig = async () => {
@@ -74,9 +94,8 @@ const fetchWebsiteConfig = async () => {
     if (config.copyright) copyright.value = config.copyright
     if (config.icp_number) icpNumber.value = config.icp_number
     if (config.website_motto) websiteMotto.value = config.website_motto
-    if (config.social_qq) socialQQ.value = config.social_qq
-    if (config.social_wechat) socialWechat.value = config.social_wechat
     if (config.social_email) socialEmail.value = config.social_email
+    if (config.social_gitee) socialGitee.value = config.social_gitee
     if (config.social_github) socialGithub.value = config.social_github
   } catch (error) {
     // 获取网站配置失败
@@ -85,6 +104,15 @@ const fetchWebsiteConfig = async () => {
 
 onMounted(() => {
   fetchWebsiteConfig()
+  calculateRuntime()
+  // 每秒更新一次运行时间
+  timer = window.setInterval(calculateRuntime, 1000)
+})
+
+onUnmounted(() => {
+  if (timer) {
+    clearInterval(timer)
+  }
 })
 </script>
 
@@ -176,6 +204,14 @@ onMounted(() => {
       margin: 0;
       position: absolute;
       left: 30px;
+    }
+    
+    .runtime {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.8);
+      margin: 0;
+      font-weight: 500;
+      text-shadow: 0 1px 3px rgba(139, 92, 246, 0.3);
     }
     
     .icp {
@@ -366,6 +402,11 @@ onMounted(() => {
       
       .copyright {
         position: static;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+      
+      .runtime {
         font-size: 12px;
         line-height: 1.6;
       }
