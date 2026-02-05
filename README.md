@@ -298,8 +298,8 @@ suz_zxl@163.com
 
 ## 📞 联系方式
 
-- 项目地址：[GitHub](https://zhuxiaoliang.cn/gitea/suz_zxl/time-blog-web)
-- 问题反馈：[Issues](https://zhuxiaoliang.cn/gitea/suz_zxl/time-blog-web/issues)
+- 项目地址：[GitHub](https://github.com/szzxl/blog)
+- 问题反馈：[Issues](https://github.com/szzxl/blog/issues)
 
 ---
 
