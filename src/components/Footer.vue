@@ -25,10 +25,10 @@
             <h4>联系方式</h4>
             <span class="contact-item" v-if="socialEmail">📧 邮箱: {{ socialEmail }}</span>
             <a v-if="socialGitee" :href="socialGitee" target="_blank" class="contact-link">
-              🔗 Gitee: {{ socialGitee }}
+              🔗 Gitee
             </a>
             <a v-if="socialGithub" :href="socialGithub" target="_blank" class="contact-link">
-              🔗 GitHub: {{ socialGithub }}
+              🔗 GitHub
             </a>
           </div>
         </div>
