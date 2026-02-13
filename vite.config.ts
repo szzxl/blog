@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
@@ -7,13 +7,9 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  // 根据环境设置 base 路径
-  const basePathMap = {
-    production: '/',
-    test: '/test/',
-    development: '/'
-  }
-  const base = basePathMap[mode as keyof typeof basePathMap] || '/'
+  // 从环境变量读取 base 路径，如果没有则使用默认值
+  const env = loadEnv(mode, process.cwd(), '')
+  const base = env.VITE_BASE_PATH || '/'
   
   return {
     base,

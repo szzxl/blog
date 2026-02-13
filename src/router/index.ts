@@ -3,14 +3,9 @@ import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
 import Home from '@/views/Home.vue'
 
-// 根据构建模式动态设置 base 路径
+// 根据环境变量动态设置 base 路径
 const getBasePath = () => {
-  const basePathMap = {
-    production: '/',
-    test: '/test/',
-    development: '/'
-  }
-  return basePathMap[import.meta.env.MODE as keyof typeof basePathMap] || '/'
+  return import.meta.env.VITE_BASE_PATH || '/'
 }
 
 const router = createRouter({
