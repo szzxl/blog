@@ -69,7 +69,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Comment from '@/components/Comment.vue'
 import Skeleton from '@/components/Skeleton.vue'
-import { getArticleDetail, addArticleView, likeArticle } from '@/api/article'
+import { getArticleDetail, addArticleView, likeArticle, getArticleLikeCount } from '@/api/article'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 
@@ -118,11 +118,25 @@ const fetchArticleDetail = async () => {
       if (!isAuthor.value) {
         incrementViewCount(id)
       }
+      // 查询最新点赞数量
+      await fetchLikeCount(id)
     }
   } catch (error) {
     ElMessage.error('获取文章详情失败')
   } finally {
     loading.value = false
+  }
+}
+
+// 查询点赞数量
+const fetchLikeCount = async (id: string) => {
+  try {
+    const res: any = await getArticleLikeCount(id)
+    if (article.value && res !== undefined) {
+      article.value.likeCount = res
+    }
+  } catch (error) {
+    // 静默失败，不影响用户体验
   }
 }
 
@@ -160,13 +174,14 @@ const handleLikeArticle = async () => {
     // 切换本地状态
     if (wasLiked) {
       // 取消点赞
-      article.value.likeCount = Math.max(0, (article.value.likeCount || 0) - 1)
       article.value.isLiked = false
     } else {
       // 点赞
-      article.value.likeCount = (article.value.likeCount || 0) + 1
       article.value.isLiked = true
     }
+    
+    // 查询最新点赞数量
+    await fetchLikeCount(article.value.id as string)
   } catch (error) {
     ElMessage.error('操作失败，请重试')
   }
