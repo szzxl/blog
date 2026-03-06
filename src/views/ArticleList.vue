@@ -98,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onActivated } from 'vue'
+import { ref, onMounted, onActivated, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getArticleList } from '@/api/article'
 import { ElMessage } from 'element-plus'
@@ -209,6 +209,13 @@ onMounted(() => {
 // 页面激活时重新加载数据（从详情页返回时）
 onActivated(() => {
   fetchArticles()
+})
+
+// 监听路由变化，当返回到此页面时重新加载数据
+watch(() => route.path, (newPath) => {
+  if (newPath === '/articles') {
+    fetchArticles()
+  }
 })
 </script>
 

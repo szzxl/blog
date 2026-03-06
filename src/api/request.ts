@@ -12,7 +12,6 @@ const PUBLIC_APIS = [
   '/system/auth/login',
   '/web/article/list',
   '/web/article/detail',
-  '/web/article/like',
   '/web/article/like/num',
   '/web/category/list',
   '/web/tag/list',

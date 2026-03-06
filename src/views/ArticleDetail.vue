@@ -156,6 +156,15 @@ const incrementViewCount = async (id: string) => {
 
 // 点赞文章
 const handleLikeArticle = async () => {
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('请先登录')
+    router.push({
+      path: '/login',
+      query: { redirect: route.fullPath }
+    })
+    return
+  }
+  
   if (!article.value) return
   
   // 保存当前状态
