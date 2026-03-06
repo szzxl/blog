@@ -256,6 +256,11 @@ onMounted(() => {
   align-items: center;
   gap: 20px;
   margin-bottom: 40px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  padding: 30px 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
   
   .header-icon {
     font-size: 60px;
@@ -275,8 +280,9 @@ onMounted(() => {
     
     p {
       font-size: 16px;
-      color: #999;
+      color: #666;
       margin: 0;
+      font-weight: 500;
     }
   }
 }
