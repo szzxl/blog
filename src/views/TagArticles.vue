@@ -109,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getArticleList } from '@/api/article'
 import { ElMessage } from 'element-plus'
@@ -200,6 +200,13 @@ onMounted(() => {
   } else {
     ElMessage.warning('标签参数缺失')
     router.push('/tag')
+  }
+})
+
+// 监听路由变化，当返回到此页面时重新加载数据
+watch(() => route.fullPath, (newPath) => {
+  if (newPath.startsWith('/tag/articles')) {
+    loadArticles()
   }
 })
 </script>
