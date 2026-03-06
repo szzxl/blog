@@ -277,7 +277,7 @@ onUnmounted(() => {
 .bg-selector {
   position: fixed;
   bottom: 30px;
-  left: 30px;
+  left: 10px;
   z-index: 998;
   
   .bg-toggle {
@@ -789,6 +789,9 @@ onUnmounted(() => {
   flex: 1;
   position: relative;
   z-index: 1;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 .announcement-bar {
@@ -804,6 +807,9 @@ onUnmounted(() => {
   gap: 15px;
   overflow: hidden;
   transition: background-color 0.3s ease, border-color 0.3s ease;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
   
   .announcement-icon {
     font-size: 20px;
@@ -919,7 +925,7 @@ onUnmounted(() => {
 .back-to-top {
   position: fixed;
   bottom: 100px;
-  right: 30px;
+  right: 10px;
   width: 50px;
   height: 50px;
   border-radius: 50%;
