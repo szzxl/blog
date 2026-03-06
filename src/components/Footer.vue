@@ -138,16 +138,16 @@ onUnmounted(() => {
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    gap: 30px;
+    align-items: center;
+    gap: 50px;
     margin-bottom: 8px;
   }
   
   .footer-info {
-    flex: 1;
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
     
     .footer-logo {
@@ -179,18 +179,19 @@ onUnmounted(() => {
   .footer-links-inline {
     display: flex;
     gap: 80px;
+    flex: 1;
+    justify-content: flex-end;
     
     .link-section {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
+      align-items: center;
+      gap: 15px;
       
       .section-title {
         font-size: 16px;
         color: #fff;
         font-weight: 700;
         text-shadow: 0 2px 8px rgba(139, 92, 246, 0.6);
-        margin-bottom: 5px;
       }
       
       a, .contact-item {
@@ -202,7 +203,7 @@ onUnmounted(() => {
         &:hover {
           color: #fff;
           text-shadow: 0 2px 8px rgba(139, 92, 246, 0.8);
-          transform: translateX(3px);
+          transform: translateY(-2px);
         }
       }
       

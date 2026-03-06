@@ -273,10 +273,15 @@ onUnmounted(() => {
 /* 背景选择器 */
 .bg-selector {
   position: fixed;
-  left: 30px;
+  left: -25px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 998;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    left: 30px;
+  }
   
   .bg-toggle {
     width: 50px;
@@ -400,9 +405,13 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .bg-selector {
-    left: 15px;
+    left: -22px;
     top: 50%;
     transform: translateY(-50%);
+    
+    &:hover {
+      left: 15px;
+    }
     
     .bg-toggle {
       width: 45px;
