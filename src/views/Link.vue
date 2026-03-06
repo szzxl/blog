@@ -1,21 +1,16 @@
 <template>
   <div class="link">
     <div class="container">
-      <!-- 页面标题 -->
-      <div class="page-header">
-        <div class="header-icon">🌈</div>
-        <div class="header-text">
-          <h1>友情链接</h1>
-          <p>一起分享，一起成长~</p>
-        </div>
-      </div>
-      
-      <!-- 申请友链卡片 - 移除 -->
-      
       <!-- 友链列表 -->
       <div class="links-section">
         <div class="section-header">
-          <h3 class="section-title">🔗 友情链接</h3>
+          <div class="header-left">
+            <div class="header-icon">🌈</div>
+            <div class="header-text">
+              <h3 class="section-title">友情链接</h3>
+              <p class="section-desc">一起分享，一起成长~</p>
+            </div>
+          </div>
           <el-button type="primary" class="apply-btn" @click="showApplyDialog = true">
             <span class="btn-icon">💌</span>
             申请友链
@@ -343,6 +338,41 @@ onMounted(() => {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    padding: 30px 40px;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      
+      .header-icon {
+        font-size: 60px;
+        animation: rainbow 3s ease-in-out infinite;
+      }
+      
+      .header-text {
+        .section-title {
+          font-size: 42px;
+          background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin: 0 0 8px 0;
+          font-weight: 700;
+        }
+        
+        .section-desc {
+          font-size: 16px;
+          color: #666;
+          margin: 0;
+          font-weight: 500;
+        }
+      }
+    }
     
     .apply-btn {
       background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
@@ -361,16 +391,6 @@ onMounted(() => {
         box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
       }
     }
-  }
-  
-  .section-title {
-    font-size: 28px;
-    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 0;
-    font-weight: 700;
   }
   
   .links-grid {
