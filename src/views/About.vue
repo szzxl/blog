@@ -6,7 +6,6 @@
         <div class="header-icon">🦋</div>
         <div class="header-text">
           <h1>关于我</h1>
-          <p>Hi~ 很高兴认识你</p>
         </div>
       </div>
       

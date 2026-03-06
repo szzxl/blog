@@ -733,14 +733,13 @@ onMounted(async () => {
   
   .container {
     width: 100%;
-    padding: 0;
-    display: grid;
-    grid-template-columns: auto 1fr;
+    padding: 0 30px;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
     min-height: 60px;
     position: relative;
     z-index: 2;
-    gap: 40px;
   }
   
   .logo {
@@ -798,6 +797,9 @@ onMounted(async () => {
   
   .nav {
     display: flex;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     gap: 10px;
     justify-content: center;
     

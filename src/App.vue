@@ -75,8 +75,8 @@
       </div>
       
       <!-- 回到顶部按钮 -->
-      <button class="back-to-top" :class="{ show: showBackToTop }" @click="scrollToTop">
-        ↑
+      <button class="back-to-top" :class="{ show: showBackToTop }" @click="scrollToTop" title="回到顶部">
+        <el-icon :size="24"><Top /></el-icon>
       </button>
       
       <main class="main-content">
@@ -89,7 +89,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Setting } from '@element-plus/icons-vue'
+import { Setting, Top } from '@element-plus/icons-vue'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'
@@ -932,12 +932,12 @@ onUnmounted(() => {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: var(--gradient-primary);
-  border: none;
-  color: #fff;
-  font-size: 24px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(139, 92, 246, 0.3);
+  color: #8b5cf6;
   cursor: pointer;
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.25);
   transition: all 0.3s;
   z-index: 997;
   display: flex;
@@ -955,7 +955,9 @@ onUnmounted(() => {
   
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 35px rgba(59, 130, 246, 0.5);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
+    border-color: #8b5cf6;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
   }
   
   &:active {

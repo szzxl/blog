@@ -68,7 +68,7 @@ const calculateRuntime = () => {
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
   const seconds = Math.floor((diff % (1000 * 60)) / 1000)
   
-  runtimeText.value = `${days} 天 ${hours} 小时 ${minutes} 分钟 ${seconds} 秒`
+  runtimeText.value = `已运行：${days} 天 ${hours} 小时 ${minutes} 分钟 ${seconds} 秒`
 }
 
 let timer: number | null = null
@@ -180,7 +180,8 @@ onUnmounted(() => {
     display: flex;
     gap: 80px;
     flex: 1;
-    justify-content: flex-end;
+    justify-content: center;
+    margin-left: -150px;
     
     .link-section {
       display: flex;
