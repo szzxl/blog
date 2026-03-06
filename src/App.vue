@@ -244,6 +244,9 @@ onUnmounted(() => {
   position: relative;
   isolation: isolate;
   overflow-x: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 /* 视频背景 */

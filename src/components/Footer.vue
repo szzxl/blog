@@ -253,7 +253,7 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .footer {
-    margin-top: 60px;
+    margin-top: 30px;
     
     .footer-wave {
       top: -30px;
@@ -261,14 +261,14 @@ onUnmounted(() => {
     }
     
     .container {
-      padding: 40px 20px 20px;
+      padding: 20px 15px 10px;
     }
     
     .footer-content {
       grid-template-columns: 1fr;
-      gap: 30px;
+      gap: 15px;
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 15px;
     }
     
     .footer-info {
@@ -276,71 +276,55 @@ onUnmounted(() => {
         justify-content: center;
         
         .logo-icon {
-          font-size: 28px;
+          font-size: 18px;
         }
         
         .logo-text {
-          font-size: 20px;
+          font-size: 15px;
         }
       }
       
       .motto {
-        font-size: 15px;
+        font-size: 12px;
       }
     }
     
-    .footer-links {
+    .footer-links-inline {
       flex-direction: column;
-      gap: 25px;
-      align-items: center;
+      gap: 10px;
       
-      .link-group {
-        width: 100%;
-        max-width: 300px;
+      .link-section {
+        justify-content: center;
+        gap: 10px;
         
-        h4 {
-          font-size: 15px;
-          margin-bottom: 12px;
+        .section-title {
+          font-size: 12px;
         }
         
-        a, .contact-item, .contact-link {
-          font-size: 13px;
-          margin-bottom: 8px;
+        a, .contact-item {
+          font-size: 11px;
         }
-      }
-    }
-    
-    .footer-decoration {
-      gap: 15px;
-      padding-top: 25px;
-      margin-bottom: 25px;
-      
-      .deco {
-        font-size: 20px;
       }
     }
     
     .footer-bottom {
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       text-align: center;
-      padding: 20px 15px;
+      padding: 10px 15px;
       border-top: 1px solid rgba(139, 92, 246, 0.15);
       
       .copyright {
         position: static;
-        font-size: 12px;
-        line-height: 1.6;
+        font-size: 10px;
       }
       
       .runtime {
-        font-size: 12px;
-        line-height: 1.6;
+        font-size: 10px;
       }
       
       .icp {
-        font-size: 12px;
-        line-height: 1.6;
+        font-size: 10px;
       }
     }
   }

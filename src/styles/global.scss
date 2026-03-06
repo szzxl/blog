@@ -4,6 +4,13 @@
   box-sizing: border-box;
 }
 
+html, body {
+  width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
 // 主题变量定义
 :root {
   // 浅色主题（默认）
