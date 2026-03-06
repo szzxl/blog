@@ -25,9 +25,9 @@
       </div>
       
       <!-- 背景选择器 -->
-      <div class="bg-selector">
+      <div class="bg-selector" :class="{ active: showBgSelector }">
         <button class="bg-toggle" @click="showBgSelector = !showBgSelector" title="切换背景">
-          <el-icon :size="22"><Picture /></el-icon>
+          <el-icon :size="22"><Setting /></el-icon>
         </button>
         <transition name="slide-up">
           <div v-if="showBgSelector" class="bg-options">
@@ -89,7 +89,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Picture } from '@element-plus/icons-vue'
+import { Setting } from '@element-plus/icons-vue'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'
@@ -273,14 +273,14 @@ onUnmounted(() => {
 /* 背景选择器 */
 .bg-selector {
   position: fixed;
-  left: -25px;
+  left: 5px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 998;
-  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: left 0.3s ease;
   
-  &:hover {
-    left: 30px;
+  &:not(:hover):not(.active) {
+    left: -35px;
   }
   
   .bg-toggle {
@@ -405,12 +405,13 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .bg-selector {
-    left: -22px;
+    left: 5px;
     top: 50%;
     transform: translateY(-50%);
+    transition: left 0.3s ease;
     
-    &:hover {
-      left: 15px;
+    &:not(:hover):not(.active) {
+      left: -30px;
     }
     
     .bg-toggle {
