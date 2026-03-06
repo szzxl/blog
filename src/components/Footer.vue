@@ -110,6 +110,9 @@ onUnmounted(() => {
   padding: 0;
   margin-top: 20px;
   position: relative;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
   
   .footer-wave {
     position: absolute;
@@ -131,6 +134,9 @@ onUnmounted(() => {
     backdrop-filter: blur(20px);
     padding: 15px 30px 8px;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   
   .footer-content {
@@ -266,7 +272,7 @@ onUnmounted(() => {
     
     .footer-content {
       grid-template-columns: 1fr;
-      gap: 15px;
+      gap: 20px;
       text-align: center;
       margin-bottom: 15px;
     }
@@ -274,57 +280,68 @@ onUnmounted(() => {
     .footer-info {
       .footer-logo {
         justify-content: center;
+        margin-bottom: 8px;
         
         .logo-icon {
-          font-size: 18px;
+          font-size: 20px;
         }
         
         .logo-text {
-          font-size: 15px;
+          font-size: 16px;
         }
       }
       
       .motto {
-        font-size: 12px;
+        font-size: 13px;
+        margin-bottom: 0;
       }
     }
     
     .footer-links-inline {
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
+      align-items: center;
       
       .link-section {
         justify-content: center;
-        gap: 10px;
+        flex-wrap: wrap;
+        gap: 12px;
+        width: 100%;
         
         .section-title {
-          font-size: 12px;
+          font-size: 13px;
+          width: 100%;
+          text-align: center;
+          margin-bottom: 5px;
         }
         
         a, .contact-item {
-          font-size: 11px;
+          font-size: 12px;
         }
       }
     }
     
     .footer-bottom {
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
       text-align: center;
-      padding: 10px 15px;
+      padding: 12px 15px;
       border-top: 1px solid rgba(139, 92, 246, 0.15);
       
       .copyright {
         position: static;
-        font-size: 10px;
+        font-size: 11px;
+        order: 1;
       }
       
       .runtime {
-        font-size: 10px;
+        font-size: 11px;
+        order: 2;
       }
       
       .icp {
-        font-size: 10px;
+        font-size: 11px;
+        order: 3;
       }
     }
   }
