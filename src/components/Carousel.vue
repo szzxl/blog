@@ -3,7 +3,7 @@
     <el-carousel 
       v-if="carouselItems.length > 0"
       :interval="5000" 
-      height="200px" 
+      height="220px" 
       arrow="always" 
       indicator-position="inside"
     >
@@ -60,7 +60,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .carousel {
-  max-width: 1400px;
+  max-width: 900px;
   margin: 0 auto 15px;
   padding: 0 20px;
   width: 100%;
