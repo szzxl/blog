@@ -91,17 +91,13 @@ export const getMonthArticleList = async (data: {
   pageNo: number
   pageSize: number
 }) => {
-  const cacheKey = generateCacheKey('month_article', data)
-  const cached = cache.get(cacheKey)
-  if (cached) return cached
-  
+  // 不使用缓存，每次都获取最新数据
   const result = await request({
     url: '/web/month/article',
     method: 'post',
     data
   })
   
-  cache.set(cacheKey, result, 5 * 60 * 1000)
   return result
 }
 

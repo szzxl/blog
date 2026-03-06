@@ -69,14 +69,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import Carousel from '@/components/Carousel.vue'
 import { getMonthArticleList } from '@/api/article'
-import { cache } from '@/utils/cache'
 
 const router = useRouter()
-const route = useRoute()
 
 interface Article {
   id: number
@@ -97,17 +95,7 @@ const articles = ref<Article[]>([])
 const loading = ref(false)
 
 // 获取最新文章
-const fetchArticles = async (clearCache = false) => {
-  // 如果需要清除缓存
-  if (clearCache) {
-    const cacheKeys = cache.keys()
-    cacheKeys.forEach(key => {
-      if (key.startsWith('month_article')) {
-        cache.delete(key)
-      }
-    })
-  }
-  
+const fetchArticles = async () => {
   loading.value = true
   try {
     const res: any = await getMonthArticleList({
@@ -147,14 +135,6 @@ const viewArticle = (id: number) => {
 
 onMounted(() => {
   fetchArticles()
-})
-
-// 监听路由变化，当返回首页时刷新数据
-watch(() => route.path, (newPath, oldPath) => {
-  // 当从其他页面返回首页时，清除缓存并重新获取数据
-  if (newPath === '/' && oldPath && oldPath !== '/') {
-    fetchArticles(true)
-  }
 })
 </script>
 
