@@ -375,6 +375,11 @@ onMounted(() => {
   }
 }
 
+// 桌面端表格视图（默认显示）
+.desktop-view {
+  display: block;
+}
+
 // 移动端卡片视图（默认隐藏）
 .mobile-view {
   display: none;
