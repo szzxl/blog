@@ -90,18 +90,13 @@ export const getMonthArticleList = async (data: {
 }
 
 export const getArticleDetail = async (data: { id: string | number }) => {
-  const cacheKey = generateCacheKey('article_detail', data)
-  const cached = cache.get(cacheKey)
-  if (cached) return cached
-  
+  // 不使用缓存，每次都获取最新数据
   const result = await request({
     url: '/web/article/detail',
     method: 'post',
     data
   })
   
-  // 文章详情缓存10分钟
-  cache.set(cacheKey, result, 10 * 60 * 1000)
   return result
 }
 
