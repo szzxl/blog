@@ -27,7 +27,7 @@
       <!-- 背景选择器 -->
       <div class="bg-selector">
         <button class="bg-toggle" @click="showBgSelector = !showBgSelector" title="切换背景">
-          <el-icon :size="22"><Operation /></el-icon>
+          <el-icon :size="22"><Picture /></el-icon>
         </button>
         <transition name="slide-up">
           <div v-if="showBgSelector" class="bg-options">
@@ -89,7 +89,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Operation } from '@element-plus/icons-vue'
+import { Picture } from '@element-plus/icons-vue'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'

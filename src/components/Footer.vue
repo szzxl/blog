@@ -229,24 +229,24 @@ onUnmounted(() => {
     position: relative;
     
     .copyright {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.7);
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.8);
       margin: 0;
       position: absolute;
       left: 30px;
     }
     
     .runtime {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.8);
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.85);
       margin: 0;
-      font-weight: 500;
+      font-weight: 600;
       text-shadow: 0 1px 3px rgba(139, 92, 246, 0.3);
     }
     
     .icp {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.7);
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.8);
       margin: 0;
     }
   }
