@@ -244,9 +244,6 @@ onUnmounted(() => {
   position: relative;
   isolation: isolate;
   overflow-x: hidden;
-  width: 100%;
-  margin: 0;
-  padding: 0;
 }
 
 /* 视频背景 */
@@ -789,9 +786,6 @@ onUnmounted(() => {
   flex: 1;
   position: relative;
   z-index: 1;
-  width: 100%;
-  max-width: 100vw;
-  overflow-x: hidden;
 }
 
 .announcement-bar {
@@ -807,9 +801,6 @@ onUnmounted(() => {
   gap: 15px;
   overflow: hidden;
   transition: background-color 0.3s ease, border-color 0.3s ease;
-  width: 100%;
-  max-width: 100vw;
-  box-sizing: border-box;
   
   .announcement-icon {
     font-size: 20px;

@@ -717,9 +717,6 @@ onMounted(async () => {
   position: sticky;
   top: 0;
   z-index: 999;
-  width: 100%;
-  max-width: 100vw;
-  overflow-x: hidden;
   border-bottom: 1px solid var(--border-light);
   overflow: visible;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;

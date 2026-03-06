@@ -297,8 +297,8 @@ onUnmounted(() => {
       align-items: center;
       
       .link-section {
-        justify-content: center;
-        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: center;
         gap: 10px;
         width: 100%;
         
@@ -315,6 +315,9 @@ onUnmounted(() => {
           background: rgba(139, 92, 246, 0.1);
           border-radius: 8px;
           transition: all 0.3s;
+          width: auto;
+          display: block;
+          text-align: center;
           
           &:hover {
             background: rgba(139, 92, 246, 0.2);
@@ -322,7 +325,7 @@ onUnmounted(() => {
         }
         
         .contact-item {
-          display: inline-block;
+          display: block;
         }
       }
     }
