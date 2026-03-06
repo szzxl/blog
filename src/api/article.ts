@@ -64,24 +64,12 @@ export const getArticleList = async (data: {
   pageNo?: number
   pageSize?: number
 }) => {
-  // 生成缓存键
-  const cacheKey = generateCacheKey('article_list', data)
-  
-  // 尝试从缓存获取
-  const cached = cache.get(cacheKey)
-  if (cached) {
-    return cached
-  }
-  
-  // 请求数据
+  // 不使用缓存，每次都获取最新数据
   const result = await request({
     url: '/web/article/list',
     method: 'post',
     data
   })
-  
-  // 缓存结果（5分钟）
-  cache.set(cacheKey, result, 5 * 60 * 1000)
   
   return result
 }
