@@ -735,9 +735,9 @@ onMounted(async () => {
   }
   
   .container {
-    max-width: 100%;
-    margin: 0;
-    padding: 0 10px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 30px;
     display: grid;
     grid-template-columns: auto 1fr;
     align-items: center;
@@ -753,8 +753,6 @@ onMounted(async () => {
     gap: 15px;
     flex-shrink: 0;
     justify-self: start;
-    margin-left: 0;
-    padding-left: 0;
     
     .logo-circle {
       width: 45px;
@@ -872,7 +870,7 @@ onMounted(async () => {
   
   .user-center {
     position: fixed;
-    right: 10px;
+    right: 30px;
     top: 10px;
     z-index: 1000;
     display: flex;

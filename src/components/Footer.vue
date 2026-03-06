@@ -110,9 +110,6 @@ onUnmounted(() => {
   padding: 0;
   margin-top: 20px;
   position: relative;
-  width: 100%;
-  max-width: 100vw;
-  overflow-x: hidden;
   
   .footer-wave {
     position: absolute;
@@ -134,9 +131,6 @@ onUnmounted(() => {
     backdrop-filter: blur(20px);
     padding: 15px 30px 8px;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
   }
   
   .footer-content {
@@ -299,24 +293,36 @@ onUnmounted(() => {
     
     .footer-links-inline {
       flex-direction: column;
-      gap: 12px;
+      gap: 15px;
       align-items: center;
       
       .link-section {
         justify-content: center;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 10px;
         width: 100%;
         
         .section-title {
           font-size: 13px;
           width: 100%;
           text-align: center;
-          margin-bottom: 5px;
+          margin-bottom: 8px;
         }
         
         a, .contact-item {
           font-size: 12px;
+          padding: 5px 10px;
+          background: rgba(139, 92, 246, 0.1);
+          border-radius: 8px;
+          transition: all 0.3s;
+          
+          &:hover {
+            background: rgba(139, 92, 246, 0.2);
+          }
+        }
+        
+        .contact-item {
+          display: inline-block;
         }
       }
     }

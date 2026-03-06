@@ -277,7 +277,7 @@ onUnmounted(() => {
 .bg-selector {
   position: fixed;
   bottom: 30px;
-  left: 10px;
+  left: 30px;
   z-index: 998;
   
   .bg-toggle {
@@ -925,7 +925,7 @@ onUnmounted(() => {
 .back-to-top {
   position: fixed;
   bottom: 100px;
-  right: 10px;
+  right: 30px;
   width: 50px;
   height: 50px;
   border-radius: 50%;
