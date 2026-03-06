@@ -268,13 +268,16 @@ onUnmounted(() => {
     }
     
     .footer-content {
-      grid-template-columns: 1fr;
-      gap: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
       text-align: center;
       margin-bottom: 15px;
     }
     
     .footer-info {
+      grid-column: 1 / -1;
+      
       .footer-logo {
         justify-content: center;
         margin-bottom: 8px;
@@ -295,26 +298,26 @@ onUnmounted(() => {
     }
     
     .footer-links-inline {
-      flex-direction: column;
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 15px;
-      align-items: center;
       
       .link-section {
         flex-direction: column;
         align-items: center;
-        gap: 10px;
-        width: 100%;
+        gap: 8px;
         
         .section-title {
           font-size: 13px;
           width: 100%;
           text-align: center;
-          margin-bottom: 8px;
+          margin-bottom: 5px;
         }
         
         a, .contact-item {
           font-size: 12px;
-          padding: 5px 10px;
+          padding: 4px 8px;
           background: rgba(139, 92, 246, 0.1);
           border-radius: 8px;
           transition: all 0.3s;
