@@ -137,16 +137,18 @@ onUnmounted(() => {
     max-width: 1200px;
     margin: 0 auto;
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 30px;
     margin-bottom: 8px;
   }
   
   .footer-info {
+    flex: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 15px;
+    gap: 8px;
     
     .footer-logo {
       display: flex;
@@ -176,36 +178,40 @@ onUnmounted(() => {
   
   .footer-links-inline {
     display: flex;
-    justify-content: center;
-    gap: 50px;
+    gap: 80px;
     
     .link-section {
       display: flex;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 10px;
       
       .section-title {
-        font-size: 13px;
+        font-size: 16px;
         color: #fff;
-        font-weight: 600;
+        font-weight: 700;
         text-shadow: 0 2px 8px rgba(139, 92, 246, 0.6);
+        margin-bottom: 5px;
       }
       
       a, .contact-item {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.8);
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.85);
         text-decoration: none;
         transition: all 0.3s;
         
         &:hover {
           color: #fff;
           text-shadow: 0 2px 8px rgba(139, 92, 246, 0.8);
+          transform: translateX(3px);
         }
       }
       
       .contact-item {
         cursor: default;
+        
+        &:hover {
+          transform: none;
+        }
       }
     }
   }
