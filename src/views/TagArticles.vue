@@ -377,12 +377,12 @@ onMounted(() => {
 
 // 桌面端表格视图（默认显示）
 .desktop-view {
-  display: block;
+  display: block !important;
 }
 
 // 移动端卡片视图（默认隐藏）
 .mobile-view {
-  display: none;
+  display: none !important;
 }
 
 // 移动端文章卡片
