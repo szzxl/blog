@@ -5,7 +5,7 @@
       :interval="5000" 
       height="180px" 
       arrow="always" 
-      indicator-position="outside"
+      indicator-position="inside"
     >
       <el-carousel-item v-for="(item, index) in carouselItems" :key="index">
         <div class="carousel-item" @click="handleClick(item)">
