@@ -136,19 +136,22 @@ onUnmounted(() => {
   .footer-content {
     max-width: 1200px;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 60px;
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
     margin-bottom: 10px;
   }
   
   .footer-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    
     .footer-logo {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 6px;
       
       .logo-icon {
         font-size: 20px;
@@ -173,8 +176,8 @@ onUnmounted(() => {
   
   .footer-links-inline {
     display: flex;
-    justify-content: space-between;
-    gap: 40px;
+    justify-content: center;
+    gap: 50px;
     
     .link-section {
       display: flex;

@@ -153,7 +153,7 @@ onMounted(() => {
 .container {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 40px 60px;
+  padding: 20px 60px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -162,7 +162,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   
   .section-icon {
     font-size: 36px;
