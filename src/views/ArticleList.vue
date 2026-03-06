@@ -99,12 +99,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { getArticleList } from '@/api/article'
 import { ElMessage } from 'element-plus'
 import Skeleton from '@/components/Skeleton.vue'
 
 const router = useRouter()
+const route = useRoute()
 
 interface Article {
   id: number
@@ -139,6 +140,12 @@ const fetchArticles = async () => {
     // 添加搜索关键词
     if (searchKeyword.value) {
       params.articleName = searchKeyword.value
+    }
+    
+    // 添加分类筛选（从URL参数获取）
+    const categoryParam = route.query.category as string
+    if (categoryParam) {
+      params.articleCategory = categoryParam
     }
     
     const res: any = await getArticleList(params)

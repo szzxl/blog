@@ -45,13 +45,6 @@
           </el-table-column>
         </el-table>
         
-        <!-- 空状态 -->
-        <div v-if="articles.length === 0 && !loading" class="empty-state">
-          <div class="empty-icon">📝</div>
-          <div class="empty-text">该标签下暂无文章</div>
-          <el-button type="primary" @click="goBack">返回标签页</el-button>
-        </div>
-        
         <!-- 分页 -->
         <div class="pagination" v-if="total > 0">
           <el-pagination
@@ -118,7 +111,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getArticlesByTag } from '@/api/article'
+import { getArticleList } from '@/api/article'
 import { ElMessage } from 'element-plus'
 
 const route = useRoute()
@@ -137,9 +130,8 @@ const loadArticles = async () => {
   
   loading.value = true
   try {
-    const response: any = await getArticlesByTag({
-      tagName: tagName.value,
-      tagStatus: 1,
+    const response: any = await getArticleList({
+      articleTag: tagName.value,
       pageNo: currentPage.value,
       pageSize: pageSize.value
     })

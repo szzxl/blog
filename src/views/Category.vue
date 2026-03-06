@@ -20,7 +20,7 @@
               <span class="label">篇文章</span>
             </div>
           </div>
-          <el-button class="view-btn" @click="viewCategory(cat.id)">
+          <el-button class="view-btn" @click="viewCategory(cat.categoryName)">
             查看文章 →
           </el-button>
         </div>
@@ -110,8 +110,8 @@ const getDefaultIcon = (name: string) => {
   return '📂'
 }
 
-const viewCategory = (id: number) => {
-  router.push(`/articles?category=${id}`)
+const viewCategory = (categoryName: string) => {
+  router.push(`/articles?category=${categoryName}`)
 }
 
 onMounted(() => {
@@ -136,6 +136,11 @@ onMounted(() => {
   align-items: center;
   gap: 20px;
   margin-bottom: 50px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  padding: 30px 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
   
   .header-icon {
     font-size: 60px;
@@ -155,8 +160,9 @@ onMounted(() => {
     
     p {
       font-size: 16px;
-      color: #999;
+      color: #666;
       margin: 0;
+      font-weight: 500;
     }
   }
 }
