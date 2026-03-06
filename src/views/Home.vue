@@ -69,10 +69,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onActivated } from 'vue'
 import { useRouter } from 'vue-router'
 import Carousel from '@/components/Carousel.vue'
 import { getMonthArticleList } from '@/api/article'
+
+// 定义组件名称，用于 keep-alive
+defineOptions({
+  name: 'Home'
+})
 
 const router = useRouter()
 
@@ -134,6 +139,11 @@ const viewArticle = (id: number) => {
 }
 
 onMounted(() => {
+  fetchArticles()
+})
+
+// 当从其他页面返回时，重新获取数据
+onActivated(() => {
   fetchArticles()
 })
 </script>
