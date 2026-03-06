@@ -387,7 +387,6 @@ onMounted(() => {
 
 // 移动端文章卡片
 .articles-cards {
-  display: flex;
   flex-direction: column;
   gap: 15px;
   

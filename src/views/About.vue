@@ -58,7 +58,7 @@
             <div class="contact-item">
               <span class="contact-icon">💬</span>
               <span class="contact-label">微信：</span>
-              <span class="contact-value">suzzxl_123</span>
+              <span class="contact-value">Su_zxl</span>
             </div>
           </div>
         </div>
