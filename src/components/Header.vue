@@ -735,9 +735,9 @@ onMounted(async () => {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 30px;
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    display: flex;
     align-items: center;
+    justify-content: center;
     min-height: 60px;
     position: relative;
     z-index: 2;
@@ -749,7 +749,6 @@ onMounted(async () => {
     align-items: center;
     gap: 15px;
     flex-shrink: 0;
-    justify-self: start;
     
     .logo-circle {
       width: 45px;
@@ -797,10 +796,7 @@ onMounted(async () => {
   }
   
   .nav {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    justify-self: center;
+    display: none;
     
     .nav-item {
       display: flex;

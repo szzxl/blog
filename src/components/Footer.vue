@@ -120,7 +120,7 @@ onUnmounted(() => {
 .footer {
   background: transparent;
   padding: 0;
-  margin-top: 60px;
+  margin-top: 40px;
   position: relative;
   
   .footer-wave {
@@ -141,7 +141,7 @@ onUnmounted(() => {
   .container {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
-    padding: 40px 30px 20px;
+    padding: 30px 30px 15px;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
   }
   
@@ -150,23 +150,23 @@ onUnmounted(() => {
     margin: 0 auto;
     display: grid;
     grid-template-columns: 2fr 1fr;
-    gap: 50px;
-    margin-bottom: 25px;
+    gap: 40px;
+    margin-bottom: 20px;
   }
   
   .footer-info {
     .footer-logo {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 15px;
+      gap: 10px;
+      margin-bottom: 12px;
       
       .logo-icon {
-        font-size: 30px;
+        font-size: 26px;
       }
       
       .logo-text {
-        font-size: 22px;
+        font-size: 20px;
         font-weight: 700;
         color: #fff;
         text-shadow: 0 2px 10px rgba(139, 92, 246, 0.8);
@@ -174,15 +174,15 @@ onUnmounted(() => {
     }
     
     .motto {
-      font-size: 16px;
+      font-size: 15px;
       color: #fff;
       text-shadow: 0 2px 8px rgba(139, 92, 246, 0.6);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       font-weight: 600;
     }
     
     .copyright {
-      font-size: 14px;
+      font-size: 13px;
       color: rgba(255, 255, 255, 0.8);
     }
   }
@@ -193,13 +193,13 @@ onUnmounted(() => {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 40px;
-    padding: 15px 30px;
+    gap: 30px;
+    padding: 12px 30px;
     border-top: 1px solid rgba(139, 92, 246, 0.15);
     position: relative;
     
     .copyright {
-      font-size: 13px;
+      font-size: 12px;
       color: rgba(255, 255, 255, 0.7);
       margin: 0;
       position: absolute;
@@ -207,7 +207,7 @@ onUnmounted(() => {
     }
     
     .runtime {
-      font-size: 13px;
+      font-size: 12px;
       color: rgba(255, 255, 255, 0.8);
       margin: 0;
       font-weight: 500;
@@ -215,7 +215,7 @@ onUnmounted(() => {
     }
     
     .icp {
-      font-size: 13px;
+      font-size: 12px;
       color: rgba(255, 255, 255, 0.7);
       margin: 0;
     }
@@ -223,13 +223,13 @@ onUnmounted(() => {
   
   .footer-links {
     display: flex;
-    gap: 50px;
+    gap: 40px;
     
     .link-group {
       h4 {
-        font-size: 16px;
+        font-size: 15px;
         color: #fff;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
         font-weight: 700;
         text-shadow: 0 2px 8px rgba(139, 92, 246, 0.6);
       }
@@ -237,8 +237,8 @@ onUnmounted(() => {
       a {
         display: block;
         color: rgba(255, 255, 255, 0.8);
-        font-size: 14px;
-        margin-bottom: 10px;
+        font-size: 13px;
+        margin-bottom: 8px;
         transition: all 0.3s;
         text-decoration: none;
         
@@ -252,16 +252,16 @@ onUnmounted(() => {
       .contact-item {
         display: block;
         color: rgba(255, 255, 255, 0.8);
-        font-size: 14px;
-        margin-bottom: 10px;
+        font-size: 13px;
+        margin-bottom: 8px;
         cursor: default;
       }
       
       .contact-link {
         display: block;
         color: rgba(255, 255, 255, 0.8);
-        font-size: 14px;
-        margin-bottom: 10px;
+        font-size: 13px;
+        margin-bottom: 8px;
         transition: all 0.3s;
         text-decoration: none;
         
@@ -279,13 +279,13 @@ onUnmounted(() => {
     margin: 0 auto;
     display: flex;
     justify-content: center;
-    gap: 20px;
-    padding-top: 20px;
-    margin-bottom: 15px;
+    gap: 15px;
+    padding-top: 15px;
+    margin-bottom: 12px;
     border-top: 2px solid rgba(139, 92, 246, 0.2);
     
     .deco {
-      font-size: 20px;
+      font-size: 18px;
       opacity: 0.6;
       animation: float 3s ease-in-out infinite;
       
