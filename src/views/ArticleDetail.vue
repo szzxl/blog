@@ -227,7 +227,7 @@ onMounted(() => {
   .article-title {
     font-size: 32px;
     font-weight: 700;
-    color: #5a5a5a;
+    color: var(--text-primary);
     line-height: 1.5;
     margin: 0 0 20px 0;
     text-align: center;
@@ -294,11 +294,11 @@ onMounted(() => {
   .content {
     font-size: 17px;
     line-height: 2.2;
-    color: #555;
+    color: var(--text-secondary);
     
     :deep(h1), :deep(h2), :deep(h3), :deep(h4), :deep(h5), :deep(h6) {
       font-weight: 700;
-      color: #5a5a5a;
+      color: var(--text-primary);
       margin-top: 40px;
       margin-bottom: 20px;
     }
@@ -345,7 +345,7 @@ onMounted(() => {
       border-left: 5px solid #8b5cf6;
       border-radius: 0 20px 20px 0;
       font-style: italic;
-      color: #666;
+      color: var(--text-secondary);
       
       p {
         margin: 0;
@@ -364,7 +364,7 @@ onMounted(() => {
     :deep(pre) {
       margin: 30px 0;
       padding: 25px;
-      background: #f8f8f8;
+      background: var(--bg-card);
       border-radius: 20px;
       overflow-x: auto;
       border: 2px solid rgba(139, 92, 246, 0.2);
@@ -372,7 +372,7 @@ onMounted(() => {
       code {
         padding: 0;
         background: none;
-        color: #5a5a5a;
+        color: var(--text-secondary);
         font-size: 14px;
         line-height: 1.8;
       }
