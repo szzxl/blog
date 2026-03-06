@@ -124,7 +124,8 @@ service.interceptors.response.use(
       return Promise.reject(new Error(res.message || res.msg || '请求失败'))
     }
     
-    return res.data || res
+    // 返回 data 字段，如果 data 不存在则返回整个响应
+    return res.data !== undefined ? res.data : res
   },
   (error) => {
     // 隐藏 Loading

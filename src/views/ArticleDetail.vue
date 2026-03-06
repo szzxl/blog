@@ -12,7 +12,12 @@
           <!-- 左侧：标签 -->
           <span class="info-item tags" v-if="article.articleTag">
             <span class="icon">🏷️</span>
-            <span class="tag" v-for="(tag, index) in parseTags(article.articleTag)" :key="index">{{ tag }}</span>
+            <span 
+              class="tag" 
+              v-for="(tag, index) in parseTags(article.articleTag)" 
+              :key="index"
+              @click="goToTag(tag)"
+            >{{ tag }}</span>
           </span>
           
           <!-- 右侧：阅读数、点赞数、时间 -->
@@ -214,6 +219,11 @@ const formatTime = (timestamp?: number) => {
 const parseTags = (tagStr?: string) => {
   if (!tagStr) return []
   return tagStr.split(',').map(t => t.trim()).filter(t => t)
+}
+
+// 跳转到标签文章列表
+const goToTag = (tag: string) => {
+  router.push(`/tag/articles?tag=${tag}`)
 }
 
 onMounted(() => {
