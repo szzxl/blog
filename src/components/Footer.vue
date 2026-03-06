@@ -14,38 +14,26 @@
           </div>
           <p class="motto" v-if="websiteMotto">✨ {{ websiteMotto }} ✨</p>
         </div>
-        <div class="footer-links">
-          <div class="link-group">
-            <h4>快速导航</h4>
+        <div class="footer-links-inline">
+          <div class="link-section">
+            <span class="section-title">快速导航：</span>
             <router-link to="/">首页</router-link>
             <router-link to="/articles">文章</router-link>
             <router-link to="/about">关于</router-link>
           </div>
-          <div class="link-group">
-            <h4>联系方式</h4>
-            <span class="contact-item" v-if="socialEmail">📧 邮箱: {{ socialEmail }}</span>
-            <a v-if="socialGitee" :href="socialGitee" target="_blank" class="contact-link">
-              🔗 Gitee
-            </a>
-            <a v-if="socialGithub" :href="socialGithub" target="_blank" class="contact-link">
-              🔗 GitHub
-            </a>
+          <div class="link-section">
+            <span class="section-title">联系方式：</span>
+            <span class="contact-item" v-if="socialEmail">📧 {{ socialEmail }}</span>
+            <a v-if="socialGitee" :href="socialGitee" target="_blank" class="contact-link">🔗 Gitee</a>
+            <a v-if="socialGithub" :href="socialGithub" target="_blank" class="contact-link">🔗 GitHub</a>
           </div>
         </div>
-      </div>
-      <div class="footer-decoration">
-        <span class="deco">💻</span>  
-        <span class="deco">⌨️</span>
-        <span class="deco">🖱️</span>
-        <span class="deco">🖥️</span>
-        <span class="deco">💾</span>
-        <span class="deco">🔧</span>
       </div>
       
       <!-- 底部版权和备案 -->
       <div class="footer-bottom">
         <p class="copyright">{{ copyright }}</p>
-        <p class="runtime">⏰ 网站已运行：{{ runtimeText }}</p>
+        <p class="runtime">⏰ {{ runtimeText }}</p>
         <p class="icp" v-if="icpNumber">{{ icpNumber }}</p>
       </div>
     </div>
@@ -120,7 +108,7 @@ onUnmounted(() => {
 .footer {
   background: transparent;
   padding: 0;
-  margin-top: 30px;
+  margin-top: 20px;
   position: relative;
   
   .footer-wave {
@@ -141,7 +129,7 @@ onUnmounted(() => {
   .container {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
-    padding: 20px 30px 10px;
+    padding: 15px 30px 8px;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
   }
   
@@ -149,9 +137,10 @@ onUnmounted(() => {
     max-width: 1200px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 30px;
-    margin-bottom: 15px;
+    grid-template-columns: auto 1fr;
+    gap: 40px;
+    align-items: center;
+    margin-bottom: 10px;
   }
   
   .footer-info {
@@ -159,14 +148,14 @@ onUnmounted(() => {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       
       .logo-icon {
-        font-size: 22px;
+        font-size: 20px;
       }
       
       .logo-text {
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 700;
         color: #fff;
         text-shadow: 0 2px 10px rgba(139, 92, 246, 0.8);
@@ -174,16 +163,47 @@ onUnmounted(() => {
     }
     
     .motto {
-      font-size: 14px;
+      font-size: 13px;
       color: #fff;
       text-shadow: 0 2px 8px rgba(139, 92, 246, 0.6);
-      margin-bottom: 6px;
+      margin-bottom: 0;
       font-weight: 600;
     }
+  }
+  
+  .footer-links-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     
-    .copyright {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.8);
+    .link-section {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      
+      .section-title {
+        font-size: 13px;
+        color: #fff;
+        font-weight: 600;
+        text-shadow: 0 2px 8px rgba(139, 92, 246, 0.6);
+      }
+      
+      a, .contact-item {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: all 0.3s;
+        
+        &:hover {
+          color: #fff;
+          text-shadow: 0 2px 8px rgba(139, 92, 246, 0.8);
+        }
+      }
+      
+      .contact-item {
+        cursor: default;
+      }
     }
   }
   
@@ -193,8 +213,8 @@ onUnmounted(() => {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 25px;
-    padding: 10px 30px;
+    gap: 20px;
+    padding: 8px 30px;
     border-top: 1px solid rgba(139, 92, 246, 0.15);
     position: relative;
     
@@ -218,100 +238,6 @@ onUnmounted(() => {
       font-size: 11px;
       color: rgba(255, 255, 255, 0.7);
       margin: 0;
-    }
-  }
-  
-  .footer-links {
-    display: flex;
-    gap: 30px;
-    
-    .link-group {
-      h4 {
-        font-size: 14px;
-        color: #fff;
-        margin-bottom: 8px;
-        font-weight: 700;
-        text-shadow: 0 2px 8px rgba(139, 92, 246, 0.6);
-      }
-      
-      a {
-        display: block;
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 12px;
-        margin-bottom: 6px;
-        transition: all 0.3s;
-        text-decoration: none;
-        
-        &:hover {
-          color: #fff;
-          transform: translateX(5px);
-          text-shadow: 0 2px 8px rgba(139, 92, 246, 0.8);
-        }
-      }
-      
-      .contact-item {
-        display: block;
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 12px;
-        margin-bottom: 6px;
-        cursor: default;
-      }
-      
-      .contact-link {
-        display: block;
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 12px;
-        margin-bottom: 6px;
-        transition: all 0.3s;
-        text-decoration: none;
-        
-        &:hover {
-          color: #fff;
-          transform: translateX(5px);
-          text-shadow: 0 2px 8px rgba(139, 92, 246, 0.8);
-        }
-      }
-    }
-  }
-  
-  .footer-decoration {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    padding-top: 10px;
-    margin-bottom: 8px;
-    border-top: 2px solid rgba(139, 92, 246, 0.2);
-    
-    .deco {
-      font-size: 16px;
-      opacity: 0.6;
-      animation: float 3s ease-in-out infinite;
-      
-      &:nth-child(1) {
-        animation-delay: 0s;
-      }
-      
-      &:nth-child(2) {
-        animation-delay: 0.5s;
-      }
-      
-      &:nth-child(3) {
-        animation-delay: 1s;
-      }
-      
-      &:nth-child(4) {
-        animation-delay: 1.5s;
-      }
-      
-      &:nth-child(5) {
-        animation-delay: 2s;
-      }
-      
-      &:nth-child(6) {
-        animation-delay: 2.5s;
-      }
     }
   }
 }
