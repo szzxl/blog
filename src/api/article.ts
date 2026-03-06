@@ -138,6 +138,15 @@ export const likeArticle = (data: {
   })
 }
 
+// 查询文章点赞数量
+export const getArticleLikeCount = (articleId: number | string) => {
+  return request({
+    url: '/web/article/like/num',
+    method: 'post',
+    data: { articleId }
+  })
+}
+
 // 分类相关
 export const getCategoryList = async (data?: { 
   id?: number
