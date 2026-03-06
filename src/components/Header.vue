@@ -734,14 +734,14 @@ onMounted(async () => {
   .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 30px;
-    display: flex;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: auto 1fr;
     align-items: center;
-    justify-content: center;
     min-height: 60px;
     position: relative;
     z-index: 2;
-    gap: 20px;
+    gap: 40px;
   }
   
   .logo {
@@ -749,6 +749,8 @@ onMounted(async () => {
     align-items: center;
     gap: 15px;
     flex-shrink: 0;
+    justify-self: start;
+    margin-left: 0;
     
     .logo-circle {
       width: 45px;
@@ -796,7 +798,9 @@ onMounted(async () => {
   }
   
   .nav {
-    display: none;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
     
     .nav-item {
       display: flex;
