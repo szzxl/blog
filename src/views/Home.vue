@@ -163,6 +163,11 @@ onMounted(() => {
   align-items: center;
   gap: 15px;
   margin-bottom: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  padding: 15px 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   
   .section-icon {
     font-size: 36px;

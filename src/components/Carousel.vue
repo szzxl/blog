@@ -3,7 +3,7 @@
     <el-carousel 
       v-if="carouselItems.length > 0"
       :interval="5000" 
-      height="180px" 
+      height="200px" 
       arrow="always" 
       indicator-position="inside"
     >
