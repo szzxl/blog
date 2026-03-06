@@ -17,6 +17,12 @@
 - 📱 **响应式设计** - 完美适配 PC 和移动端
 - 🎯 **用户体验** - 全局 Loading、错误边界、友好提示
 
+测试环境地址: <http://81.68.239.14/test/>
+
+账号：zxl123
+
+密码: zxl@zxl@zxl
+
 ## 🚀 快速开始
 
 ### 环境要求
@@ -36,7 +42,7 @@ npm install
 npm run dev
 ```
 
-访问 http://localhost:80
+访问 <http://localhost:80>
 
 ### 生产构建
 
@@ -53,30 +59,36 @@ npm run preview
 ## 📦 技术栈
 
 ### 核心框架
+
 - **Vue 3.5** - 渐进式 JavaScript 框架
 - **TypeScript 5.9** - JavaScript 的超集
 - **Vite 6.0** - 下一代前端构建工具
 
 ### UI 框架
+
 - **Element Plus 2.13** - 基于 Vue 3 的组件库
 - **SCSS** - CSS 预处理器
 
 ### 状态管理
+
 - **Pinia 3.0** - Vue 的状态管理库
 
 ### 路由
+
 - **Vue Router 4.6** - Vue 官方路由
 
 ### HTTP 请求
+
 - **Axios 1.13** - Promise 基于的 HTTP 客户端
 
 ### 工具库
+
 - **Day.js 1.11** - 轻量级日期处理库
 - **@vueuse/core 14.1** - Vue 组合式 API 工具集
 
 ## 📁 项目结构
 
-```
+```text
 time-blog-web/
 ├── public/                 # 静态资源
 │   ├── images/            # 图片资源
@@ -128,12 +140,12 @@ time-blog-web/
 ├── vite.config.ts         # Vite 配置
 ├── tsconfig.json          # TypeScript 配置
 └── package.json           # 项目依赖
-
 ```
 
 ## 🎯 核心功能
 
 ### 1. 文章系统
+
 - 📝 文章列表展示
 - 📖 文章详情阅读
 - 🏷️ 标签分类
@@ -141,6 +153,7 @@ time-blog-web/
 - 🔍 文章搜索（规划中）
 
 ### 2. 评论系统
+
 - 💬 发表评论
 - 😊 表情包支持（500+ 表情）
 - 📷 图片上传（最多 9 张）
@@ -148,6 +161,7 @@ time-blog-web/
 - 🗑️ 评论删除
 
 ### 3. 用户系统
+
 - 🔐 用户登录/注册
 - 👤 个人中心
 - 🖼️ 头像上传
@@ -155,30 +169,36 @@ time-blog-web/
 - 🔒 密码修改
 
 ### 4. 主题系统
+
 - ☀️ 浅色模式
 - 🌙 深色模式
 - 🔄 自动模式（跟随系统）
 - 💾 主题记忆（localStorage）
 
 ### 5. 其他功能
+
 - 💕 说说动态
 - 💌 留言板
 - 🔗 友情链接
 - 👨‍💻 关于页面
 - 📢 公告栏
 
+## 🔒 安全特性
 
 ### XSS 防护
+
 - HTML 转义
 - URL 清理
 - 输入验证
 - 内容过滤
 
 ### CSRF 防护
+
 - Token 验证
 - 请求来源检查
 
 ### 其他安全措施
+
 - 密码加密传输
 - Token 过期处理
 - 权限验证
@@ -187,6 +207,7 @@ time-blog-web/
 ## 🎨 主题定制
 
 ### CSS 变量
+
 ```scss
 :root {
   --bg-primary: #f5f7fa;
@@ -202,24 +223,28 @@ time-blog-web/
 ```
 
 ### 自定义主题
+
 修改 `src/styles/global.scss` 中的 CSS 变量即可。
 
 ## 📖 开发指南
 
 ### 代码规范
+
 - 使用 TypeScript 严格模式
 - 遵循 Vue 3 Composition API
 - 组件使用 `<script setup>` 语法
 - 样式使用 SCSS + scoped
 
 ### 命名规范
+
 - **组件**：PascalCase（如 `ArticleList.vue`）
 - **变量/函数**：camelCase（如 `articleList`）
 - **常量**：UPPER_SNAKE_CASE（如 `API_BASE_URL`）
 - **CSS 类**：kebab-case（如 `.article-card`）
 
 ### Git 提交规范
-```
+
+```text
 feat: 新功能
 fix: 修复 bug
 docs: 文档更新
@@ -235,11 +260,13 @@ chore: 构建/工具相关
 ### 环境变量
 
 #### 开发环境 (`.env.development`)
+
 ```env
 VITE_API_BASE_URL=/admin-api
 ```
 
 #### 生产环境 (`.env.production`)
+
 ```env
 VITE_API_BASE_URL=/admin-api
 ```
@@ -247,6 +274,7 @@ VITE_API_BASE_URL=/admin-api
 ### API 代理配置
 
 开发环境代理配置在 `vite.config.ts`：
+
 ```typescript
 server: {
   proxy: {
@@ -273,6 +301,7 @@ server: {
 欢迎提交 Issue 和 Pull Request！
 
 ### 开发流程
+
 1. Fork 本仓库
 2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
 3. 提交更改 (`git commit -m 'feat: Add some AmazingFeature'`)
@@ -287,7 +316,7 @@ server: {
 
 ---
 
-suz_zxl@163.com
+<suz_zxl@163.com>
 
 ## 🙏 致谢
 
