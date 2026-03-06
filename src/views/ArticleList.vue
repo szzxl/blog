@@ -98,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onActivated } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getArticleList } from '@/api/article'
 import { ElMessage } from 'element-plus'
@@ -203,6 +203,11 @@ const viewArticle = (id: number) => {
 }
 
 onMounted(() => {
+  fetchArticles()
+})
+
+// 页面激活时重新加载数据（从详情页返回时）
+onActivated(() => {
   fetchArticles()
 })
 </script>
