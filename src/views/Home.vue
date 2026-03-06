@@ -151,9 +151,9 @@ onMounted(() => {
 }
 
 .container {
-  max-width: 1600px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 15px 60px;
+  padding: 30px 40px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -162,7 +162,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   padding: 15px 20px;
@@ -195,7 +195,7 @@ onMounted(() => {
 .article-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  gap: 25px;
 }
 
 .article-card {
@@ -255,10 +255,10 @@ onMounted(() => {
   .article-cover {
     position: relative;
     width: 100%;
-    height: 150px;
+    height: 180px;
     overflow: hidden;
     border-radius: 15px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     
     img {
       width: 100%;
