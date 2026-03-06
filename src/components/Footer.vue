@@ -120,7 +120,7 @@ onUnmounted(() => {
 .footer {
   background: transparent;
   padding: 0;
-  margin-top: 100px;
+  margin-top: 60px;
   position: relative;
   
   .footer-wave {
@@ -141,7 +141,7 @@ onUnmounted(() => {
   .container {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
-    padding: 60px 30px 30px;
+    padding: 40px 30px 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
   }
   
@@ -151,7 +151,7 @@ onUnmounted(() => {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 50px;
-    margin-bottom: 40px;
+    margin-bottom: 25px;
   }
   
   .footer-info {
@@ -159,14 +159,14 @@ onUnmounted(() => {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       
       .logo-icon {
-        font-size: 35px;
+        font-size: 30px;
       }
       
       .logo-text {
-        font-size: 24px;
+        font-size: 22px;
         font-weight: 700;
         color: #fff;
         text-shadow: 0 2px 10px rgba(139, 92, 246, 0.8);
@@ -174,10 +174,10 @@ onUnmounted(() => {
     }
     
     .motto {
-      font-size: 18px;
+      font-size: 16px;
       color: #fff;
       text-shadow: 0 2px 8px rgba(139, 92, 246, 0.6);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       font-weight: 600;
     }
     
@@ -194,7 +194,7 @@ onUnmounted(() => {
     justify-content: center;
     align-items: center;
     gap: 40px;
-    padding: 20px 30px;
+    padding: 15px 30px;
     border-top: 1px solid rgba(139, 92, 246, 0.15);
     position: relative;
     
@@ -279,12 +279,13 @@ onUnmounted(() => {
     margin: 0 auto;
     display: flex;
     justify-content: center;
-    gap: 30px;
-    padding-top: 30px;
+    gap: 20px;
+    padding-top: 20px;
+    margin-bottom: 15px;
     border-top: 2px solid rgba(139, 92, 246, 0.2);
     
     .deco {
-      font-size: 24px;
+      font-size: 20px;
       opacity: 0.6;
       animation: float 3s ease-in-out infinite;
       

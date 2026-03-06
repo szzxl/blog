@@ -63,6 +63,8 @@ onMounted(() => {
   max-width: 1400px;
   margin: 0 auto 30px;
   padding: 0 20px;
+  width: 100%;
+  box-sizing: border-box;
   
   :deep(.el-carousel) {
     position: relative;
@@ -130,12 +132,23 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .carousel {
-    padding: 0 15px;
-    margin-bottom: 20px;
+    padding: 0;
+    margin-bottom: 15px;
+    max-width: 100%;
     
     :deep(.el-carousel) {
       height: 200px !important;
-      border-radius: 12px;
+      border-radius: 0;
+      box-shadow: none;
+      
+      .el-carousel__container {
+        border-radius: 0;
+      }
+      
+      .el-carousel__arrow {
+        width: 30px;
+        height: 30px;
+      }
     }
   }
 }
