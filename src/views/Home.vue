@@ -153,7 +153,7 @@ onMounted(() => {
 .container {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 20px 60px;
+  padding: 15px 60px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -162,7 +162,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   
   .section-icon {
     font-size: 36px;
@@ -190,7 +190,7 @@ onMounted(() => {
 .article-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 30px;
+  gap: 20px;
 }
 
 .article-card {
@@ -250,10 +250,10 @@ onMounted(() => {
   .article-cover {
     position: relative;
     width: 100%;
-    height: 180px;
+    height: 150px;
     overflow: hidden;
     border-radius: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     
     img {
       width: 100%;

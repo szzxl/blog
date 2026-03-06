@@ -108,7 +108,7 @@ onUnmounted(() => {
 .footer {
   background: transparent;
   padding: 0;
-  margin-top: 20px;
+  margin-top: 15px;
   position: relative;
   
   .footer-wave {
@@ -129,7 +129,7 @@ onUnmounted(() => {
   .container {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
-    padding: 15px 30px 8px;
+    padding: 12px 30px 6px;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
   }
   
@@ -138,8 +138,8 @@ onUnmounted(() => {
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin-bottom: 10px;
+    gap: 10px;
+    margin-bottom: 8px;
   }
   
   .footer-info {
@@ -217,7 +217,7 @@ onUnmounted(() => {
     justify-content: center;
     align-items: center;
     gap: 20px;
-    padding: 8px 30px;
+    padding: 6px 30px;
     border-top: 1px solid rgba(139, 92, 246, 0.15);
     position: relative;
     
