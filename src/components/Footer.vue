@@ -138,7 +138,7 @@ onUnmounted(() => {
     margin: 0 auto;
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 40px;
+    gap: 60px;
     align-items: center;
     margin-bottom: 10px;
   }
@@ -173,8 +173,8 @@ onUnmounted(() => {
   
   .footer-links-inline {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 40px;
     
     .link-section {
       display: flex;
