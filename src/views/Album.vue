@@ -180,352 +180,272 @@ onMounted(() => {
 <style scoped lang="scss">
 .album {
   min-height: calc(100vh - 200px);
-  padding: 40px 0;
+  padding: 32px 0 48px;
 }
 
 .container {
-  max-width: 1600px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 60px;
+  padding: 0 24px;
 }
 
 .page-header {
-  text-align: center;
-  margin-bottom: 50px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(15px);
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-  
+  border-left: 3px solid var(--color-accent);
+  padding-left: 16px;
+  margin-bottom: 32px;
+
   .page-title {
-    font-size: 42px;
+    font-size: 24px;
     font-weight: 700;
-    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 15px;
+    color: var(--text-primary);
+    margin-bottom: 6px;
   }
-  
+
   .page-desc {
-    font-size: 16px;
-    color: #666;
-    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-tertiary);
   }
 }
 
-
-
-// 相册列表视图
 .albums-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
 }
 
 .album-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
   cursor: pointer;
   overflow: hidden;
-  transition: all 0.3s ease;
-  
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+
   &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 40px rgba(139, 92, 246, 0.25);
-    
-    .cover-img {
-      transform: scale(1.1);
-    }
-    
-    .cover-overlay {
-      opacity: 1;
-    }
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+
+    .cover-img { transform: scale(1.04); }
+    .cover-overlay { opacity: 1; }
   }
-  
+
   .album-cover {
     position: relative;
     width: 100%;
-    height: 240px;
+    height: 200px;
     overflow: hidden;
-    border-radius: 15px;
-    margin-bottom: 15px;
-    
+
     .cover-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.5s ease;
+      transition: transform 0.3s ease;
     }
-    
+
     .cover-overlay {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(139, 92, 246, 0.85);
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
       opacity: 0;
-      transition: opacity 0.3s ease;
-      
-      .view-icon {
-        font-size: 48px;
-        filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.3));
-      }
-      
+      transition: opacity 0.2s ease;
+
+      .view-icon { font-size: 36px; }
+
       .photo-count {
         color: #fff;
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 600;
       }
     }
   }
-  
+
   .album-info {
+    padding: 14px 16px;
+
     .album-name {
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 15px;
+      font-weight: 600;
       color: var(--text-primary);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    
+
     .album-desc {
-      font-size: 14px;
-      color: var(--text-secondary);
+      font-size: 13px;
+      color: var(--text-tertiary);
       display: -webkit-box;
       -webkit-line-clamp: 2;
-      line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
   }
 }
 
-// 相册详情视图
 .detail-header {
-  margin-bottom: 40px;
-  
+  margin-bottom: 32px;
+
   .back-btn {
-    margin-bottom: 20px;
-    border-radius: 20px;
-    padding: 10px 20px;
-    background: var(--bg-card);
-    border: 2px solid rgba(139, 92, 246, 0.2);
-    color: var(--text-primary);
-    font-weight: 600;
-    
-    .icon {
-      margin-right: 5px;
-      font-size: 18px;
-    }
-    
+    margin-bottom: 16px;
+    border-radius: var(--radius-btn);
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
     &:hover {
-      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-      color: #fff;
-      border-color: #8b5cf6;
+      border-color: var(--color-accent);
+      color: var(--color-accent);
     }
   }
-  
+
   .album-title-section {
-    text-align: center;
-    
+    border-left: 3px solid var(--color-accent);
+    padding-left: 16px;
+
     .album-title {
-      font-size: 36px;
+      font-size: 22px;
       font-weight: 700;
-      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 10px;
+      color: var(--text-primary);
+      margin-bottom: 6px;
     }
-    
+
     .album-subtitle {
-      font-size: 16px;
-      color: var(--text-secondary);
+      font-size: 13px;
+      color: var(--text-tertiary);
     }
   }
 }
 
 .photos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
 }
 
 .photo-item {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
   cursor: pointer;
   overflow: hidden;
-  transition: all 0.3s ease;
-  
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+
   &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 40px rgba(139, 92, 246, 0.25);
-    
-    .photo-img {
-      transform: scale(1.1);
-    }
-    
-    .photo-overlay {
-      opacity: 1;
-    }
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+
+    .photo-img { transform: scale(1.04); }
+    .photo-overlay { opacity: 1; }
   }
-  
+
   .photo-wrapper {
     position: relative;
     width: 100%;
-    height: 240px;
+    height: 200px;
     overflow: hidden;
-    border-radius: 15px;
-    margin-bottom: 15px;
-    
+
     .photo-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.5s ease;
+      transition: transform 0.3s ease;
     }
-    
+
     .photo-overlay {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(139, 92, 246, 0.7);
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
       display: flex;
       align-items: center;
       justify-content: center;
       opacity: 0;
-      transition: opacity 0.3s ease;
-      
-      .view-icon {
-        font-size: 48px;
-        filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.3));
-      }
+      transition: opacity 0.2s ease;
+
+      .view-icon { font-size: 36px; }
     }
   }
-  
+
   .photo-info {
+    padding: 12px 14px;
+
     .photo-title {
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 600;
       color: var(--text-primary);
-      margin-bottom: 8px;
+      margin-bottom: 4px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    
+
     .photo-desc {
-      font-size: 14px;
-      color: var(--text-secondary);
+      font-size: 12px;
+      color: var(--text-tertiary);
       display: -webkit-box;
       -webkit-line-clamp: 2;
-      line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
   }
 }
 
-
-
 .empty-state {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 100px 20px;
-  
-  .empty-icon {
-    font-size: 80px;
-    margin-bottom: 20px;
-    opacity: 0.5;
-  }
-  
-  .empty-text {
-    font-size: 18px;
-    color: var(--text-tertiary);
-  }
+  padding: 64px 20px;
+  color: var(--text-tertiary);
+  font-size: 14px;
 }
 
 .photo-preview-dialog {
   :deep(.el-dialog) {
     background: rgba(0, 0, 0, 0.95);
-    backdrop-filter: blur(20px);
-    
+
     .el-dialog__body {
       padding: 20px;
       text-align: center;
     }
   }
-  
+
   .preview-img {
     max-width: 100%;
     max-height: 70vh;
     object-fit: contain;
-    border-radius: 10px;
+    border-radius: var(--radius-btn);
   }
-  
+
   .preview-info {
-    margin-top: 20px;
+    margin-top: 16px;
     color: #fff;
-    
+
     h3 {
-      font-size: 20px;
-      margin-bottom: 10px;
+      font-size: 16px;
+      margin-bottom: 8px;
     }
-    
+
     p {
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.7);
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
     }
   }
 }
 
-@media (max-width: 768px) {
-  .container {
-    padding: 0 20px;
-  }
-  
-  .page-header {
-    margin-bottom: 30px;
-    padding: 20px;
-    
-    .page-title {
-      font-size: 32px;
-    }
-    
-    .page-desc {
-      font-size: 14px;
-    }
-  }
-  
+@media (max-width: 640px) {
   .albums-grid,
   .photos-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .album-card,
-  .photo-item {
-    .album-cover,
-    .photo-wrapper {
-      height: 220px;
-    }
-  }
-  
-  .detail-header {
-    .album-title-section {
-      .album-title {
-        font-size: 28px;
-      }
-    }
   }
 }
 </style>

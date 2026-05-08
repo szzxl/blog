@@ -1072,429 +1072,529 @@ onMounted(() => {
 <style scoped lang="scss">
 .talk {
   min-height: calc(100vh - 200px);
-  padding: 30px 0;
+  padding: 32px 0 48px;
 }
 
 .container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 24px;
 }
 
 .page-header {
   display: flex;
   align-items: center;
-  gap: 15px;
-  margin-bottom: 30px;
-  position: relative;
-  
-  .header-icon {
-    font-size: 45px;
-    animation: float 3s ease-in-out infinite;
-  }
-  
+  justify-content: space-between;
+  margin-bottom: 32px;
+  border-left: 3px solid var(--color-accent);
+  padding-left: 16px;
+
   .header-text {
-    flex: 1;
-    
     h1 {
-      font-size: 32px;
-      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0 0 5px 0;
+      font-size: 24px;
+      color: var(--text-primary);
+      margin: 0 0 4px 0;
       font-weight: 700;
     }
-    
+
     p {
-      font-size: 14px;
-      color: #999;
+      font-size: 13px;
+      color: var(--text-tertiary);
       margin: 0;
     }
   }
-  
+
   .publish-btn {
-    height: 38px;
-    padding: 0 20px;
-    border-radius: 19px;
-    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-    border: none;
-    font-size: 14px;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: var(--radius-btn);
+    background: transparent;
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    font-size: 13px;
     font-weight: 600;
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-    transition: all 0.3s;
-    
-    .btn-icon {
-      margin-right: 5px;
-      font-size: 14px;
-    }
-    
+    cursor: pointer;
+    transition: all 0.15s ease;
+
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+      background: var(--color-accent);
+      color: var(--text-inverse);
     }
   }
 }
 
 .talk-list {
-  min-height: 400px;
-  
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
   .empty-state {
     text-align: center;
-    padding: 100px 20px;
-    
-    .empty-icon {
-      font-size: 80px;
-      margin-bottom: 20px;
-      opacity: 0.5;
-    }
-    
-    .empty-text {
-      font-size: 18px;
-      color: #999;
-    }
+    padding: 64px 20px;
+    color: var(--text-tertiary);
+    font-size: 14px;
   }
-  
+
   .talk-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-card);
     padding: 20px;
-    margin-bottom: 20px;
-    
+    transition: border-color 0.2s ease;
+
+    &:hover {
+      border-color: rgba(0, 212, 170, 0.3);
+    }
+
     .talk-header {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 15px;
-      
+      margin-bottom: 14px;
+
       .avatar {
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        border: 2px solid #fff;
-        box-shadow: 0 2px 10px rgba(139, 92, 246, 0.2);
-      }
-      
-      .user-info {
-        .username {
-          font-size: 15px;
-          font-weight: 700;
-          color: #5a5a5a;
-          margin-bottom: 3px;
-        }
-        
-        .time {
-          font-size: 12px;
-          color: #999;
-        }
-      }
-    }
-    
-    .talk-content {
-      font-size: 14px;
-      line-height: 1.6;
-      color: #666;
-      margin-bottom: 15px;
-    }
-    
-    .talk-images {
-      display: grid;
-      gap: 10px;
-      margin-bottom: 20px;
-      
-      &:has(.talk-img:nth-child(1):nth-last-child(1)) {
-        grid-template-columns: 1fr;
-        max-width: 400px;
-      }
-      
-      &:has(.talk-img:nth-child(2)) {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      
-      &:has(.talk-img:nth-child(3)) {
-        grid-template-columns: repeat(3, 1fr);
-      }
-      
-      &:has(.talk-img:nth-child(4)) {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      
-      .talk-img {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-        border-radius: 15px;
-        cursor: pointer;
-        transition: all 0.3s;
-        
-        &:hover {
-          transform: scale(1.05);
-          box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
-        }
-      }
-    }
-    
-    .talk-footer {
-      border-top: 1px solid rgba(139, 92, 246, 0.2);
-      padding-top: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      
-      .actions {
-        display: flex;
-        gap: 20px;
-        
-        .action-btn {
-          color: #8b5cf6;
-          font-size: 15px;
-          
-          .icon {
-            margin-right: 5px;
-            font-size: 18px;
-          }
-          
-          .count {
-            margin-left: 5px;
-          }
-          
-          &:hover {
-            color: #6366f1;
-          }
-        }
-      }
-      
-      .delete-talk-btn {
-        color: #999;
-        font-size: 14px;
-        transition: all 0.3s;
-        
-        .icon {
-          margin-right: 4px;
-          font-size: 16px;
-        }
-        
-        &:hover {
-          color: #4338ca;
-        }
-      }
-    }
-  }
-  
-  .comment-list {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(139, 92, 246, 0.2);
-    
-    .comment-item-bilibili {
-      display: flex;
-      gap: 12px;
-      padding: 16px 0;
-      border-bottom: 1px solid rgba(255, 182, 193, 0.1);
-      
-      &:last-child {
-        border-bottom: none;
-      }
-      
-      .comment-avatar {
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        border: 2px solid #fff;
-        box-shadow: 0 2px 8px rgba(255, 154, 158, 0.2);
+        border: 1px solid var(--border-color);
+        object-fit: cover;
         flex-shrink: 0;
       }
-      
+
+      .user-info {
+        .username {
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--text-primary);
+          margin-bottom: 2px;
+        }
+
+        .time {
+          font-size: 12px;
+          color: var(--text-tertiary);
+        }
+      }
+    }
+
+    .talk-content {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .talk-images {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 16px;
+
+      &:has(.talk-img:nth-child(1):nth-last-child(1)) {
+        grid-template-columns: 1fr;
+        max-width: 360px;
+      }
+
+      &:has(.talk-img:nth-child(2)) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      &:has(.talk-img:nth-child(3)) {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      &:has(.talk-img:nth-child(4)) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .talk-img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        border-radius: var(--radius-btn);
+        cursor: pointer;
+        transition: opacity 0.15s ease;
+
+        &:hover {
+          opacity: 0.85;
+        }
+      }
+    }
+
+    .talk-footer {
+      border-top: 1px solid var(--border-color);
+      padding-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .actions {
+        display: flex;
+        gap: 16px;
+
+        .action-btn {
+          color: var(--text-tertiary);
+          font-size: 13px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          transition: color 0.15s ease;
+          background: none;
+          border: none;
+          padding: 0;
+
+          .icon { font-size: 15px; }
+
+          &:hover { color: var(--color-accent); }
+          &.liked { color: var(--color-danger); }
+        }
+      }
+
+      .delete-talk-btn {
+        color: var(--text-tertiary);
+        font-size: 13px;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+        transition: color 0.15s ease;
+
+        &:hover { color: var(--color-danger); }
+      }
+    }
+  }
+
+  .comment-list {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+
+    .comment-item-bilibili {
+      display: flex;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+
+      &:last-child { border-bottom: none; }
+
+      .comment-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 1px solid var(--border-color);
+        flex-shrink: 0;
+        object-fit: cover;
+      }
+
       .comment-main {
         flex: 1;
         min-width: 0;
-        
+
         .comment-user {
-          font-size: 14px;
+          font-size: 13px;
           font-weight: 600;
-          color: #666;
-          margin-bottom: 8px;
-          
+          color: var(--text-secondary);
+          margin-bottom: 6px;
+
           &.author {
-            color: #6366f1;
-            
+            color: var(--color-accent);
+
             &::after {
               content: '博主';
-              margin-left: 8px;
-              font-size: 11px;
-              background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-              color: #fff;
-              padding: 2px 8px;
-              border-radius: 10px;
+              margin-left: 6px;
+              font-size: 10px;
+              background: var(--color-accent);
+              color: var(--text-inverse);
+              padding: 1px 6px;
+              border-radius: var(--radius-tag);
               font-weight: 600;
             }
           }
         }
-        
+
         .comment-text {
-          font-size: 15px;
-          color: #333;
+          font-size: 14px;
+          color: var(--text-secondary);
           line-height: 1.7;
-          margin-bottom: 10px;
-          word-wrap: break-word;
+          margin-bottom: 8px;
+          word-break: break-word;
         }
-        
+
         .comment-footer {
           display: flex;
           align-items: center;
-          gap: 20px;
-          margin-bottom: 10px;
-          
+          gap: 16px;
+          margin-bottom: 8px;
+
           .comment-time {
-            font-size: 13px;
-            color: #999;
+            font-size: 12px;
+            color: var(--text-tertiary);
           }
-          
+
           .comment-actions {
             display: flex;
-            gap: 15px;
-            
+            gap: 12px;
+
             .action-btn {
-              font-size: 13px;
-              color: #999;
+              font-size: 12px;
+              color: var(--text-tertiary);
               cursor: pointer;
-              transition: all 0.2s;
-              
-              &:hover {
-                color: #8b5cf6;
-              }
-              
-              &.delete:hover {
-                color: #4338ca;
-              }
+              background: none;
+              border: none;
+              padding: 0;
+              transition: color 0.15s ease;
+
+              &:hover { color: var(--color-accent); }
+              &.delete:hover { color: var(--color-danger); }
             }
           }
         }
-        
+
         .expand-replies {
           display: inline-flex;
           align-items: center;
-          gap: 6px;
-          padding: 6px 12px;
-          background: rgba(139, 92, 246, 0.08);
-          border-radius: 6px;
+          gap: 4px;
+          padding: 4px 10px;
+          background: rgba(0, 212, 170, 0.08);
+          border-radius: var(--radius-tag);
           cursor: pointer;
-          transition: all 0.2s;
-          margin-top: 8px;
-          
+          transition: background 0.15s ease;
+          margin-top: 6px;
+
           .expand-text {
-            font-size: 13px;
-            color: #8b5cf6;
-            font-weight: 500;
+            font-size: 12px;
+            color: var(--color-accent);
           }
-          
+
           .expand-icon {
             font-size: 10px;
-            color: #8b5cf6;
-            transition: transform 0.3s;
-            
-            &.expanded {
-              transform: rotate(180deg);
-            }
+            color: var(--color-accent);
+            transition: transform 0.2s;
+
+            &.expanded { transform: rotate(180deg); }
           }
-          
-          &:hover {
-            background: rgba(255, 154, 158, 0.15);
-          }
+
+          &:hover { background: rgba(0, 212, 170, 0.15); }
         }
-        
-        .replies-container {
-          margin-top: 12px;
-          padding: 12px;
-          background: rgba(255, 250, 252, 0.5);
-          border-radius: 8px;
-          
+
+        .replies-list {
+          margin-top: 10px;
+          padding-left: 12px;
+          border-left: 2px solid var(--border-color);
+
           .reply-item {
             display: flex;
-            gap: 10px;
-            padding: 10px 0;
-            
-            &:first-child {
-              padding-top: 0;
-            }
-            
-            &:not(:last-child) {
-              border-bottom: 1px solid rgba(255, 182, 193, 0.1);
-            }
-            
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+
+            &:last-child { border-bottom: none; }
+
             .reply-avatar {
               width: 28px;
               height: 28px;
               border-radius: 50%;
-              border: 2px solid #fff;
-              box-shadow: 0 2px 6px rgba(255, 154, 158, 0.15);
+              border: 1px solid var(--border-color);
               flex-shrink: 0;
+              object-fit: cover;
             }
-            
-            .reply-content {
+
+            .reply-main {
               flex: 1;
               min-width: 0;
-              font-size: 14px;
-              line-height: 1.6;
-              
+
               .reply-user {
-                color: #666;
+                font-size: 12px;
                 font-weight: 600;
-                display: block;
+                color: var(--text-secondary);
                 margin-bottom: 4px;
-                
-                &.author {
-                  color: #6366f1;
-                  
-                  &::after {
-                    content: '博主';
-                    margin-left: 6px;
-                    font-size: 10px;
-                    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-                    color: #fff;
-                    padding: 2px 6px;
-                    border-radius: 8px;
-                    font-weight: 600;
-                  }
+
+                &.author { color: var(--color-accent); }
+
+                .reply-to {
+                  color: var(--color-accent-2);
+                  margin: 0 4px;
                 }
               }
-              
+
               .reply-text {
-                color: #333;
-                display: block;
+                font-size: 13px;
+                color: var(--text-secondary);
+                line-height: 1.6;
                 margin-bottom: 6px;
-                
-                .mention {
-                  color: #8b5cf6;
-                  font-weight: 600;
-                }
+                word-break: break-word;
               }
-              
+
               .reply-footer {
                 display: flex;
                 align-items: center;
-                gap: 15px;
-                margin-top: 6px;
-                
+                gap: 12px;
+
                 .reply-time {
-                  font-size: 12px;
-                  color: #aaa;
+                  font-size: 11px;
+                  color: var(--text-tertiary);
                 }
-                
-                .action-btn {
-                  font-size: 12px;
-                  color: #999;
-                  cursor: pointer;
-                  transition: all 0.2s;
-                  
-                  &:hover {
-                    color: #8b5cf6;
-                  }
-                  
-                  &.delete:hover {
-                    color: #4338ca;
+
+                .reply-actions {
+                  display: flex;
+                  gap: 10px;
+
+                  .action-btn {
+                    font-size: 11px;
+                    color: var(--text-tertiary);
+                    cursor: pointer;
+                    background: none;
+                    border: none;
+                    padding: 0;
+                    transition: color 0.15s ease;
+
+                    &:hover { color: var(--color-accent); }
+                    &.delete:hover { color: var(--color-danger); }
                   }
                 }
               }
             }
+          }
+        }
+      }
+    }
+  }
+
+  .comment-input-area {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+
+    .input-box {
+      width: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-btn);
+      padding: 10px 12px;
+      font-size: 14px;
+      color: var(--text-primary);
+      resize: vertical;
+      min-height: 80px;
+      font-family: inherit;
+      transition: border-color 0.15s ease;
+
+      &:focus {
+        outline: none;
+        border-color: var(--color-accent);
+      }
+
+      &::placeholder { color: var(--text-tertiary); }
+    }
+
+    .input-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 8px;
+
+      .submit-btn {
+        padding: 6px 16px;
+        border-radius: var(--radius-btn);
+        background: var(--color-accent);
+        border: none;
+        color: var(--text-inverse);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s ease;
+
+        &:hover { background: #00b894; }
+      }
+    }
+  }
+}
+
+.publish-dialog {
+  .publish-form {
+    .form-textarea {
+      width: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-btn);
+      padding: 12px;
+      font-size: 14px;
+      color: var(--text-primary);
+      resize: vertical;
+      min-height: 120px;
+      font-family: inherit;
+      transition: border-color 0.15s ease;
+
+      &:focus {
+        outline: none;
+        border-color: var(--color-accent);
+      }
+
+      &::placeholder { color: var(--text-tertiary); }
+    }
+
+    .image-upload-section {
+      margin-top: 12px;
+
+      .upload-title {
+        font-size: 13px;
+        color: var(--text-tertiary);
+        margin-bottom: 8px;
+      }
+
+      .image-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        .image-item {
+          position: relative;
+          width: 80px;
+          height: 80px;
+          border-radius: var(--radius-btn);
+          overflow: hidden;
+          border: 1px solid var(--border-color);
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          .remove-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+          }
+        }
+
+        .upload-btn {
+          width: 80px;
+          height: 80px;
+          border: 1px dashed var(--border-color);
+          border-radius: var(--radius-btn);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          color: var(--text-tertiary);
+          font-size: 24px;
+          background: transparent;
+          transition: border-color 0.15s ease;
+
+          &:hover {
+            border-color: var(--color-accent);
+            color: var(--color-accent);
           }
         }
       }
@@ -1505,519 +1605,14 @@ onMounted(() => {
 .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 40px;
-  
-  :deep(.el-pagination) {
-    .btn-prev, .btn-next, .el-pager li {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(252, 182, 159, 0.1);
-      
-      &:hover {
-        color: #8b5cf6;
-      }
-      
-      &.is-active {
-        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-        color: #fff;
-      }
-    }
-  }
+  padding: 24px 0 0;
+  border-top: 1px solid var(--border-color);
+  margin-top: 8px;
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@media (max-width: 768px) {
-  .talk {
-    .container {
-      padding: 20px 15px;
-    }
-  }
-  
-  .page-header {
-    flex-direction: column;
-    text-align: center;
-    padding: 30px 20px;
-    margin-bottom: 25px;
-    gap: 15px;
-    
-    .header-icon {
-      font-size: 50px;
-    }
-    
-    .header-text {
-      h1 {
-        font-size: 28px;
-        margin-bottom: 8px;
-      }
-      
-      p {
-        font-size: 13px;
-      }
-    }
-    
-    .publish-btn {
-      width: 100%;
-      padding: 12px;
-      font-size: 15px;
-    }
-  }
-  
-  .talk-list {
-    gap: 15px;
-  }
-  
-  .talk-item {
-    padding: 20px 15px;
-    
-    .talk-avatar {
-      width: 45px;
-      height: 45px;
-    }
-    
-    .talk-content {
-      .talk-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-        margin-bottom: 12px;
-        
-        .talk-user {
-          font-size: 15px;
-        }
-        
-        .talk-time {
-          font-size: 11px;
-        }
-      }
-      
-      .talk-text {
-        font-size: 14px;
-        line-height: 1.6;
-        margin-bottom: 12px;
-      }
-      
-      .talk-images {
-        gap: 8px;
-        margin-bottom: 12px;
-        
-        .talk-img {
-          height: 100px;
-          
-          &.single {
-            height: 200px;
-          }
-          
-          &.double {
-            height: 150px;
-          }
-        }
-      }
-      
-      .talk-footer {
-        flex-direction: column;
-        gap: 12px;
-        
-        .talk-stats {
-          width: 100%;
-          justify-content: flex-start;
-          gap: 15px;
-          
-          .stat-item {
-            font-size: 12px;
-            
-            .icon {
-              font-size: 14px;
-            }
-          }
-        }
-        
-        .talk-actions {
-          width: 100%;
-          justify-content: flex-start;
-          gap: 15px;
-          
-          .action-btn {
-            font-size: 12px;
-            padding: 5px 12px;
-            
-            .icon {
-              font-size: 14px;
-            }
-          }
-        }
-      }
-    }
-  }
-  
-  .pagination-wrapper {
-    margin-top: 25px;
-    
-    :deep(.el-pagination) {
-      justify-content: center;
-      
-      .el-pager li {
-        min-width: 32px;
-        height: 32px;
-        line-height: 32px;
-        font-size: 13px;
-      }
-      
-      button {
-        padding: 0 8px;
-        font-size: 13px;
-      }
-    }
-  }
-  
-  .empty-state {
-    padding: 60px 20px;
-    
-    .empty-icon {
-      font-size: 60px;
-    }
-    
-    .empty-text {
-      font-size: 14px;
-    }
-  }
-}
-
-// 发表说说弹窗移动端样式
-:deep(.publish-dialog) {
-  @media (max-width: 768px) {
-    .el-dialog {
-      width: 95vw !important;
-      margin: 0 auto;
-    }
-    
-    .el-dialog__header {
-      padding: 15px 20px !important;
-    }
-    
-    .el-dialog__body {
-      padding: 20px 15px !important;
-    }
-    
-    .el-dialog__footer {
-      padding: 15px 20px 20px !important;
-    }
-    
-    .image-list {
-      gap: 10px;
-      
-      .image-item {
-        width: calc(33.333% - 7px);
-        height: 80px;
-        
-        .remove-btn {
-          width: 24px;
-          height: 24px;
-          font-size: 14px;
-        }
-      }
-    }
-    
-    .upload-trigger {
-      width: calc(33.333% - 7px);
-      height: 80px;
-      
-      .upload-icon {
-        font-size: 24px;
-      }
-      
-      .upload-text {
-        font-size: 12px;
-      }
-    }
-  }
-}
-
-/* 发表说说弹框样式 */
-:deep(.el-dialog) {
-  border-radius: 20px;
-  
-  .el-dialog__header {
-    padding: 25px 30px 20px;
-    border-bottom: 1px solid rgba(139, 92, 246, 0.2);
-    
-    .el-dialog__title {
-      font-size: 20px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-  }
-  
-  .el-dialog__body {
-    padding: 25px 30px;
-  }
-  
-  .el-dialog__footer {
-    padding: 15px 30px 25px;
-    border-top: 1px solid rgba(139, 92, 246, 0.2);
-    
-    .el-button {
-      padding: 10px 24px;
-      border-radius: 20px;
-      
-      &--primary {
-        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-        border: none;
-      }
-    }
-  }
-  
-  @media (max-width: 768px) {
-    width: 95vw !important;
-    margin: 0 auto;
-    border-radius: 15px;
-    
-    .el-dialog__header {
-      padding: 20px 15px 15px;
-      
-      .el-dialog__title {
-        font-size: 18px;
-      }
-    }
-    
-    .el-dialog__body {
-      padding: 20px 15px;
-      max-height: 60vh;
-      overflow-y: auto;
-    }
-    
-    .el-dialog__footer {
-      padding: 12px 15px 20px;
-      
-      .el-button {
-        padding: 10px 20px;
-        font-size: 14px;
-        
-        &:first-child {
-          margin-right: 10px;
-        }
-      }
-    }
-  }
-}
-
-.upload-section {
-  width: 100%;
-  
-  .upload-title {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 600;
-    
-    .icon {
-      font-size: 16px;
-    }
-  }
-  
-  .upload-area {
-    border: 2px dashed rgba(139, 92, 246, 0.4);
-    border-radius: 12px;
-    padding: 30px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(99, 102, 241, 0.03) 100%);
-    
-    &:hover {
-      border-color: #8b5cf6;
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
-    }
-    
-    .upload-icon {
-      font-size: 40px;
-      color: #8b5cf6;
-      margin-bottom: 10px;
-    }
-    
-    .upload-text {
-      font-size: 14px;
-      color: #666;
-    }
-  }
-  
-  .image-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
-    
-    .image-item {
-      position: relative;
-      width: 100%;
-      padding-bottom: 100%;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #f5f5f5;
-      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
-      transition: all 0.3s;
-      
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
-        
-        .image-overlay {
-          opacity: 1;
-        }
-      }
-      
-      img {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-      
-      .image-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        opacity: 0;
-        transition: opacity 0.3s;
-        
-        .el-icon {
-          font-size: 20px;
-          color: #fff;
-          cursor: pointer;
-          transition: all 0.3s;
-          
-          &:hover {
-            transform: scale(1.2);
-          }
-          
-          &.delete-icon:hover {
-            color: #4338ca;
-          }
-        }
-      }
-      
-      .upload-progress {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 6px;
-        background: rgba(255, 255, 255, 0.95);
-      }
-    }
-    
-    .upload-btn {
-      position: relative;
-      width: 100%;
-      padding-bottom: 100%;
-      border: 2px dashed rgba(139, 92, 246, 0.4);
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s;
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(99, 102, 241, 0.03) 100%);
-      
-      &:hover {
-        border-color: #8b5cf6;
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
-      }
-      
-      .el-icon {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 28px;
-        color: #8b5cf6;
-      }
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .upload-area {
-      padding: 20px;
-      
-      .upload-icon {
-        font-size: 32px;
-      }
-      
-      .upload-text {
-        font-size: 13px;
-      }
-    }
-    
-    .image-list {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      
-      .image-item {
-        border-radius: 8px;
-        
-        .image-overlay {
-          opacity: 1;
-          background: rgba(0, 0, 0, 0.3);
-          
-          .el-icon {
-            font-size: 18px;
-          }
-        }
-      }
-      
-      .upload-btn {
-        border-radius: 8px;
-        
-        .el-icon {
-          font-size: 24px;
-        }
-      }
-    }
-  }
-}
-
-.status-select {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  
-  .status-label {
-    font-size: 14px;
-    color: #666;
-    font-weight: 600;
-  }
-  
-  :deep(.el-radio-group) {
-    .el-radio {
-      margin-right: 20px;
-      
-      .el-radio__input.is-checked + .el-radio__label {
-        color: #8b5cf6;
-      }
-      
-      .el-radio__input.is-checked .el-radio__inner {
-        background-color: #8b5cf6;
-        border-color: #8b5cf6;
-      }
-    }
+@media (max-width: 640px) {
+  .talk-list .talk-item .talk-images .talk-img {
+    height: 140px;
   }
 }
 </style>

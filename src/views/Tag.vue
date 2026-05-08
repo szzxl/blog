@@ -116,236 +116,153 @@ onMounted(() => {
 <style scoped lang="scss">
 .tag {
   min-height: calc(100vh - 200px);
-  padding: 40px 0;
+  padding: 32px 0 48px;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 30px;
+  padding: 0 24px;
 }
 
 .page-header {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 50px;
-  
-  .header-icon {
-    font-size: 60px;
-    animation: swing 2s ease-in-out infinite;
+  border-left: 3px solid var(--color-accent);
+  padding-left: 16px;
+  margin-bottom: 32px;
+
+  h1 {
+    font-size: 24px;
+    color: var(--text-primary);
+    margin: 0 0 6px 0;
+    font-weight: 700;
   }
-  
-  .header-text {
-    h1 {
-      font-size: 42px;
-      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0 0 8px 0;
-      font-weight: 700;
-    }
-    
-    p {
-      font-size: 16px;
-      color: #999;
-      margin: 0;
-    }
+
+  p {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin: 0;
   }
 }
 
 .tag-cloud {
-  padding: 50px;
-  margin-bottom: 50px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 32px;
+  margin-bottom: 32px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 20px;
-  min-height: 300px;
-  
+  gap: 12px;
+  min-height: 160px;
+
   .tag-item {
     cursor: pointer;
-    padding: 8px 16px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
-    color: #8b5cf6;
-    font-weight: 600;
-    transition: all 0.3s;
+    padding: 6px 14px;
+    border-radius: var(--radius-tag);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all 0.15s ease;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    
+    gap: 4px;
+
     &:hover {
-      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-      color: #fff;
-      transform: scale(1.1);
-      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      box-shadow: var(--shadow-glow);
     }
-    
+
     .tag-count {
       font-size: 0.8em;
-      opacity: 0.8;
+      opacity: 0.7;
     }
   }
 }
 
 .tag-list {
   .list-title {
-    font-size: 28px;
-    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 0 0 30px 0;
-    font-weight: 700;
+    font-size: 16px;
+    color: var(--text-primary);
+    margin: 0 0 20px 0;
+    font-weight: 600;
   }
-  
+
   .tag-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
   }
-  
+
   .tag-card {
-    padding: 25px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-card);
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    transition: all 0.3s;
-    
+    gap: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+
     &:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 30px rgba(139, 92, 246, 0.2);
+      border-color: var(--color-accent);
+      box-shadow: var(--shadow-glow);
+      transform: translateY(-2px);
     }
-    
+
     .tag-header {
       display: flex;
       align-items: center;
-      gap: 10px;
-      
-      .tag-icon {
-        font-size: 24px;
-      }
-      
+      gap: 8px;
+
+      .tag-icon { font-size: 20px; }
+
       .tag-name {
-        font-size: 18px;
-        font-weight: 700;
-        color: #5a5a5a;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-primary);
       }
     }
-    
+
     .tag-info {
       .tag-count {
-        font-size: 14px;
-        color: #999;
-      }
-    }
-    
-    .view-btn {
-      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-      border: none;
-      color: #fff;
-      border-radius: 15px;
-      font-weight: 600;
-      
-      &:hover {
-        opacity: 0.9;
-      }
-    }
-  }
-}
-
-@keyframes swing {
-  0%, 100% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(10deg);
-  }
-  75% {
-    transform: rotate(-10deg);
-  }
-}
-
-@media (max-width: 768px) {
-  .tag {
-    .container {
-      padding: 20px 15px;
-    }
-  }
-  
-  .page-header {
-    flex-direction: column;
-    text-align: center;
-    padding: 30px 20px;
-    margin-bottom: 25px;
-    gap: 15px;
-    
-    .header-icon {
-      font-size: 50px;
-    }
-    
-    .header-text {
-      h1 {
-        font-size: 28px;
-        margin-bottom: 8px;
-      }
-      
-      p {
         font-size: 13px;
+        color: var(--text-tertiary);
+      }
+    }
+
+    .view-btn {
+      background: transparent;
+      border: 1px solid var(--color-accent);
+      color: var(--color-accent);
+      border-radius: var(--radius-btn);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 0;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background: var(--color-accent);
+        color: var(--text-inverse);
       }
     }
   }
-  
-  .tag-cloud {
-    padding: 25px 15px;
-    margin-bottom: 25px;
-    
-    .cloud-title {
-      font-size: 16px;
-      margin-bottom: 15px;
-    }
-    
-    .tag-item {
-      font-size: 13px;
-      padding: 6px 14px;
-    }
-  }
-  
-  .tag-grid {
+}
+
+.empty-state {
+  text-align: center;
+  padding: 64px 20px;
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+@media (max-width: 640px) {
+  .tag-list .tag-grid {
     grid-template-columns: 1fr;
-    gap: 15px;
-  }
-  
-  .tag-card {
-    padding: 20px 18px;
-    
-    .tag-name {
-      font-size: 16px;
-      margin-bottom: 8px;
-    }
-    
-    .tag-count {
-      font-size: 13px;
-    }
-    
-    .tag-arrow {
-      font-size: 18px;
-    }
-  }
-  
-  .empty-state {
-    padding: 60px 20px;
-    
-    .empty-icon {
-      font-size: 60px;
-    }
-    
-    .empty-text {
-      font-size: 14px;
-    }
   }
 }
 </style>
