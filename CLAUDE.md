@@ -7,7 +7,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 npm run dev          # Start dev server on port 80 (proxies /admin-api → localhost:48080)
 npm run build        # Type-check + production build
-npm run build:test   # Type-check + test environment build
 npm run preview      # Preview production build locally
 ```
 
@@ -20,7 +19,7 @@ No test runner is configured. Type checking is done via `vue-tsc -b` as part of 
 ### API Layer (`src/api/`)
 
 All API calls go through a single Axios instance in `request.ts`. The interceptor handles:
-- Auth: reads `ACCESS_TOKEN` from localStorage, which is stored in a nested JSON format `{ c, e, v }` where `v` is the actual token (double-JSON-encoded). Both the router guard and the store parse this same format.
+- Auth: reads `ACCESS_TOKEN` from localStorage via `parseToken()` in `src/utils/token.ts`. Token is stored as `{ c, e, v }` where `v` is the actual token value (double-JSON-encoded). The router guard inlines its own equivalent parsing instead of calling `parseToken` — keep both in sync if the format changes.
 - XSS sanitization of outgoing request bodies (skips FormData)
 - Global loading indicator (suppressed for certain endpoints via `NO_LOADING_APIS`)
 - Silent error suppression for certain endpoints via `SILENT_APIS`
@@ -31,7 +30,7 @@ All API functions are defined in `article.ts` (despite the name, it covers all d
 ### State Management (`src/stores/`)
 
 Two stores:
-- `user.ts` — login state, token, user profile. Initializes synchronously from localStorage on import. Token parsing logic is duplicated between this store and the router guard — both must stay in sync.
+- `user.ts` — login state, token, user profile. Calls `initFromStorage()` synchronously on import to restore session from localStorage. Login stores token in `{ c, e, v }` format with a far-future expiry (`e: '253402300799000'`).
 - `theme.ts` — light/dark/auto mode. Applies theme by setting `data-theme` attribute on `<html>`. CSS variables in `src/styles/global.scss` respond to this attribute.
 
 ### Routing (`src/router/index.ts`)
