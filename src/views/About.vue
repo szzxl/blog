@@ -76,267 +76,158 @@
 <style scoped lang="scss">
 .about {
   min-height: calc(100vh - 200px);
-  padding: 40px 0;
+  padding: 32px 0 48px;
 }
 
 .container {
   max-width: 900px;
   margin: 0 auto;
-  padding: 0 30px;
+  padding: 0 24px;
 }
 
 .page-header {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+  border-left: 3px solid var(--color-accent);
+  padding-left: 16px;
   margin-bottom: 40px;
-  
-  .header-icon {
-    font-size: 60px;
-    animation: flutter 3s ease-in-out infinite;
+
+  h1 {
+    font-size: 24px;
+    color: var(--text-primary);
+    margin: 0 0 6px 0;
+    font-weight: 700;
   }
-  
-  .header-text {
-    h1 {
-      font-size: 42px;
-      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0 0 8px 0;
-      font-weight: 700;
-    }
-    
-    p {
-      font-size: 16px;
-      color: #999;
-      margin: 0;
-    }
+
+  p {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin: 0;
   }
 }
 
 .about-content {
-  padding: 50px;
-  
   .intro-section {
     text-align: center;
     margin-bottom: 40px;
-    
+
     .intro-icon {
-      font-size: 80px;
-      margin-bottom: 20px;
-      animation: float 3s ease-in-out infinite;
+      font-size: 56px;
+      margin-bottom: 16px;
+      display: block;
     }
-    
+
     .intro-title {
-      font-size: 32px;
-      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0 0 30px 0;
+      font-size: 22px;
+      color: var(--text-primary);
+      margin: 0 0 20px 0;
       font-weight: 700;
     }
-    
+
     .intro-text {
-      font-size: 16px;
+      font-size: 15px;
       line-height: 1.8;
-      color: #666;
+      color: var(--text-secondary);
       max-width: 600px;
       margin: 0 auto;
-      
+
       p {
-        margin: 15px 0;
-        
+        margin: 12px 0;
+
         strong {
-          color: #8b5cf6;
-          font-weight: 700;
+          color: var(--color-accent);
+          font-weight: 600;
         }
       }
     }
   }
-  
+
   .divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.2), transparent);
-    margin: 40px 0;
+    background: var(--border-color);
+    margin: 32px 0;
   }
-  
+
   .tech-section,
   .contact-section {
-    margin-bottom: 40px;
-    
+    margin-bottom: 32px;
+
     .section-title {
-      font-size: 24px;
-      color: #333;
-      margin: 0 0 25px 0;
-      font-weight: 700;
+      font-size: 16px;
+      color: var(--text-primary);
+      margin: 0 0 20px 0;
+      font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
   }
-  
+
   .tech-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    
+    gap: 8px;
+
     .tech-tag {
-      padding: 10px 20px;
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
-      border: 2px solid rgba(139, 92, 246, 0.3);
-      border-radius: 20px;
-      color: #8b5cf6;
-      font-size: 14px;
-      font-weight: 600;
-      transition: all 0.3s;
-      
+      padding: 6px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-tag);
+      color: var(--text-secondary);
+      font-size: 13px;
+      transition: all 0.15s ease;
+
       &:hover {
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%);
-        border-color: #8b5cf6;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+        border-color: var(--color-accent);
+        color: var(--color-accent);
       }
     }
   }
-  
+
   .contact-text {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.8;
-    color: #666;
-    margin: 0 0 25px 0;
+    color: var(--text-secondary);
+    margin: 0 0 20px 0;
   }
-  
+
   .contact-info {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    
+    gap: 12px;
+
     .contact-item {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 15px 20px;
-      background: rgba(139, 92, 246, 0.05);
-      border-radius: 12px;
-      border-left: 4px solid #8b5cf6;
-      
-      .contact-icon {
-        font-size: 24px;
-      }
-      
+      padding: 12px 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-card);
+      border-left: 3px solid var(--color-accent);
+
+      .contact-icon { font-size: 18px; }
+
       .contact-label {
-        font-weight: 600;
-        color: #666;
-        min-width: 60px;
+        font-size: 13px;
+        color: var(--text-tertiary);
+        min-width: 48px;
       }
-      
+
       .contact-value {
-        color: #8b5cf6;
-        font-weight: 500;
+        font-size: 14px;
+        color: var(--color-accent);
       }
     }
   }
-  
+
   .footer-note {
     text-align: center;
-    margin-top: 40px;
-    padding-top: 30px;
-    border-top: 1px dashed rgba(139, 92, 246, 0.2);
-    
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-color);
+
     p {
-      font-size: 18px;
-      color: #8b5cf6;
+      font-size: 14px;
+      color: var(--text-tertiary);
       margin: 0;
-      font-weight: 600;
-    }
-  }
-}
-
-@keyframes flutter {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  25% {
-    transform: translateY(-10px) rotate(-5deg);
-  }
-  75% {
-    transform: translateY(-5px) rotate(5deg);
-  }
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-15px);
-  }
-}
-
-@media (max-width: 768px) {
-  .page-header {
-    flex-direction: column;
-    text-align: center;
-    
-    .header-icon {
-      font-size: 50px;
-    }
-    
-    .header-text h1 {
-      font-size: 32px;
-    }
-  }
-  
-  .about-content {
-    padding: 30px 20px;
-    
-    .intro-section {
-      .intro-icon {
-        font-size: 60px;
-      }
-      
-      .intro-title {
-        font-size: 26px;
-      }
-      
-      .intro-text {
-        font-size: 15px;
-      }
-    }
-    
-    .tech-section,
-    .contact-section {
-      .section-title {
-        font-size: 20px;
-      }
-    }
-    
-    .tech-tags {
-      gap: 10px;
-      
-      .tech-tag {
-        padding: 8px 16px;
-        font-size: 13px;
-      }
-    }
-    
-    .contact-info {
-      .contact-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-        padding: 12px 15px;
-        
-        .contact-label {
-          min-width: auto;
-        }
-      }
-    }
-    
-    .footer-note p {
-      font-size: 16px;
     }
   }
 }

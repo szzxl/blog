@@ -344,235 +344,156 @@ const submitMessage = async () => {
 <style scoped lang="scss">
 .guestbook {
   min-height: calc(100vh - 200px);
-  padding: 40px 0;
+  padding: 32px 0 48px;
 }
 
 .container {
   max-width: 900px;
   margin: 0 auto;
-  padding: 0 30px;
+  padding: 0 24px;
 }
 
 .page-header {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 40px;
-  
-  .header-icon {
-    font-size: 60px;
-    animation: bounce 2s ease-in-out infinite;
+  border-left: 3px solid var(--color-accent);
+  padding-left: 16px;
+  margin-bottom: 32px;
+
+  h1 {
+    font-size: 24px;
+    color: var(--text-primary);
+    margin: 0 0 6px 0;
+    font-weight: 700;
   }
-  
-  .header-text {
-    h1 {
-      font-size: 42px;
-      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0 0 8px 0;
-      font-weight: 700;
-    }
-    
-    p {
-      font-size: 16px;
-      color: #999;
-      margin: 0;
-    }
+
+  p {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin: 0;
   }
 }
 
 .message-form {
-  padding: 35px;
-  margin-bottom: 40px;
-  
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  margin-bottom: 32px;
+
   .form-title {
-    font-size: 24px;
-    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 0 0 25px 0;
-    font-weight: 700;
+    font-size: 16px;
+    color: var(--text-primary);
+    margin: 0 0 20px 0;
+    font-weight: 600;
   }
-  
+
   .el-form-item {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
   }
-  
-  .el-input {
-    :deep(.el-input__wrapper) {
-      padding: 12px 18px;
-      border-radius: 15px;
-      box-shadow: 0 2px 12px rgba(139, 92, 246, 0.1);
-      border: 2px solid rgba(139, 92, 246, 0.2);
-      transition: all 0.3s;
-      
-      &:hover {
-        box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
-        border-color: rgba(139, 92, 246, 0.3);
-      }
-      
-      &.is-focus {
-        border-color: #8b5cf6;
-        box-shadow: 0 4px 20px rgba(139, 92, 246, 0.25);
-      }
-    }
-    
-    :deep(.el-input__prefix) {
-      color: #8b5cf6;
-    }
-  }
-  
-  .el-textarea {
-    :deep(.el-textarea__inner) {
-      padding: 15px;
-      border-radius: 15px;
-      box-shadow: 0 2px 12px rgba(139, 92, 246, 0.1);
-      border: 2px solid rgba(139, 92, 246, 0.2);
-      transition: all 0.3s;
-      
-      &:hover {
-        box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
-        border-color: rgba(139, 92, 246, 0.3);
-      }
-      
-      &:focus {
-        border-color: #8b5cf6;
-        box-shadow: 0 4px 20px rgba(139, 92, 246, 0.25);
-      }
-    }
-  }
-  
+
   .submit-btn {
     width: 100%;
-    height: 48px;
-    border-radius: 24px;
-    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    height: 40px;
+    border-radius: var(--radius-btn);
+    background: var(--color-accent);
     border: none;
-    font-size: 16px;
-    font-weight: 700;
-    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
-    transition: all 0.3s;
-    
-    .btn-icon {
-      margin-right: 8px;
-      font-size: 18px;
-    }
-    
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-inverse);
+    cursor: pointer;
+    transition: background 0.15s ease;
+
     &:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 35px rgba(139, 92, 246, 0.5);
+      background: #00b894;
     }
   }
-  
+
   .login-tip {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 15px 20px;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
-    border-radius: 15px;
-    border: 2px solid rgba(139, 92, 246, 0.2);
-    
-    .tip-icon {
-      font-size: 20px;
-    }
-    
+    padding: 12px 16px;
+    background: var(--bg-primary);
+    border-radius: var(--radius-btn);
+    border: 1px solid var(--border-color);
+
     .tip-text {
-      font-size: 14px;
-      color: #666;
-      
+      font-size: 13px;
+      color: var(--text-secondary);
+
       .login-link {
-        color: #8b5cf6;
-        font-weight: 700;
+        color: var(--color-accent);
+        font-weight: 600;
         text-decoration: none;
-        transition: all 0.3s;
-        
+
         &:hover {
-          color: #6366f1;
           text-decoration: underline;
         }
       }
     }
   }
-  
+
   .upload-section {
     width: 100%;
-    
+
     .upload-title {
-      font-size: 15px;
-      color: #666;
-      margin-bottom: 15px;
+      font-size: 13px;
+      color: var(--text-tertiary);
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       font-weight: 600;
-      
-      .icon {
-        font-size: 18px;
-      }
     }
-    
+
     .upload-area {
-      border: 2px dashed rgba(139, 92, 246, 0.4);
-      border-radius: 15px;
-      padding: 40px;
+      border: 1px dashed var(--border-color);
+      border-radius: var(--radius-btn);
+      padding: 32px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.3s;
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(99, 102, 241, 0.03) 100%);
-      
+      transition: all 0.15s ease;
+
       &:hover {
-        border-color: #8b5cf6;
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
-        transform: translateY(-2px);
+        border-color: var(--color-accent);
+        background: rgba(0, 212, 170, 0.04);
       }
-      
+
       .upload-icon {
-        font-size: 48px;
-        color: #8b5cf6;
-        margin-bottom: 15px;
+        font-size: 32px;
+        color: var(--text-tertiary);
+        margin-bottom: 10px;
       }
-      
+
       .upload-text {
-        font-size: 16px;
-        color: #666;
-        margin-bottom: 8px;
-        font-weight: 600;
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
       }
-      
+
       .upload-tip {
-        font-size: 13px;
-        color: #999;
+        font-size: 12px;
+        color: var(--text-tertiary);
       }
     }
-    
+
     .image-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 12px;
-      
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+
       .image-item {
         position: relative;
         width: 100%;
         padding-bottom: 100%;
-        border-radius: 12px;
+        border-radius: var(--radius-btn);
         overflow: hidden;
-        background: #f5f5f5;
-        box-shadow: 0 2px 12px rgba(139, 92, 246, 0.15);
-        transition: all 0.3s;
-        
-        &:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 6px 20px rgba(139, 92, 246, 0.25);
-          
-          .image-overlay {
-            opacity: 1;
-          }
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+
+        &:hover .image-overlay {
+          opacity: 1;
         }
-        
+
         img {
           position: absolute;
           top: 0;
@@ -581,260 +502,64 @@ const submitMessage = async () => {
           height: 100%;
           object-fit: cover;
         }
-        
+
         .image-overlay {
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.5);
+          inset: 0;
+          background: rgba(0, 0, 0, 0.6);
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 15px;
+          gap: 12px;
           opacity: 0;
-          transition: opacity 0.3s;
-          
+          transition: opacity 0.15s ease;
+
           .el-icon {
-            font-size: 24px;
+            font-size: 20px;
             color: #fff;
             cursor: pointer;
-            transition: all 0.3s;
-            
-            &:hover {
-              transform: scale(1.2);
-            }
-            
-            &.delete-icon:hover {
-              color: #4338ca;
-            }
           }
         }
-        
+
         .upload-progress {
           position: absolute;
           bottom: 0;
           left: 0;
           right: 0;
-          padding: 8px;
-          background: rgba(255, 255, 255, 0.95);
+          padding: 6px;
+          background: rgba(10, 10, 15, 0.8);
         }
       }
-      
+
       .upload-btn {
         position: relative;
         width: 100%;
         padding-bottom: 100%;
-        border: 2px dashed rgba(139, 92, 246, 0.4);
-        border-radius: 12px;
+        border: 1px dashed var(--border-color);
+        border-radius: var(--radius-btn);
         cursor: pointer;
-        transition: all 0.3s;
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(99, 102, 241, 0.03) 100%);
-        
+        transition: all 0.15s ease;
+
         &:hover {
-          border-color: #8b5cf6;
-          background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
-          transform: translateY(-3px);
+          border-color: var(--color-accent);
         }
-        
+
         .el-icon {
           position: absolute;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          font-size: 32px;
-          color: #8b5cf6;
+          font-size: 24px;
+          color: var(--text-tertiary);
         }
       }
     }
   }
 }
 
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@media (max-width: 768px) {
-  .guestbook {
-    .container {
-      padding: 20px 15px;
-    }
-  }
-  
-  .page-header {
-    flex-direction: column;
-    text-align: center;
-    padding: 30px 20px;
-    margin-bottom: 25px;
-    gap: 15px;
-    
-    .header-icon {
-      font-size: 50px;
-    }
-    
-    .header-text {
-      h1 {
-        font-size: 28px;
-        margin-bottom: 8px;
-      }
-      
-      p {
-        font-size: 13px;
-      }
-    }
-  }
-  
+@media (max-width: 640px) {
   .message-form {
-    padding: 20px 15px;
-    margin-bottom: 25px;
-    
-    .form-title {
-      font-size: 18px;
-      margin-bottom: 20px;
-    }
-    
-    .image-list {
-      gap: 10px;
-      
-      .image-item {
-        width: calc(33.333% - 7px);
-        height: 80px;
-        
-        .remove-btn {
-          width: 24px;
-          height: 24px;
-          font-size: 14px;
-        }
-      }
-    }
-    
-    .upload-trigger {
-      width: calc(33.333% - 7px);
-      height: 80px;
-      
-      .upload-icon {
-        font-size: 24px;
-      }
-      
-      .upload-text {
-        font-size: 12px;
-      }
-    }
-    
-    .form-footer {
-      flex-direction: column;
-      gap: 10px;
-      
-      .char-count {
-        order: -1;
-        width: 100%;
-        text-align: right;
-        font-size: 12px;
-      }
-      
-      .submit-btn {
-        width: 100%;
-        padding: 12px;
-        font-size: 15px;
-      }
-    }
-  }
-  
-  .message-list {
-    gap: 15px;
-  }
-  
-  .message-item {
-    padding: 20px 15px;
-    
-    .message-avatar {
-      width: 45px;
-      height: 45px;
-    }
-    
-    .message-content {
-      .message-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-        margin-bottom: 12px;
-        
-        .message-user {
-          font-size: 15px;
-        }
-        
-        .message-time {
-          font-size: 11px;
-        }
-      }
-      
-      .message-text {
-        font-size: 14px;
-        line-height: 1.6;
-        margin-bottom: 12px;
-      }
-      
-      .message-images {
-        gap: 8px;
-        margin-bottom: 12px;
-        
-        .message-image {
-          width: calc(33.333% - 6px);
-          height: 80px;
-        }
-      }
-      
-      .message-actions {
-        gap: 15px;
-        
-        .action-btn {
-          font-size: 12px;
-          padding: 5px 12px;
-          
-          .icon {
-            font-size: 14px;
-          }
-        }
-      }
-    }
-  }
-  
-  .pagination-wrapper {
-    margin-top: 25px;
-    
-    :deep(.el-pagination) {
-      justify-content: center;
-      
-      .el-pager li {
-        min-width: 32px;
-        height: 32px;
-        line-height: 32px;
-        font-size: 13px;
-      }
-      
-      button {
-        padding: 0 8px;
-        font-size: 13px;
-      }
-    }
-  }
-  
-  .empty-state {
-    padding: 60px 20px;
-    
-    .empty-icon {
-      font-size: 60px;
-    }
-    
-    .empty-text {
-      font-size: 14px;
-    }
+    padding: 16px;
   }
 }
 </style>
