@@ -73,6 +73,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Carousel from '@/components/Carousel.vue'
 import { getMonthArticleList } from '@/api/article'
+import { formatDate } from '@/utils/format'
 
 const router = useRouter()
 
@@ -117,11 +118,7 @@ const fetchArticles = async () => {
 
 const formatTime = (timestamp?: number) => {
   if (!timestamp) return ''
-  const date = new Date(timestamp)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
+  return formatDate(new Date(timestamp), 'YYYY-MM-DD')
 }
 
 const parseTags = (tagStr?: string) => {

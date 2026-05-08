@@ -4,6 +4,7 @@ import { ElMessage } from 'element-plus'
 import router from '@/router'
 import { showLoading, hideLoading } from '@/utils/loading'
 import { sanitizeInput } from '@/utils/security'
+import { parseToken } from '@/utils/token'
 
 // 公开接口列表（不需要登录的接口）
 const PUBLIC_APIS = [
@@ -64,21 +65,7 @@ service.interceptors.request.use(
       showLoading()
     }
     
-    // 从 localStorage 获取 token（使用管理后台的 key）
-    const tokenStr = localStorage.getItem('ACCESS_TOKEN')
-    
-    // 解析管理后台的 token 格式
-    let token = ''
-    if (tokenStr) {
-      try {
-        const tokenObj = JSON.parse(tokenStr)
-        // 管理后台的 token 格式：{ c: 创建时间, e: 过期时间, v: token值 }
-        token = tokenObj.v ? JSON.parse(tokenObj.v) : tokenStr
-      } catch {
-        // 如果解析失败，直接使用原始值
-        token = tokenStr
-      }
-    }
+    const token = parseToken(localStorage.getItem('ACCESS_TOKEN'))
     
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`

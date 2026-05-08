@@ -20,41 +20,14 @@
       
       <!-- PC 端导航 -->
       <nav class="nav desktop-nav">
-        <router-link to="/" class="nav-item">
-          <span class="nav-icon">🏠</span>
-          <span class="nav-text">首页</span>
-        </router-link>
-        <router-link to="/articles" class="nav-item">
-          <span class="nav-icon">📝</span>
-          <span class="nav-text">文章</span>
-        </router-link>
-        <router-link to="/category" class="nav-item">
-          <span class="nav-icon">📂</span>
-          <span class="nav-text">分类</span>
-        </router-link>
-        <router-link to="/tag" class="nav-item">
-          <span class="nav-icon">🏷️</span>
-          <span class="nav-text">标签</span>
-        </router-link>
-        <router-link to="/talk" class="nav-item">
-          <span class="nav-icon">💬</span>
-          <span class="nav-text">说说</span>
-        </router-link>
-        <router-link to="/album" class="nav-item">
-          <span class="nav-icon">📷</span>
-          <span class="nav-text">相册</span>
-        </router-link>
-        <router-link to="/guestbook" class="nav-item">
-          <span class="nav-icon">✍️</span>
-          <span class="nav-text">留言板</span>
-        </router-link>
-        <router-link to="/link" class="nav-item">
-          <span class="nav-icon">🔗</span>
-          <span class="nav-text">友链</span>
-        </router-link>
-        <router-link to="/about" class="nav-item">
-          <span class="nav-icon">👨‍💻</span>
-          <span class="nav-text">关于</span>
+        <router-link
+          v-for="item in navItems"
+          :key="item.to"
+          :to="item.to"
+          class="nav-item"
+        >
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-text">{{ item.text }}</span>
         </router-link>
       </nav>
     </div>
@@ -116,56 +89,22 @@
     </template>
     
     <nav class="mobile-nav">
-      <router-link to="/" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">🏠</span>
-        <span class="nav-text">首页</span>
-        <span class="nav-arrow">›</span>
-      </router-link>
-      <router-link to="/articles" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">📝</span>
-        <span class="nav-text">文章</span>
-        <span class="nav-arrow">›</span>
-      </router-link>
-      <router-link to="/category" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">📂</span>
-        <span class="nav-text">分类</span>
-        <span class="nav-arrow">›</span>
-      </router-link>
-      <router-link to="/tag" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">🏷️</span>
-        <span class="nav-text">标签</span>
-        <span class="nav-arrow">›</span>
-      </router-link>
-      <router-link to="/talk" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">💬</span>
-        <span class="nav-text">说说</span>
-        <span class="nav-arrow">›</span>
-      </router-link>
-      <router-link to="/album" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">📷</span>
-        <span class="nav-text">相册</span>
-        <span class="nav-arrow">›</span>
-      </router-link>
-      <router-link to="/guestbook" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">✍️</span>
-        <span class="nav-text">留言板</span>
-        <span class="nav-arrow">›</span>
-      </router-link>
-      <router-link to="/link" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">🔗</span>
-        <span class="nav-text">友链</span>
-        <span class="nav-arrow">›</span>
-      </router-link>
-      <router-link to="/about" class="mobile-nav-item" @click="showMobileMenu = false">
-        <span class="nav-icon">👨‍💻</span>
-        <span class="nav-text">关于</span>
+      <router-link
+        v-for="item in navItems"
+        :key="item.to"
+        :to="item.to"
+        class="mobile-nav-item"
+        @click="showMobileMenu = false"
+      >
+        <span class="nav-icon">{{ item.icon }}</span>
+        <span class="nav-text">{{ item.text }}</span>
         <span class="nav-arrow">›</span>
       </router-link>
       
       <!-- 移动端用户操作 -->
       <div class="mobile-user-actions" v-if="userStore.isLoggedIn">
         <div class="divider"></div>
-        <button class="mobile-nav-item" @click="handleMobileThemeToggle">
+        <button class="mobile-nav-item" @click="toggleTheme">
           <span class="nav-icon">{{ themeIcon }}</span>
           <span class="nav-text">{{ themeStore.appliedTheme === 'dark' ? '浅色模式' : '深色模式' }}</span>
           <span class="nav-arrow">›</span>
@@ -188,7 +127,7 @@
       </div>
       <div class="mobile-user-actions" v-else>
         <div class="divider"></div>
-        <button class="mobile-nav-item" @click="handleMobileThemeToggle">
+        <button class="mobile-nav-item" @click="toggleTheme">
           <span class="nav-icon">{{ themeIcon }}</span>
           <span class="nav-text">{{ themeStore.appliedTheme === 'dark' ? '浅色模式' : '深色模式' }}</span>
           <span class="nav-arrow">›</span>
@@ -351,6 +290,18 @@ import { ElMessage } from 'element-plus'
 const router = useRouter()
 const userStore = useUserStore()
 const themeStore = useThemeStore()
+
+const navItems = [
+  { to: '/', icon: '🏠', text: '首页' },
+  { to: '/articles', icon: '📝', text: '文章' },
+  { to: '/category', icon: '📂', text: '分类' },
+  { to: '/tag', icon: '🏷️', text: '标签' },
+  { to: '/talk', icon: '💬', text: '说说' },
+  { to: '/album', icon: '📷', text: '相册' },
+  { to: '/guestbook', icon: '✍️', text: '留言板' },
+  { to: '/link', icon: '🔗', text: '友链' },
+  { to: '/about', icon: '👨‍💻', text: '关于' },
+]
 
 const siteName = ref('')
 const siteDescription = ref('')
@@ -581,21 +532,17 @@ const handleAvatarUpload = async (event: Event) => {
     // 1. 上传图片
     const uploadResponse: any = await uploadImage(file)
     
-    console.log('上传响应:', uploadResponse) // 调试日志
-    
-    // 尝试多种可能的字段名
-    const avatarUrl = uploadResponse?.url || 
-                     uploadResponse?.data?.url || 
-                     uploadResponse?.path || 
-                     uploadResponse?.data?.path || 
-                     uploadResponse?.data || 
+    const avatarUrl = uploadResponse?.url ||
+                     uploadResponse?.data?.url ||
+                     uploadResponse?.path ||
+                     uploadResponse?.data?.path ||
+                     uploadResponse?.data ||
                      uploadResponse
     
     console.log('解析的头像URL:', avatarUrl) // 调试日志
     
     if (!avatarUrl || typeof avatarUrl !== 'string') {
       loadingMessage.close()
-      console.error('无效的上传响应:', uploadResponse)
       ElMessage.error('上传失败：无法获取图片地址')
       return
     }
@@ -619,7 +566,6 @@ const handleAvatarUpload = async (event: Event) => {
     // 不自动关闭弹窗，让用户继续查看或编辑其他信息
   } catch (error: any) {
     loadingMessage.close()
-    console.error('头像上传错误:', error)
     ElMessage.error(error.msg || error.message || '上传失败，请重试')
   } finally {
     // 清空 input，允许重复选择同一文件
@@ -683,11 +629,6 @@ const handleMobileCommand = async (command: string) => {
 const handleMobileLogin = () => {
   showMobileMenu.value = false
   goToLogin()
-}
-
-// 移动端主题切换
-const handleMobileThemeToggle = () => {
-  toggleTheme()
 }
 
 onMounted(async () => {
@@ -1341,37 +1282,6 @@ onMounted(async () => {
   transition: all 0.3s;
   flex-shrink: 0;
   margin-right: 12px;
-  
-  .menu-icon {
-    font-size: 24px;
-    color: #fff;
-  }
-  
-  &:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
-  }
-  
-  &:active {
-    transform: scale(0.95);
-  }
-}
-
-// 移动端汉堡菜单按钮（右侧 - 废弃）
-.mobile-menu-btn {
-  display: none;
-  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-  border: none;
-  border-radius: 12px;
-  width: 45px;
-  height: 45px;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-  transition: all 0.3s;
-  position: fixed !important;
-  right: 15px !important;
-  top: 12px !important;
-  z-index: 1001 !important;
   
   .menu-icon {
     font-size: 24px;
