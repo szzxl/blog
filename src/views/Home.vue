@@ -1,67 +1,59 @@
 <template>
   <div class="home">
-    <div class="carousel-wrapper">
-      <Carousel />
-    </div>
-    
-    <div class="container">
-      <div class="section-header">
-        <div class="section-icon">💌</div>
-        <div class="section-text">
-          <h2>最新文章</h2>
-          <!-- <p>记录生活中的小确幸</p> -->
+    <!-- Hero 区 -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1 class="hero-title">{{ siteName || '博客' }}</h1>
+          <p class="hero-desc">{{ siteDescription || '记录技术与生活' }}</p>
         </div>
       </div>
-      
+    </section>
+
+    <!-- 文章网格 -->
+    <div class="container">
+      <div class="section-title">
+        <span>最新文章</span>
+      </div>
+
       <div class="article-grid" v-loading="loading">
-        <div class="article-card card" v-for="article in articles" :key="article.id" @click="viewArticle(article.id)">
-          <div class="article-badge">NEW</div>
-          
-          <!-- 标识标签 -->
-          <div class="badges" v-if="article.isTop === 1 || article.isRecommend === 1">
-            <span class="badge badge-top" v-if="article.isTop === 1">📌 置顶</span>
-            <span class="badge badge-recommend" v-if="article.isRecommend === 1">⭐ 推荐</span>
+        <div
+          class="article-card card"
+          v-for="article in articles"
+          :key="article.id"
+          @click="viewArticle(article.id)"
+        >
+          <div class="card-badges" v-if="article.isTop === 1 || article.isRecommend === 1">
+            <span class="badge-top" v-if="article.isTop === 1">置顶</span>
+            <span class="badge-recommend" v-if="article.isRecommend === 1">推荐</span>
           </div>
-          
-          <div class="article-cover">
-            <img :src="article.articleCover || '/default-cover.svg'" alt="文章封面">
-            <div class="cover-overlay">
-              <span class="read-more">阅读全文 →</span>
-            </div>
+
+          <div class="card-cover">
+            <img :src="article.articleCover || '/default-cover.svg'" :alt="article.articleName">
           </div>
-          <div class="article-info">
-            <h3 class="article-title">✨ {{ article.articleName }}</h3>
-            <p class="article-desc" v-if="article.articleCategory">
-              <span class="category-badge">📂 {{ article.articleCategory }}</span>
-            </p>
-            <div class="article-meta">
-              <span class="meta-item">
-                <span class="icon">📅</span>
-                {{ formatTime(article.createTime) }}
-              </span>
-              <span class="meta-item" v-if="article.readNum !== undefined">
-                <span class="icon">👁️</span>
-                {{ article.readNum }}
-              </span>
-              <span class="meta-item" v-if="article.likeCount">
-                <span class="icon">💗</span>
-                {{ article.likeCount }}
-              </span>
-              <span class="meta-item" v-if="article.commentCount">
-                <span class="icon">💬</span>
-                {{ article.commentCount }}
-              </span>
+
+          <div class="card-body">
+            <h3 class="card-title">{{ article.articleName }}</h3>
+            <p class="card-abstract" v-if="article.articleAbstract">{{ article.articleAbstract }}</p>
+
+            <div class="card-meta">
+              <span v-if="article.articleCategory" class="meta-category">{{ article.articleCategory }}</span>
+              <span class="meta-date">{{ formatTime(article.createTime) }}</span>
+              <span v-if="article.readNum !== undefined" class="meta-read">{{ article.readNum }} 阅读</span>
             </div>
-            <div class="article-tags" v-if="article.articleTag">
-              <span class="tag-item" v-for="(tag, index) in parseTags(article.articleTag).slice(0, 2)" :key="index">🌸 {{ tag }}</span>
+
+            <div class="card-tags" v-if="article.articleTag">
+              <span
+                class="tag"
+                v-for="(tag, i) in parseTags(article.articleTag).slice(0, 3)"
+                :key="i"
+              >{{ tag }}</span>
             </div>
           </div>
         </div>
-        
-        <!-- 空状态 -->
+
         <div v-if="!loading && articles.length === 0" class="empty-state">
-          <div class="empty-icon">📝</div>
-          <div class="empty-text">暂无文章</div>
+          <p>暂无文章</p>
         </div>
       </div>
     </div>
@@ -71,9 +63,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import Carousel from '@/components/Carousel.vue'
 import { getMonthArticleList } from '@/api/article'
 import { formatDate } from '@/utils/format'
+import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
 
 const router = useRouter()
 
@@ -94,25 +86,29 @@ interface Article {
 
 const articles = ref<Article[]>([])
 const loading = ref(false)
+const siteName = ref('')
+const siteDescription = ref('')
 
-// 获取最新文章
 const fetchArticles = async () => {
   loading.value = true
   try {
-    const res: any = await getMonthArticleList({
-      pageNo: 1,
-      pageSize: 3
-    })
-    
-    if (res && res.list) {
-      articles.value = res.list
-    } else if (Array.isArray(res)) {
-      articles.value = res.slice(0, 3)
-    }
-  } catch (error) {
-    // 获取文章列表失败
+    const res: any = await getMonthArticleList({ pageNo: 1, pageSize: 9 })
+    if (res && res.list) articles.value = res.list
+    else if (Array.isArray(res)) articles.value = res
+  } catch {
+    // 静默失败
   } finally {
     loading.value = false
+  }
+}
+
+const fetchConfig = async () => {
+  try {
+    const config = await fetchWebsiteConfigWithCache()
+    if (config.site_name) siteName.value = config.site_name
+    if (config.site_description) siteDescription.value = config.site_description
+  } catch {
+    // 静默失败
   }
 }
 
@@ -132,426 +128,196 @@ const viewArticle = (id: number) => {
 
 onMounted(() => {
   fetchArticles()
+  fetchConfig()
 })
 </script>
 
 <style scoped lang="scss">
 .home {
   min-height: calc(100vh - 200px);
-  position: relative;
-  
-  .carousel-wrapper {
-    position: relative;
-    z-index: 1;
-    isolation: isolate;
+}
+
+.hero {
+  padding: 48px 0 40px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 40px;
+
+  .hero-content {
+    max-width: 600px;
+  }
+
+  .hero-title {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  .hero-desc {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
   }
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 30px 40px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.section-header {
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 24px;
   display: flex;
   align-items: center;
-  gap: 15px;
-  margin-bottom: 25px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  padding: 15px 20px;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  
-  .section-icon {
-    font-size: 36px;
-    animation: bounce 2s ease-in-out infinite;
-  }
-  
-  .section-text {
-    h2 {
-      font-size: 28px;
-      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 0;
-      font-weight: 700;
-    }
-    
-    p {
-      color: #999;
-      font-size: 14px;
-    }
+  gap: 12px;
+
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-color);
   }
 }
 
 .article-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding-bottom: 48px;
 }
 
 .article-card {
-  overflow: visible;
   cursor: pointer;
+  overflow: hidden;
   position: relative;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(139, 92, 246, 0.2);
-  }
-  
-  .article-badge {
+
+  .card-badges {
     position: absolute;
-    top: -10px;
-    right: -10px;
-    background: linear-gradient(135deg, #4338ca 0%, #8b5cf6 100%);
-    color: #fff;
-    padding: 5px 15px;
-    border-radius: 15px;
-    font-size: 12px;
-    font-weight: 700;
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
-    z-index: 10;
-    animation: pulse 2s ease-in-out infinite;
-  }
-  
-  .badges {
-    position: absolute;
-    top: 15px;
-    left: 15px;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
     display: flex;
-    gap: 8px;
-    z-index: 10;
-    
-    .badge {
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      
-      &.badge-top {
-        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
-        color: #fff;
-      }
-      
-      &.badge-recommend {
-        background: linear-gradient(135deg, #ffd93d 0%, #ffb800 100%);
-        color: #333;
-      }
-    }
+    gap: 6px;
   }
-  
-  .article-cover {
-    position: relative;
-    width: 100%;
-    height: 180px;
+
+  .badge-top {
+    padding: 2px 8px;
+    border-radius: var(--radius-tag);
+    background: var(--color-danger);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .badge-recommend {
+    padding: 2px 8px;
+    border-radius: var(--radius-tag);
+    background: var(--color-warning);
+    color: var(--text-inverse);
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .card-cover {
+    aspect-ratio: 16/9;
     overflow: hidden;
-    border-radius: 15px;
-    margin-bottom: 15px;
-    
+
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.5s;
-    }
-    
-    .cover-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.85) 0%, rgba(99, 102, 241, 0.85) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.3s;
-      
-      .read-more {
-        color: #fff;
-        font-size: 18px;
-        font-weight: 700;
-        transform: translateY(10px);
-        transition: transform 0.3s;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-      }
+      transition: transform 0.3s ease;
     }
   }
-  
-  &:hover .article-cover {
-    img {
-      transform: scale(1.15) rotate(2deg);
-    }
-    
-    .cover-overlay {
-      opacity: 1;
-      
-      .read-more {
-        transform: translateY(0);
-      }
-    }
-  }
-  
-  .article-info {
-    .article-title {
-      font-size: 18px;
-      color: #5a5a5a;
-      margin-bottom: 10px;
-      font-weight: 700;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    
-    .article-desc {
-      color: #888;
-      font-size: 13px;
-      line-height: 1.6;
-      margin-bottom: 12px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      
-      .category-badge {
-        display: inline-block;
-        padding: 3px 10px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%);
-        color: #8b5cf6;
-        font-size: 12px;
-        font-weight: 600;
-      }
-    }
-    
-    .article-meta {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 12px;
-      
-      .meta-item {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 12px;
-        color: #aaa;
-        
-        .icon {
-          font-size: 13px;
-        }
-      }
-    }
-    
-    .article-tags {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      
-      .tag-item {
-        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-        color: #fff;
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 11px;
-        box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
-        font-weight: 600;
-      }
-    }
-  }
-}
 
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
+  &:hover .card-cover img {
+    transform: scale(1.04);
   }
-  to {
-    transform: rotate(360deg);
-  }
-}
 
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
+  .card-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
-  50% {
-    transform: translateY(-10px);
-  }
-}
 
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
+  .card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0;
   }
-  50% {
-    transform: scale(1.05);
+
+  .card-abstract {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    span {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    .meta-category {
+      color: var(--color-accent-2);
+    }
+  }
+
+  .card-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    padding: 2px 8px;
+    border-radius: var(--radius-tag);
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    font-size: 11px;
   }
 }
 
 .empty-state {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 80px 20px;
-  
-  .empty-icon {
-    font-size: 80px;
-    margin-bottom: 20px;
-    opacity: 0.5;
-  }
-  
-  .empty-text {
-    font-size: 18px;
-    color: #999;
+  padding: 48px;
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+@media (max-width: 1024px) {
+  .article-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 768px) {
-  .home {
-    min-height: calc(100vh - 150px);
-    
-    .container {
-      padding: 15px;
-      max-width: 100%;
-    }
+@media (max-width: 640px) {
+  .hero .hero-title {
+    font-size: 28px;
   }
-  
-  .section-header {
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding: 0;
-    
-    .section-icon {
-      font-size: 28px;
-    }
-    
-    .section-text {
-      h2 {
-        font-size: 20px;
-        margin-bottom: 0;
-      }
-      
-      p {
-        display: none;
-      }
-    }
-  }
-  
+
   .article-grid {
     grid-template-columns: 1fr;
-    gap: 15px;
-  }
-  
-  .article-card {
-    border-radius: 12px;
-    margin: 0;
-    
-    &:hover {
-      transform: translateY(-2px);
-    }
-    
-    .article-badge {
-      font-size: 10px;
-      padding: 4px 10px;
-      top: -8px;
-      right: -8px;
-    }
-    
-    .badges {
-      top: 10px;
-      left: 10px;
-      gap: 6px;
-      
-      .badge {
-        padding: 3px 10px;
-        font-size: 11px;
-        border-radius: 15px;
-      }
-    }
-    
-    .article-cover {
-      height: 180px;
-      border-radius: 12px;
-      margin-bottom: 12px;
-      
-      .cover-overlay {
-        .read-more {
-          font-size: 16px;
-        }
-      }
-    }
-    
-    .article-info {
-      padding: 0;
-      
-      .article-title {
-        font-size: 16px;
-        margin-bottom: 10px;
-        line-height: 1.4;
-        white-space: normal;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-      }
-      
-      .article-desc {
-        margin-bottom: 10px;
-        font-size: 12px;
-        
-        .category-badge {
-          padding: 2px 8px;
-          font-size: 11px;
-        }
-      }
-      
-      .article-meta {
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 10px;
-        
-        .meta-item {
-          font-size: 11px;
-          
-          .icon {
-            font-size: 12px;
-          }
-        }
-      }
-      
-      .article-tags {
-        gap: 6px;
-        
-        .tag-item {
-          font-size: 10px;
-          padding: 3px 10px;
-          border-radius: 10px;
-        }
-      }
-    }
-  }
-  
-  .empty-state {
-    padding: 50px 20px;
-    
-    .empty-icon {
-      font-size: 50px;
-      margin-bottom: 15px;
-    }
-    
-    .empty-text {
-      font-size: 14px;
-    }
   }
 }
 </style>
