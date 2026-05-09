@@ -383,13 +383,14 @@ onUnmounted(() => {
   right: 0;
   height: 64px;
   z-index: 999;
-  background: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
-  transition: background 0.2s ease, backdrop-filter 0.2s ease;
+  background: transparent;
+  transition: background 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease;
 
   &.scrolled {
     background: var(--bg-header);
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(16px) saturate(1.6);
+    -webkit-backdrop-filter: blur(16px) saturate(1.6);
+    box-shadow: 0 1px 0 var(--border-color);
   }
 
   .container {
@@ -402,52 +403,62 @@ onUnmounted(() => {
 
 .logo {
   flex-shrink: 0;
-  font-size: 18px;
+  font-family: var(--font-serif);
+  font-size: 20px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #fff;
   text-decoration: none;
+  transition: color 0.2s ease;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
 
-  .logo-name {
-    position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: var(--color-accent);
-    }
+  .scrolled & {
+    color: var(--text-primary);
+    text-shadow: none;
   }
 
   &:hover {
-    color: var(--text-primary);
+    color: var(--color-accent) !important;
   }
 }
 
 .nav {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   flex: 1;
 }
 
 .nav-item {
   padding: 6px 12px;
   font-size: 14px;
-  color: var(--text-secondary);
+  color: rgba(255,255,255,0.9);
   border-radius: var(--radius-btn);
   transition: color 0.15s ease, background 0.15s ease;
   white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+
+  .scrolled & {
+    color: var(--text-secondary);
+    text-shadow: none;
+  }
 
   &:hover {
-    color: var(--text-primary);
-    background: rgba(255, 255, 255, 0.04);
+    color: #fff !important;
+    background: rgba(255,255,255,0.15);
+
+    .scrolled & {
+      color: var(--text-primary) !important;
+      background: var(--bg-secondary);
+    }
   }
 
   &.router-link-active {
-    color: var(--color-accent);
+    color: #fff !important;
+    font-weight: 600;
+
+    .scrolled & {
+      color: var(--color-accent) !important;
+    }
   }
 }
 
@@ -462,9 +473,9 @@ onUnmounted(() => {
   width: 36px;
   height: 36px;
   border-radius: var(--radius-btn);
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-secondary);
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -472,25 +483,46 @@ onUnmounted(() => {
   font-size: 16px;
   transition: all 0.15s ease;
 
+  .scrolled & {
+    background: transparent;
+    border-color: transparent;
+    color: var(--text-secondary);
+  }
+
   &:hover {
-    border-color: var(--border-color);
-    color: var(--text-primary);
+    background: rgba(255,255,255,0.25);
+
+    .scrolled & {
+      border-color: var(--border-color);
+      color: var(--text-primary);
+      background: var(--bg-secondary);
+    }
   }
 }
 
 .login-btn {
   padding: 6px 16px;
   border-radius: var(--radius-btn);
-  background: transparent;
-  border: 1px solid var(--color-accent);
-  color: var(--color-accent);
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: #fff;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.15s ease;
 
+  .scrolled & {
+    background: transparent;
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
   &:hover {
-    background: var(--color-accent);
-    color: var(--text-inverse);
+    background: rgba(255,255,255,0.25);
+
+    .scrolled & {
+      background: var(--color-accent);
+      color: #fff;
+    }
   }
 }
 
@@ -499,10 +531,14 @@ onUnmounted(() => {
   height: 32px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid var(--border-color);
+  border: 2px solid rgba(255,255,255,0.5);
   cursor: pointer;
   transition: border-color 0.15s ease;
   display: block;
+
+  .scrolled & {
+    border-color: var(--border-color);
+  }
 
   &:hover {
     border-color: var(--color-accent);
@@ -516,12 +552,13 @@ onUnmounted(() => {
 .mobile-menu {
   padding: 24px 16px;
   height: 100%;
-  background: var(--bg-secondary);
+  background: var(--bg-card);
   display: flex;
   flex-direction: column;
   gap: 24px;
 
   .mobile-logo {
+    font-family: var(--font-serif);
     font-size: 20px;
     font-weight: 700;
     color: var(--text-primary);
@@ -553,7 +590,7 @@ onUnmounted(() => {
     }
 
     &:hover, &.router-link-active {
-      background: rgba(0, 212, 170, 0.08);
+      background: var(--bg-secondary);
       color: var(--color-accent);
     }
   }
@@ -588,7 +625,7 @@ onUnmounted(() => {
 
       &:hover {
         background: var(--color-accent);
-        color: var(--text-inverse);
+        color: #fff;
       }
     }
   }
@@ -633,7 +670,6 @@ onUnmounted(() => {
   .profile-info {
     display: flex;
     flex-direction: column;
-    gap: 0;
 
     .info-row {
       display: flex;
