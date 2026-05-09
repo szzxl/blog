@@ -1,13 +1,10 @@
-<template>
+﻿<template>
   <div class="category">
     <div class="container">
       <!-- 页面标题 -->
       <div class="page-header">
-        <div class="header-icon">📂</div>
-        <div class="header-text">
-          <h1>文章分类</h1>
-          <p>共 {{ categories.length }} 个分类，{{ totalArticles }} 篇文章</p>
-        </div>
+        <h1>文章分类</h1>
+        <p>共 {{ categories.length }} 个分类，{{ totalArticles }} 篇文章</p>
       </div>
       
       <!-- 分类网格 -->
@@ -122,7 +119,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .category {
   min-height: calc(100vh - 200px);
-  padding: 32px 0 48px;
+  padding: 104px 0 64px;
 }
 
 .container {
@@ -134,7 +131,7 @@ onMounted(() => {
 .page-header {
   border-left: 4px solid var(--color-accent);
   padding-left: 20px;
-  margin-bottom: 36px;
+  margin-bottom: 40px;
 
   h1 {
     font-family: var(--font-serif);
@@ -156,46 +153,50 @@ onMounted(() => {
 .category-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  gap: 22px;
 }
 
 .category-item {
   background: var(--bg-card);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
-  padding: 28px 24px;
+  padding: 32px 24px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   cursor: pointer;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+  transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
 
   &:hover {
-    border-color: var(--color-accent);
     box-shadow: var(--shadow-card-hover);
     transform: translateY(-4px);
+    border-color: var(--color-accent);
 
     .category-name {
       color: var(--color-accent);
     }
-  }
 
-  .category-icon {
-    font-size: 40px;
-    margin-bottom: 16px;
+    .view-btn {
+      background: var(--color-accent);
+      color: var(--text-inverse);
+    }
   }
 
   .category-info {
     margin-bottom: 20px;
+    width: 100%;
 
     .category-name {
       font-family: var(--font-serif);
-      font-size: 18px;
+      font-size: 19px;
       font-weight: 700;
       color: var(--text-primary);
-      margin: 0 0 10px 0;
+      margin: 0 0 14px 0;
+      letter-spacing: -0.01em;
       transition: color 0.2s ease;
     }
 
@@ -210,17 +211,23 @@ onMounted(() => {
       display: flex;
       align-items: baseline;
       justify-content: center;
-      gap: 4px;
+      gap: 6px;
 
       .count {
-        font-size: 28px;
+        font-size: 32px;
         font-weight: 700;
-        color: var(--color-accent);
+        line-height: 1;
+        background: var(--gradient-accent);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.02em;
       }
 
       .label {
-        font-size: 13px;
+        font-size: 12px;
         color: var(--text-tertiary);
+        letter-spacing: 0.04em;
       }
     }
   }
@@ -232,10 +239,11 @@ onMounted(() => {
     background: transparent;
     border: 1px solid var(--color-accent);
     color: var(--color-accent);
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
     cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition: background 0.25s ease, color 0.25s ease;
 
     &:hover {
       background: var(--color-accent);
@@ -246,9 +254,9 @@ onMounted(() => {
 
 .empty-state {
   text-align: center;
-  padding: 64px 20px;
+  padding: 72px 0;
   color: var(--text-tertiary);
-  font-size: 14px;
+  font-size: 15px;
 }
 
 @media (max-width: 640px) {

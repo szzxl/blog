@@ -1,73 +1,90 @@
-<template>
+﻿<template>
   <div class="home">
-    <!-- 全屏 Hero -->
-    <section class="hero" :style="heroBg">
-      <div class="hero-overlay"></div>
-      <div class="hero-content">
-        <h1 class="hero-title">{{ siteName || '我的博客' }}</h1>
-        <p class="hero-subtitle">
-          <span class="typewriter">{{ displayText }}</span>
-          <span class="cursor" :class="{ blink: !isTyping }">|</span>
-        </p>
-        <div class="hero-stats" v-if="articles.length > 0">
-          <span class="hero-stat">{{ articles.length }} 篇文章</span>
-          <span class="hero-dot">·</span>
-          <span class="hero-stat">用心记录每一天</span>
-        </div>
-        <div class="hero-scroll" @click="scrollToContent">
-          <span>向下探索</span>
-          <span class="scroll-arrow">↓</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- 主体两栏 -->
-    <div class="main-layout container" ref="contentRef">
-      <!-- 左侧文章列表 -->
-      <div class="article-col">
-        <!-- Featured 第一篇 -->
-        <div
-          v-if="featuredArticle"
-          class="featured-card"
-          @click="viewArticle(featuredArticle.id)"
-        >
-          <div class="featured-cover">
-            <img :src="featuredArticle.articleCover || '/default-cover.svg'" :alt="featuredArticle.articleName" />
-            <div class="featured-cover-overlay"></div>
-            <div class="featured-cover-body">
-              <span v-if="featuredArticle.articleCategory" class="article-category">{{ featuredArticle.articleCategory }}</span>
-              <h2 class="featured-title">{{ featuredArticle.articleName }}</h2>
-              <p class="featured-abstract" v-if="featuredArticle.articleAbstract">{{ featuredArticle.articleAbstract }}</p>
-              <div class="article-meta">
-                <span>{{ formatTime(featuredArticle.createTime) }}</span>
-                <span v-if="featuredArticle.readNum !== undefined">· {{ featuredArticle.readNum }} 阅读</span>
-              </div>
+    <div class="page-layout">
+      <!-- 左侧侧边栏 -->
+      <aside class="sidebar">
+        <!-- 博主卡片 -->
+        <div class="sidebar-card author-card">
+          <div class="author-cover"></div>
+          <div class="author-info">
+            <img src="/default-avatar.svg" class="author-avatar" alt="博主" />
+            <div class="author-name">{{ siteName || '博主' }}</div>
+            <div class="author-desc">{{ siteDescription || '记录技术与生活' }}</div>
+          </div>
+          <div class="author-stats">
+            <div class="stat-item">
+              <span class="stat-num">{{ totalArticles }}</span>
+              <span class="stat-label">文章</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-num">{{ categoryCount }}</span>
+              <span class="stat-label">分类</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-num">{{ tagCount }}</span>
+              <span class="stat-label">标签</span>
             </div>
           </div>
         </div>
 
-        <!-- 普通文章列表 -->
-        <div class="article-list" v-loading="loading">
+        <!-- 公告 -->
+        <div class="sidebar-card">
+          <div class="card-title">
+            <span class="title-dot" style="background:linear-gradient(135deg,#ff7d00,#f53f3f)"></span>
+            公告
+          </div>
+          <p class="notice-text">欢迎来到我的博客，这里记录着技术成长与生活感悟。</p>
+        </div>
+
+        <!-- 标签云 -->
+        <div class="sidebar-card">
+          <div class="card-title">
+            <span class="title-dot" style="background:linear-gradient(135deg,#f53f3f,#722ed1)"></span>
+            标签云
+          </div>
+          <div class="tag-sphere-wrap">
+            <div class="tag-sphere" ref="sphereRef">
+              <span
+                v-for="(tag, i) in tags" :key="tag.id"
+                class="sphere-tag"
+                :style="getTagStyle(i)"
+                :ref="el => setTagRef(el, i)"
+                @click="$router.push(`/tag/articles?tag=${tag.tagName}`)"
+                @mouseenter="pauseSphere"
+                @mouseleave="resumeSphere"
+              >{{ tag.tagName }}</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 右侧主内容 -->
+      <main class="main-content">
+        <div class="section-header">
+          <h2 class="section-title">最新文章</h2>
+          <router-link to="/articles" class="section-more">查看全部 →</router-link>
+        </div>
+
+        <div class="article-grid" v-loading="loading">
           <div
-            class="article-item"
-            v-for="article in restArticles"
+            class="article-card"
+            v-for="article in articles"
             :key="article.id"
             @click="viewArticle(article.id)"
           >
-            <div class="article-cover">
+            <div class="card-cover">
               <img :src="article.articleCover || '/default-cover.svg'" :alt="article.articleName" />
-              <span class="badge-top" v-if="article.isTop === 1">置顶</span>
+              <span class="top-badge" v-if="article.isTop === 1">置顶</span>
+              <span class="cat-badge" v-if="article.articleCategory">{{ article.articleCategory }}</span>
             </div>
-            <div class="article-body">
-              <span v-if="article.articleCategory" class="article-category">{{ article.articleCategory }}</span>
-              <h3 class="article-title">{{ article.articleName }}</h3>
-              <p class="article-abstract" v-if="article.articleAbstract">{{ article.articleAbstract }}</p>
-              <div class="article-footer">
-                <div class="article-meta">
-                  <span>{{ formatTime(article.createTime) }}</span>
-                  <span v-if="article.readNum !== undefined">· {{ article.readNum }} 阅读</span>
-                </div>
-                <div class="article-tags" v-if="article.articleTag">
+            <div class="card-body">
+              <h3 class="card-title">{{ article.articleName }}</h3>
+              <p class="card-abstract" v-if="article.articleAbstract">{{ article.articleAbstract }}</p>
+              <div class="card-footer">
+                <span class="card-date">{{ formatTime(article.createTime) }}</span>
+                <div class="card-tags" v-if="article.articleTag">
                   <span class="tag" v-for="(tag, i) in parseTags(article.articleTag).slice(0, 2)" :key="i">{{ tag }}</span>
                 </div>
               </div>
@@ -75,72 +92,23 @@
           </div>
 
           <div v-if="!loading && articles.length === 0" class="empty-state">
-            暂无文章
+            <div class="empty-icon">📭</div>
+            <p>暂无文章，敬请期待</p>
           </div>
         </div>
-      </div>
-
-      <!-- 右侧边栏 -->
-      <aside class="sidebar">
-        <!-- 博主卡片 -->
-        <div class="sidebar-card author-card">
-          <div class="author-avatar-wrap">
-            <img src="/default-avatar.svg" alt="博主" class="author-avatar" />
-          </div>
-          <div class="author-name">{{ siteName || '博主' }}</div>
-          <div class="author-desc">{{ siteDescription || '记录技术与生活' }}</div>
-          <div class="author-divider"></div>
-          <div class="author-stats">
-            <div class="author-stat">
-              <span class="stat-num">{{ articles.length }}</span>
-              <span class="stat-label">文章</span>
-            </div>
-            <div class="author-stat">
-              <span class="stat-num">∞</span>
-              <span class="stat-label">热爱</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 公告 -->
-        <div class="sidebar-card notice-card">
-          <div class="sidebar-title">
-            <span class="sidebar-title-icon">📢</span>公告
-          </div>
-          <p class="notice-text">欢迎来到我的博客，这里记录着我的技术成长与生活感悟。</p>
-        </div>
-
-        <!-- 最新文章 -->
-        <div class="sidebar-card" v-if="articles.length > 0">
-          <div class="sidebar-title">
-            <span class="sidebar-title-icon">📝</span>最新文章
-          </div>
-          <ul class="recent-list">
-            <li
-              v-for="article in articles.slice(0, 5)"
-              :key="article.id"
-              class="recent-item"
-              @click="viewArticle(article.id)"
-            >
-              <span class="recent-dot"></span>
-              <span class="recent-title">{{ article.articleName }}</span>
-            </li>
-          </ul>
-        </div>
-      </aside>
+      </main>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { getMonthArticleList } from '@/api/article'
+import { getMonthArticleList, getCategoryList, getTagList, getArticleList } from '@/api/article'
 import { formatDate } from '@/utils/format'
 import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
 
 const router = useRouter()
-const contentRef = ref<HTMLElement>()
 
 interface Article {
   id: number
@@ -151,71 +119,76 @@ interface Article {
   articleCategory?: string
   readNum?: number
   createTime?: number
-  isRecommend?: number
   isTop?: number
 }
 
+interface Category {
+  id: number
+  categoryName: string
+  articleCount?: number
+}
+
+interface Tag {
+  id: number
+  tagName: string
+}
+
 const articles = ref<Article[]>([])
+const categories = ref<Category[]>([])
+const tags = ref<Tag[]>([])
+const totalArticles = ref(0)
+const totalCategories = ref(0)
+const totalTags = ref(0)
 const loading = ref(false)
 const siteName = ref('')
 const siteDescription = ref('')
-const heroCover = ref('')
 
-const featuredArticle = computed(() => articles.value[0] ?? null)
-const restArticles = computed(() => articles.value.slice(1))
+const categoryCount = computed(() => totalCategories.value || categories.value.length)
+const tagCount = computed(() => totalTags.value || tags.value.length)
 
-const heroBg = computed(() => {
-  const img = heroCover.value || featuredArticle.value?.articleCover || ''
-  return img ? { backgroundImage: `url(${img})` } : {}
-})
-
-// 打字机效果
-const phrases = computed(() => [
-  siteDescription.value || '记录技术与生活',
-  '分享所见所闻',
-  '用文字留住时光',
-])
+const phrases = ['记录技术与生活', '分享所见所闻', '用文字留住时光']
 const displayText = ref('')
 const isTyping = ref(true)
 let typeTimer: ReturnType<typeof setTimeout>
 
-const runTypewriter = (phraseIndex = 0, charIndex = 0, deleting = false) => {
-  const phrase = phrases.value[phraseIndex] ?? ''
-  if (!deleting) {
-    displayText.value = phrase.slice(0, charIndex + 1)
+const runTypewriter = (pi = 0, ci = 0, del = false) => {
+  const phrase = phrases[pi] ?? ''
+  if (!del) {
+    displayText.value = phrase.slice(0, ci + 1)
     isTyping.value = true
-    if (charIndex < phrase.length - 1) {
-      typeTimer = setTimeout(() => runTypewriter(phraseIndex, charIndex + 1, false), 100)
+    if (ci < phrase.length - 1) {
+      typeTimer = setTimeout(() => runTypewriter(pi, ci + 1), 100)
     } else {
       isTyping.value = false
-      typeTimer = setTimeout(() => runTypewriter(phraseIndex, charIndex, true), 2000)
+      typeTimer = setTimeout(() => runTypewriter(pi, ci, true), 2200)
     }
   } else {
-    displayText.value = phrase.slice(0, charIndex)
+    displayText.value = phrase.slice(0, ci)
     isTyping.value = true
-    if (charIndex > 0) {
-      typeTimer = setTimeout(() => runTypewriter(phraseIndex, charIndex - 1, true), 60)
+    if (ci > 0) {
+      typeTimer = setTimeout(() => runTypewriter(pi, ci - 1, true), 55)
     } else {
-      typeTimer = setTimeout(() => runTypewriter((phraseIndex + 1) % phrases.value.length, 0, false), 400)
+      typeTimer = setTimeout(() => runTypewriter((pi + 1) % phrases.length, 0), 400)
     }
   }
-}
-
-const scrollToContent = () => {
-  contentRef.value?.scrollIntoView({ behavior: 'smooth' })
 }
 
 const fetchArticles = async () => {
   loading.value = true
   try {
-    const res: any = await getMonthArticleList({ pageNo: 1, pageSize: 10 })
-    if (res && res.list) articles.value = res.list
+    const res: any = await getMonthArticleList({ pageNo: 1, pageSize: 12 })
+    if (res?.list) articles.value = res.list
     else if (Array.isArray(res)) articles.value = res
-  } catch {
-    // 静默失败
-  } finally {
+  } catch { /* 静默 */ } finally {
     loading.value = false
   }
+}
+
+const fetchStats = async () => {
+  try {
+    const res: any = await getArticleList({ pageNo: 1, pageSize: 1 })
+    if (res?.total != null) totalArticles.value = res.total
+  } catch { /* 静默 */ }
 }
 
 const fetchConfig = async () => {
@@ -223,375 +196,127 @@ const fetchConfig = async () => {
     const config = await fetchWebsiteConfigWithCache()
     if (config.site_name) siteName.value = config.site_name
     if (config.site_description) siteDescription.value = config.site_description
-    const cfg = config as any
-    if (cfg.cover) heroCover.value = cfg.cover
-  } catch {
-    // 静默失败
-  }
+  } catch { /* 静默 */ }
 }
 
-const formatTime = (timestamp?: number) => {
-  if (!timestamp) return ''
-  return formatDate(new Date(timestamp), 'YYYY-MM-DD')
+const fetchCategories = async () => {
+  try {
+    const res: any = await getCategoryList({ pageSize: 100 })
+    if (res?.list) { categories.value = res.list; totalCategories.value = res.total ?? res.list.length }
+    else if (Array.isArray(res)) { categories.value = res; totalCategories.value = res.length }
+  } catch { /* 静默 */ }
 }
 
-const parseTags = (tagStr?: string) => {
-  if (!tagStr) return []
-  return tagStr.split(',').map(t => t.trim()).filter(t => t)
+const fetchTags = async () => {
+  try {
+    const res: any = await getTagList({ pageSize: 200 })
+    if (res?.list) { tags.value = res.list; totalTags.value = res.total ?? res.list.length }
+    else if (Array.isArray(res)) { tags.value = res; totalTags.value = res.length }
+    await nextTick()
+    initSphere()
+  } catch { /* 静默 */ }
 }
 
-const viewArticle = (id: number) => {
-  router.push(`/article/${id}`)
+// ── 球形标签云 ────────────────────────────────────────
+const tagEls = ref<HTMLElement[]>([])
+let sphereTimer = 0
+let angleX = 0.008
+let angleY = 0.012
+let items: { el: HTMLElement; x: number; y: number; z: number }[] = []
+
+const setTagRef = (el: any, i: number) => {
+  if (el) tagEls.value[i] = el as HTMLElement
 }
 
-onMounted(() => {
-  fetchArticles()
-  fetchConfig()
-  typeTimer = setTimeout(() => runTypewriter(), 600)
-})
+const initSphere = () => {
+  const count = tagEls.value.length
+  if (!count) return
+  items = tagEls.value.map((el, i) => {
+    const phi   = Math.acos(-1 + (2 * i) / count)
+    const theta = Math.sqrt(count * Math.PI) * phi
+    return {
+      el,
+      x: Math.sin(phi) * Math.cos(theta),
+      y: Math.sin(phi) * Math.sin(theta),
+      z: Math.cos(phi),
+    }
+  })
+  renderSphere()
+  sphereTimer = window.setInterval(rotateSphere, 30)
+}
 
-onUnmounted(() => {
-  clearTimeout(typeTimer)
-})
+const rotateSphere = () => {
+  const cosX = Math.cos(angleX), sinX = Math.sin(angleX)
+  const cosY = Math.cos(angleY), sinY = Math.sin(angleY)
+  items.forEach(item => {
+    // rotate Y
+    const x1 = item.x * cosY - item.z * sinY
+    const z1 = item.x * sinY + item.z * cosY
+    // rotate X
+    const y2 = item.y * cosX - z1 * sinX
+    const z2 = item.y * sinX + z1 * cosX
+    item.x = x1; item.y = y2; item.z = z2
+  })
+  renderSphere()
+}
+
+const renderSphere = () => {
+  const R = 110
+  items.forEach(item => {
+    const scale = (item.z + 1.6) / 2.6
+    const x = item.x * R + R
+    const y = item.y * R + R
+    item.el.style.transform = `translate(${x}px, ${y}px) scale(${scale.toFixed(3)})`
+    item.el.style.opacity   = (scale * 0.7 + 0.2).toFixed(3)
+    item.el.style.zIndex    = Math.round(scale * 10).toString()
+  })
+}
+
+const pauseSphere  = () => { angleX = 0; angleY = 0 }
+const resumeSphere = () => { angleX = 0.008; angleY = 0.012 }
+
+const TAG_COLORS = [
+  ['#e8f0ff', '#165dff'], ['#f3e8ff', '#722ed1'], ['#fff3e8', '#ff7d00'],
+  ['#ffe8e8', '#f53f3f'], ['#e8fff0', '#00b42a'], ['#e8fffe', '#0fc6c2'],
+  ['#fff8e8', '#f77234'], ['#f0ffe8', '#9fdb1d'],
+]
+
+const getTagStyle = (i: number) => {
+  const pair = TAG_COLORS[i % TAG_COLORS.length] ?? ['#e8f0ff', '#165dff']
+  const [bg, color] = pair
+  return { background: bg, color, borderColor: (color ?? '#165dff') + '55' }
+}
+
+const formatTime = (ts?: number) => ts ? formatDate(new Date(ts), 'YYYY-MM-DD') : ''
+const parseTags = (s?: string) => s ? s.split(',').map(t => t.trim()).filter(Boolean) : []
+const viewArticle = (id: number) => router.push(`/article/${id}`)
+
+onMounted(() => { fetchArticles(); fetchConfig(); fetchCategories(); fetchTags(); fetchStats(); typeTimer = setTimeout(() => runTypewriter(), 800) })
+onUnmounted(() => { clearTimeout(typeTimer); clearInterval(sphereTimer) })
 </script>
 
 <style scoped lang="scss">
 .home {
   min-height: 100vh;
+  background: var(--bg-primary);
+  padding-top: 64px;
 }
 
-// ── 全屏 Hero ─────────────────────────────────────────
-.hero {
-  position: relative;
-  height: 100vh;
-  min-height: 560px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #1c1917 center/cover no-repeat;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, #1c1917 0%, #3c2a1e 100%);
-    z-index: 0;
-  }
-}
-
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.3) 0%,
-    rgba(0,0,0,0.5) 60%,
-    rgba(0,0,0,0.7) 100%
-  );
-  z-index: 1;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  color: #fff;
-  padding: 0 24px;
-  max-width: 700px;
-}
-
-.hero-title {
-  font-family: var(--font-display);
-  font-size: clamp(48px, 8vw, 88px);
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  margin-bottom: 24px;
-  text-shadow: 0 2px 24px rgba(0,0,0,0.5);
-  line-height: 1.1;
-}
-
-.hero-subtitle {
-  font-size: clamp(16px, 2.5vw, 22px);
-  opacity: 0.85;
-  margin-bottom: 28px;
-  min-height: 1.6em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-}
-
-.cursor {
-  display: inline-block;
-  font-weight: 300;
-  opacity: 1;
-  transition: opacity 0.1s;
-
-  &.blink {
-    animation: blink 1s step-end infinite;
-  }
-}
-
-.hero-stats {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 14px;
-  opacity: 0.7;
-  margin-bottom: 48px;
-
-  .hero-dot { opacity: 0.5; }
-}
-
-.hero-scroll {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  opacity: 0.6;
-  cursor: pointer;
-  transition: opacity 0.2s;
-
-  &:hover { opacity: 1; }
-
-  .scroll-arrow {
-    font-size: 18px;
-    animation: bounce 2s ease-in-out infinite;
-  }
-}
-
-// ── 主体两栏 ──────────────────────────────────────────
-.main-layout {
+.page-layout {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
   display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 32px;
-  padding-top: 48px;
-  padding-bottom: 64px;
+  grid-template-columns: 280px 1fr;
+  gap: 28px;
   align-items: start;
-}
-
-.article-col {
-  min-width: 0;
-}
-
-// ── Featured 卡片 ─────────────────────────────────────
-.featured-card {
-  border-radius: var(--radius-card);
-  overflow: hidden;
-  margin-bottom: 24px;
-  cursor: pointer;
-  box-shadow: var(--shadow-card);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-
-  &:hover {
-    box-shadow: var(--shadow-card-hover);
-    transform: translateY(-4px);
-
-    .featured-cover img { transform: scale(1.04); }
-  }
-
-  .featured-cover {
-    position: relative;
-    aspect-ratio: 21/9;
-    overflow: hidden;
-    background: var(--bg-secondary);
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.5s ease;
-    }
-  }
-
-  .featured-cover-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 55%, transparent 100%);
-  }
-
-  .featured-cover-body {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 28px 32px;
-    color: #fff;
-  }
-
-  .featured-title {
-    font-family: var(--font-serif);
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 1.35;
-    margin-bottom: 10px;
-    letter-spacing: -0.02em;
-    text-shadow: 0 1px 6px rgba(0,0,0,0.3);
-  }
-
-  .featured-abstract {
-    font-size: 14px;
-    opacity: 0.8;
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin-bottom: 10px;
-  }
-}
-
-// ── 文章列表 ──────────────────────────────────────────
-.article-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.article-item {
-  display: flex;
-  gap: 20px;
-  background: var(--bg-card);
-  border-radius: var(--radius-card);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
-  cursor: pointer;
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
-
-  &:hover {
-    box-shadow: var(--shadow-card-hover);
-    transform: translateY(-3px);
-
-    .article-cover img { transform: scale(1.06); }
-    .article-title { color: var(--color-accent); }
-  }
-
-  .article-cover {
-    width: 200px;
-    flex-shrink: 0;
-    position: relative;
-    overflow: hidden;
-    background: var(--bg-secondary);
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.4s ease;
-    }
-
-    .badge-top {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      background: var(--color-accent);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: var(--radius-tag);
-    }
-  }
-
-  .article-body {
-    flex: 1;
-    padding: 20px 20px 20px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-width: 0;
-  }
-
-  .article-title {
-    font-family: var(--font-serif);
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1.4;
-    letter-spacing: -0.01em;
-    transition: color 0.2s ease;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin: 0;
-  }
-
-  .article-abstract {
-    font-size: 14px;
-    color: var(--text-tertiary);
-    line-height: 1.75;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin: 0;
-    flex: 1;
-  }
-
-  .article-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: auto;
-  }
-}
-
-// 共用
-.article-category {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-accent);
-  margin-bottom: 2px;
-}
-
-.article-meta {
-  font-size: 12px;
-  color: var(--text-tertiary);
-  display: flex;
-  gap: 6px;
-}
-
-.article-tags {
-  display: flex;
-  gap: 6px;
-}
-
-.tag {
-  padding: 2px 10px;
-  border-radius: var(--radius-tag);
-  background: var(--bg-secondary);
-  color: var(--text-tertiary);
-  font-size: 11px;
-  transition: all 0.15s;
-
-  &:hover {
-    background: var(--color-accent);
-    color: #fff;
-  }
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px;
-  color: var(--text-tertiary);
-  font-size: 15px;
 }
 
 // ── 侧边栏 ────────────────────────────────────────────
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   position: sticky;
   top: 80px;
 }
@@ -601,174 +326,254 @@ onUnmounted(() => {
   border-radius: var(--radius-card);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-card);
-  padding: 20px;
-}
-
-.sidebar-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  .sidebar-title-icon { font-size: 15px; }
+  overflow: hidden;
+  transition: box-shadow 0.3s;
+  &:hover { box-shadow: var(--shadow-card-hover); }
 }
 
 .author-card {
-  text-align: center;
-
-  .author-avatar-wrap {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin: 0 auto 12px;
-    border: 3px solid var(--border-color);
-    box-shadow: var(--shadow-sm);
+  .author-cover {
+    height: 80px;
+    background: linear-gradient(135deg, #165dff 0%, #722ed1 100%);
   }
-
-  .author-avatar {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .author-name {
-    font-family: var(--font-serif);
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 6px;
-    letter-spacing: -0.01em;
-  }
-
-  .author-desc {
-    font-size: 13px;
-    color: var(--text-tertiary);
-    line-height: 1.5;
-    margin-bottom: 16px;
-  }
-
-  .author-divider {
-    height: 1px;
-    background: var(--border-color);
-    margin-bottom: 16px;
-  }
-
-  .author-stats {
-    display: flex;
-    justify-content: center;
-    gap: 32px;
-  }
-
-  .author-stat {
+  .author-info {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
-
+    padding: 0 20px 16px;
+    margin-top: -32px;
+  }
+  .author-avatar {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    border: 3px solid var(--bg-card);
+    box-shadow: var(--shadow-card);
+    object-fit: cover;
+    background: var(--bg-secondary);
+  }
+  .author-name {
+    font-family: var(--font-serif);
+    font-size: 16px; font-weight: 700;
+    color: var(--text-primary);
+    margin-top: 10px;
+  }
+  .author-desc {
+    font-size: 12px; color: var(--text-tertiary);
+    text-align: center; line-height: 1.6; margin-top: 4px;
+  }
+  .author-stats {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid var(--border-color);
+    padding: 12px 0;
+  }
+  .stat-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
     .stat-num {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text-primary);
-      line-height: 1;
+      font-size: 18px; font-weight: 700; line-height: 1;
+      background: var(--gradient-accent);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
+    .stat-label { font-size: 11px; color: var(--text-tertiary); }
+  }
+  .stat-divider { width: 1px; height: 28px; background: var(--border-color); }
+}
 
-    .stat-label {
-      font-size: 11px;
-      color: var(--text-tertiary);
-    }
+.card-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 700; color: var(--text-primary);
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border-color);
+  .title-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
   }
 }
 
-.notice-card {
-  .notice-text {
-    font-size: 13px;
-    color: var(--text-secondary);
-    line-height: 1.7;
+.notice-text {
+  font-size: 13px; color: var(--text-secondary);
+  line-height: 1.8; padding: 12px 16px;
+}
+
+.tag-sphere-wrap {
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.tag-sphere {
+  position: relative;
+  width: 220px;
+  height: 220px;
+}
+
+.sphere-tag {
+  position: absolute;
+  top: 0; left: 0;
+  padding: 3px 10px;
+  border-radius: var(--radius-tag);
+  border: 1px solid;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  will-change: transform, opacity;
+  transition: filter 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    filter: brightness(0.85) saturate(1.4);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   }
 }
 
-.recent-list {
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 12px;
+}
+
+.nav-grid-item {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 8px 4px;
+  border-radius: 10px;
+  font-size: 11px; color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s;
+  &:hover { background: var(--bg-secondary); color: var(--color-accent); }
+  .nav-grid-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+  }
+}
+
+// ── 主内容 ────────────────────────────────────────────
+.main-content { min-width: 0; }
+
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-family: var(--font-serif);
+  font-size: 20px; font-weight: 700; color: var(--text-primary);
+  display: flex; align-items: center; gap: 10px;
+  &::before {
+    content: '';
+    display: block; width: 4px; height: 20px;
+    background: var(--gradient-accent); border-radius: 2px;
+  }
+}
+
+.section-more {
+  font-size: 13px; color: var(--color-accent); font-weight: 500;
+  transition: opacity 0.2s;
+  &:hover { opacity: 0.7; }
+}
+
+// ── 文章网格 ──────────────────────────────────────────
+.article-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.article-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
 
-.recent-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  cursor: pointer;
-  transition: color 0.15s;
-
-  &:hover .recent-title { color: var(--color-accent); }
-
-  .recent-dot {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--color-accent);
-    flex-shrink: 0;
-    margin-top: 7px;
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-4px);
+    border-color: var(--color-accent);
+    .card-cover img { transform: scale(1.06); }
+    .card-title { color: var(--color-accent); }
   }
 
-  .recent-title {
-    font-size: 13px;
-    color: var(--text-secondary);
-    line-height: 1.5;
-    transition: color 0.15s;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+  .card-cover {
+    position: relative;
+    aspect-ratio: 16/10;
     overflow: hidden;
+    background: var(--bg-secondary);
+    flex-shrink: 0;
+    img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
+    .top-badge {
+      position: absolute; top: 8px; left: 8px;
+      background: var(--gradient-warm); color: #fff;
+      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 8px;
+    }
+    .cat-badge {
+      position: absolute; bottom: 8px; left: 8px;
+      background: rgba(0,0,0,0.55); color: #fff;
+      backdrop-filter: blur(4px);
+      font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 8px;
+    }
+  }
+
+  .card-body {
+    flex: 1; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;
+  }
+
+  .card-title {
+    font-family: var(--font-serif);
+    font-size: 15px; font-weight: 700; color: var(--text-primary);
+    line-height: 1.5;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    transition: color 0.2s; margin: 0;
+  }
+
+  .card-abstract {
+    font-size: 12px; color: var(--text-tertiary); line-height: 1.7;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    margin: 0; flex: 1;
+  }
+
+  .card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 4px;
+  }
+
+  .card-date { font-size: 11px; color: var(--text-tertiary); }
+
+  .card-tags { display: flex; gap: 4px; }
+
+  .tag {
+    padding: 1px 7px; border-radius: 6px;
+    background: var(--bg-secondary); color: var(--text-tertiary);
+    font-size: 10px; border: 1px solid var(--border-color);
+    transition: all 0.2s;
+    &:hover { border-color: var(--color-accent); color: var(--color-accent); }
   }
 }
 
-// ── 动画 ──────────────────────────────────────────────
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(6px); }
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center; padding: 64px 0; color: var(--text-tertiary);
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  p { font-size: 15px; }
 }
 
 // ── 响应式 ────────────────────────────────────────────
-@media (max-width: 900px) {
-  .main-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    position: static;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-  }
+@media (max-width: 1100px) {
+  .article-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 640px) {
-  .hero { height: 80vh; }
+@media (max-width: 860px) {
+  .page-layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; display: grid; grid-template-columns: repeat(2, 1fr); }
+  .author-card { grid-column: 1 / -1; }
+}
 
-  .article-item {
-    flex-direction: column;
-
-    .article-cover {
-      width: 100%;
-      height: 180px;
-    }
-
-    .article-body {
-      padding: 16px;
-    }
-  }
-
-  .sidebar {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 560px) {
+  .article-grid { grid-template-columns: 1fr; }
+  .sidebar { grid-template-columns: 1fr; }
+  .page-layout { padding: 16px 16px 60px; }
 }
 </style>

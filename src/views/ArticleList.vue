@@ -3,7 +3,7 @@
     <div class="container">
       <!-- 页面标题 -->
       <div class="page-header">
-        <h1>📚 文章列表</h1>
+        <h1>文章列表</h1>
         <p class="subtitle">共 {{ total }} 篇文章</p>
       </div>
       
@@ -33,8 +33,8 @@
         <div v-else class="article-card" v-for="article in articles" :key="article.id" @click="viewArticle(article.id)">
           <!-- 标识标签 -->
           <div class="badges" v-if="article.isTop === 1 || article.isRecommend === 1">
-            <span class="badge badge-top" v-if="article.isTop === 1">📌 置顶</span>
-            <span class="badge badge-recommend" v-if="article.isRecommend === 1">⭐ 推荐</span>
+            <span class="badge badge-top" v-if="article.isTop === 1">置顶</span>
+            <span class="badge badge-recommend" v-if="article.isRecommend === 1">推荐</span>
           </div>
           
           <div class="card-left">
@@ -46,27 +46,15 @@
             <h2 class="article-title">{{ article.articleName }}</h2>
             <div class="article-tags" v-if="article.articleTag">
               <span class="tag" v-for="(tag, index) in parseTags(article.articleTag)" :key="index">
-                🏷️ {{ tag }}
+                {{ tag }}
               </span>
             </div>
             <div class="article-footer">
               <div class="meta-info">
-                <span class="meta-item">
-                  <i class="icon">📅</i>
-                  {{ formatTime(article.createTime) }}
-                </span>
-                <span class="meta-item" v-if="article.articleCategory">
-                  <i class="icon">📂</i>
-                  {{ article.articleCategory }}
-                </span>
-                <span class="meta-item">
-                  <i class="icon">👁️</i>
-                  {{ article.readNum || 0 }}
-                </span>
-                <span class="meta-item">
-                  <i class="icon">💗</i>
-                  {{ article.likeCount || 0 }}
-                </span>
+                <span class="meta-item">{{ formatTime(article.createTime) }}</span>
+                <span class="meta-item" v-if="article.articleCategory">{{ article.articleCategory }}</span>
+                <span class="meta-item">{{ article.readNum || 0 }} 阅读</span>
+                <span class="meta-item">{{ article.likeCount || 0 }} 喜欢</span>
               </div>
               <div class="read-btn">
                 阅读全文 →
@@ -77,7 +65,6 @@
         
         <!-- 空状态 -->
         <div v-if="!loading && articles.length === 0" class="empty-state">
-          <div class="empty-icon">📝</div>
           <div class="empty-text">暂无文章</div>
         </div>
       </div>
@@ -222,7 +209,7 @@ watch(() => route.path, (newPath) => {
 <style scoped lang="scss">
 .article-list {
   min-height: 100vh;
-  padding: 32px 0 48px;
+  padding: 104px 0 80px;
 }
 
 .container {
@@ -231,10 +218,11 @@ watch(() => route.path, (newPath) => {
   padding: 0 24px;
 }
 
+// ── 页面标题（与 Home.vue page-header 一致）────────────
 .page-header {
   border-left: 4px solid var(--color-accent);
   padding-left: 20px;
-  margin-bottom: 36px;
+  margin-bottom: 40px;
 
   h1 {
     font-family: var(--font-serif);
@@ -253,13 +241,17 @@ watch(() => route.path, (newPath) => {
   }
 }
 
+// ── 筛选栏 ────────────────────────────────────────────
 .filter-bar {
-  margin-bottom: 28px;
+  margin-bottom: 32px;
 
   .search-input {
     :deep(.el-input__wrapper) {
       border-radius: var(--radius-btn);
-      transition: box-shadow 0.2s ease;
+      background: var(--bg-card);
+      backdrop-filter: var(--blur-glass);
+      -webkit-backdrop-filter: var(--blur-glass);
+      transition: box-shadow 0.25s ease;
 
       &.is-focus {
         box-shadow: 0 0 0 1px var(--color-accent) inset;
@@ -273,6 +265,7 @@ watch(() => route.path, (newPath) => {
 
       .el-button {
         color: var(--text-secondary);
+        font-family: var(--font-sans);
 
         &:hover {
           color: var(--color-accent);
@@ -282,98 +275,109 @@ watch(() => route.path, (newPath) => {
   }
 }
 
+// ── 文章卡片列表（对齐 Home.vue article-item）────────
 .articles {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 28px;
+  gap: 20px;
+  margin-bottom: 36px;
 }
 
 .article-card {
+  display: flex;
   background: var(--bg-card);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
   overflow: hidden;
-  display: flex;
   cursor: pointer;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
-  height: 160px;
   position: relative;
+  transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
 
   &:hover {
-    border-color: var(--color-accent);
     box-shadow: var(--shadow-card-hover);
     transform: translateY(-4px);
+    border-color: var(--color-accent);
 
     .article-cover img {
-      transform: scale(1.05);
+      transform: scale(1.07);
     }
 
     .article-title {
       color: var(--color-accent);
     }
+
+    .read-btn {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
 
+  // 角标（置顶 / 推荐）
   .badges {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 12px;
+    left: 12px;
     display: flex;
     gap: 6px;
     z-index: 2;
 
     .badge {
+      font-size: 11px;
+      font-weight: 700;
       padding: 3px 10px;
       border-radius: var(--radius-tag);
-      font-size: 11px;
-      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #fff;
 
       &.badge-top {
-        background: var(--color-danger);
-        color: #fff;
+        background: var(--gradient-accent);
       }
 
       &.badge-recommend {
-        background: var(--color-warning);
-        color: var(--text-inverse);
+        background: linear-gradient(135deg, rgba(22,93,255,0.85) 0%, rgba(114,46,209,0.85) 100%);
       }
     }
   }
 
   .card-left {
-    width: 200px;
+    width: 220px;
     flex-shrink: 0;
 
     .article-cover {
       width: 100%;
       height: 100%;
       overflow: hidden;
+      background: var(--bg-secondary);
 
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.35s ease;
+        display: block;
+        transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
       }
     }
   }
 
   .card-right {
     flex: 1;
-    padding: 18px 22px;
+    padding: 22px 24px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     min-width: 0;
 
     .article-title {
       font-family: var(--font-serif);
-      font-size: 17px;
+      font-size: 19px;
       font-weight: 700;
       color: var(--text-primary);
       margin: 0;
       line-height: 1.45;
+      letter-spacing: -0.01em;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
@@ -387,17 +391,18 @@ watch(() => route.path, (newPath) => {
       gap: 6px;
 
       .tag {
-        padding: 3px 10px;
+        padding: 2px 10px;
         border-radius: var(--radius-tag);
         background: var(--bg-secondary);
-        color: var(--text-secondary);
+        color: var(--text-tertiary);
         font-size: 11px;
-        font-weight: 500;
-        transition: background 0.15s ease, color 0.15s ease;
+        border: 1px solid transparent;
+        transition: all 0.2s;
 
         &:hover {
-          background: var(--color-accent);
-          color: #fff;
+          background: transparent;
+          border-color: var(--color-accent);
+          color: var(--color-accent);
         }
       }
     }
@@ -407,50 +412,57 @@ watch(() => route.path, (newPath) => {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
 
       .meta-info {
         display: flex;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 6px 12px;
 
         .meta-item {
-          display: flex;
-          align-items: center;
-          gap: 4px;
           font-size: 12px;
           color: var(--text-tertiary);
-
-          .icon { font-style: normal; }
         }
       }
 
       .read-btn {
-        font-size: 12px;
+        font-size: 13px;
+        font-weight: 600;
         color: var(--color-accent);
         white-space: nowrap;
-        font-weight: 500;
+        opacity: 0;
+        transform: translateX(-6px);
+        transition: opacity 0.25s ease, transform 0.25s ease;
+        letter-spacing: 0.02em;
       }
     }
   }
 }
 
+// ── 空状态（对齐 Home.vue）─────────────────────────────
 .empty-state {
   text-align: center;
-  padding: 64px 20px;
+  padding: 72px 0;
   color: var(--text-tertiary);
-  font-size: 14px;
+  font-size: 15px;
+
+  .empty-text {
+    font-family: var(--font-serif);
+  }
 }
 
+// ── 分页 ──────────────────────────────────────────────
 .pagination {
   display: flex;
   justify-content: center;
-  padding: 28px 0 0;
+  padding: 32px 0 0;
   border-top: 1px solid var(--border-color);
 
   :deep(.el-pagination) {
     .el-pager li {
       border-radius: var(--radius-btn);
-      transition: background 0.15s ease, color 0.15s ease;
+      transition: background 0.2s ease, color 0.2s ease;
+      font-family: var(--font-sans);
 
       &.is-active {
         background: var(--color-accent);
@@ -465,22 +477,25 @@ watch(() => route.path, (newPath) => {
   }
 }
 
+// ── 响应式 ────────────────────────────────────────────
 @media (max-width: 640px) {
-  .page-header h1 {
-    font-size: 26px;
+  .article-list { padding: 28px 0 60px; }
+
+  .page-header {
+    margin-bottom: 28px;
+    h1 { font-size: 26px; }
   }
 
   .article-card {
     flex-direction: column;
-    height: auto;
 
     .card-left {
       width: 100%;
-      height: 180px;
+      height: 190px;
     }
 
     .card-right {
-      padding: 14px 16px;
+      padding: 18px;
     }
   }
 }

@@ -1,21 +1,19 @@
-<template>
+﻿<template>
   <div class="talk">
     <div class="container">
       <!-- 页面标题 -->
       <div class="page-header">
-        <div class="header-icon">💭</div>
         <div class="header-text">
           <h1>说说</h1>
           <p>记录生活的点点滴滴~</p>
         </div>
         <!-- 发表说说按钮 - 仅博主可见 -->
-        <el-button 
-          v-if="isAuthor" 
-          type="primary" 
+        <el-button
+          v-if="isAuthor"
+          type="primary"
           class="publish-btn"
           @click="showPublishDialog = true"
         >
-          <span class="btn-icon">✨</span>
           发表说说
         </el-button>
       </div>
@@ -47,10 +45,10 @@
           <div class="talk-footer">
             <div class="actions">
               <el-button text class="action-btn" @click="handleLike(talk)">
-                <span class="icon">{{ talk.isLiked ? '❤️' : '💗' }}</span>
+                <span class="action-text" :class="{ liked: talk.isLiked }">喜欢</span>
               </el-button>
               <el-button text class="action-btn" @click="openCommentDialog(talk)">
-                <span class="icon">💬</span>
+                <span class="action-text">评论</span>
               </el-button>
             </div>
             <!-- 删除按钮 - 仅博主和超级管理员可见 -->
@@ -60,7 +58,6 @@
               class="delete-talk-btn"
               @click="handleDeleteTalk(talk)"
             >
-              <span class="icon">🗑️</span>
               删除
             </el-button>
           </div>
@@ -192,7 +189,6 @@
         
         <!-- 空状态 -->
         <div v-if="talks.length === 0 && !loading" class="empty-state">
-          <div class="empty-icon">💭</div>
           <div class="empty-text">暂无说说</div>
         </div>
       </div>
@@ -246,10 +242,7 @@
         
         <el-form-item>
           <div class="upload-section">
-            <div class="upload-title">
-              <span class="icon">📷</span>
-              上传图片（最多9张）
-            </div>
+            <div class="upload-title">上传图片（最多9张）</div>
             
             <!-- 图片预览列表 -->
             <div class="image-list" v-if="talkImageList.length > 0">
@@ -1072,7 +1065,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .talk {
   min-height: calc(100vh - 200px);
-  padding: 32px 0 48px;
+  padding: 104px 0 64px;
 }
 
 .container {
@@ -1081,110 +1074,130 @@ onMounted(() => {
   padding: 0 24px;
 }
 
+// ── 页头 ──────────────────────────────────────────────
 .page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 32px;
+  gap: 16px;
+  margin-bottom: 40px;
   border-left: 4px solid var(--color-accent);
   padding-left: 20px;
 
   .header-text {
+    flex: 1;
+    min-width: 0;
+
     h1 {
       font-family: var(--font-serif);
       font-size: 32px;
       font-weight: 700;
       letter-spacing: -0.02em;
       color: var(--text-primary);
-      margin: 0 0 4px 0;
+      margin: 0 0 8px 0;
     }
 
     p {
-      font-size: 13px;
+      font-size: 14px;
       color: var(--text-tertiary);
       margin: 0;
     }
   }
 
   .publish-btn {
-    height: 36px;
-    padding: 0 18px;
+    flex-shrink: 0;
+    height: 38px;
+    padding: 0 20px;
     border-radius: var(--radius-btn);
     background: var(--color-accent);
     border: none;
     color: #fff;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: 0.04em;
     cursor: pointer;
-    transition: opacity 0.15s ease;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 
     &:hover {
-      opacity: 0.85;
+      background: var(--color-accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
     }
   }
 }
 
+// ── 说说列表 ──────────────────────────────────────────
 .talk-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 
+  // 空状态：与 Home.vue 对齐
   .empty-state {
     text-align: center;
-    padding: 64px 20px;
+    padding: 72px 0;
     color: var(--text-tertiary);
-    font-size: 14px;
+    font-size: 15px;
   }
 
+  // 说说卡片：玻璃态
   .talk-item {
     background: var(--bg-card);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-card);
-    padding: 20px;
+    padding: 24px;
     box-shadow: var(--shadow-card);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
 
     &:hover {
       transform: translateY(-4px);
       box-shadow: var(--shadow-card-hover);
+      border-color: var(--color-accent);
     }
 
     .talk-header {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
 
       .avatar {
-        width: 40px;
-        height: 40px;
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--border-strong);
         object-fit: cover;
         flex-shrink: 0;
+        box-shadow: 0 0 0 3px var(--bg-card);
       }
 
       .user-info {
+        min-width: 0;
+
         .username {
           font-family: var(--font-serif);
           font-size: 15px;
           font-weight: 700;
           color: var(--text-primary);
-          margin-bottom: 2px;
+          letter-spacing: -0.01em;
+          margin-bottom: 3px;
         }
 
         .time {
           font-size: 12px;
           color: var(--text-tertiary);
+          font-variant-numeric: tabular-nums;
         }
       }
     }
 
     .talk-content {
-      font-size: 14px;
-      line-height: 1.7;
+      font-size: 15px;
+      line-height: 1.85;
       color: var(--text-secondary);
-      margin-bottom: 14px;
+      margin-bottom: 16px;
       white-space: pre-wrap;
       word-break: break-word;
     }
@@ -1192,7 +1205,7 @@ onMounted(() => {
     .talk-images {
       display: grid;
       gap: 8px;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
 
       &:has(.talk-img:nth-child(1):nth-last-child(1)) {
         grid-template-columns: 1fr;
@@ -1217,67 +1230,74 @@ onMounted(() => {
         object-fit: cover;
         border-radius: var(--radius-btn);
         cursor: pointer;
-        transition: opacity 0.15s ease;
+        transition: transform 0.35s ease, opacity 0.2s ease;
 
         &:hover {
-          opacity: 0.85;
+          transform: scale(1.015);
+          opacity: 0.94;
         }
       }
     }
 
     .talk-footer {
       border-top: 1px solid var(--border-color);
-      padding-top: 12px;
+      padding-top: 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
 
       .actions {
         display: flex;
-        gap: 16px;
+        gap: 22px;
 
         .action-btn {
-          color: var(--text-tertiary);
-          font-size: 13px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          transition: color 0.15s ease;
           background: none;
           border: none;
           padding: 0;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          transition: opacity 0.15s ease;
 
-          .icon { font-size: 15px; }
+          &:hover { opacity: 0.85; }
 
-          &:hover { color: var(--color-accent); }
-          &.liked { color: var(--color-danger); }
+          .action-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            transition: color 0.15s ease;
+
+            &.liked { color: var(--color-accent); }
+          }
         }
       }
 
       .delete-talk-btn {
-        color: var(--text-tertiary);
+        color: var(--color-danger);
         font-size: 13px;
         cursor: pointer;
         background: none;
         border: none;
         padding: 0;
-        transition: color 0.15s ease;
+        opacity: 0.78;
+        transition: opacity 0.15s ease;
 
-        &:hover { color: var(--color-danger); }
+        &:hover { opacity: 1; }
       }
     }
   }
 
+  // ── 评论区 ──
   .comment-list {
-    margin-top: 16px;
-    padding-top: 16px;
+    margin-top: 18px;
+    padding-top: 18px;
     border-top: 1px solid var(--border-color);
 
     .comment-item-bilibili {
       display: flex;
-      gap: 10px;
-      padding: 12px 0;
+      gap: 12px;
+      padding: 14px 0;
       border-bottom: 1px solid var(--border-color);
 
       &:last-child { border-bottom: none; }
@@ -1300,7 +1320,10 @@ onMounted(() => {
           font-weight: 600;
           color: var(--text-secondary);
           margin-bottom: 6px;
+          display: inline-flex;
+          align-items: center;
 
+          // 博主使用 accent 强调
           &.author {
             color: var(--color-accent);
 
@@ -1308,11 +1331,12 @@ onMounted(() => {
               content: '博主';
               margin-left: 6px;
               font-size: 10px;
-              background: var(--color-accent);
-              color: var(--text-inverse);
-              padding: 1px 6px;
+              background: var(--gradient-accent);
+              color: #fff;
+              padding: 1px 7px;
               border-radius: var(--radius-tag);
-              font-weight: 600;
+              font-weight: 700;
+              letter-spacing: 0.04em;
             }
           }
         }
@@ -1320,7 +1344,7 @@ onMounted(() => {
         .comment-text {
           font-size: 14px;
           color: var(--text-secondary);
-          line-height: 1.7;
+          line-height: 1.75;
           margin-bottom: 8px;
           word-break: break-word;
         }
@@ -1334,11 +1358,12 @@ onMounted(() => {
           .comment-time {
             font-size: 12px;
             color: var(--text-tertiary);
+            font-variant-numeric: tabular-nums;
           }
 
           .comment-actions {
             display: flex;
-            gap: 12px;
+            gap: 14px;
 
             .action-btn {
               font-size: 12px;
@@ -1359,38 +1384,43 @@ onMounted(() => {
           display: inline-flex;
           align-items: center;
           gap: 4px;
-          padding: 4px 10px;
+          padding: 4px 12px;
           background: var(--bg-secondary);
+          border: 1px solid var(--border-color);
           border-radius: var(--radius-tag);
           cursor: pointer;
-          transition: background 0.15s ease;
-          margin-top: 6px;
+          transition: background 0.2s ease, border-color 0.2s ease;
+          margin-top: 4px;
 
           .expand-text {
             font-size: 12px;
+            font-weight: 600;
             color: var(--color-accent);
           }
 
           .expand-icon {
             font-size: 10px;
             color: var(--color-accent);
-            transition: transform 0.2s;
+            transition: transform 0.25s ease;
 
             &.expanded { transform: rotate(180deg); }
           }
 
-          &:hover { background: var(--bg-primary); }
+          &:hover {
+            background: var(--bg-card);
+            border-color: var(--color-accent);
+          }
         }
 
         .replies-list {
           margin-top: 10px;
-          padding-left: 12px;
+          padding-left: 14px;
           border-left: 2px solid var(--border-color);
 
           .reply-item {
             display: flex;
-            gap: 8px;
-            padding: 8px 0;
+            gap: 10px;
+            padding: 10px 0;
             border-bottom: 1px solid var(--border-color);
 
             &:last-child { border-bottom: none; }
@@ -1425,7 +1455,7 @@ onMounted(() => {
               .reply-text {
                 font-size: 13px;
                 color: var(--text-secondary);
-                line-height: 1.6;
+                line-height: 1.7;
                 margin-bottom: 6px;
                 word-break: break-word;
               }
@@ -1438,6 +1468,7 @@ onMounted(() => {
                 .reply-time {
                   font-size: 11px;
                   color: var(--text-tertiary);
+                  font-variant-numeric: tabular-nums;
                 }
 
                 .reply-actions {
@@ -1465,6 +1496,7 @@ onMounted(() => {
     }
   }
 
+  // ── 评论输入框 ──
   .comment-input-area {
     margin-top: 16px;
     padding-top: 16px;
@@ -1472,20 +1504,22 @@ onMounted(() => {
 
     .input-box {
       width: 100%;
-      background: var(--bg-primary);
+      background: var(--bg-secondary);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-btn);
-      padding: 10px 12px;
+      padding: 12px 14px;
       font-size: 14px;
       color: var(--text-primary);
       resize: vertical;
-      min-height: 80px;
+      min-height: 84px;
       font-family: inherit;
-      transition: border-color 0.15s ease;
+      line-height: 1.7;
+      transition: border-color 0.2s ease, background 0.2s ease;
 
       &:focus {
         outline: none;
         border-color: var(--color-accent);
+        background: var(--bg-card);
       }
 
       &::placeholder { color: var(--text-tertiary); }
@@ -1494,69 +1528,82 @@ onMounted(() => {
     .input-footer {
       display: flex;
       justify-content: flex-end;
-      margin-top: 8px;
+      margin-top: 10px;
 
       .submit-btn {
-        padding: 6px 16px;
+        padding: 8px 20px;
         border-radius: var(--radius-btn);
         background: var(--color-accent);
         border: none;
         color: #fff;
         font-size: 13px;
-        font-weight: 600;
+        font-weight: 700;
+        letter-spacing: 0.04em;
         cursor: pointer;
-        transition: opacity 0.15s ease;
+        transition: background 0.2s ease, transform 0.2s ease;
 
-        &:hover { opacity: 0.85; }
+        &:hover {
+          background: var(--color-accent-hover);
+          transform: translateY(-1px);
+        }
       }
     }
   }
 }
 
+// ── 发布弹窗 ──────────────────────────────────────────
 .publish-dialog {
   .publish-form {
     .form-textarea {
       width: 100%;
-      background: var(--bg-primary);
+      background: var(--bg-secondary);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-btn);
-      padding: 12px;
+      padding: 14px 16px;
       font-size: 14px;
       color: var(--text-primary);
       resize: vertical;
-      min-height: 120px;
+      min-height: 130px;
       font-family: inherit;
-      transition: border-color 0.15s ease;
+      line-height: 1.75;
+      transition: border-color 0.2s ease, background 0.2s ease;
 
       &:focus {
         outline: none;
         border-color: var(--color-accent);
+        background: var(--bg-card);
       }
 
       &::placeholder { color: var(--text-tertiary); }
     }
 
     .image-upload-section {
-      margin-top: 12px;
+      margin-top: 16px;
 
       .upload-title {
         font-size: 13px;
+        font-weight: 600;
         color: var(--text-tertiary);
-        margin-bottom: 8px;
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
       }
 
       .image-list {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 10px;
 
         .image-item {
           position: relative;
-          width: 80px;
-          height: 80px;
+          width: 84px;
+          height: 84px;
           border-radius: var(--radius-btn);
           overflow: hidden;
           border: 1px solid var(--border-color);
+          background: var(--bg-secondary);
+          transition: border-color 0.2s ease;
+
+          &:hover { border-color: var(--color-accent); }
 
           img {
             width: 100%;
@@ -1566,12 +1613,12 @@ onMounted(() => {
 
           .remove-btn {
             position: absolute;
-            top: 2px;
-            right: 2px;
-            width: 18px;
-            height: 18px;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.65);
             color: #fff;
             font-size: 12px;
             cursor: pointer;
@@ -1579,12 +1626,15 @@ onMounted(() => {
             align-items: center;
             justify-content: center;
             border: none;
+            transition: background 0.15s ease;
+
+            &:hover { background: var(--color-danger); }
           }
         }
 
         .upload-btn {
-          width: 80px;
-          height: 80px;
+          width: 84px;
+          height: 84px;
           border: 1px dashed var(--border-color);
           border-radius: var(--radius-btn);
           display: flex;
@@ -1593,11 +1643,12 @@ onMounted(() => {
           cursor: pointer;
           color: var(--text-tertiary);
           font-size: 24px;
-          background: transparent;
-          transition: border-color 0.15s ease;
+          background: var(--bg-secondary);
+          transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
 
           &:hover {
             border-color: var(--color-accent);
+            background: var(--bg-card);
             color: var(--color-accent);
           }
         }
@@ -1606,15 +1657,32 @@ onMounted(() => {
   }
 }
 
+// ── 分页 ──────────────────────────────────────────────
 .pagination {
   display: flex;
   justify-content: center;
-  padding: 24px 0 0;
+  padding: 28px 0 0;
   border-top: 1px solid var(--border-color);
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 @media (max-width: 640px) {
+  .talk { padding: 28px 0 48px; }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 28px;
+
+    .header-text h1 { font-size: 26px; }
+    .publish-btn { width: 100%; }
+  }
+
+  .talk-list .talk-item {
+    padding: 18px;
+  }
+
   .talk-list .talk-item .talk-images .talk-img {
     height: 140px;
   }

@@ -1,18 +1,14 @@
-<template>
+﻿<template>
   <div class="link">
     <div class="container">
       <!-- 友链列表 -->
       <div class="links-section">
         <div class="section-header">
           <div class="header-left">
-            <div class="header-icon">🌈</div>
-            <div class="header-text">
-              <h3 class="section-title">友情链接</h3>
-              <p class="section-desc">一起分享，一起成长~</p>
-            </div>
+            <h3 class="section-title">友情链接</h3>
+            <p class="section-desc">一起分享，一起成长~</p>
           </div>
           <el-button type="primary" class="apply-btn" @click="showApplyDialog = true">
-            <span class="btn-icon">💌</span>
             申请友链
           </el-button>
         </div>
@@ -37,7 +33,6 @@
           
           <!-- 空状态 -->
           <div v-if="links.length === 0 && !loading" class="empty-state">
-            <div class="empty-icon">🔗</div>
             <div class="empty-text">暂无友情链接</div>
           </div>
         </div>
@@ -48,7 +43,7 @@
   <!-- 申请友链弹窗 -->
   <el-dialog
     v-model="showApplyDialog"
-    title="💌 申请友链"
+    title="申请友链"
     width="600px"
     :close-on-click-modal="false"
     @close="resetForm"
@@ -237,7 +232,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .link {
   min-height: calc(100vh - 200px);
-  padding: 32px 0 48px;
+  padding: 104px 0 64px;
 }
 
 .container {
@@ -246,89 +241,20 @@ onMounted(() => {
   padding: 0 24px;
 }
 
-.page-header {
-  border-left: 3px solid var(--color-accent);
-  padding-left: 16px;
-  margin-bottom: 32px;
-
-  h1 {
-    font-size: 24px;
-    color: var(--text-primary);
-    margin: 0 0 6px 0;
-    font-weight: 700;
-  }
-
-  p {
-    font-size: 13px;
-    color: var(--text-tertiary);
-    margin: 0;
-  }
-}
-
-.apply-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-card);
-  padding: 24px;
-  margin-bottom: 32px;
-
-  .card-title {
-    font-size: 16px;
-    color: var(--text-primary);
-    margin: 0 0 12px 0;
-    font-weight: 600;
-  }
-
-  .card-desc {
-    color: var(--text-secondary);
-    font-size: 14px;
-    line-height: 1.8;
-    margin-bottom: 20px;
-  }
-
-  .my-info {
-    background: var(--bg-primary);
-    padding: 16px;
-    border-radius: var(--radius-btn);
-    border: 1px solid var(--border-color);
-
-    .info-item {
-      display: flex;
-      align-items: center;
-      padding: 8px 0;
-
-      &:not(:last-child) {
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .label {
-        font-size: 13px;
-        color: var(--text-tertiary);
-        min-width: 80px;
-      }
-
-      .value {
-        font-size: 13px;
-        color: var(--text-secondary);
-        flex: 1;
-      }
-    }
-  }
-}
-
 .links-section {
   .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 36px;
     border-left: 4px solid var(--color-accent);
     padding-left: 20px;
 
     .header-left {
       display: flex;
-      align-items: center;
-      gap: 12px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
 
       .section-title {
         font-family: var(--font-serif);
@@ -336,72 +262,88 @@ onMounted(() => {
         font-weight: 700;
         letter-spacing: -0.02em;
         color: var(--text-primary);
-        margin: 0 0 4px 0;
+        margin: 0;
+        line-height: 1.2;
       }
 
       .section-desc {
-        font-size: 13px;
+        font-size: 14px;
         color: var(--text-tertiary);
         margin: 0;
       }
     }
 
     .apply-btn {
-      height: 36px;
-      padding: 0 18px;
+      height: 38px;
+      padding: 0 22px;
       border-radius: var(--radius-btn);
       background: var(--color-accent);
       border: none;
       color: #fff;
       font-size: 13px;
       font-weight: 600;
+      letter-spacing: 0.02em;
       cursor: pointer;
-      transition: opacity 0.15s ease;
+      transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.25s ease;
 
-      &:hover { opacity: 0.85; }
+      &:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-glow);
+      }
     }
   }
 
   .links-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 16px;
+    gap: 20px;
   }
 
   .link-card {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 20px;
+    padding: 22px;
     text-decoration: none;
     background: var(--bg-card);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
 
     &:hover {
-      transform: translateY(-4px);
       box-shadow: var(--shadow-card-hover);
+      transform: translateY(-4px);
+      border-color: var(--color-accent);
 
       .link-name { color: var(--color-accent); }
 
       .link-icon {
         color: var(--color-accent);
+        transform: translateX(3px);
+      }
+
+      .link-avatar {
+        box-shadow: var(--shadow-glow-strong);
       }
     }
 
     .link-avatar {
       flex-shrink: 0;
-      width: 56px;
-      height: 56px;
+      width: 58px;
+      height: 58px;
       border-radius: 50%;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
+      background: linear-gradient(145deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+      border: 2px solid var(--border-strong);
+      box-shadow: var(--shadow-glow);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      transition: box-shadow 0.35s ease;
 
       img {
         width: 100%;
@@ -411,9 +353,13 @@ onMounted(() => {
 
       .avatar-text {
         font-family: var(--font-serif);
-        font-size: 22px;
+        font-size: 24px;
         font-weight: 700;
-        color: var(--color-accent);
+        line-height: 1;
+        background: var(--gradient-accent);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
     }
 
@@ -423,24 +369,26 @@ onMounted(() => {
 
       .link-name {
         font-family: var(--font-serif);
-        font-size: 16px;
+        font-size: 17px;
         font-weight: 700;
         color: var(--text-primary);
         margin: 0 0 4px 0;
-        transition: color 0.15s ease;
+        letter-spacing: -0.01em;
+        transition: color 0.2s ease;
       }
 
       .link-author {
         font-size: 12px;
         color: var(--text-tertiary);
         margin: 0 0 4px 0;
+        letter-spacing: 0.02em;
       }
 
       .link-desc {
         font-size: 13px;
         color: var(--text-tertiary);
         margin: 0;
-        line-height: 1.5;
+        line-height: 1.55;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
@@ -451,7 +399,7 @@ onMounted(() => {
     .link-icon {
       font-size: 16px;
       color: var(--text-tertiary);
-      transition: color 0.15s ease;
+      transition: color 0.25s ease, transform 0.25s ease;
       flex-shrink: 0;
     }
   }
@@ -460,95 +408,88 @@ onMounted(() => {
 .empty-state {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 64px 20px;
+  padding: 72px 0;
   color: var(--text-tertiary);
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .apply-dialog {
   .dialog-desc {
     color: var(--text-secondary);
     font-size: 14px;
-    line-height: 1.8;
+    line-height: 1.85;
     margin-bottom: 20px;
-  }
-
-  .my-info {
-    background: var(--bg-primary);
-    padding: 16px;
-    border-radius: var(--radius-btn);
-    border: 1px solid var(--border-color);
-    margin-bottom: 16px;
-
-    .info-title {
-      font-size: 13px;
-      color: var(--text-tertiary);
-      margin: 0 0 12px 0;
-      font-weight: 600;
-    }
-
-    .info-item {
-      display: flex;
-      align-items: center;
-      padding: 6px 0;
-
-      &:not(:last-child) {
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .label {
-        font-size: 12px;
-        color: var(--text-tertiary);
-        min-width: 72px;
-      }
-
-      .value {
-        font-size: 13px;
-        color: var(--text-secondary);
-        flex: 1;
-        word-break: break-all;
-      }
-    }
-  }
-
-  .apply-tips {
-    background: var(--bg-primary);
-    padding: 16px;
-    border-radius: var(--radius-btn);
-    border: 1px solid var(--border-color);
-
-    .tips-title {
-      font-size: 13px;
-      color: var(--text-tertiary);
-      margin: 0 0 10px 0;
-      font-weight: 600;
-    }
-
-    .tips-list {
-      margin: 0;
-      padding-left: 16px;
-
-      li {
-        color: var(--text-secondary);
-        font-size: 13px;
-        line-height: 1.8;
-      }
-    }
   }
 
   .apply-form {
     margin: 16px 0;
   }
+
+  .apply-tips {
+    background: var(--bg-secondary);
+    padding: 18px 20px;
+    border-radius: var(--radius-btn);
+    border: 1px solid var(--border-color);
+
+    .tips-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin: 0 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &::before {
+        content: '';
+        display: block;
+        width: 3px;
+        height: 14px;
+        background: var(--gradient-accent);
+        border-radius: 2px;
+        flex-shrink: 0;
+      }
+    }
+
+    .tips-list {
+      margin: 0;
+      padding-left: 18px;
+
+      li {
+        color: var(--text-secondary);
+        font-size: 13px;
+        line-height: 1.85;
+      }
+    }
+  }
 }
 
 @media (max-width: 640px) {
-  .links-section .links-grid {
-    grid-template-columns: 1fr;
+  .links-section {
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+
+      .apply-btn {
+        align-self: stretch;
+      }
+    }
+
+    .links-grid {
+      grid-template-columns: 1fr;
+    }
   }
 
   .link-card .link-avatar {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
+
+    .avatar-text {
+      font-size: 20px;
+    }
   }
 }
 </style>

@@ -11,8 +11,7 @@
         <div class="article-info">
           <!-- 左侧：标签 -->
           <span class="info-item tags" v-if="article.articleTag">
-            <span class="icon">🏷️</span>
-            <span 
+            <span
               class="tag" 
               v-for="(tag, index) in parseTags(article.articleTag)" 
               :key="index"
@@ -22,19 +21,10 @@
           
           <!-- 右侧：阅读数、点赞数、时间 -->
           <div class="info-right">
-            <span class="info-item" v-if="article.readNum !== undefined">
-              <span class="icon">👁️</span>
-              {{ article.readNum }} 阅读
-            </span>
-            <span class="info-item" v-if="article.likeCount">
-              <span class="icon">💗</span>
-              {{ article.likeCount }} 点赞
-            </span>
+            <span class="info-item" v-if="article.readNum !== undefined">{{ article.readNum }} 阅读</span>
+            <span class="info-item" v-if="article.likeCount">{{ article.likeCount }} 点赞</span>
             <span class="info-divider" v-if="article.createTime">|</span>
-            <span class="info-item" v-if="article.createTime">
-              <span class="icon">📅</span>
-              {{ formatTime(article.createTime) }}
-            </span>
+            <span class="info-item" v-if="article.createTime">{{ formatTime(article.createTime) }}</span>
           </div>
         </div>
         
@@ -49,16 +39,13 @@
           :class="{ liked: article.isLiked }"
           @click="handleLikeArticle"
         >
-          <span class="icon">{{ article.isLiked ? '💗' : '🤍' }}</span>
           <span class="text">点赞</span>
           <span class="count">{{ article.likeCount || 0 }}</span>
         </el-button>
         <el-button class="action-btn" size="large">
-          <span class="icon">⭐</span>
           <span class="text">收藏</span>
         </el-button>
         <el-button class="action-btn" size="large" @click="handleShare">
-          <span class="icon">🔗</span>
           <span class="text">分享</span>
         </el-button>
       </div>
@@ -234,7 +221,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .article-detail {
   min-height: calc(100vh - 200px);
-  padding: 40px 0 60px;
+  padding: 112px 0 80px;
   position: relative;
 }
 
@@ -244,18 +231,25 @@ onMounted(() => {
   padding: 0 24px;
 }
 
+// ── 文章卡片（玻璃态对齐 Home.vue）────────────────────
 .article-content {
-  padding: 48px 56px;
-  margin-bottom: 20px;
+  padding: 56px 64px;
+  margin-bottom: 24px;
+  background: var(--bg-card);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
 
   .article-title {
-    font-family: var(--font-serif);
-    font-size: 32px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-family: var(--font-display, var(--font-serif));
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
     color: var(--text-primary);
-    line-height: 1.4;
-    margin: 0 0 20px 0;
+    line-height: 1.25;
+    margin: 0 0 24px 0;
     text-align: center;
   }
 
@@ -264,11 +258,11 @@ onMounted(() => {
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 8px 16px;
+    gap: 10px 18px;
     font-size: 13px;
     color: var(--text-tertiary);
-    padding-bottom: 24px;
-    margin-bottom: 32px;
+    padding-bottom: 28px;
+    margin-bottom: 36px;
     border-bottom: 1px solid var(--border-color);
     font-family: var(--font-sans);
 
@@ -284,20 +278,21 @@ onMounted(() => {
         flex-wrap: wrap;
         justify-content: center;
 
+        // 与 Home.vue tag 一致
         .tag {
-          padding: 3px 12px;
+          padding: 2px 10px;
           border-radius: var(--radius-tag);
           background: var(--bg-secondary);
-          color: var(--text-secondary);
-          font-size: 12px;
-          font-weight: 500;
+          color: var(--text-tertiary);
+          font-size: 11px;
+          border: 1px solid transparent;
           transition: all 0.2s;
           cursor: pointer;
-          border: none;
 
           &:hover {
-            background: var(--color-accent);
-            color: #fff;
+            background: transparent;
+            border-color: var(--color-accent);
+            color: var(--color-accent);
           }
         }
       }
@@ -306,12 +301,13 @@ onMounted(() => {
     .info-right {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
     .info-divider {
-      color: var(--border-color);
+      color: var(--border-strong);
       margin: 0 2px;
+      opacity: 0.6;
     }
   }
 
@@ -410,7 +406,7 @@ onMounted(() => {
     :deep(a) {
       color: var(--color-accent);
       text-decoration: none;
-      border-bottom: 1px solid rgba(232, 93, 38, 0.3);
+      border-bottom: 1px solid rgba(74, 140, 110, 0.2);
       transition: border-color 0.2s;
 
       &:hover {
@@ -454,9 +450,10 @@ onMounted(() => {
   }
 }
 
+// ── 侧边操作栏（精致文字药丸）────────────────────────
 .article-actions {
   position: fixed;
-  right: calc((100vw - 860px) / 2 - 100px);
+  right: calc((100vw - 860px) / 2 - 96px);
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -465,57 +462,57 @@ onMounted(() => {
   z-index: 100;
 
   .action-btn {
-    width: 60px;
-    height: 60px;
-    padding: 0;
+    width: 64px;
+    min-height: auto;
+    height: auto;
+    padding: 14px 8px;
     border-radius: var(--radius-card);
     border: 1px solid var(--border-color);
     background: var(--bg-card);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
     box-shadow: var(--shadow-card);
     color: var(--text-secondary);
-    font-size: 13px;
-    font-weight: 500;
     font-family: var(--font-sans);
-    transition: all 0.2s;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease, transform 0.25s ease;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 4px;
     position: relative;
 
-    .icon {
-      font-size: 20px;
-    }
-
     .text {
-      font-size: 11px;
-      color: var(--text-tertiary);
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      transition: color 0.2s ease;
     }
 
     .count {
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      padding: 1px 6px;
-      background: var(--color-accent);
-      color: #fff;
-      border-radius: 10px;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
-      min-width: 18px;
-      text-align: center;
+      color: var(--text-tertiary);
+      letter-spacing: 0.02em;
+      transition: color 0.2s ease;
     }
 
     &:hover {
-      border-color: var(--color-accent);
-      color: var(--color-accent);
+      border-color: var(--border-strong);
       box-shadow: var(--shadow-card-hover);
+      transform: translateY(-2px);
+
+      .text { color: var(--color-accent); }
+      .count { color: var(--color-accent); }
     }
 
     &.like-btn.liked {
       border-color: var(--color-accent);
-      color: var(--color-accent);
+      background: rgba(22, 93, 255, 0.08);
+
+      .text { color: var(--color-accent); }
+      .count { color: var(--color-accent); }
     }
   }
 }
@@ -527,26 +524,30 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .article-detail {
+    padding: 24px 0 60px;
+  }
+
   .article-detail .container {
     padding: 0;
   }
 
   .article-content {
-    padding: 28px 20px;
+    padding: 32px 22px;
     border-radius: 0;
     margin-bottom: 16px;
 
     .article-title {
-      font-size: 22px;
-      letter-spacing: -0.01em;
-      margin-bottom: 16px;
+      font-size: 26px;
+      letter-spacing: -0.02em;
+      margin-bottom: 18px;
     }
 
     .article-info {
       gap: 8px;
       font-size: 12px;
-      padding-bottom: 16px;
-      margin-bottom: 20px;
+      padding-bottom: 18px;
+      margin-bottom: 24px;
       flex-direction: column;
       align-items: center;
 
@@ -592,6 +593,7 @@ onMounted(() => {
     }
   }
 
+  // 移动端浮动操作条
   .article-actions {
     position: fixed;
     right: 14px;
@@ -603,11 +605,11 @@ onMounted(() => {
     display: flex;
 
     .action-btn {
-      width: 48px;
-      height: 48px;
+      width: 56px;
+      padding: 10px 6px;
 
-      .icon { font-size: 18px; }
-      .text { display: none; }
+      .text { font-size: 11px; }
+      .count { font-size: 10px; }
     }
   }
 }

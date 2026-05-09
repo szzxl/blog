@@ -1,30 +1,48 @@
-<template>
+﻿<template>
   <footer class="footer">
     <div class="container">
       <div class="footer-main">
         <div class="footer-brand">
           <span class="brand-name">{{ websiteName }}</span>
           <p class="brand-motto" v-if="websiteMotto">{{ websiteMotto }}</p>
+          <div class="social-links">
+            <a v-if="socialGithub" :href="socialGithub" target="_blank" class="social-btn">
+              <span>GitHub</span>
+            </a>
+            <a v-if="socialGitee" :href="socialGitee" target="_blank" class="social-btn">
+              <span>Gitee</span>
+            </a>
+            <span v-if="socialEmail" class="social-btn email">{{ socialEmail }}</span>
+          </div>
         </div>
+
         <div class="footer-links">
           <div class="link-group">
             <span class="group-title">导航</span>
             <router-link to="/">首页</router-link>
             <router-link to="/articles">文章</router-link>
-            <router-link to="/about">关于</router-link>
+            <router-link to="/category">分类</router-link>
+            <router-link to="/tag">标签</router-link>
           </div>
-          <div class="link-group" v-if="socialEmail || socialGitee || socialGithub">
-            <span class="group-title">联系</span>
-            <span v-if="socialEmail" class="contact-item">{{ socialEmail }}</span>
-            <a v-if="socialGitee" :href="socialGitee" target="_blank">Gitee</a>
-            <a v-if="socialGithub" :href="socialGithub" target="_blank">GitHub</a>
+          <div class="link-group">
+            <span class="group-title">更多</span>
+            <router-link to="/talk">说说</router-link>
+            <router-link to="/album">相册</router-link>
+            <router-link to="/guestbook">留言板</router-link>
+            <router-link to="/about">关于</router-link>
           </div>
         </div>
       </div>
+
       <div class="footer-bottom">
-        <span class="copyright">{{ copyright }}</span>
-        <span class="runtime">{{ runtimeText }}</span>
-        <span class="icp" v-if="icpNumber">{{ icpNumber }}</span>
+        <div class="footer-bottom-left">
+          <span class="copyright">{{ copyright }}</span>
+          <span class="icp" v-if="icpNumber">{{ icpNumber }}</span>
+        </div>
+        <div class="runtime-wrap">
+          <span class="runtime-dot"></span>
+          <span class="runtime">{{ runtimeText }}</span>
+        </div>
       </div>
     </div>
   </footer>
@@ -52,7 +70,7 @@ const calculateRuntime = () => {
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
   const seconds = Math.floor((diff % (1000 * 60)) / 1000)
-  runtimeText.value = `已运行 ${days}d ${hours}h ${minutes}m ${seconds}s`
+  runtimeText.value = `已运行 ${days}天 ${hours}时 ${minutes}分 ${seconds}秒`
 }
 
 let timer: number | null = null
@@ -67,9 +85,7 @@ const fetchWebsiteConfig = async () => {
     if (config.social_email) socialEmail.value = config.social_email
     if (config.social_gitee) socialGitee.value = config.social_gitee
     if (config.social_github) socialGithub.value = config.social_github
-  } catch {
-    // 静默失败
-  }
+  } catch { /* 静默失败 */ }
 }
 
 onMounted(() => {
@@ -85,9 +101,22 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .footer {
+  position: relative;
   border-top: 1px solid var(--border-color);
-  margin-top: 64px;
+  margin-top: 80px;
   background: var(--bg-card);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: var(--gradient-accent);
+    border-radius: 2px;
+  }
 }
 
 .footer-main {
@@ -95,7 +124,7 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: flex-start;
   gap: 48px;
-  padding: 48px 0 32px;
+  padding: 48px 0 36px;
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -104,20 +133,52 @@ onUnmounted(() => {
 
   .brand-name {
     font-family: var(--font-serif);
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--text-primary);
     display: block;
     margin-bottom: 10px;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
   }
 
   .brand-motto {
     font-size: 13px;
     color: var(--text-tertiary);
-    margin: 0;
-    line-height: 1.6;
+    margin: 0 0 20px;
+    line-height: 1.75;
+    border-left: 2px solid var(--color-accent);
+    padding-left: 10px;
+    opacity: 0.8;
   }
+}
+
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 14px;
+  border-radius: var(--radius-tag);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background: transparent;
+  }
+
+  &.email { cursor: default; &:hover { color: var(--text-secondary); border-color: var(--border-color); background: var(--bg-secondary); } }
 }
 
 .footer-links {
@@ -135,21 +196,16 @@ onUnmounted(() => {
     font-weight: 700;
     color: var(--text-tertiary);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 2px;
+    letter-spacing: 0.12em;
+    margin-bottom: 4px;
   }
 
-  a, .contact-item {
+  a {
     font-size: 13px;
     color: var(--text-secondary);
-    transition: color 0.15s ease;
-
+    text-decoration: none;
+    transition: color 0.18s;
     &:hover { color: var(--color-accent); }
-  }
-
-  .contact-item {
-    cursor: default;
-    &:hover { color: var(--text-secondary); }
   }
 }
 
@@ -159,35 +215,69 @@ onUnmounted(() => {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
-  padding: 20px 0;
+  padding: 20px 0 24px;
+
+  .footer-bottom-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
 
   span {
     font-size: 12px;
     color: var(--text-tertiary);
+    letter-spacing: 0.02em;
+  }
+
+  .icp {
+    padding-left: 16px;
+    border-left: 1px solid var(--border-color);
+  }
+}
+
+.runtime-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .runtime-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-success);
+    box-shadow: 0 0 0 2px rgba(0, 180, 42, 0.2);
+    animation: pulse 2s ease-in-out infinite;
+    flex-shrink: 0;
   }
 
   .runtime {
+    font-size: 12px;
+    color: var(--text-tertiary);
     font-variant-numeric: tabular-nums;
   }
 }
 
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(0, 180, 42, 0.2); }
+  50%       { box-shadow: 0 0 0 5px rgba(0, 180, 42, 0.08); }
+}
+
 @media (max-width: 768px) {
+  .footer { margin-top: 56px; }
+
   .footer-main {
     flex-direction: column;
     gap: 28px;
-    padding: 32px 0 24px;
+    padding: 36px 0 28px;
   }
 
-  .footer-links {
-    gap: 28px;
-    flex-wrap: wrap;
-  }
+  .footer-links { gap: 32px; }
 
   .footer-bottom {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+    padding: 16px 0 20px;
   }
 }
 </style>
-

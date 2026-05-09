@@ -22,18 +22,9 @@
             <h3 class="article-title">{{ article.articleName }}</h3>
             <p class="article-desc" v-if="article.articleDesc">{{ article.articleDesc }}</p>
             <div class="article-meta">
-              <span class="meta-item">
-                <span class="icon">📅</span>
-                {{ formatTime(article.createTime) }}
-              </span>
-              <span class="meta-item">
-                <span class="icon">👁️</span>
-                {{ article.readNum || 0 }} 阅读
-              </span>
-              <span class="meta-item">
-                <span class="icon">💗</span>
-                {{ article.likeCount || 0 }} 点赞
-              </span>
+              <span class="meta-item">{{ formatTime(article.createTime) }}</span>
+              <span class="meta-item">{{ article.readNum || 0 }} 阅读</span>
+              <span class="meta-item">{{ article.likeCount || 0 }} 点赞</span>
             </div>
           </div>
           <div class="article-actions">
@@ -49,7 +40,6 @@
         
         <!-- 空状态 -->
         <div v-if="articles.length === 0 && !loading" class="empty-state">
-          <div class="empty-icon">📚</div>
           <div class="empty-text">还没有收藏任何文章</div>
           <el-button type="primary" @click="goToHome">去首页看看</el-button>
         </div>
@@ -178,7 +168,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .favorites {
   min-height: calc(100vh - 200px);
-  padding: 40px 0;
+  padding: 48px 0 80px;
 }
 
 .container {
@@ -187,86 +177,106 @@ onMounted(() => {
   padding: 0 24px;
 }
 
+// ── 页面标题（与 Home.vue page-header 一致）────────────
 .page-header {
-  padding: 32px 0 24px;
-  border-left: 3px solid var(--color-accent);
-  padding-left: 16px;
-  margin-bottom: 32px;
+  border-left: 4px solid var(--color-accent);
+  padding-left: 20px;
+  margin-bottom: 40px;
 
   h1 {
-    font-size: 22px;
-    color: var(--text-primary);
-    margin: 0 0 6px 0;
+    font-family: var(--font-serif);
+    font-size: 32px;
     font-weight: 700;
-    font-family: 'JetBrains Mono', monospace;
-
-    &::before {
-      content: '> ';
-      color: var(--color-accent);
-    }
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+    line-height: 1.2;
   }
 
   p {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--text-tertiary);
     margin: 0;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-sans);
   }
 }
 
+// ── 收藏文章列表（对齐 Home.vue article-item）─────────
 .article-list {
   min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 
   .article-card {
     display: flex;
-    gap: 20px;
-    padding: 20px;
-    margin-bottom: 12px;
+    background: var(--bg-card);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
     cursor: pointer;
-    transition: all 0.15s;
     position: relative;
+    transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
+
+    &:hover {
+      box-shadow: var(--shadow-card-hover);
+      transform: translateY(-4px);
+      border-color: var(--border-strong);
+
+      .article-cover img {
+        transform: scale(1.07);
+      }
+
+      .article-title {
+        color: var(--color-accent);
+      }
+    }
 
     .article-cover {
-      width: 160px;
-      height: 110px;
+      width: 180px;
       flex-shrink: 0;
-      border-radius: var(--radius-card);
       overflow: hidden;
-      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
 
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.3s;
-        filter: brightness(0.85);
+        display: block;
+        transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
       }
-    }
-
-    &:hover .article-cover img {
-      transform: scale(1.05);
-      filter: brightness(1);
     }
 
     .article-content {
       flex: 1;
+      padding: 22px 24px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
+      min-width: 0;
 
       .article-title {
-        font-size: 16px;
+        font-family: var(--font-serif);
+        font-size: 17px;
         font-weight: 700;
         color: var(--text-primary);
         margin: 0;
-        line-height: 1.4;
-        transition: color 0.15s;
+        line-height: 1.45;
+        letter-spacing: -0.01em;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        transition: color 0.2s ease;
       }
 
       .article-desc {
-        font-size: 13px;
+        font-size: 14px;
         color: var(--text-tertiary);
-        line-height: 1.6;
+        line-height: 1.7;
         margin: 0;
         display: -webkit-box;
         -webkit-line-clamp: 2;
@@ -277,16 +287,14 @@ onMounted(() => {
 
       .article-meta {
         display: flex;
-        gap: 20px;
+        flex-wrap: wrap;
+        gap: 6px 14px;
         margin-top: auto;
 
         .meta-item {
-          display: flex;
-          align-items: center;
-          gap: 5px;
           font-size: 12px;
           color: var(--text-tertiary);
-          font-family: 'JetBrains Mono', monospace;
+          font-family: var(--font-sans);
         }
       }
     }
@@ -294,39 +302,39 @@ onMounted(() => {
     .article-actions {
       display: flex;
       align-items: center;
+      padding: 0 22px 0 0;
 
       .unfavorite-btn {
         border-radius: var(--radius-btn);
-        border: 1px solid rgba(248, 113, 113, 0.4);
+        border: 1px solid var(--border-color);
         color: var(--color-danger);
         background: transparent;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-sans);
         font-size: 12px;
+        padding: 8px 14px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        transition: all 0.2s ease;
 
         &:hover {
           background: var(--color-danger);
-          color: var(--bg-primary);
+          color: #fff;
           border-color: var(--color-danger);
         }
       }
     }
   }
 
+  // ── 空状态（对齐 Home.vue）────────────────────────
   .empty-state {
     text-align: center;
-    padding: 100px 20px;
-
-    .empty-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-      opacity: 0.3;
-    }
+    padding: 72px 0;
 
     .empty-text {
-      font-size: 14px;
+      font-family: var(--font-serif);
+      font-size: 15px;
       color: var(--text-tertiary);
-      margin-bottom: 28px;
-      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 24px;
     }
 
     .el-button {
@@ -334,20 +342,25 @@ onMounted(() => {
       border: 1px solid var(--color-accent);
       color: var(--color-accent);
       border-radius: var(--radius-btn);
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-sans);
+      padding: 10px 22px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      transition: all 0.25s ease;
 
       &:hover {
         background: var(--color-accent);
-        color: var(--bg-primary);
+        color: #fff;
       }
     }
   }
 }
 
+// ── 分页 ──────────────────────────────────────────────
 .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 32px;
+  margin-top: 36px;
 
   :deep(.el-pagination) {
     .btn-prev, .btn-next, .el-pager li {
@@ -355,6 +368,8 @@ onMounted(() => {
       border: 1px solid var(--border-color);
       color: var(--text-secondary);
       border-radius: var(--radius-btn);
+      font-family: var(--font-sans);
+      transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 
       &:hover {
         color: var(--color-accent);
@@ -363,7 +378,7 @@ onMounted(() => {
 
       &.is-active {
         background: var(--color-accent);
-        color: var(--bg-primary);
+        color: #fff;
         border-color: var(--color-accent);
         font-weight: 700;
       }
@@ -371,12 +386,20 @@ onMounted(() => {
   }
 }
 
+// ── 响应式 ────────────────────────────────────────────
 @media (max-width: 768px) {
+  .favorites { padding: 28px 0 60px; }
+
   .container {
     padding: 0 16px;
   }
 
-  .article-card {
+  .page-header {
+    margin-bottom: 28px;
+    h1 { font-size: 26px; }
+  }
+
+  .article-list .article-card {
     flex-direction: column;
 
     .article-cover {
@@ -384,8 +407,13 @@ onMounted(() => {
       height: 180px;
     }
 
+    .article-content {
+      padding: 18px 20px 14px;
+    }
+
     .article-actions {
       justify-content: flex-end;
+      padding: 0 20px 18px;
     }
   }
 }

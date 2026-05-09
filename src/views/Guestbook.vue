@@ -1,18 +1,15 @@
-<template>
+﻿<template>
   <div class="guestbook">
     <div class="container">
       <!-- 页面标题 -->
       <div class="page-header">
-        <div class="header-icon">💌</div>
-        <div class="header-text">
-          <h1>留言板</h1>
-          <p>留下你的足迹，分享你的心情~</p>
-        </div>
+        <h1>留言板</h1>
+        <p>留下你的足迹，分享你的心情~</p>
       </div>
       
       <!-- 发表留言 -->
       <div class="message-form card">
-        <h3 class="form-title">✨ 写下你的留言</h3>
+        <h3 class="form-title">写下你的留言</h3>
         <el-form :model="messageForm" label-width="0">
           <el-form-item>
             <el-input 
@@ -45,10 +42,7 @@
           <!-- 图片上传 - 仅登录用户可见 -->
           <el-form-item v-if="isLoggedIn">
             <div class="upload-section">
-              <div class="upload-title">
-                <span class="icon">📷</span>
-                上传图片（最多9张）
-              </div>
+              <div class="upload-title">上传图片（最多9张）</div>
               
               <!-- 图片预览列表 -->
               <div class="image-list" v-if="imageList.length > 0">
@@ -116,7 +110,6 @@
               :loading="submitting"
               @click="submitMessage"
             >
-              <span class="btn-icon">💕</span>
               发表留言
             </el-button>
           </el-form-item>
@@ -324,7 +317,7 @@ const submitMessage = async () => {
     // 调用后端 API 提交留言
     await submitGuestbookMessage(requestData)
     
-    ElMessage.success('留言发表成功！ 🌸')
+    ElMessage.success('留言发表成功！')
     
     // 清空表单（已登录用户保留昵称）
     if (!isLoggedIn.value) {
@@ -344,7 +337,7 @@ const submitMessage = async () => {
 <style scoped lang="scss">
 .guestbook {
   min-height: calc(100vh - 200px);
-  padding: 32px 0 48px;
+  padding: 104px 0 64px;
 }
 
 .container {
@@ -353,10 +346,11 @@ const submitMessage = async () => {
   padding: 0 24px;
 }
 
+// ── 页头 ──────────────────────────────────────────────
 .page-header {
   border-left: 4px solid var(--color-accent);
   padding-left: 20px;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
 
   h1 {
     font-family: var(--font-serif);
@@ -364,125 +358,141 @@ const submitMessage = async () => {
     font-weight: 700;
     letter-spacing: -0.02em;
     color: var(--text-primary);
-    margin: 0 0 6px 0;
+    margin: 0 0 8px 0;
   }
 
   p {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--text-tertiary);
     margin: 0;
   }
 }
 
+// ── 留言表单卡片（玻璃态）────────────────────────────
 .message-form {
   background: var(--bg-card);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
-  padding: 24px;
-  margin-bottom: 32px;
+  padding: 32px;
+  margin-bottom: 36px;
   box-shadow: var(--shadow-card);
+  transition: box-shadow 0.35s ease, border-color 0.35s ease;
 
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
+    border-color: var(--color-accent);
+  }
+
+  // 顶部小标题（玉石条 + 大写字距）
   .form-title {
-    font-family: var(--font-serif);
-    font-size: 18px;
+    font-size: 12px;
     font-weight: 700;
-    color: var(--text-primary);
-    margin: 0 0 20px 0;
-  }
-
-  .el-form-item {
-    margin-bottom: 16px;
-  }
-
-  .submit-btn {
-    width: 100%;
-    height: 40px;
-    border-radius: var(--radius-btn);
-    background: var(--color-accent);
-    border: none;
-    font-size: 14px;
-    font-weight: 600;
-    color: #fff;
-    cursor: pointer;
-    transition: opacity 0.15s ease;
-
-    &:hover {
-      opacity: 0.85;
-    }
-  }
-
-  .login-tip {
+    color: var(--text-tertiary);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 0 0 22px 0;
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
-    background: var(--bg-primary);
-    border-radius: var(--radius-btn);
-    border: 1px solid var(--border-color);
+    gap: 8px;
 
-    .tip-text {
-      font-size: 13px;
-      color: var(--text-secondary);
-
-      .login-link {
-        color: var(--color-accent);
-        font-weight: 600;
-        text-decoration: none;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      }
+    &::before {
+      content: '';
+      display: block;
+      width: 3px;
+      height: 14px;
+      background: var(--gradient-accent);
+      border-radius: 2px;
+      flex-shrink: 0;
     }
   }
 
+  :deep(.el-form-item) {
+    margin-bottom: 18px;
+  }
+
+  // 提交按钮：宽 + accent 渐变 + hover 加深
+  .submit-btn {
+    width: 100%;
+    height: 44px;
+    border-radius: var(--radius-btn);
+    background: var(--gradient-accent);
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      background: var(--color-accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  // 上传区
   .upload-section {
     width: 100%;
 
     .upload-title {
       font-size: 13px;
+      font-weight: 600;
       color: var(--text-tertiary);
+      letter-spacing: 0.04em;
       margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 6px;
-      font-weight: 600;
     }
 
     .upload-area {
       border: 1px dashed var(--border-color);
       border-radius: var(--radius-btn);
-      padding: 32px;
+      padding: 36px 24px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.15s ease;
+      background: var(--bg-secondary);
+      transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
 
       &:hover {
         border-color: var(--color-accent);
-        background: var(--bg-secondary);
+        background: var(--bg-card);
+
+        .upload-icon { color: var(--color-accent); }
+        .upload-text { color: var(--text-primary); }
       }
 
       .upload-icon {
         font-size: 32px;
         color: var(--text-tertiary);
-        margin-bottom: 10px;
+        margin-bottom: 12px;
+        transition: color 0.2s ease;
       }
 
       .upload-text {
         font-size: 14px;
         color: var(--text-secondary);
-        margin-bottom: 4px;
+        margin-bottom: 6px;
+        transition: color 0.2s ease;
       }
 
       .upload-tip {
         font-size: 12px;
         color: var(--text-tertiary);
+        letter-spacing: 0.02em;
       }
     }
 
     .image-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
       gap: 10px;
 
       .image-item {
@@ -491,17 +501,18 @@ const submitMessage = async () => {
         padding-bottom: 100%;
         border-radius: var(--radius-btn);
         overflow: hidden;
-        background: var(--bg-primary);
+        background: var(--bg-secondary);
         border: 1px solid var(--border-color);
+        transition: border-color 0.2s ease;
 
-        &:hover .image-overlay {
-          opacity: 1;
+        &:hover {
+          border-color: var(--color-accent);
+          .image-overlay { opacity: 1; }
         }
 
         img {
           position: absolute;
-          top: 0;
-          left: 0;
+          inset: 0;
           width: 100%;
           height: 100%;
           object-fit: cover;
@@ -510,19 +521,25 @@ const submitMessage = async () => {
         .image-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(0, 0, 0, 0.6);
+          background: linear-gradient(to top, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.32) 100%);
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 12px;
+          gap: 14px;
           opacity: 0;
-          transition: opacity 0.15s ease;
+          transition: opacity 0.2s ease;
 
-          .el-icon {
+          :deep(.el-icon) {
             font-size: 20px;
-            color: #fff;
+            color: rgba(255, 255, 255, 0.92);
             cursor: pointer;
+            transition: color 0.15s ease, transform 0.15s ease;
+
+            &:hover { transform: scale(1.12); }
           }
+
+          .preview-icon:hover { color: var(--color-accent); }
+          .delete-icon:hover { color: var(--color-danger); }
         }
 
         .upload-progress {
@@ -531,7 +548,7 @@ const submitMessage = async () => {
           left: 0;
           right: 0;
           padding: 6px;
-          background: rgba(10, 10, 15, 0.8);
+          background: rgba(10, 10, 15, 0.78);
         }
       }
 
@@ -542,19 +559,23 @@ const submitMessage = async () => {
         border: 1px dashed var(--border-color);
         border-radius: var(--radius-btn);
         cursor: pointer;
-        transition: all 0.15s ease;
+        background: var(--bg-secondary);
+        transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
 
         &:hover {
           border-color: var(--color-accent);
+          background: var(--bg-card);
+          :deep(.el-icon) { color: var(--color-accent); }
         }
 
-        .el-icon {
+        :deep(.el-icon) {
           position: absolute;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
           font-size: 24px;
           color: var(--text-tertiary);
+          transition: color 0.2s ease;
         }
       }
     }
@@ -562,8 +583,15 @@ const submitMessage = async () => {
 }
 
 @media (max-width: 640px) {
+  .guestbook { padding: 28px 0 48px; }
+
+  .page-header {
+    margin-bottom: 28px;
+    h1 { font-size: 26px; }
+  }
+
   .message-form {
-    padding: 16px;
+    padding: 20px;
   }
 }
 </style>

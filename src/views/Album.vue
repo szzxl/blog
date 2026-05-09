@@ -1,8 +1,8 @@
-<template>
+﻿<template>
   <div class="album">
     <div class="container">
       <div class="page-header">
-        <h1 class="page-title">📷 相册</h1>
+        <h1 class="page-title">相册</h1>
         <p class="page-desc">记录生活中的美好瞬间</p>
       </div>
 
@@ -18,7 +18,7 @@
             <div class="album-cover">
               <img :src="album.albumCover" :alt="album.albumName" class="cover-img">
               <div class="cover-overlay">
-                <span class="view-icon">📷</span>
+                <span class="view-icon">↗</span>
                 <span class="photo-count">{{ album.photoCount }} 张照片</span>
               </div>
             </div>
@@ -30,7 +30,6 @@
 
           <!-- 空状态 -->
           <div v-if="!loading && albums.length === 0" class="empty-state">
-            <div class="empty-icon">📷</div>
             <div class="empty-text">暂无相册</div>
           </div>
         </div>
@@ -61,7 +60,7 @@
             <div class="photo-wrapper">
               <img :src="photo.photoUrl" :alt="photo.photoName" class="photo-img">
               <div class="photo-overlay">
-                <span class="view-icon">🔍</span>
+                <span class="view-icon">↗</span>
               </div>
             </div>
             <div class="photo-info">
@@ -72,7 +71,6 @@
 
           <!-- 空状态 -->
           <div v-if="!loading && photos.length === 0" class="empty-state">
-            <div class="empty-icon">📷</div>
             <div class="empty-text">该相册暂无照片</div>
           </div>
         </div>
@@ -180,7 +178,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .album {
   min-height: calc(100vh - 200px);
-  padding: 32px 0 48px;
+  padding: 104px 0 64px;
 }
 
 .container {
@@ -189,10 +187,11 @@ onMounted(() => {
   padding: 0 24px;
 }
 
+// ── 页头 ──────────────────────────────────────────────
 .page-header {
   border-left: 4px solid var(--color-accent);
   padding-left: 20px;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
 
   .page-title {
     font-family: var(--font-serif);
@@ -200,108 +199,123 @@ onMounted(() => {
     font-weight: 700;
     letter-spacing: -0.02em;
     color: var(--text-primary);
-    margin-bottom: 6px;
+    margin: 0 0 8px 0;
   }
 
   .page-desc {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--text-tertiary);
+    margin: 0;
   }
 }
 
+// ── 相册网格 ──────────────────────────────────────────
 .albums-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  gap: 22px;
 }
 
 .album-card {
   background: var(--bg-card);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   cursor: pointer;
   overflow: hidden;
   box-shadow: var(--shadow-card);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
 
   &:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-card-hover);
+    border-color: var(--color-accent);
 
-    .cover-img { transform: scale(1.04); }
+    .cover-img { transform: scale(1.06); }
     .cover-overlay { opacity: 1; }
+    .album-name { color: var(--color-accent); }
   }
 
   .album-cover {
     position: relative;
     width: 100%;
-    height: 200px;
+    aspect-ratio: 4 / 3;
     overflow: hidden;
+    background: var(--bg-secondary);
 
     .cover-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.3s ease;
+      display: block;
+      transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .cover-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.5);
+      background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.32) 60%, rgba(0,0,0,0.18) 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
       opacity: 0;
-      transition: opacity 0.2s ease;
+      transition: opacity 0.3s ease;
 
-      .view-icon { font-size: 36px; }
+      .view-icon {
+        font-size: 22px;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 300;
+      }
 
       .photo-count {
         color: #fff;
-        font-size: 14px;
+        font-size: 12px;
         font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0.85;
       }
     }
   }
 
   .album-info {
-    padding: 14px 16px;
+    padding: 16px 18px 18px;
 
     .album-name {
       font-family: var(--font-serif);
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 700;
       color: var(--text-primary);
-      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+      margin: 0 0 6px 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      transition: color 0.15s ease;
+      transition: color 0.2s ease;
     }
 
     .album-desc {
       font-size: 13px;
       color: var(--text-tertiary);
+      line-height: 1.65;
+      margin: 0;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
   }
-
-  &:hover .album-name {
-    color: var(--color-accent);
-  }
 }
 
+// ── 详情页头 ──────────────────────────────────────────
 .detail-header {
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 
   .back-btn {
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     border-radius: var(--radius-btn);
     padding: 8px 16px;
     background: transparent;
@@ -309,11 +323,14 @@ onMounted(() => {
     color: var(--text-secondary);
     font-size: 13px;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+
+    .icon { margin-right: 4px; }
 
     &:hover {
       border-color: var(--color-accent);
       color: var(--color-accent);
+      background: var(--bg-secondary);
     }
   }
 
@@ -323,115 +340,135 @@ onMounted(() => {
 
     .album-title {
       font-family: var(--font-serif);
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 700;
       letter-spacing: -0.02em;
       color: var(--text-primary);
-      margin-bottom: 6px;
+      margin: 0 0 8px 0;
     }
 
     .album-subtitle {
-      font-size: 13px;
+      font-size: 14px;
       color: var(--text-tertiary);
+      margin: 0;
     }
   }
 }
 
+// ── 照片网格 ──────────────────────────────────────────
 .photos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
+  gap: 18px;
 }
 
 .photo-item {
   background: var(--bg-card);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   cursor: pointer;
   overflow: hidden;
   box-shadow: var(--shadow-card);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
 
   &:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-card-hover);
+    border-color: var(--color-accent);
 
-    .photo-img { transform: scale(1.04); }
+    .photo-img { transform: scale(1.06); }
     .photo-overlay { opacity: 1; }
+    .photo-title { color: var(--color-accent); }
   }
 
   .photo-wrapper {
     position: relative;
     width: 100%;
-    height: 200px;
+    aspect-ratio: 4 / 3;
     overflow: hidden;
+    background: var(--bg-secondary);
 
     .photo-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.3s ease;
+      display: block;
+      transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .photo-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.5);
+      background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.18) 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       opacity: 0;
-      transition: opacity 0.2s ease;
+      transition: opacity 0.3s ease;
 
-      .view-icon { font-size: 36px; }
+      .view-icon {
+        font-size: 22px;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 300;
+      }
     }
   }
 
   .photo-info {
-    padding: 12px 14px;
+    padding: 14px 16px 16px;
 
     .photo-title {
       font-family: var(--font-serif);
       font-size: 15px;
       font-weight: 700;
       color: var(--text-primary);
-      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+      margin: 0 0 4px 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      transition: color 0.15s ease;
+      transition: color 0.2s ease;
     }
 
     .photo-desc {
       font-size: 12px;
       color: var(--text-tertiary);
+      line-height: 1.6;
+      margin: 0;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
   }
-
-  &:hover .photo-title {
-    color: var(--color-accent);
-  }
 }
 
+// ── 空状态 ────────────────────────────────────────────
 .empty-state {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 64px 20px;
+  padding: 72px 0;
   color: var(--text-tertiary);
-  font-size: 14px;
+  font-size: 15px;
 }
 
+// ── 预览弹窗（保留深色背景）───────────────────────────
 .photo-preview-dialog {
   :deep(.el-dialog) {
-    background: rgba(0, 0, 0, 0.95);
+    background: rgba(8, 10, 14, 0.96);
+    border-radius: var(--radius-card);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
 
     .el-dialog__body {
-      padding: 20px;
+      padding: 20px 24px 28px;
       text-align: center;
+    }
+
+    .el-dialog__headerbtn .el-dialog__close {
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 22px;
     }
   }
 
@@ -440,28 +477,44 @@ onMounted(() => {
     max-height: 70vh;
     object-fit: contain;
     border-radius: var(--radius-btn);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
   }
 
   .preview-info {
-    margin-top: 16px;
+    margin-top: 18px;
     color: #fff;
 
     h3 {
-      font-size: 16px;
-      margin-bottom: 8px;
+      font-family: var(--font-serif);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 0 0 6px 0;
     }
 
     p {
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(255, 255, 255, 0.62);
+      margin: 0;
+      line-height: 1.65;
     }
   }
 }
 
 @media (max-width: 640px) {
+  .album { padding: 28px 0 48px; }
+
+  .page-header {
+    margin-bottom: 28px;
+    .page-title { font-size: 26px; }
+  }
+
   .albums-grid,
   .photos-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
+
+  .detail-header .album-title-section .album-title { font-size: 22px; }
 }
 </style>
