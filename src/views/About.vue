@@ -86,15 +86,17 @@
 }
 
 .page-header {
-  border-left: 3px solid var(--color-accent);
-  padding-left: 16px;
+  border-left: 4px solid var(--color-accent);
+  padding-left: 20px;
   margin-bottom: 40px;
 
   h1 {
-    font-size: 24px;
+    font-family: var(--font-serif);
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     color: var(--text-primary);
     margin: 0 0 6px 0;
-    font-weight: 700;
   }
 
   p {
@@ -105,6 +107,18 @@
 }
 
 .about-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 40px;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
+  }
+
   .intro-section {
     text-align: center;
     margin-bottom: 40px;
@@ -116,10 +130,11 @@
     }
 
     .intro-title {
-      font-size: 22px;
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-weight: 700;
       color: var(--text-primary);
       margin: 0 0 20px 0;
-      font-weight: 700;
     }
 
     .intro-text {
@@ -151,10 +166,11 @@
     margin-bottom: 32px;
 
     .section-title {
-      font-size: 16px;
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 700;
       color: var(--text-primary);
       margin: 0 0 20px 0;
-      font-weight: 600;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -168,6 +184,7 @@
 
     .tech-tag {
       padding: 6px 14px;
+      background: var(--bg-secondary);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-tag);
       color: var(--text-secondary);

@@ -322,12 +322,20 @@ onMounted(() => {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
+    border-left: 4px solid var(--color-accent);
+    padding-left: 20px;
 
     .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
       .section-title {
-        font-size: 16px;
+        font-family: var(--font-serif);
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
         color: var(--text-primary);
-        font-weight: 600;
         margin: 0 0 4px 0;
       }
 
@@ -336,6 +344,21 @@ onMounted(() => {
         color: var(--text-tertiary);
         margin: 0;
       }
+    }
+
+    .apply-btn {
+      height: 36px;
+      padding: 0 18px;
+      border-radius: var(--radius-btn);
+      background: var(--color-accent);
+      border: none;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+
+      &:hover { opacity: 0.85; }
     }
   }
 
@@ -351,15 +374,17 @@ onMounted(() => {
     gap: 16px;
     padding: 20px;
     text-decoration: none;
-    background: var(--bg-secondary);
+    background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-card);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 
     &:hover {
-      border-color: var(--color-accent);
-      box-shadow: var(--shadow-glow);
-      transform: translateY(-2px);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card-hover);
+
+      .link-name { color: var(--color-accent); }
 
       .link-icon {
         color: var(--color-accent);
@@ -371,7 +396,7 @@ onMounted(() => {
       width: 56px;
       height: 56px;
       border-radius: 50%;
-      background: var(--bg-primary);
+      background: var(--bg-secondary);
       border: 1px solid var(--border-color);
       display: flex;
       align-items: center;
@@ -385,6 +410,7 @@ onMounted(() => {
       }
 
       .avatar-text {
+        font-family: var(--font-serif);
         font-size: 22px;
         font-weight: 700;
         color: var(--color-accent);
@@ -396,15 +422,17 @@ onMounted(() => {
       min-width: 0;
 
       .link-name {
-        font-size: 15px;
-        font-weight: 600;
+        font-family: var(--font-serif);
+        font-size: 16px;
+        font-weight: 700;
         color: var(--text-primary);
         margin: 0 0 4px 0;
+        transition: color 0.15s ease;
       }
 
       .link-author {
         font-size: 12px;
-        color: var(--color-accent-2);
+        color: var(--text-tertiary);
         margin: 0 0 4px 0;
       }
 

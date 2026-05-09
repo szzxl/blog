@@ -132,19 +132,22 @@ onMounted(() => {
 }
 
 .page-header {
-  border-left: 3px solid var(--color-accent);
-  padding-left: 16px;
-  margin-bottom: 32px;
+  border-left: 4px solid var(--color-accent);
+  padding-left: 20px;
+  margin-bottom: 36px;
 
   h1 {
-    font-size: 24px;
-    color: var(--text-primary);
-    margin: 0 0 6px 0;
+    font-family: var(--font-serif);
+    font-size: 32px;
     font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+    line-height: 1.2;
   }
 
   p {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--text-tertiary);
     margin: 0;
   }
@@ -153,25 +156,30 @@ onMounted(() => {
 .category-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  gap: 20px;
 }
 
 .category-item {
-  background: var(--bg-secondary);
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
-  padding: 24px;
+  box-shadow: var(--shadow-card);
+  padding: 28px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
 
   &:hover {
     border-color: var(--color-accent);
-    box-shadow: var(--shadow-glow);
-    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-4px);
+
+    .category-name {
+      color: var(--color-accent);
+    }
   }
 
   .category-icon {
@@ -183,16 +191,18 @@ onMounted(() => {
     margin-bottom: 20px;
 
     .category-name {
+      font-family: var(--font-serif);
       font-size: 18px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text-primary);
-      margin: 0 0 8px 0;
+      margin: 0 0 10px 0;
+      transition: color 0.2s ease;
     }
 
     .category-desc {
       font-size: 13px;
       color: var(--text-tertiary);
-      margin: 0 0 12px 0;
+      margin: 0 0 14px 0;
       line-height: 1.6;
     }
 
@@ -225,7 +235,7 @@ onMounted(() => {
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease;
 
     &:hover {
       background: var(--color-accent);
@@ -242,6 +252,10 @@ onMounted(() => {
 }
 
 @media (max-width: 640px) {
+  .page-header h1 {
+    font-size: 26px;
+  }
+
   .category-grid {
     grid-template-columns: 1fr;
   }
