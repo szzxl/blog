@@ -4,7 +4,7 @@
       <button class="close-btn" @click="goBack">×</button>
       
       <div class="register-header">
-        <div class="logo">🌸</div>
+        <h2 class="title">注册账号</h2>
       </div>
       
       <el-form :model="registerForm" :rules="rules" ref="registerFormRef" size="large">
@@ -187,21 +187,55 @@ const goBack = () => {
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  position: relative;
+  overflow: hidden;
+
+  // 微弱的玉色光晕（与 Home hero 呼应，但克制）
+  &::before {
+    content: '';
+    position: absolute;
+    top: -180px;
+    right: -180px;
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle, rgba(74, 140, 110, 0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(70px);
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -160px;
+    left: -160px;
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle, rgba(107, 95, 191, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(70px);
+    pointer-events: none;
+  }
 }
 
 .register-container {
+  position: relative;
+  z-index: 2;
   width: 100%;
   max-width: 400px;
-  background: var(--bg-secondary);
+  background: var(--bg-card);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
-  padding: 40px;
-  position: relative;
+  box-shadow: var(--shadow-card-hover);
+  padding: 44px 40px 36px;
 
   .close-btn {
     position: absolute;
-    top: 16px;
-    right: 16px;
+    top: 14px;
+    right: 14px;
     width: 32px;
     height: 32px;
     border-radius: var(--radius-btn);
@@ -213,11 +247,12 @@ const goBack = () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.15s ease;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
 
     &:hover {
       border-color: var(--color-accent);
       color: var(--color-accent);
+      background: var(--bg-secondary);
     }
   }
 
@@ -225,67 +260,81 @@ const goBack = () => {
     text-align: center;
     margin-bottom: 28px;
 
-    .logo {
-      font-size: 40px;
-      display: block;
-      margin-bottom: 12px;
+    .title {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin: 0 0 8px 0;
     }
   }
 
-  .el-form {
-    .el-form-item {
-      margin-bottom: 16px;
-    }
+  :deep(.el-form-item) {
+    margin-bottom: 18px;
+  }
 
-    .agreement {
-      width: 100%;
+  .agreement {
+    width: 100%;
 
-      :deep(.el-checkbox__label) {
-        font-size: 13px;
-        color: var(--text-secondary);
-        line-height: 1.6;
-      }
-
-      .el-link {
-        font-size: 13px;
-        color: var(--color-accent);
-      }
-    }
-
-    .register-btn {
-      width: 100%;
-      height: 40px;
-      border-radius: var(--radius-btn);
-      background: var(--color-accent);
-      border: none;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-inverse);
-      cursor: pointer;
-      transition: background 0.15s ease;
-
-      &:hover {
-        background: #00b894;
-      }
-    }
-
-    .login-tip {
-      text-align: center;
+    :deep(.el-checkbox__label) {
       font-size: 13px;
-      color: var(--text-tertiary);
-      width: 100%;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
 
-      .el-link {
-        color: var(--color-accent);
-        margin-left: 4px;
-      }
+    :deep(.el-link) {
+      font-size: 13px;
+      color: var(--color-accent);
+    }
+  }
+
+  // 主按钮：渐变 + hover 加深
+  .register-btn {
+    width: 100%;
+    height: 42px;
+    border-radius: var(--radius-btn);
+    background: var(--gradient-accent);
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      background: var(--color-accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  .login-tip {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-tertiary);
+    width: 100%;
+
+    :deep(.el-link) {
+      color: var(--color-accent);
+      margin-left: 4px;
+      font-weight: 600;
     }
   }
 }
 
 @media (max-width: 480px) {
   .register-container {
-    padding: 32px 24px;
+    padding: 36px 24px 28px;
+  }
+
+  .register-container .register-header .title {
+    font-size: 22px;
   }
 }
 </style>

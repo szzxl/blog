@@ -80,11 +80,13 @@ onUnmounted(() => {
   position: fixed;
   bottom: 32px;
   right: 32px;
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  border: 1px solid var(--border-strong);
   color: var(--text-secondary);
   cursor: pointer;
   z-index: 997;
@@ -94,7 +96,8 @@ onUnmounted(() => {
   opacity: 0;
   visibility: hidden;
   transform: translateY(12px);
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-card);
 
   &.show {
     opacity: 1;
@@ -105,7 +108,8 @@ onUnmounted(() => {
   &:hover {
     border-color: var(--color-accent);
     color: var(--color-accent);
-    box-shadow: var(--shadow-glow);
+    box-shadow: var(--shadow-glow-strong);
+    transform: translateY(-2px);
   }
 }
 

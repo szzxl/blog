@@ -1,13 +1,10 @@
-<template>
+﻿<template>
   <div class="tag">
     <div class="container">
       <!-- 页面标题 -->
       <div class="page-header">
-        <div class="header-icon">🏷️</div>
-        <div class="header-text">
-          <h1>标签云</h1>
-          <p>共 {{ tags.length }} 个标签</p>
-        </div>
+        <h1>标签云</h1>
+        <p>共 {{ tags.length }} 个标签</p>
       </div>
       
       <!-- 标签云 -->
@@ -26,11 +23,10 @@
       
       <!-- 标签列表 -->
       <div class="tag-list">
-        <h3 class="list-title">📋 标签列表</h3>
+        <h3 class="list-title">标签列表</h3>
         <div class="tag-grid">
           <div class="tag-card card" v-for="(tag, index) in sortedTags" :key="index">
             <div class="tag-header">
-              <span class="tag-icon">🔖</span>
               <span class="tag-name">{{ tag.name }}</span>
             </div>
             <div class="tag-info">
@@ -116,7 +112,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .tag {
   min-height: calc(100vh - 200px);
-  padding: 32px 0 48px;
+  padding: 104px 0 64px;
 }
 
 .container {
@@ -128,7 +124,7 @@ onMounted(() => {
 .page-header {
   border-left: 4px solid var(--color-accent);
   padding-left: 20px;
-  margin-bottom: 36px;
+  margin-bottom: 40px;
 
   h1 {
     font-family: var(--font-serif);
@@ -149,77 +145,107 @@ onMounted(() => {
 
 .tag-cloud {
   background: var(--bg-card);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
-  padding: 36px 32px;
-  margin-bottom: 36px;
+  padding: 40px 32px;
+  margin-bottom: 40px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 12px;
-  min-height: 160px;
+  gap: 10px;
+  min-height: 180px;
+  transition: box-shadow 0.35s ease, border-color 0.35s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
+    border-color: var(--color-accent);
+  }
 
   .tag-item {
     cursor: pointer;
-    padding: 6px 16px;
+    padding: 4px 12px;
     border-radius: var(--radius-tag);
     background: var(--bg-secondary);
-    color: var(--text-secondary);
+    color: var(--text-tertiary);
     font-weight: 500;
-    transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    border: 1px solid transparent;
+    transition: all 0.2s;
     display: inline-flex;
     align-items: center;
     gap: 4px;
 
     &:hover {
-      background: var(--color-accent);
-      color: #fff;
-      box-shadow: var(--shadow-glow);
+      background: transparent;
+      border-color: var(--color-accent);
+      color: var(--color-accent);
     }
 
     .tag-count {
-      font-size: 0.8em;
-      opacity: 0.75;
+      font-size: 0.72em;
+      opacity: 0.7;
     }
   }
 }
 
 .tag-list {
   .list-title {
-    font-family: var(--font-serif);
-    font-size: 20px;
+    font-size: 12px;
     font-weight: 700;
-    color: var(--text-primary);
-    margin: 0 0 24px 0;
+    color: var(--text-tertiary);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 0 0 18px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &::before {
+      content: '';
+      display: block;
+      width: 3px;
+      height: 14px;
+      background: var(--gradient-accent);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
   }
 
   .tag-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px;
+    gap: 18px;
   }
 
   .tag-card {
     background: var(--bg-card);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
-    padding: 20px;
+    padding: 22px 20px;
     display: flex;
     flex-direction: column;
     gap: 12px;
     cursor: pointer;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+    transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
 
     &:hover {
-      border-color: var(--color-accent);
       box-shadow: var(--shadow-card-hover);
       transform: translateY(-4px);
+      border-color: var(--color-accent);
 
       .tag-name {
         color: var(--color-accent);
+      }
+
+      .view-btn {
+        background: var(--color-accent);
+        color: var(--text-inverse);
       }
     }
 
@@ -228,21 +254,21 @@ onMounted(() => {
       align-items: center;
       gap: 8px;
 
-      .tag-icon { font-size: 20px; }
-
       .tag-name {
         font-family: var(--font-serif);
-        font-size: 15px;
+        font-size: 16px;
         font-weight: 700;
         color: var(--text-primary);
+        letter-spacing: -0.01em;
         transition: color 0.2s ease;
       }
     }
 
     .tag-info {
       .tag-count {
-        font-size: 13px;
+        font-size: 12px;
         color: var(--text-tertiary);
+        letter-spacing: 0.04em;
       }
     }
 
@@ -251,11 +277,12 @@ onMounted(() => {
       border: 1px solid var(--color-accent);
       color: var(--color-accent);
       border-radius: var(--radius-btn);
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
       padding: 6px 0;
       cursor: pointer;
-      transition: background 0.15s ease, color 0.15s ease;
+      transition: background 0.25s ease, color 0.25s ease;
 
       &:hover {
         background: var(--color-accent);
@@ -267,9 +294,9 @@ onMounted(() => {
 
 .empty-state {
   text-align: center;
-  padding: 64px 20px;
+  padding: 72px 0;
   color: var(--text-tertiary);
-  font-size: 14px;
+  font-size: 15px;
 }
 
 @media (max-width: 640px) {

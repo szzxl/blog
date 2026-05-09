@@ -13,7 +13,10 @@
           :key="item.to"
           :to="item.to"
           class="nav-item"
-        >{{ item.text }}</router-link>
+        >
+          <span class="nav-icon" :style="{ background: item.color + '22', color: item.color }">{{ item.icon }}</span>
+          <span class="nav-text">{{ item.text }}</span>
+        </router-link>
       </nav>
 
       <!-- 右侧操作区 -->
@@ -69,8 +72,8 @@
             {{ themeIcon }} {{ themeTooltip }}
           </button>
           <template v-if="userStore.isLoggedIn">
-            <button v-if="isAuthor" class="mobile-action-btn" @click="handleMobileCommand('admin')">⚙️ 管理后台</button>
-            <button class="mobile-action-btn" @click="handleMobileCommand('profile')">👤 个人中心</button>
+            <button v-if="isAuthor" class="mobile-action-btn" @click="handleMobileCommand('admin')">管理后台</button>
+            <button class="mobile-action-btn" @click="handleMobileCommand('profile')">个人中心</button>
             <button class="mobile-action-btn" @click="handleMobileCommand('logout')">退出登录</button>
           </template>
           <template v-else>
@@ -163,20 +166,20 @@ const userStore = useUserStore()
 const themeStore = useThemeStore()
 
 const navItems = [
-  { to: '/', icon: '🏠', text: '首页' },
-  { to: '/articles', icon: '📝', text: '文章' },
-  { to: '/category', icon: '📂', text: '分类' },
-  { to: '/tag', icon: '🏷️', text: '标签' },
-  { to: '/talk', icon: '💬', text: '说说' },
-  { to: '/album', icon: '📷', text: '相册' },
-  { to: '/guestbook', icon: '✍️', text: '留言板' },
-  { to: '/link', icon: '🔗', text: '友链' },
-  { to: '/about', icon: '👨‍💻', text: '关于' },
+  { to: '/', icon: '🏠', text: '首页', color: '#165dff' },
+  { to: '/articles', icon: '📝', text: '文章', color: '#722ed1' },
+  { to: '/category', icon: '📂', text: '分类', color: '#ff7d00' },
+  { to: '/tag', icon: '🏷️', text: '标签', color: '#f53f3f' },
+  { to: '/talk', icon: '💬', text: '说说', color: '#00b42a' },
+  { to: '/album', icon: '📷', text: '相册', color: '#0fc6c2' },
+  { to: '/guestbook', icon: '✍️', text: '留言板', color: '#f77234' },
+  { to: '/link', icon: '🔗', text: '友链', color: '#9fdb1d' },
+  { to: '/about', icon: '👨‍💻', text: '关于', color: '#165dff' },
 ]
 
 const siteName = ref('')
 const siteDescription = ref('')
-const siteLogo = ref('🌸')
+const siteLogo = ref('')
 const showMobileMenu = ref(false)
 const isScrolled = ref(false)
 
@@ -383,82 +386,74 @@ onUnmounted(() => {
   right: 0;
   height: 64px;
   z-index: 999;
-  background: transparent;
-  transition: background 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease;
-
-  &.scrolled {
-    background: var(--bg-header);
-    backdrop-filter: blur(16px) saturate(1.6);
-    -webkit-backdrop-filter: blur(16px) saturate(1.6);
-    box-shadow: 0 1px 0 var(--border-color);
-  }
+  background: var(--bg-header);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  box-shadow: 0 1px 0 var(--border-color), 0 4px 20px rgba(0,0,0,0.06);
+  transition: box-shadow 0.3s ease;
 
   .container {
     height: 100%;
     display: flex;
     align-items: center;
-    gap: 32px;
+    gap: 24px;
   }
 }
 
 .logo {
   flex-shrink: 0;
-  font-family: var(--font-serif);
-  font-size: 20px;
-  font-weight: 700;
-  color: #fff;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--text-primary);
   text-decoration: none;
+  letter-spacing: -0.03em;
   transition: color 0.2s ease;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
 
-  .scrolled & {
-    color: var(--text-primary);
-    text-shadow: none;
-  }
-
-  &:hover {
-    color: var(--color-accent) !important;
-  }
+  &:hover { color: var(--color-accent) !important; }
 }
 
 .nav {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   flex: 1;
 }
 
 .nav-item {
-  padding: 6px 12px;
-  font-size: 14px;
-  color: rgba(255,255,255,0.9);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
   border-radius: var(--radius-btn);
-  transition: color 0.15s ease, background 0.15s ease;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
   white-space: nowrap;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.25);
 
-  .scrolled & {
-    color: var(--text-secondary);
-    text-shadow: none;
+  .nav-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
   }
 
   &:hover {
-    color: #fff !important;
-    background: rgba(255,255,255,0.15);
-
-    .scrolled & {
-      color: var(--text-primary) !important;
-      background: var(--bg-secondary);
-    }
+    background: var(--bg-secondary);
+    color: var(--text-primary) !important;
+    .nav-icon { transform: scale(1.15); }
   }
 
   &.router-link-active {
-    color: #fff !important;
-    font-weight: 600;
-
-    .scrolled & {
-      color: var(--color-accent) !important;
-    }
+    color: var(--color-accent) !important;
+    background: rgba(22, 93, 255, 0.08);
+    font-weight: 700;
   }
 }
 
@@ -473,81 +468,51 @@ onUnmounted(() => {
   width: 36px;
   height: 36px;
   border-radius: var(--radius-btn);
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: #fff;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
-  transition: all 0.15s ease;
-
-  .scrolled & {
-    background: transparent;
-    border-color: transparent;
-    color: var(--text-secondary);
-  }
+  transition: all 0.2s ease;
 
   &:hover {
-    background: rgba(255,255,255,0.25);
-
-    .scrolled & {
-      border-color: var(--border-color);
-      color: var(--text-primary);
-      background: var(--bg-secondary);
-    }
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+    background: var(--bg-secondary);
   }
 }
 
 .login-btn {
-  padding: 6px 16px;
+  padding: 7px 18px;
   border-radius: var(--radius-btn);
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.4);
+  background: var(--color-accent);
+  border: none;
   color: #fff;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
 
-  .scrolled & {
-    background: transparent;
-    border-color: var(--color-accent);
-    color: var(--color-accent);
-  }
-
-  &:hover {
-    background: rgba(255,255,255,0.25);
-
-    .scrolled & {
-      background: var(--color-accent);
-      color: #fff;
-    }
-  }
+  &:hover { background: var(--color-accent-hover); }
 }
 
 .user-avatar {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(255,255,255,0.5);
+  border: 2px solid var(--border-strong);
   cursor: pointer;
-  transition: border-color 0.15s ease;
+  transition: all 0.2s ease;
   display: block;
 
-  .scrolled & {
-    border-color: var(--border-color);
-  }
-
-  &:hover {
-    border-color: var(--color-accent);
-  }
+  &:hover { border-color: var(--color-accent); box-shadow: var(--shadow-glow); }
 }
 
-.mobile-menu-btn {
-  display: none;
-}
+.mobile-menu-btn { display: none; }
 
 .mobile-menu {
   padding: 24px 16px;
@@ -558,12 +523,13 @@ onUnmounted(() => {
   gap: 24px;
 
   .mobile-logo {
-    font-family: var(--font-serif);
-    font-size: 20px;
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 900;
     color: var(--text-primary);
     padding-bottom: 16px;
     border-bottom: 1px solid var(--border-color);
+    letter-spacing: -0.03em;
   }
 
   .mobile-nav {
@@ -577,16 +543,21 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 12px;
+    padding: 11px 14px;
     border-radius: var(--radius-btn);
     color: var(--text-secondary);
     font-size: 15px;
-    transition: all 0.15s ease;
+    transition: all 0.2s ease;
 
     .mobile-nav-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 16px;
-      width: 20px;
-      text-align: center;
+      background: var(--bg-secondary);
     }
 
     &:hover, &.router-link-active {
@@ -604,7 +575,7 @@ onUnmounted(() => {
   }
 
   .mobile-action-btn {
-    padding: 10px 12px;
+    padding: 11px 14px;
     border-radius: var(--radius-btn);
     background: transparent;
     border: 1px solid var(--border-color);
@@ -612,7 +583,7 @@ onUnmounted(() => {
     font-size: 14px;
     cursor: pointer;
     text-align: left;
-    transition: all 0.15s ease;
+    transition: all 0.2s ease;
 
     &:hover {
       border-color: var(--color-accent);
@@ -620,13 +591,11 @@ onUnmounted(() => {
     }
 
     &.accent {
+      background: var(--color-accent);
       border-color: var(--color-accent);
-      color: var(--color-accent);
+      color: #fff;
 
-      &:hover {
-        background: var(--color-accent);
-        color: #fff;
-      }
+      &:hover { background: var(--color-accent-hover); }
     }
   }
 }
@@ -643,11 +612,12 @@ onUnmounted(() => {
     gap: 12px;
 
     .profile-avatar {
-      width: 80px;
-      height: 80px;
+      width: 88px;
+      height: 88px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid var(--border-color);
+      border: 3px solid var(--border-strong);
+      box-shadow: var(--shadow-glow);
     }
 
     .change-avatar-btn {
@@ -658,12 +628,9 @@ onUnmounted(() => {
       color: var(--text-secondary);
       font-size: 13px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.2s ease;
 
-      &:hover {
-        border-color: var(--color-accent);
-        color: var(--color-accent);
-      }
+      &:hover { border-color: var(--color-accent); color: var(--color-accent); }
     }
   }
 
@@ -678,17 +645,8 @@ onUnmounted(() => {
       padding: 10px 0;
       border-bottom: 1px solid var(--border-color);
 
-      .info-label {
-        font-size: 13px;
-        color: var(--text-tertiary);
-        width: 40px;
-        flex-shrink: 0;
-      }
-
-      .info-value {
-        font-size: 14px;
-        color: var(--text-primary);
-      }
+      .info-label { font-size: 13px; color: var(--text-tertiary); width: 40px; flex-shrink: 0; }
+      .info-value { font-size: 14px; color: var(--text-primary); }
     }
   }
 
@@ -700,16 +658,8 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
-  .desktop-nav {
-    display: none;
-  }
-
-  .mobile-menu-btn {
-    display: flex;
-  }
-
-  .header .container {
-    gap: 16px;
-  }
+  .desktop-nav { display: none; }
+  .mobile-menu-btn { display: flex; }
+  .header .container { gap: 16px; }
 }
 </style>

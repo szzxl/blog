@@ -1,9 +1,9 @@
-<template>
+﻿<template>
   <div class="tag-articles">
     <div class="container">
       <!-- 标签标题 -->
       <div class="tag-header">
-        <h1 class="tag-name">🏷️ {{ tagName }}</h1>
+        <h1 class="tag-name">{{ tagName }}</h1>
         <p class="tag-desc">共 {{ total }} 篇文章</p>
       </div>
       
@@ -28,12 +28,12 @@
           </el-table-column>
           <el-table-column prop="readNum" label="阅读量" width="120" align="center">
             <template #default="{ row }">
-              <span class="stat-item">👁️ {{ row.readNum || 0 }}</span>
+              <span class="stat-item">{{ row.readNum || 0 }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="likeCount" label="点赞数" width="120" align="center">
             <template #default="{ row }">
-              <span class="stat-item">💗 {{ row.likeCount || 0 }}</span>
+              <span class="stat-item">{{ row.likeCount || 0 }}</span>
             </template>
           </el-table-column>
           <el-table-column label="操作" width="120" align="center">
@@ -66,18 +66,9 @@
             <h3 class="card-title">{{ article.articleName }}</h3>
           </div>
           <div class="card-meta">
-            <span class="meta-item">
-              <span class="icon">📅</span>
-              {{ formatTime(article.createTime) }}
-            </span>
-            <span class="meta-item">
-              <span class="icon">👁️</span>
-              {{ article.readNum || 0 }}
-            </span>
-            <span class="meta-item">
-              <span class="icon">💗</span>
-              {{ article.likeCount || 0 }}
-            </span>
+            <span class="meta-item">{{ formatTime(article.createTime) }}</span>
+            <span class="meta-item">{{ article.readNum || 0 }} 阅读</span>
+            <span class="meta-item">{{ article.likeCount || 0 }} 喜欢</span>
           </div>
           <div class="card-action">
             <span class="view-text">查看详情 →</span>
@@ -86,7 +77,6 @@
         
         <!-- 空状态 -->
         <div v-if="articles.length === 0 && !loading" class="empty-state">
-          <div class="empty-icon">📝</div>
           <div class="empty-text">该标签下暂无文章</div>
           <el-button type="primary" @click="goBack">返回标签页</el-button>
         </div>
@@ -214,7 +204,7 @@ watch(() => route.fullPath, (newPath) => {
 <style scoped lang="scss">
 .tag-articles {
   min-height: calc(100vh - 200px);
-  padding: 40px 0;
+  padding: 48px 0 80px;
 }
 
 .container {
@@ -223,42 +213,52 @@ watch(() => route.fullPath, (newPath) => {
   padding: 0 24px;
 }
 
+// ── 标签标题（与 Home.vue page-header 一致）────────────
 .tag-header {
-  padding: 32px 0 24px;
-  border-left: 3px solid var(--color-accent);
-  padding-left: 16px;
-  margin-bottom: 32px;
+  border-left: 4px solid var(--color-accent);
+  padding-left: 20px;
+  margin-bottom: 40px;
 
   .tag-name {
-    font-size: 22px;
-    color: var(--text-primary);
-    margin: 0 0 6px 0;
+    font-family: var(--font-serif);
+    font-size: 32px;
     font-weight: 700;
-    font-family: 'JetBrains Mono', monospace;
-
-    &::before {
-      content: '> ';
-      color: var(--color-accent);
-    }
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+    line-height: 1.2;
   }
 
   .tag-desc {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--text-tertiary);
     margin: 0;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-sans);
   }
 }
 
+// ── 桌面端表格 ────────────────────────────────────────
 .articles-table {
   padding: 0;
   overflow: hidden;
+  background: var(--bg-card);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
+    border-color: var(--color-accent);
+  }
 
   :deep(.el-table) {
-    background: var(--bg-card);
+    background: transparent;
     color: var(--text-secondary);
-    font-size: 13px;
-    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-family: var(--font-sans);
     border: none;
 
     &::before {
@@ -268,38 +268,42 @@ watch(() => route.fullPath, (newPath) => {
     .el-table__header-wrapper {
       th.el-table__cell {
         background: var(--bg-secondary);
-        color: var(--color-accent);
+        color: var(--text-tertiary);
         font-weight: 700;
         font-size: 12px;
         border-bottom: 1px solid var(--border-color);
         border-right: none;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.1em;
+        font-family: var(--font-sans);
       }
     }
 
     .el-table__body-wrapper {
       td.el-table__cell {
-        background: var(--bg-card);
+        background: transparent;
         border-bottom: 1px solid var(--border-color);
         border-right: none;
         color: var(--text-secondary);
+        padding: 14px 0;
       }
     }
 
     .el-table__row {
       cursor: pointer;
-      transition: background 0.15s;
+      transition: background 0.2s ease;
 
       &:hover td.el-table__cell {
-        background: rgba(0, 212, 170, 0.05) !important;
+        background: rgba(74, 140, 110, 0.05) !important;
       }
 
       .article-title {
-        font-weight: 600;
+        font-family: var(--font-serif);
+        font-weight: 700;
         color: var(--text-primary);
-        transition: color 0.15s;
-        font-size: 13px;
+        transition: color 0.2s ease;
+        font-size: 15px;
+        letter-spacing: -0.01em;
 
         &:hover {
           color: var(--color-accent);
@@ -318,32 +322,28 @@ watch(() => route.fullPath, (newPath) => {
       color: var(--color-accent);
       border-radius: var(--radius-btn);
       font-weight: 600;
-      padding: 4px 10px;
+      padding: 5px 12px;
       font-size: 12px;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-sans);
+      letter-spacing: 0.02em;
+      transition: all 0.2s ease;
 
       &:hover {
         background: var(--color-accent);
-        color: var(--bg-primary);
+        color: #fff;
       }
     }
   }
 
   .empty-state {
     text-align: center;
-    padding: 80px 20px;
-
-    .empty-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-      opacity: 0.4;
-    }
+    padding: 72px 0;
 
     .empty-text {
-      font-size: 14px;
+      font-family: var(--font-serif);
+      font-size: 15px;
       color: var(--text-tertiary);
       margin-bottom: 24px;
-      font-family: 'JetBrains Mono', monospace;
     }
 
     .el-button {
@@ -351,11 +351,12 @@ watch(() => route.fullPath, (newPath) => {
       border: 1px solid var(--color-accent);
       color: var(--color-accent);
       border-radius: var(--radius-btn);
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-sans);
+      padding: 10px 22px;
 
       &:hover {
         background: var(--color-accent);
-        color: var(--bg-primary);
+        color: #fff;
       }
     }
   }
@@ -363,15 +364,16 @@ watch(() => route.fullPath, (newPath) => {
   .pagination {
     display: flex;
     justify-content: center;
-    padding: 20px;
+    padding: 24px;
     border-top: 1px solid var(--border-color);
   }
 }
 
+// ── 通用分页 ──────────────────────────────────────────
 .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 24px;
+  margin-top: 32px;
 }
 
 :deep(.el-pagination) {
@@ -380,6 +382,8 @@ watch(() => route.fullPath, (newPath) => {
     border: 1px solid var(--border-color);
     color: var(--text-secondary);
     border-radius: var(--radius-btn);
+    font-family: var(--font-sans);
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 
     &:hover {
       color: var(--color-accent);
@@ -388,7 +392,7 @@ watch(() => route.fullPath, (newPath) => {
 
     &.is-active {
       background: var(--color-accent);
-      color: var(--bg-primary);
+      color: #fff;
       border-color: var(--color-accent);
       font-weight: 700;
     }
@@ -396,8 +400,8 @@ watch(() => route.fullPath, (newPath) => {
 
   .el-pagination__jump, .el-pagination__total {
     color: var(--text-tertiary);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-family: var(--font-sans);
+    font-size: 13px;
   }
 }
 
@@ -411,15 +415,31 @@ watch(() => route.fullPath, (newPath) => {
   display: none !important;
 }
 
-// 移动端文章卡片
+// ── 移动端文章卡片（对齐 Home.vue article-item）───────
 .articles-cards {
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 
   .article-card {
-    padding: 20px;
+    padding: 20px 22px;
+    background: var(--bg-card);
+    backdrop-filter: var(--blur-glass);
+    -webkit-backdrop-filter: var(--blur-glass);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
+
+    &:hover {
+      box-shadow: var(--shadow-card-hover);
+      transform: translateY(-3px);
+      border-color: var(--color-accent);
+
+      .card-title {
+        color: var(--color-accent);
+      }
+    }
 
     &:active {
       transform: scale(0.99);
@@ -429,77 +449,73 @@ watch(() => route.fullPath, (newPath) => {
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
 
       .card-index {
         flex-shrink: 0;
-        width: 28px;
-        height: 28px;
-        border: 1px solid var(--color-accent);
-        color: var(--color-accent);
+        width: 30px;
+        height: 30px;
+        background: var(--gradient-accent);
+        color: #fff;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 700;
         font-size: 12px;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-sans);
         border-radius: var(--radius-tag);
+        letter-spacing: 0.02em;
       }
 
       .card-title {
         flex: 1;
-        font-size: 15px;
-        font-weight: 600;
+        font-family: var(--font-serif);
+        font-size: 17px;
+        font-weight: 700;
         color: var(--text-primary);
-        line-height: 1.5;
+        line-height: 1.45;
+        letter-spacing: -0.01em;
         margin: 0;
+        transition: color 0.2s ease;
       }
     }
 
     .card-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 6px 14px;
       margin-bottom: 12px;
-      padding-left: 40px;
+      padding-left: 42px;
 
       .meta-item {
-        display: flex;
-        align-items: center;
-        gap: 5px;
         font-size: 12px;
         color: var(--text-tertiary);
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-sans);
       }
     }
 
     .card-action {
-      padding-left: 40px;
+      padding-left: 42px;
 
       .view-text {
         color: var(--color-accent);
         font-size: 13px;
         font-weight: 600;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-sans);
+        letter-spacing: 0.02em;
       }
     }
   }
 
   .empty-state {
     text-align: center;
-    padding: 80px 20px;
-
-    .empty-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-      opacity: 0.4;
-    }
+    padding: 72px 0;
 
     .empty-text {
-      font-size: 14px;
+      font-family: var(--font-serif);
+      font-size: 15px;
       color: var(--text-tertiary);
       margin-bottom: 24px;
-      font-family: 'JetBrains Mono', monospace;
     }
 
     .el-button {
@@ -507,34 +523,36 @@ watch(() => route.fullPath, (newPath) => {
       border: 1px solid var(--color-accent);
       color: var(--color-accent);
       border-radius: var(--radius-btn);
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-sans);
+      padding: 10px 22px;
 
       &:hover {
         background: var(--color-accent);
-        color: var(--bg-primary);
+        color: #fff;
       }
     }
   }
 
   .pagination {
-    margin-top: 20px;
+    margin-top: 24px;
     display: flex;
     justify-content: center;
   }
 }
 
+// ── 响应式 ────────────────────────────────────────────
 @media (max-width: 768px) {
+  .tag-articles { padding: 28px 0 60px; }
+
   .container {
     padding: 0 16px;
   }
 
   .tag-header {
-    padding: 24px 0 20px;
-    padding-left: 14px;
-    margin-bottom: 20px;
+    margin-bottom: 28px;
 
     .tag-name {
-      font-size: 18px;
+      font-size: 26px;
     }
   }
 

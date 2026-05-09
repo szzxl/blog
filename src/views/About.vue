@@ -1,18 +1,14 @@
-<template>
+﻿<template>
   <div class="about">
     <div class="container">
       <!-- 页面标题 -->
       <div class="page-header">
-        <div class="header-icon">🦋</div>
-        <div class="header-text">
-          <h1>关于我</h1>
-        </div>
+        <h1>关于我</h1>
       </div>
       
       <!-- 个人介绍 -->
       <div class="about-content card">
         <div class="intro-section">
-          <div class="intro-icon">👨‍💻</div>
           <h2 class="intro-title">关于我</h2>
           <div class="intro-text">
             <p>你好！我是一名拥有 <strong>5年经验</strong> 的全栈开发工程师。</p>
@@ -23,7 +19,7 @@
         <div class="divider"></div>
         
         <div class="tech-section">
-          <h3 class="section-title">💼 技术栈</h3>
+          <h3 class="section-title">技术栈</h3>
           <div class="tech-tags">
             <span class="tech-tag">Vue 3</span>
             <span class="tech-tag">TypeScript</span>
@@ -44,18 +40,16 @@
         <div class="divider"></div>
         
         <div class="contact-section">
-          <h3 class="section-title">📮 联系我</h3>
+          <h3 class="section-title">联系我</h3>
           <p class="contact-text">
             如果你对这个博客系统感兴趣，或者需要定制开发服务，欢迎联系我！
           </p>
           <div class="contact-info">
             <div class="contact-item">
-              <span class="contact-icon">📧</span>
               <span class="contact-label">邮箱：</span>
               <span class="contact-value">suz_zxl@126.com</span>
             </div>
             <div class="contact-item">
-              <span class="contact-icon">💬</span>
               <span class="contact-label">微信：</span>
               <span class="contact-value">Su_zxl</span>
             </div>
@@ -63,7 +57,7 @@
         </div>
         
         <div class="footer-note">
-          <p>✨ 期待与你的合作！</p>
+          <p>期待与你的合作！</p>
         </div>
       </div>
     </div>
@@ -76,7 +70,7 @@
 <style scoped lang="scss">
 .about {
   min-height: calc(100vh - 200px);
-  padding: 32px 0 48px;
+  padding: 104px 0 64px;
 }
 
 .container {
@@ -96,11 +90,12 @@
     font-weight: 700;
     letter-spacing: -0.02em;
     color: var(--text-primary);
-    margin: 0 0 6px 0;
+    margin: 0 0 8px 0;
+    line-height: 1.2;
   }
 
   p {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--text-tertiary);
     margin: 0;
   }
@@ -108,40 +103,37 @@
 
 .about-content {
   background: var(--bg-card);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
-  padding: 40px;
+  padding: 44px;
   box-shadow: var(--shadow-card);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
 
   &:hover {
-    transform: translateY(-4px);
     box-shadow: var(--shadow-card-hover);
+    border-color: var(--color-accent);
   }
 
   .intro-section {
     text-align: center;
-    margin-bottom: 40px;
-
-    .intro-icon {
-      font-size: 56px;
-      margin-bottom: 16px;
-      display: block;
-    }
+    margin-bottom: 36px;
 
     .intro-title {
       font-family: var(--font-serif);
-      font-size: 24px;
+      font-size: 26px;
       font-weight: 700;
       color: var(--text-primary);
-      margin: 0 0 20px 0;
+      margin: 0 0 22px 0;
+      letter-spacing: -0.02em;
     }
 
     .intro-text {
       font-size: 15px;
-      line-height: 1.8;
+      line-height: 1.85;
       color: var(--text-secondary);
-      max-width: 600px;
+      max-width: 620px;
       margin: 0 auto;
 
       p {
@@ -149,7 +141,7 @@
 
         strong {
           color: var(--color-accent);
-          font-weight: 600;
+          font-weight: 700;
         }
       }
     }
@@ -157,23 +149,34 @@
 
   .divider {
     height: 1px;
-    background: var(--border-color);
-    margin: 32px 0;
+    background: linear-gradient(to right, transparent, var(--border-strong), transparent);
+    margin: 36px 0;
   }
 
   .tech-section,
   .contact-section {
-    margin-bottom: 32px;
+    margin-bottom: 28px;
 
     .section-title {
-      font-family: var(--font-serif);
-      font-size: 18px;
+      font-size: 12px;
       font-weight: 700;
-      color: var(--text-primary);
-      margin: 0 0 20px 0;
+      color: var(--text-tertiary);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin: 0 0 18px 0;
       display: flex;
       align-items: center;
       gap: 8px;
+
+      &::before {
+        content: '';
+        display: block;
+        width: 3px;
+        height: 14px;
+        background: var(--gradient-accent);
+        border-radius: 2px;
+        flex-shrink: 0;
+      }
     }
   }
 
@@ -183,15 +186,16 @@
     gap: 8px;
 
     .tech-tag {
-      padding: 6px 14px;
+      padding: 4px 12px;
       background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
+      border: 1px solid transparent;
       border-radius: var(--radius-tag);
-      color: var(--text-secondary);
-      font-size: 13px;
-      transition: all 0.15s ease;
+      color: var(--text-tertiary);
+      font-size: 12px;
+      transition: all 0.2s;
 
       &:hover {
+        background: transparent;
         border-color: var(--color-accent);
         color: var(--color-accent);
       }
@@ -200,37 +204,43 @@
 
   .contact-text {
     font-size: 14px;
-    line-height: 1.8;
+    line-height: 1.85;
     color: var(--text-secondary);
-    margin: 0 0 20px 0;
+    margin: 0 0 18px 0;
   }
 
   .contact-info {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 
     .contact-item {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 16px;
+      padding: 12px 18px;
       background: var(--bg-secondary);
       border: 1px solid var(--border-color);
-      border-radius: var(--radius-card);
+      border-radius: var(--radius-btn);
       border-left: 3px solid var(--color-accent);
+      transition: border-color 0.25s ease, background 0.25s ease;
 
-      .contact-icon { font-size: 18px; }
+      &:hover {
+        border-color: var(--color-accent);
+        border-left-color: var(--color-accent);
+      }
 
       .contact-label {
-        font-size: 13px;
+        font-size: 12px;
         color: var(--text-tertiary);
+        letter-spacing: 0.04em;
         min-width: 48px;
       }
 
       .contact-value {
         font-size: 14px;
         color: var(--color-accent);
+        font-weight: 500;
       }
     }
   }
@@ -242,9 +252,12 @@
     border-top: 1px solid var(--border-color);
 
     p {
+      font-family: var(--font-serif);
+      font-style: italic;
       font-size: 14px;
       color: var(--text-tertiary);
       margin: 0;
+      letter-spacing: 0.02em;
     }
   }
 }
