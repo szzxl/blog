@@ -302,13 +302,13 @@ onUnmounted(() => {
 }
 
 .hero-title {
-  font-family: var(--font-serif);
-  font-size: clamp(36px, 6vw, 64px);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 20px;
-  text-shadow: 0 2px 20px rgba(0,0,0,0.4);
-  line-height: 1.15;
+  font-family: var(--font-display);
+  font-size: clamp(48px, 8vw, 88px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin-bottom: 24px;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.5);
+  line-height: 1.1;
 }
 
 .hero-subtitle {
@@ -425,10 +425,10 @@ onUnmounted(() => {
 
   .featured-title {
     font-family: var(--font-serif);
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 700;
     line-height: 1.35;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     letter-spacing: -0.02em;
     text-shadow: 0 1px 6px rgba(0,0,0,0.3);
   }
@@ -510,7 +510,7 @@ onUnmounted(() => {
 
   .article-title {
     font-family: var(--font-serif);
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--text-primary);
     line-height: 1.4;
@@ -526,7 +526,7 @@ onUnmounted(() => {
   .article-abstract {
     font-size: 14px;
     color: var(--text-tertiary);
-    line-height: 1.65;
+    line-height: 1.75;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -637,10 +637,11 @@ onUnmounted(() => {
 
   .author-name {
     font-family: var(--font-serif);
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 6px;
+    letter-spacing: -0.01em;
   }
 
   .author-desc {
