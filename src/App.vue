@@ -8,7 +8,7 @@
         <el-icon :size="20"><Top /></el-icon>
       </button>
 
-      <main class="main-content">
+      <main class="main-content" :class="{ 'no-padding': isHome }">
         <router-view />
       </main>
       <Footer />
@@ -17,14 +17,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { Top } from '@element-plus/icons-vue'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
 
+const route = useRoute()
 const showBackToTop = ref(false)
+const isHome = computed(() => route.path === '/')
 
 const fetchWebsiteConfig = async () => {
   try {
@@ -67,6 +70,10 @@ onUnmounted(() => {
 .main-content {
   flex: 1;
   padding-top: 64px;
+
+  &.no-padding {
+    padding-top: 0;
+  }
 }
 
 .back-to-top {
