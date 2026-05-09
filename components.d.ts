@@ -10,8 +10,6 @@ declare module 'vue' {
     Carousel: typeof import('./src/components/Carousel.vue')['default']
     Comment: typeof import('./src/components/Comment.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
-    ElCarousel: typeof import('element-plus/es')['ElCarousel']
-    ElCarouselItem: typeof import('element-plus/es')['ElCarouselItem']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElDialog: typeof import('element-plus/es')['ElDialog']
     ElDrawer: typeof import('element-plus/es')['ElDrawer']

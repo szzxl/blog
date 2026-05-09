@@ -86,12 +86,8 @@ onUnmounted(() => {
 <style scoped lang="scss">
 .footer {
   border-top: 1px solid var(--border-color);
-  margin-top: 48px;
-
-  .container {
-    padding-top: 32px;
-    padding-bottom: 24px;
-  }
+  margin-top: 64px;
+  background: var(--bg-card);
 }
 
 .footer-main {
@@ -99,44 +95,48 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: flex-start;
   gap: 48px;
-  margin-bottom: 24px;
-  padding-bottom: 24px;
+  padding: 48px 0 32px;
   border-bottom: 1px solid var(--border-color);
 }
 
 .footer-brand {
+  max-width: 280px;
+
   .brand-name {
-    font-size: 16px;
+    font-family: var(--font-serif);
+    font-size: 18px;
     font-weight: 700;
     color: var(--text-primary);
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
   }
 
   .brand-motto {
     font-size: 13px;
     color: var(--text-tertiary);
     margin: 0;
+    line-height: 1.6;
   }
 }
 
 .footer-links {
   display: flex;
-  gap: 48px;
+  gap: 56px;
 }
 
 .link-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 
   .group-title {
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     color: var(--text-tertiary);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 4px;
+    letter-spacing: 0.1em;
+    margin-bottom: 2px;
   }
 
   a, .contact-item {
@@ -144,25 +144,22 @@ onUnmounted(() => {
     color: var(--text-secondary);
     transition: color 0.15s ease;
 
-    &:hover {
-      color: var(--color-accent);
-    }
+    &:hover { color: var(--color-accent); }
   }
 
   .contact-item {
     cursor: default;
-
-    &:hover {
-      color: var(--text-secondary);
-    }
+    &:hover { color: var(--text-secondary); }
   }
 }
 
 .footer-bottom {
   display: flex;
   align-items: center;
-  gap: 24px;
+  justify-content: space-between;
   flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px 0;
 
   span {
     font-size: 12px;
@@ -177,17 +174,20 @@ onUnmounted(() => {
 @media (max-width: 768px) {
   .footer-main {
     flex-direction: column;
-    gap: 24px;
+    gap: 28px;
+    padding: 32px 0 24px;
   }
 
   .footer-links {
-    gap: 24px;
+    gap: 28px;
+    flex-wrap: wrap;
   }
 
   .footer-bottom {
-    gap: 12px;
     flex-direction: column;
     align-items: flex-start;
+    gap: 8px;
   }
 }
 </style>
+

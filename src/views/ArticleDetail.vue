@@ -245,101 +245,103 @@ onMounted(() => {
 }
 
 .article-content {
-  padding: 40px 48px;
+  padding: 48px 56px;
   margin-bottom: 20px;
 
   .article-title {
-    font-size: 26px;
+    font-family: var(--font-serif);
+    font-size: 32px;
     font-weight: 700;
+    letter-spacing: -0.02em;
     color: var(--text-primary);
-    line-height: 1.5;
-    margin: 0 0 24px 0;
+    line-height: 1.4;
+    margin: 0 0 20px 0;
     text-align: center;
-    font-family: 'JetBrains Mono', monospace;
   }
 
   .article-info {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    justify-content: center;
+    gap: 8px 16px;
     font-size: 13px;
     color: var(--text-tertiary);
     padding-bottom: 24px;
-    margin-bottom: 28px;
+    margin-bottom: 32px;
     border-bottom: 1px solid var(--border-color);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-sans);
 
     .info-item {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
 
       &.tags {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        flex: 1;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: center;
 
         .tag {
-          padding: 3px 10px;
+          padding: 3px 12px;
           border-radius: var(--radius-tag);
-          background: transparent;
-          border: 1px solid rgba(0, 212, 170, 0.4);
-          color: var(--color-accent);
+          background: var(--bg-secondary);
+          color: var(--text-secondary);
           font-size: 12px;
-          font-weight: 600;
-          transition: all 0.15s;
+          font-weight: 500;
+          transition: all 0.2s;
           cursor: pointer;
+          border: none;
 
           &:hover {
-            background: rgba(0, 212, 170, 0.1);
-            border-color: var(--color-accent);
+            background: var(--color-accent);
+            color: #fff;
           }
         }
       }
     }
 
     .info-right {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 16px;
+      gap: 6px;
     }
 
     .info-divider {
       color: var(--border-color);
+      margin: 0 2px;
     }
   }
 
   .content {
     font-size: 16px;
-    line-height: 2;
+    line-height: 1.9;
     color: var(--text-secondary);
+    font-family: var(--font-sans);
 
     :deep(h1), :deep(h2), :deep(h3), :deep(h4), :deep(h5), :deep(h6) {
+      font-family: var(--font-serif);
       font-weight: 700;
       color: var(--text-primary);
-      margin-top: 36px;
-      margin-bottom: 16px;
-      font-family: 'JetBrains Mono', monospace;
     }
 
     :deep(h2) {
-      font-size: 22px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border-color);
-      color: var(--color-accent);
+      font-size: 24px;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 8px;
+      margin: 40px 0 16px;
     }
 
     :deep(h3) {
-      font-size: 18px;
+      font-size: 20px;
+      margin: 32px 0 12px;
+    }
 
-      &::before {
-        content: '## ';
-        color: var(--color-accent);
-        opacity: 0.6;
-      }
+    :deep(h4) {
+      font-size: 17px;
+      margin: 24px 0 10px;
     }
 
     :deep(p) {
@@ -349,16 +351,18 @@ onMounted(() => {
     :deep(img) {
       max-width: 100%;
       border-radius: var(--radius-card);
-      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-card);
       margin: 24px 0;
+      display: block;
     }
 
     :deep(blockquote) {
       margin: 24px 0;
       padding: 16px 20px;
-      background: rgba(0, 212, 170, 0.04);
+      background: var(--bg-secondary);
       border-left: 3px solid var(--color-accent);
-      color: var(--text-tertiary);
+      border-radius: 0 var(--radius-btn) var(--radius-btn) 0;
+      color: var(--text-secondary);
       font-style: italic;
 
       p {
@@ -368,21 +372,20 @@ onMounted(() => {
 
     :deep(code) {
       padding: 2px 6px;
-      background: rgba(0, 212, 170, 0.08);
-      border-radius: 3px;
-      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      background: var(--bg-secondary);
+      border-radius: 4px;
+      font-family: 'Fira Code', 'Consolas', monospace;
       font-size: 0.88em;
       color: var(--color-accent);
-      border: 1px solid rgba(0, 212, 170, 0.2);
     }
 
     :deep(pre) {
       margin: 24px 0;
       padding: 20px 24px;
       background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
       border-radius: var(--radius-card);
       overflow-x: auto;
-      border: 1px solid var(--border-color);
 
       code {
         padding: 0;
@@ -407,8 +410,8 @@ onMounted(() => {
     :deep(a) {
       color: var(--color-accent);
       text-decoration: none;
-      border-bottom: 1px solid rgba(0, 212, 170, 0.3);
-      transition: border-color 0.15s;
+      border-bottom: 1px solid rgba(232, 93, 38, 0.3);
+      transition: border-color 0.2s;
 
       &:hover {
         border-bottom-color: var(--color-accent);
@@ -423,14 +426,13 @@ onMounted(() => {
 
       th {
         background: var(--bg-secondary);
-        color: var(--color-accent);
+        color: var(--text-primary);
         font-weight: 700;
         padding: 10px 14px;
         border: 1px solid var(--border-color);
         text-align: left;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 12px;
-        text-transform: uppercase;
+        font-family: var(--font-sans);
+        font-size: 13px;
       }
 
       td {
@@ -440,7 +442,7 @@ onMounted(() => {
       }
 
       tr:hover td {
-        background: rgba(0, 212, 170, 0.03);
+        background: var(--bg-secondary);
       }
     }
 
@@ -469,17 +471,18 @@ onMounted(() => {
     border-radius: var(--radius-card);
     border: 1px solid var(--border-color);
     background: var(--bg-card);
+    box-shadow: var(--shadow-card);
     color: var(--text-secondary);
     font-size: 13px;
-    font-weight: 600;
-    transition: all 0.15s;
+    font-weight: 500;
+    font-family: var(--font-sans);
+    transition: all 0.2s;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 3px;
     position: relative;
-    font-family: 'JetBrains Mono', monospace;
 
     .icon {
       font-size: 20px;
@@ -496,7 +499,7 @@ onMounted(() => {
       right: -6px;
       padding: 1px 6px;
       background: var(--color-accent);
-      color: var(--bg-primary);
+      color: #fff;
       border-radius: 10px;
       font-size: 10px;
       font-weight: 700;
@@ -507,11 +510,10 @@ onMounted(() => {
     &:hover {
       border-color: var(--color-accent);
       color: var(--color-accent);
-      box-shadow: var(--shadow-glow);
+      box-shadow: var(--shadow-card-hover);
     }
 
     &.like-btn.liked {
-      background: rgba(0, 212, 170, 0.1);
       border-color: var(--color-accent);
       color: var(--color-accent);
     }
@@ -530,32 +532,33 @@ onMounted(() => {
   }
 
   .article-content {
-    padding: 24px 16px;
+    padding: 28px 20px;
     border-radius: 0;
     margin-bottom: 16px;
 
     .article-title {
-      font-size: 20px;
+      font-size: 22px;
+      letter-spacing: -0.01em;
       margin-bottom: 16px;
     }
 
     .article-info {
-      gap: 10px;
+      gap: 8px;
       font-size: 12px;
-      padding-bottom: 14px;
+      padding-bottom: 16px;
       margin-bottom: 20px;
       flex-direction: column;
-      align-items: flex-start;
+      align-items: center;
 
       .info-item.tags {
         width: 100%;
-        flex-wrap: wrap;
+        justify-content: center;
       }
 
       .info-right {
-        width: 100%;
         flex-wrap: wrap;
-        gap: 10px;
+        justify-content: center;
+        gap: 6px;
       }
 
       .info-divider {
@@ -567,8 +570,15 @@ onMounted(() => {
       font-size: 15px;
       line-height: 1.85;
 
-      :deep(h2) { font-size: 18px; }
-      :deep(h3) { font-size: 16px; }
+      :deep(h2) {
+        font-size: 20px;
+        margin: 32px 0 12px;
+      }
+
+      :deep(h3) {
+        font-size: 17px;
+        margin: 24px 0 10px;
+      }
 
       :deep(pre) {
         padding: 14px 16px;

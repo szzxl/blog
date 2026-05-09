@@ -126,30 +126,34 @@ onMounted(() => {
 }
 
 .page-header {
-  border-left: 3px solid var(--color-accent);
-  padding-left: 16px;
-  margin-bottom: 32px;
+  border-left: 4px solid var(--color-accent);
+  padding-left: 20px;
+  margin-bottom: 36px;
 
   h1 {
-    font-size: 24px;
-    color: var(--text-primary);
-    margin: 0 0 6px 0;
+    font-family: var(--font-serif);
+    font-size: 32px;
     font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+    line-height: 1.2;
   }
 
   p {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--text-tertiary);
     margin: 0;
   }
 }
 
 .tag-cloud {
-  background: var(--bg-secondary);
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
-  padding: 32px;
-  margin-bottom: 32px;
+  box-shadow: var(--shadow-card);
+  padding: 36px 32px;
+  margin-bottom: 36px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -159,35 +163,36 @@ onMounted(() => {
 
   .tag-item {
     cursor: pointer;
-    padding: 6px 14px;
+    padding: 6px 16px;
     border-radius: var(--radius-tag);
-    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
     color: var(--text-secondary);
     font-weight: 500;
-    transition: all 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
     display: inline-flex;
     align-items: center;
     gap: 4px;
 
     &:hover {
-      border-color: var(--color-accent);
-      color: var(--color-accent);
+      background: var(--color-accent);
+      color: #fff;
       box-shadow: var(--shadow-glow);
     }
 
     .tag-count {
       font-size: 0.8em;
-      opacity: 0.7;
+      opacity: 0.75;
     }
   }
 }
 
 .tag-list {
   .list-title {
-    font-size: 16px;
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 700;
     color: var(--text-primary);
-    margin: 0 0 20px 0;
-    font-weight: 600;
+    margin: 0 0 24px 0;
   }
 
   .tag-grid {
@@ -197,20 +202,25 @@ onMounted(() => {
   }
 
   .tag-card {
-    background: var(--bg-secondary);
+    background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 12px;
     cursor: pointer;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
 
     &:hover {
       border-color: var(--color-accent);
-      box-shadow: var(--shadow-glow);
-      transform: translateY(-2px);
+      box-shadow: var(--shadow-card-hover);
+      transform: translateY(-4px);
+
+      .tag-name {
+        color: var(--color-accent);
+      }
     }
 
     .tag-header {
@@ -221,9 +231,11 @@ onMounted(() => {
       .tag-icon { font-size: 20px; }
 
       .tag-name {
+        font-family: var(--font-serif);
         font-size: 15px;
-        font-weight: 600;
+        font-weight: 700;
         color: var(--text-primary);
+        transition: color 0.2s ease;
       }
     }
 
@@ -243,7 +255,7 @@ onMounted(() => {
       font-weight: 600;
       padding: 6px 0;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: background 0.15s ease, color 0.15s ease;
 
       &:hover {
         background: var(--color-accent);
@@ -261,6 +273,10 @@ onMounted(() => {
 }
 
 @media (max-width: 640px) {
+  .page-header h1 {
+    font-size: 26px;
+  }
+
   .tag-list .tag-grid {
     grid-template-columns: 1fr;
   }

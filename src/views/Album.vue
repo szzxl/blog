@@ -190,13 +190,15 @@ onMounted(() => {
 }
 
 .page-header {
-  border-left: 3px solid var(--color-accent);
-  padding-left: 16px;
+  border-left: 4px solid var(--color-accent);
+  padding-left: 20px;
   margin-bottom: 32px;
 
   .page-title {
-    font-size: 24px;
+    font-family: var(--font-serif);
+    font-size: 32px;
     font-weight: 700;
+    letter-spacing: -0.02em;
     color: var(--text-primary);
     margin-bottom: 6px;
   }
@@ -214,17 +216,17 @@ onMounted(() => {
 }
 
 .album-card {
-  background: var(--bg-secondary);
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   cursor: pointer;
   overflow: hidden;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    border-color: var(--color-accent);
-    box-shadow: var(--shadow-glow);
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
 
     .cover-img { transform: scale(1.04); }
     .cover-overlay { opacity: 1; }
@@ -269,13 +271,15 @@ onMounted(() => {
     padding: 14px 16px;
 
     .album-name {
-      font-size: 15px;
-      font-weight: 600;
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-weight: 700;
       color: var(--text-primary);
       margin-bottom: 6px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      transition: color 0.15s ease;
     }
 
     .album-desc {
@@ -286,6 +290,10 @@ onMounted(() => {
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+  }
+
+  &:hover .album-name {
+    color: var(--color-accent);
   }
 }
 
@@ -310,12 +318,14 @@ onMounted(() => {
   }
 
   .album-title-section {
-    border-left: 3px solid var(--color-accent);
-    padding-left: 16px;
+    border-left: 4px solid var(--color-accent);
+    padding-left: 20px;
 
     .album-title {
-      font-size: 22px;
+      font-family: var(--font-serif);
+      font-size: 26px;
       font-weight: 700;
+      letter-spacing: -0.02em;
       color: var(--text-primary);
       margin-bottom: 6px;
     }
@@ -334,17 +344,17 @@ onMounted(() => {
 }
 
 .photo-item {
-  background: var(--bg-secondary);
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   cursor: pointer;
   overflow: hidden;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    border-color: var(--color-accent);
-    box-shadow: var(--shadow-glow);
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
 
     .photo-img { transform: scale(1.04); }
     .photo-overlay { opacity: 1; }
@@ -381,13 +391,15 @@ onMounted(() => {
     padding: 12px 14px;
 
     .photo-title {
-      font-size: 14px;
-      font-weight: 600;
+      font-family: var(--font-serif);
+      font-size: 15px;
+      font-weight: 700;
       color: var(--text-primary);
       margin-bottom: 4px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      transition: color 0.15s ease;
     }
 
     .photo-desc {
@@ -398,6 +410,10 @@ onMounted(() => {
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+  }
+
+  &:hover .photo-title {
+    color: var(--color-accent);
   }
 }
 

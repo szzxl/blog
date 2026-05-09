@@ -1086,15 +1086,17 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 32px;
-  border-left: 3px solid var(--color-accent);
-  padding-left: 16px;
+  border-left: 4px solid var(--color-accent);
+  padding-left: 20px;
 
   .header-text {
     h1 {
-      font-size: 24px;
+      font-family: var(--font-serif);
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
       color: var(--text-primary);
       margin: 0 0 4px 0;
-      font-weight: 700;
     }
 
     p {
@@ -1106,19 +1108,18 @@ onMounted(() => {
 
   .publish-btn {
     height: 36px;
-    padding: 0 16px;
+    padding: 0 18px;
     border-radius: var(--radius-btn);
-    background: transparent;
-    border: 1px solid var(--color-accent);
-    color: var(--color-accent);
+    background: var(--color-accent);
+    border: none;
+    color: #fff;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: opacity 0.15s ease;
 
     &:hover {
-      background: var(--color-accent);
-      color: var(--text-inverse);
+      opacity: 0.85;
     }
   }
 }
@@ -1136,14 +1137,16 @@ onMounted(() => {
   }
 
   .talk-item {
-    background: var(--bg-secondary);
+    background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-card);
     padding: 20px;
-    transition: border-color 0.2s ease;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 
     &:hover {
-      border-color: rgba(0, 212, 170, 0.3);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card-hover);
     }
 
     .talk-header {
@@ -1163,8 +1166,9 @@ onMounted(() => {
 
       .user-info {
         .username {
-          font-size: 14px;
-          font-weight: 600;
+          font-family: var(--font-serif);
+          font-size: 15px;
+          font-weight: 700;
           color: var(--text-primary);
           margin-bottom: 2px;
         }
@@ -1356,7 +1360,7 @@ onMounted(() => {
           align-items: center;
           gap: 4px;
           padding: 4px 10px;
-          background: rgba(0, 212, 170, 0.08);
+          background: var(--bg-secondary);
           border-radius: var(--radius-tag);
           cursor: pointer;
           transition: background 0.15s ease;
@@ -1375,7 +1379,7 @@ onMounted(() => {
             &.expanded { transform: rotate(180deg); }
           }
 
-          &:hover { background: rgba(0, 212, 170, 0.15); }
+          &:hover { background: var(--bg-primary); }
         }
 
         .replies-list {
@@ -1413,7 +1417,7 @@ onMounted(() => {
                 &.author { color: var(--color-accent); }
 
                 .reply-to {
-                  color: var(--color-accent-2);
+                  color: var(--color-accent);
                   margin: 0 4px;
                 }
               }
@@ -1497,13 +1501,13 @@ onMounted(() => {
         border-radius: var(--radius-btn);
         background: var(--color-accent);
         border: none;
-        color: var(--text-inverse);
+        color: #fff;
         font-size: 13px;
         font-weight: 600;
         cursor: pointer;
-        transition: background 0.15s ease;
+        transition: opacity 0.15s ease;
 
-        &:hover { background: #00b894; }
+        &:hover { opacity: 0.85; }
       }
     }
   }

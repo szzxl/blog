@@ -232,31 +232,44 @@ watch(() => route.path, (newPath) => {
 }
 
 .page-header {
-  border-left: 3px solid var(--color-accent);
-  padding-left: 16px;
-  margin-bottom: 32px;
+  border-left: 4px solid var(--color-accent);
+  padding-left: 20px;
+  margin-bottom: 36px;
 
   h1 {
-    font-size: 24px;
-    color: var(--text-primary);
-    margin: 0 0 6px 0;
+    font-family: var(--font-serif);
+    font-size: 32px;
     font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+    line-height: 1.2;
   }
-  
+
   .subtitle {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--text-tertiary);
     margin: 0;
   }
 }
 
 .filter-bar {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 
   .search-input {
+    :deep(.el-input__wrapper) {
+      border-radius: var(--radius-btn);
+      transition: box-shadow 0.2s ease;
+
+      &.is-focus {
+        box-shadow: 0 0 0 1px var(--color-accent) inset;
+      }
+    }
+
     :deep(.el-input-group__append) {
       background: var(--bg-secondary);
       border-color: var(--border-color);
+      border-radius: 0 var(--radius-btn) var(--radius-btn) 0;
 
       .el-button {
         color: var(--text-secondary);
@@ -272,28 +285,29 @@ watch(() => route.path, (newPath) => {
 .articles {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: 16px;
+  margin-bottom: 28px;
 }
 
 .article-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
   display: flex;
   cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
   height: 160px;
   position: relative;
 
   &:hover {
     border-color: var(--color-accent);
-    box-shadow: var(--shadow-glow);
-    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-4px);
 
     .article-cover img {
-      transform: scale(1.04);
+      transform: scale(1.05);
     }
 
     .article-title {
@@ -303,14 +317,14 @@ watch(() => route.path, (newPath) => {
 
   .badges {
     position: absolute;
-    top: 8px;
-    left: 8px;
+    top: 10px;
+    left: 10px;
     display: flex;
     gap: 6px;
     z-index: 2;
 
     .badge {
-      padding: 2px 8px;
+      padding: 3px 10px;
       border-radius: var(--radius-tag);
       font-size: 11px;
       font-weight: 600;
@@ -340,30 +354,31 @@ watch(() => route.path, (newPath) => {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.3s ease;
+        transition: transform 0.35s ease;
       }
     }
   }
 
   .card-right {
     flex: 1;
-    padding: 16px 20px;
+    padding: 18px 22px;
     display: flex;
     flex-direction: column;
     gap: 8px;
     min-width: 0;
 
     .article-title {
-      font-size: 16px;
-      font-weight: 600;
+      font-family: var(--font-serif);
+      font-size: 17px;
+      font-weight: 700;
       color: var(--text-primary);
       margin: 0;
-      line-height: 1.4;
+      line-height: 1.45;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      transition: color 0.15s ease;
+      transition: color 0.2s ease;
     }
 
     .article-tags {
@@ -372,11 +387,18 @@ watch(() => route.path, (newPath) => {
       gap: 6px;
 
       .tag {
-        padding: 2px 8px;
+        padding: 3px 10px;
         border-radius: var(--radius-tag);
-        border: 1px solid var(--color-accent);
-        color: var(--color-accent);
+        background: var(--bg-secondary);
+        color: var(--text-secondary);
         font-size: 11px;
+        font-weight: 500;
+        transition: background 0.15s ease, color 0.15s ease;
+
+        &:hover {
+          background: var(--color-accent);
+          color: #fff;
+        }
       }
     }
 
@@ -406,6 +428,7 @@ watch(() => route.path, (newPath) => {
         font-size: 12px;
         color: var(--color-accent);
         white-space: nowrap;
+        font-weight: 500;
       }
     }
   }
@@ -421,11 +444,32 @@ watch(() => route.path, (newPath) => {
 .pagination {
   display: flex;
   justify-content: center;
-  padding: 24px 0 0;
+  padding: 28px 0 0;
   border-top: 1px solid var(--border-color);
+
+  :deep(.el-pagination) {
+    .el-pager li {
+      border-radius: var(--radius-btn);
+      transition: background 0.15s ease, color 0.15s ease;
+
+      &.is-active {
+        background: var(--color-accent);
+        color: #fff;
+      }
+    }
+
+    .btn-prev,
+    .btn-next {
+      border-radius: var(--radius-btn);
+    }
+  }
 }
 
 @media (max-width: 640px) {
+  .page-header h1 {
+    font-size: 26px;
+  }
+
   .article-card {
     flex-direction: column;
     height: auto;
@@ -436,7 +480,7 @@ watch(() => route.path, (newPath) => {
     }
 
     .card-right {
-      padding: 14px;
+      padding: 14px 16px;
     }
   }
 }
