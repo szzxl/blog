@@ -3,6 +3,7 @@
     <div class="container">
       <!-- Logo -->
       <router-link to="/" class="logo">
+        <img v-if="siteLogo" :src="siteLogo" class="logo-img" alt="logo" />
         <span class="logo-name">{{ siteName || '博客' }}</span>
       </router-link>
 
@@ -14,7 +15,9 @@
           :to="item.to"
           class="nav-item"
         >
-          <span class="nav-icon" :style="{ background: item.color + '22', color: item.color }">{{ item.icon }}</span>
+          <span class="nav-icon" :style="{ background: item.color + '22', color: item.color }">
+            <el-icon><component :is="item.icon" /></el-icon>
+          </span>
           <span class="nav-text">{{ item.text }}</span>
         </router-link>
       </nav>
@@ -22,7 +25,7 @@
       <!-- 右侧操作区 -->
       <div class="header-actions">
         <button class="icon-btn" @click="toggleTheme" :title="themeTooltip">
-          <span>{{ themeIcon }}</span>
+          <el-icon :size="17"><component :is="themeIconComp" /></el-icon>
         </button>
 
         <template v-if="userStore.isLoggedIn">
@@ -47,7 +50,11 @@
         </template>
 
         <!-- 移动端汉堡 -->
-        <button class="icon-btn mobile-menu-btn" @click="showMobileMenu = true">☰</button>
+        <button class="icon-btn mobile-menu-btn" @click="showMobileMenu = true">
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor">
+            <rect width="16" height="2" rx="1"/><rect y="5" width="16" height="2" rx="1"/><rect y="10" width="16" height="2" rx="1"/>
+          </svg>
+        </button>
       </div>
     </div>
 
@@ -63,13 +70,15 @@
             class="mobile-nav-item"
             @click="showMobileMenu = false"
           >
-            <span class="mobile-nav-icon">{{ item.icon }}</span>
+            <span class="mobile-nav-icon" :style="{ background: item.color + '18', color: item.color }">
+              <el-icon :size="16"><component :is="item.icon" /></el-icon>
+            </span>
             {{ item.text }}
           </router-link>
         </nav>
         <div class="mobile-actions">
           <button class="mobile-action-btn" @click="toggleTheme; showMobileMenu = false">
-            {{ themeIcon }} {{ themeTooltip }}
+            <el-icon style="vertical-align:-2px;margin-right:6px"><component :is="themeIconComp" /></el-icon>{{ themeTooltip }}
           </button>
           <template v-if="userStore.isLoggedIn">
             <button v-if="isAuthor" class="mobile-action-btn" @click="handleMobileCommand('admin')">管理后台</button>
@@ -160,38 +169,39 @@ import { useThemeStore } from '@/stores/theme'
 import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
 import { uploadImage, updateUserProfile, getUserInfo, updatePassword } from '@/api/article'
 import { ElMessage } from 'element-plus'
+import {
+  House, Document, Folder, CollectionTag, ChatDotRound,
+  PictureFilled, EditPen, Connection, Moon, Sunny,
+} from '@element-plus/icons-vue'
 
 const router = useRouter()
 const userStore = useUserStore()
 const themeStore = useThemeStore()
 
 const navItems = [
-  { to: '/', icon: '🏠', text: '首页', color: '#165dff' },
-  { to: '/articles', icon: '📝', text: '文章', color: '#722ed1' },
-  { to: '/category', icon: '📂', text: '分类', color: '#ff7d00' },
-  { to: '/tag', icon: '🏷️', text: '标签', color: '#f53f3f' },
-  { to: '/talk', icon: '💬', text: '说说', color: '#00b42a' },
-  { to: '/album', icon: '📷', text: '相册', color: '#0fc6c2' },
-  { to: '/guestbook', icon: '✍️', text: '留言板', color: '#f77234' },
-  { to: '/link', icon: '🔗', text: '友链', color: '#9fdb1d' },
-  { to: '/about', icon: '👨‍💻', text: '关于', color: '#165dff' },
+  { to: '/', icon: House, text: '首页', color: '#165dff' },
+  { to: '/articles', icon: Document, text: '文章', color: '#722ed1' },
+  { to: '/category', icon: Folder, text: '分类', color: '#ff7d00' },
+  { to: '/tag', icon: CollectionTag, text: '标签', color: '#f53f3f' },
+  { to: '/talk', icon: ChatDotRound, text: '说说', color: '#00b42a' },
+  { to: '/album', icon: PictureFilled, text: '相册', color: '#0fc6c2' },
+  { to: '/guestbook', icon: EditPen, text: '留言板', color: '#f77234' },
+  { to: '/link', icon: Connection, text: '友链', color: '#9fdb1d' },
 ]
 
 const siteName = ref('')
-const siteDescription = ref('')
 const siteLogo = ref('')
 const showMobileMenu = ref(false)
 const isScrolled = ref(false)
 
-const themeIcon = computed(() => themeStore.appliedTheme === 'dark' ? '🌙' : '☀️')
+const themeIconComp = computed(() => themeStore.appliedTheme === 'dark' ? Sunny : Moon)
 const themeTooltip = computed(() => themeStore.appliedTheme === 'dark' ? '切换到浅色模式' : '切换到深色模式')
 const toggleTheme = () => themeStore.toggleTheme()
 
 const fetchWebsiteConfig = async () => {
   try {
     const config = await fetchWebsiteConfigWithCache()
-    if (config.site_name) siteName.value = config.site_name
-    if (config.site_description) siteDescription.value = config.site_description
+    if (config.site_name) siteName.value = config.site_name.replace(/系统$/u, '')
     if (config.logo) siteLogo.value = config.logo
   } catch {
     // 静默失败
@@ -386,31 +396,71 @@ onUnmounted(() => {
   right: 0;
   height: 64px;
   z-index: 999;
-  background: var(--bg-header);
-  backdrop-filter: blur(20px) saturate(1.8);
-  -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  box-shadow: 0 1px 0 var(--border-color), 0 4px 20px rgba(0,0,0,0.06);
+  background-image: url('/bg-banner.png');
+  background-size: cover;
+  background-position: center 20%;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.25);
   transition: box-shadow 0.3s ease;
+
+  /* 半透明遮罩，保证导航文字可读 */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(8, 18, 40, 0.55);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    pointer-events: none;
+  }
+
+  /* 流光底边 */
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #165dff, #0fc6c2, #ff7d00, #f53f3f, #165dff);
+    background-size: 300% 100%;
+    animation: header-flow 5s linear infinite;
+  }
 
   .container {
     height: 100%;
     display: flex;
     align-items: center;
     gap: 24px;
+    position: relative;
   }
+}
+
+@keyframes header-flow {
+  from { background-position: 0% center; }
+  to   { background-position: 300% center; }
 }
 
 .logo {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--font-display);
   font-size: 22px;
   font-weight: 900;
-  color: var(--text-primary);
+  color: #fff;
   text-decoration: none;
   letter-spacing: -0.03em;
   transition: color 0.2s ease;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.4);
 
-  &:hover { color: var(--color-accent) !important; }
+  &:hover { color: #7eb8ff !important; }
+
+  .logo-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
 }
 
 .nav {
@@ -426,7 +476,7 @@ onUnmounted(() => {
   gap: 6px;
   padding: 5px 10px;
   border-radius: var(--radius-btn);
-  color: var(--text-secondary);
+  color: rgba(255,255,255,0.85);
   font-size: 13px;
   font-weight: 500;
   transition: all 0.2s ease;
@@ -439,20 +489,21 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
+    font-size: 14px;
     flex-shrink: 0;
     transition: transform 0.2s ease;
+    .el-icon { font-size: 14px; }
   }
 
   &:hover {
-    background: var(--bg-secondary);
-    color: var(--text-primary) !important;
+    background: rgba(255,255,255,0.12);
+    color: #fff !important;
     .nav-icon { transform: scale(1.15); }
   }
 
   &.router-link-active {
-    color: var(--color-accent) !important;
-    background: rgba(22, 93, 255, 0.08);
+    color: #7eb8ff !important;
+    background: rgba(22, 93, 255, 0.2);
     font-weight: 700;
   }
 }
@@ -469,8 +520,8 @@ onUnmounted(() => {
   height: 36px;
   border-radius: var(--radius-btn);
   background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-secondary);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.85);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -479,24 +530,25 @@ onUnmounted(() => {
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: var(--border-strong);
-    color: var(--text-primary);
-    background: var(--bg-secondary);
+    border-color: rgba(255,255,255,0.5);
+    color: #fff;
+    background: rgba(255,255,255,0.12);
   }
 }
 
 .login-btn {
   padding: 7px 18px;
   border-radius: var(--radius-btn);
-  background: var(--color-accent);
-  border: none;
+  background: rgba(22,93,255,0.75);
+  border: 1px solid rgba(22,93,255,0.5);
   color: #fff;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
 
-  &:hover { background: var(--color-accent-hover); }
+  &:hover { background: rgba(22,93,255,0.95); }
 }
 
 .user-avatar {

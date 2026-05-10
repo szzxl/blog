@@ -1,98 +1,68 @@
-﻿<template>
+<template>
   <div class="tag-articles">
-    <div class="container">
-      <!-- 标签标题 -->
-      <div class="tag-header">
-        <h1 class="tag-name">{{ tagName }}</h1>
-        <p class="tag-desc">共 {{ total }} 篇文章</p>
+    <!-- ── Banner ──────────────────────────────────────── -->
+    <div class="page-banner">
+      <div class="banner-overlay"></div>
+      <div class="banner-content">
+        <h1 class="banner-title">#{{ tagName }}</h1>
+        <p class="banner-subtitle">共 {{ total }} 篇文章</p>
       </div>
-      
-      <!-- 文章表格 - PC端 -->
-      <div class="articles-table card desktop-view">
-        <el-table 
-          :data="articles" 
-          v-loading="loading"
-          style="width: 100%"
-          @row-click="goToArticle"
+    </div>
+
+    <!-- ── 主体内容 ─────────────────────────────────────── -->
+    <div class="container main-body">
+
+      <!-- 文章卡片网格 -->
+      <div class="articles-grid" v-loading="loading">
+
+        <!-- 文章卡片（每行3列） -->
+        <div
+          class="article-card"
+          v-for="(article, index) in articles"
+          :key="article.id"
+          @click="goToArticle(article)"
         >
-          <el-table-column type="index" label="序号" width="80" align="center" />
-          <el-table-column prop="articleName" label="文章标题" min-width="300">
-            <template #default="{ row }">
-              <div class="article-title">{{ row.articleName }}</div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="createTime" label="发布时间" width="180" align="center">
-            <template #default="{ row }">
-              {{ formatTime(row.createTime) }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="readNum" label="阅读量" width="120" align="center">
-            <template #default="{ row }">
-              <span class="stat-item">{{ row.readNum || 0 }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="likeCount" label="点赞数" width="120" align="center">
-            <template #default="{ row }">
-              <span class="stat-item">{{ row.likeCount || 0 }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="120" align="center">
-            <template #default="{ row }">
-              <el-button type="primary" size="small" @click.stop="goToArticle(row)">
-                查看
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        
-        <!-- 分页 -->
-        <div class="pagination" v-if="total > 0">
-          <el-pagination
-            background
-            layout="total, prev, pager, next, jumper"
-            :total="total"
-            :page-size="pageSize"
-            :current-page="currentPage"
-            @current-change="handlePageChange"
-          />
-        </div>
-      </div>
-      
-      <!-- 文章卡片 - 移动端 -->
-      <div class="articles-cards mobile-view" v-loading="loading">
-        <div class="article-card card" v-for="(article, index) in articles" :key="article.id" @click="goToArticle(article)">
-          <div class="card-header">
+          <!-- 封面 -->
+          <div class="card-cover">
+            <img
+              v-lazyload="article.articleCover || '/default-cover.svg'"
+              :alt="article.articleName"
+            />
+            <div class="cover-overlay"></div>
             <span class="card-index">{{ (currentPage - 1) * pageSize + index + 1 }}</span>
+          </div>
+
+          <!-- 内容 -->
+          <div class="card-body">
             <h3 class="card-title">{{ article.articleName }}</h3>
-          </div>
-          <div class="card-meta">
-            <span class="meta-item">{{ formatTime(article.createTime) }}</span>
-            <span class="meta-item">{{ article.readNum || 0 }} 阅读</span>
-            <span class="meta-item">{{ article.likeCount || 0 }} 喜欢</span>
-          </div>
-          <div class="card-action">
-            <span class="view-text">查看详情 →</span>
+            <div class="card-meta">
+              <span class="meta-item">{{ formatTime(article.createTime) }}</span>
+              <span class="meta-sep">·</span>
+              <span class="meta-item">{{ article.readNum || 0 }} 阅读</span>
+              <span class="meta-sep">·</span>
+              <span class="meta-item">{{ article.likeCount || 0 }} 喜欢</span>
+            </div>
+            <div class="card-action">阅读全文 →</div>
           </div>
         </div>
-        
+
         <!-- 空状态 -->
         <div v-if="articles.length === 0 && !loading" class="empty-state">
           <div class="empty-text">该标签下暂无文章</div>
-          <el-button type="primary" @click="goBack">返回标签页</el-button>
+          <button class="back-btn" @click="goBack">返回标签页</button>
         </div>
-        
-        <!-- 分页 -->
-        <div class="pagination" v-if="total > 0">
-          <el-pagination
-            background
-            layout="prev, pager, next"
-            :total="total"
-            :page-size="pageSize"
-            :current-page="currentPage"
-            @current-change="handlePageChange"
-            small
-          />
-        </div>
+      </div>
+
+      <!-- 分页 -->
+      <div class="pagination" v-if="total > 0">
+        <el-pagination
+          background
+          layout="total, prev, pager, next, jumper"
+          :total="total"
+          :page-size="pageSize"
+          :current-page="currentPage"
+          @current-change="handlePageChange"
+        />
       </div>
     </div>
   </div>
@@ -117,7 +87,7 @@ const pageSize = ref(12)
 // 加载文章列表
 const loadArticles = async () => {
   if (!tagName.value) return
-  
+
   loading.value = true
   try {
     const response: any = await getArticleList({
@@ -125,14 +95,14 @@ const loadArticles = async () => {
       pageNo: currentPage.value,
       pageSize: pageSize.value
     })
-    
+
     // 处理分页数据
     if (response) {
       // 如果返回的是分页对象 {list: [], total: 0}
       if (response.list && Array.isArray(response.list)) {
         articles.value = response.list
         total.value = response.total || 0
-      } 
+      }
       // 如果直接返回数组
       else if (Array.isArray(response)) {
         articles.value = response
@@ -202,366 +172,293 @@ watch(() => route.fullPath, (newPath) => {
 </script>
 
 <style scoped lang="scss">
-.tag-articles {
-  min-height: calc(100vh - 200px);
-  padding: 48px 0 80px;
+// ── Banner ────────────────────────────────────────────
+.page-banner {
+  position: relative;
+  height: 200px;
+  background: url('/bg-banner.png') center 30% / cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 12, 30, 0.62);
+  }
+
+  .banner-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+
+    .banner-title {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+      margin: 0 0 8px 0;
+      line-height: 1.2;
+    }
+
+    .banner-subtitle {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.65);
+      margin: 0;
+      font-family: var(--font-sans);
+    }
+  }
 }
 
+// ── 容器 ──────────────────────────────────────────────
 .container {
-  max-width: 1200px;
+  max-width: 1240px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
-// ── 标签标题（与 Home.vue page-header 一致）────────────
-.tag-header {
-  border-left: 4px solid var(--color-accent);
-  padding-left: 20px;
-  margin-bottom: 40px;
-
-  .tag-name {
-    font-family: var(--font-serif);
-    font-size: 32px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--text-primary);
-    margin: 0 0 8px 0;
-    line-height: 1.2;
-  }
-
-  .tag-desc {
-    font-size: 14px;
-    color: var(--text-tertiary);
-    margin: 0;
-    font-family: var(--font-sans);
-  }
+.main-body {
+  padding-top: 48px;
+  padding-bottom: 80px;
 }
 
-// ── 桌面端表格 ────────────────────────────────────────
-.articles-table {
-  padding: 0;
-  overflow: hidden;
+// ── 文章卡片网格（每行3列）───────────────────────────
+.articles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.article-card {
   background: var(--bg-card);
-  backdrop-filter: var(--blur-glass);
-  -webkit-backdrop-filter: var(--blur-glass);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
 
   &:hover {
     box-shadow: var(--shadow-card-hover);
+    transform: translateY(-4px);
     border-color: var(--color-accent);
+
+    .card-cover img {
+      transform: scale(1.06);
+    }
+
+    .card-title {
+      color: var(--color-accent);
+    }
+
+    .card-action {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
 
-  :deep(.el-table) {
-    background: transparent;
-    color: var(--text-secondary);
-    font-size: 14px;
-    font-family: var(--font-sans);
-    border: none;
+  // 封面图
+  .card-cover {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    background: var(--bg-secondary);
+    flex-shrink: 0;
 
-    &::before {
-      display: none;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .el-table__header-wrapper {
-      th.el-table__cell {
-        background: var(--bg-secondary);
-        color: var(--text-tertiary);
-        font-weight: 700;
-        font-size: 12px;
-        border-bottom: 1px solid var(--border-color);
-        border-right: none;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        font-family: var(--font-sans);
-      }
+    .cover-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(5, 12, 30, 0.45) 0%, transparent 60%);
     }
 
-    .el-table__body-wrapper {
-      td.el-table__cell {
-        background: transparent;
-        border-bottom: 1px solid var(--border-color);
-        border-right: none;
-        color: var(--text-secondary);
-        padding: 14px 0;
-      }
-    }
-
-    .el-table__row {
-      cursor: pointer;
-      transition: background 0.2s ease;
-
-      &:hover td.el-table__cell {
-        background: rgba(74, 140, 110, 0.05) !important;
-      }
-
-      .article-title {
-        font-family: var(--font-serif);
-        font-weight: 700;
-        color: var(--text-primary);
-        transition: color 0.2s ease;
-        font-size: 15px;
-        letter-spacing: -0.01em;
-
-        &:hover {
-          color: var(--color-accent);
-        }
-      }
-
-      .stat-item {
-        font-size: 12px;
-        color: var(--text-tertiary);
-      }
-    }
-
-    .el-button {
-      background: transparent;
-      border: 1px solid var(--color-accent);
-      color: var(--color-accent);
-      border-radius: var(--radius-btn);
-      font-weight: 600;
-      padding: 5px 12px;
-      font-size: 12px;
+    .card-index {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 28px;
+      height: 28px;
+      background: var(--gradient-accent);
+      color: #fff;
+      border-radius: var(--radius-tag);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
       font-family: var(--font-sans);
       letter-spacing: 0.02em;
-      transition: all 0.2s ease;
-
-      &:hover {
-        background: var(--color-accent);
-        color: #fff;
-      }
     }
   }
 
-  .empty-state {
-    text-align: center;
-    padding: 72px 0;
-
-    .empty-text {
-      font-family: var(--font-serif);
-      font-size: 15px;
-      color: var(--text-tertiary);
-      margin-bottom: 24px;
-    }
-
-    .el-button {
-      background: transparent;
-      border: 1px solid var(--color-accent);
-      color: var(--color-accent);
-      border-radius: var(--radius-btn);
-      font-family: var(--font-sans);
-      padding: 10px 22px;
-
-      &:hover {
-        background: var(--color-accent);
-        color: #fff;
-      }
-    }
-  }
-
-  .pagination {
+  // 内容区
+  .card-body {
+    flex: 1;
+    padding: 18px 20px;
     display: flex;
-    justify-content: center;
-    padding: 24px;
-    border-top: 1px solid var(--border-color);
-  }
-}
+    flex-direction: column;
+    gap: 8px;
 
-// ── 通用分页 ──────────────────────────────────────────
-.pagination {
-  display: flex;
-  justify-content: center;
-  margin-top: 32px;
-}
-
-:deep(.el-pagination) {
-  .btn-prev, .btn-next, .el-pager li {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    border-radius: var(--radius-btn);
-    font-family: var(--font-sans);
-    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-
-    &:hover {
-      color: var(--color-accent);
-      border-color: var(--color-accent);
-    }
-
-    &.is-active {
-      background: var(--color-accent);
-      color: #fff;
-      border-color: var(--color-accent);
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 16px;
       font-weight: 700;
-    }
-  }
-
-  .el-pagination__jump, .el-pagination__total {
-    color: var(--text-tertiary);
-    font-family: var(--font-sans);
-    font-size: 13px;
-  }
-}
-
-// 桌面端表格视图（默认显示）
-.desktop-view {
-  display: block !important;
-}
-
-// 移动端卡片视图（默认隐藏）
-.mobile-view {
-  display: none !important;
-}
-
-// ── 移动端文章卡片（对齐 Home.vue article-item）───────
-.articles-cards {
-  flex-direction: column;
-  gap: 16px;
-
-  .article-card {
-    padding: 20px 22px;
-    background: var(--bg-card);
-    backdrop-filter: var(--blur-glass);
-    -webkit-backdrop-filter: var(--blur-glass);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-card);
-    box-shadow: var(--shadow-card);
-    cursor: pointer;
-    transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
-
-    &:hover {
-      box-shadow: var(--shadow-card-hover);
-      transform: translateY(-3px);
-      border-color: var(--color-accent);
-
-      .card-title {
-        color: var(--color-accent);
-      }
-    }
-
-    &:active {
-      transform: scale(0.99);
-    }
-
-    .card-header {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 14px;
-
-      .card-index {
-        flex-shrink: 0;
-        width: 30px;
-        height: 30px;
-        background: var(--gradient-accent);
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 12px;
-        font-family: var(--font-sans);
-        border-radius: var(--radius-tag);
-        letter-spacing: 0.02em;
-      }
-
-      .card-title {
-        flex: 1;
-        font-family: var(--font-serif);
-        font-size: 17px;
-        font-weight: 700;
-        color: var(--text-primary);
-        line-height: 1.45;
-        letter-spacing: -0.01em;
-        margin: 0;
-        transition: color 0.2s ease;
-      }
+      color: var(--text-primary);
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin: 0;
+      transition: color 0.2s ease;
     }
 
     .card-meta {
       display: flex;
+      align-items: center;
       flex-wrap: wrap;
-      gap: 6px 14px;
-      margin-bottom: 12px;
-      padding-left: 42px;
+      gap: 4px;
+      margin-top: auto;
 
       .meta-item {
         font-size: 12px;
         color: var(--text-tertiary);
         font-family: var(--font-sans);
       }
+
+      .meta-sep {
+        font-size: 12px;
+        color: var(--text-tertiary);
+        opacity: 0.5;
+      }
     }
 
     .card-action {
-      padding-left: 42px;
-
-      .view-text {
-        color: var(--color-accent);
-        font-size: 13px;
-        font-weight: 600;
-        font-family: var(--font-sans);
-        letter-spacing: 0.02em;
-      }
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-accent);
+      font-family: var(--font-sans);
+      letter-spacing: 0.02em;
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
     }
   }
+}
 
-  .empty-state {
-    text-align: center;
-    padding: 72px 0;
+// ── 空状态 ────────────────────────────────────────────
+.empty-state {
+  text-align: center;
+  padding: 72px 0;
+  grid-column: 1 / -1;
+  color: var(--text-tertiary);
 
-    .empty-text {
-      font-family: var(--font-serif);
-      font-size: 15px;
-      color: var(--text-tertiary);
-      margin-bottom: 24px;
+  .empty-text {
+    font-family: var(--font-display);
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+
+  .back-btn {
+    display: inline-block;
+    padding: 10px 24px;
+    border-radius: var(--radius-btn);
+    background: transparent;
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease;
+
+    &:hover {
+      background: var(--color-accent);
+      color: #fff;
     }
+  }
+}
 
-    .el-button {
-      background: transparent;
-      border: 1px solid var(--color-accent);
-      color: var(--color-accent);
+// ── 分页 ──────────────────────────────────────────────
+.pagination {
+  display: flex;
+  justify-content: center;
+  padding-top: 32px;
+  border-top: 1px solid var(--border-color);
+
+  :deep(.el-pagination) {
+    .el-pager li {
       border-radius: var(--radius-btn);
       font-family: var(--font-sans);
-      padding: 10px 22px;
+      transition: background 0.2s ease, color 0.2s ease;
 
-      &:hover {
+      &.is-active {
         background: var(--color-accent);
         color: #fff;
       }
     }
-  }
 
-  .pagination {
-    margin-top: 24px;
-    display: flex;
-    justify-content: center;
+    .btn-prev,
+    .btn-next {
+      border-radius: var(--radius-btn);
+    }
+
+    .el-pagination__total,
+    .el-pagination__jump {
+      color: var(--text-tertiary);
+      font-family: var(--font-sans);
+      font-size: 13px;
+    }
   }
 }
 
 // ── 响应式 ────────────────────────────────────────────
-@media (max-width: 768px) {
-  .tag-articles { padding: 28px 0 60px; }
-
-  .container {
-    padding: 0 16px;
+@media (max-width: 1024px) {
+  .articles-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
+}
 
-  .tag-header {
-    margin-bottom: 28px;
+@media (max-width: 768px) {
+  .page-banner {
+    height: 160px;
 
-    .tag-name {
-      font-size: 26px;
+    .banner-content .banner-title {
+      font-size: 1.8rem;
     }
   }
 
-  .desktop-view {
-    display: none !important;
+  .main-body {
+    padding-top: 36px;
+    padding-bottom: 60px;
   }
 
-  .mobile-view {
-    display: flex !important;
+  .articles-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .article-card .card-cover {
+    height: 140px;
+  }
+}
+
+@media (max-width: 480px) {
+  .articles-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

@@ -1,26 +1,30 @@
 <template>
   <div class="login-page">
-    <div class="login-container card">
-      <button class="close-btn" @click="goBack">×</button>
-      
+    <div class="bg-overlay"></div>
+
+    <div class="login-container">
+      <button class="close-btn" @click="goBack" aria-label="返回首页">&#10005;</button>
+
       <div class="login-header">
+        <div class="logo-ring"></div>
         <h2 class="title">欢迎回来</h2>
+        <p class="subtitle">登录以继续访问博客</p>
       </div>
-      
+
       <el-form :model="loginForm" :rules="rules" ref="loginFormRef" size="large">
         <el-form-item prop="username">
-          <el-input 
-            v-model="loginForm.username" 
+          <el-input
+            v-model="loginForm.username"
             placeholder="用户名"
             prefix-icon="User"
             clearable
           />
         </el-form-item>
-        
+
         <el-form-item prop="password">
-          <el-input 
-            v-model="loginForm.password" 
-            type="password" 
+          <el-input
+            v-model="loginForm.password"
+            type="password"
             placeholder="密码"
             prefix-icon="Lock"
             show-password
@@ -28,28 +32,28 @@
             @keyup.enter="handleLogin"
           />
         </el-form-item>
-        
+
         <el-form-item>
           <div class="form-options">
             <el-checkbox v-model="rememberMe">记住密码</el-checkbox>
-            <el-link type="primary" underline="never">忘记密码？</el-link>
+            <el-link type="primary" :underline="false">忘记密码？</el-link>
           </div>
         </el-form-item>
-        
+
         <el-form-item>
-          <el-button 
-            type="primary" 
+          <el-button
+            type="primary"
             class="login-btn"
             :loading="loginLoading"
             @click="handleLogin"
           >
-            登录
+            登 录
           </el-button>
         </el-form-item>
-        
+
         <el-form-item>
           <div class="register-tip">
-            还没有账号？<el-link type="primary" underline="never" @click="goToRegister">立即注册</el-link>
+            还没有账号？<el-link type="primary" :underline="false" @click="goToRegister">立即注册</el-link>
           </div>
         </el-form-item>
       </el-form>
@@ -86,14 +90,14 @@ const rules: FormRules = {
 
 const handleLogin = async () => {
   if (!loginFormRef.value) return
-  
+
   await loginFormRef.value.validate(async (valid) => {
     if (valid) {
       loginLoading.value = true
-      
+
       try {
         const success = await userStore.login(loginForm.value.username, loginForm.value.password)
-        
+
         if (success) {
           // 获取登录前的页面路径
           const redirect = router.currentRoute.value.query.redirect as string
@@ -119,105 +123,137 @@ const goBack = () => {
 </script>
 
 <style scoped lang="scss">
+// ── 全页背景 ──────────────────────────────────────────
 .login-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   position: relative;
   overflow: hidden;
+  background: url('/bg-banner.png') center center / cover no-repeat fixed;
 
-  // 微弱的玉色光晕（与 Home hero 呼应，但克制）
-  &::before {
-    content: '';
+  .bg-overlay {
     position: absolute;
-    top: -180px;
-    left: -180px;
-    width: 480px;
-    height: 480px;
-    background: radial-gradient(circle, rgba(74, 140, 110, 0.12) 0%, transparent 70%);
-    border-radius: 50%;
-    filter: blur(70px);
-    pointer-events: none;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -160px;
-    right: -160px;
-    width: 420px;
-    height: 420px;
-    background: radial-gradient(circle, rgba(107, 95, 191, 0.08) 0%, transparent 70%);
-    border-radius: 50%;
-    filter: blur(70px);
-    pointer-events: none;
+    inset: 0;
+    background: rgba(5, 12, 30, 0.72);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 0;
   }
 }
 
+// ── 毛玻璃登录卡片 ────────────────────────────────────
 .login-container {
   position: relative;
-  z-index: 2;
+  z-index: 1;
   width: 100%;
-  max-width: 400px;
-  background: var(--bg-card);
-  backdrop-filter: var(--blur-glass);
-  -webkit-backdrop-filter: var(--blur-glass);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card-hover);
-  padding: 44px 40px 36px;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  padding: 48px 44px 40px;
 
+  // 关闭按钮
   .close-btn {
     position: absolute;
-    top: 14px;
-    right: 14px;
+    top: 16px;
+    right: 16px;
     width: 32px;
     height: 32px;
-    border-radius: var(--radius-btn);
-    border: 1px solid var(--border-color);
-    background: transparent;
-    color: var(--text-tertiary);
-    font-size: 18px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 16px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
 
     &:hover {
-      border-color: var(--color-accent);
-      color: var(--color-accent);
-      background: var(--bg-secondary);
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.36);
+      color: #fff;
     }
   }
 
+  // 头部
   .login-header {
     text-align: center;
-    margin-bottom: 32px;
+    margin-bottom: 36px;
+
+    .logo-ring {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-accent) 0%, #7b9eff 100%);
+      margin: 0 auto 16px;
+      box-shadow: 0 4px 20px rgba(22, 93, 255, 0.45);
+    }
 
     .title {
-      font-family: var(--font-serif);
+      font-family: var(--font-display);
       font-size: 26px;
       font-weight: 700;
       letter-spacing: -0.02em;
-      color: var(--text-primary);
-      margin: 0 0 8px 0;
+      color: #fff;
+      margin: 0 0 6px 0;
+      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
     }
 
     .subtitle {
+      font-family: var(--font-sans);
       font-size: 13px;
-      color: var(--text-tertiary);
+      color: rgba(255, 255, 255, 0.52);
       margin: 0;
     }
   }
 
+  // Element Plus 表单项间距
   :deep(.el-form-item) {
     margin-bottom: 18px;
   }
 
+  // 输入框：毛玻璃风格
+  :deep(.el-input__wrapper) {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14) inset;
+    transition: box-shadow 0.2s, background 0.2s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.26) inset;
+    }
+
+    &.is-focus {
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 0 0 1px var(--color-accent) inset, 0 0 12px rgba(22, 93, 255, 0.2);
+    }
+  }
+
+  :deep(.el-input__inner) {
+    color: #fff;
+    font-family: var(--font-sans);
+
+    &::placeholder { color: rgba(255, 255, 255, 0.38); }
+  }
+
+  :deep(.el-input__prefix .el-icon),
+  :deep(.el-input__suffix .el-icon) {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  // 记住密码 / 忘记密码行
   .form-options {
     display: flex;
     justify-content: space-between;
@@ -226,61 +262,72 @@ const goBack = () => {
 
     :deep(.el-checkbox__label) {
       font-size: 13px;
-      color: var(--text-secondary);
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    :deep(.el-checkbox__inner) {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
     }
 
     :deep(.el-link) {
       font-size: 13px;
-      color: var(--color-accent);
+      color: rgba(255, 255, 255, 0.65);
+
+      &:hover { color: #fff; }
     }
   }
 
-  // 主按钮：渐变 + hover 加深
+  // 登录按钮
   .login-btn {
     width: 100%;
-    height: 42px;
-    border-radius: var(--radius-btn);
-    background: var(--gradient-accent);
+    height: 46px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, var(--color-accent) 0%, #4d7eff 100%);
     border: none;
-    font-size: 14px;
+    font-family: var(--font-sans);
+    font-size: 15px;
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.1em;
     color: #fff;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 18px rgba(22, 93, 255, 0.38);
 
     &:hover {
-      background: var(--color-accent-hover);
-      transform: translateY(-1px);
-      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
+      opacity: 0.92;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(22, 93, 255, 0.48);
     }
 
-    &:active {
-      transform: translateY(0);
-    }
+    &:active { transform: translateY(0); }
   }
 
+  // 注册提示
   .register-tip {
     text-align: center;
+    font-family: var(--font-sans);
     font-size: 13px;
-    color: var(--text-tertiary);
+    color: rgba(255, 255, 255, 0.5);
     width: 100%;
 
     :deep(.el-link) {
-      color: var(--color-accent);
+      color: rgba(255, 255, 255, 0.8);
       margin-left: 4px;
       font-weight: 600;
+
+      &:hover { color: #fff; }
     }
   }
 }
 
+// ── 响应式 ────────────────────────────────────────────
 @media (max-width: 480px) {
   .login-container {
     padding: 36px 24px 28px;
+    border-radius: 16px;
   }
 
-  .login-container .login-header .title {
-    font-size: 22px;
-  }
+  .login-container .login-header .title { font-size: 22px; }
 }
 </style>

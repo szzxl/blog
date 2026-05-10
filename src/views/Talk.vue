@@ -1,27 +1,33 @@
-﻿<template>
+<template>
   <div class="talk">
-    <div class="container">
-      <!-- 页面标题 -->
-      <div class="page-header">
-        <div class="header-text">
-          <h1>说说</h1>
-          <p>记录生活的点点滴滴~</p>
-        </div>
-        <!-- 发表说说按钮 - 仅博主可见 -->
-        <el-button
-          v-if="isAuthor"
-          type="primary"
-          class="publish-btn"
-          @click="showPublishDialog = true"
-        >
-          发表说说
-        </el-button>
+    <!-- ── Banner ── -->
+    <div class="page-banner">
+      <div class="banner-mask"></div>
+      <div class="banner-content">
+        <h1 class="banner-title">说说</h1>
+        <p class="banner-sub">记录生活点滴</p>
       </div>
-      
+    </div>
+
+    <div class="container">
+      <!-- 发布框（博主置顶卡片） -->
+      <div v-if="isAuthor" class="publish-card">
+        <div class="publish-card-bar"></div>
+        <div class="publish-card-inner">
+          <span class="publish-hint">今天又有什么想说的呢？</span>
+          <el-button
+            type="primary"
+            class="publish-btn"
+            @click="showPublishDialog = true"
+          >
+            发表说说
+          </el-button>
+        </div>
+      </div>
+
       <!-- 说说列表 -->
       <div class="talk-list" v-loading="loading">
-        <!-- 遍历说说列表 -->
-        <div class="talk-item card" v-for="talk in talks" :key="talk.id">
+        <div class="talk-item" v-for="talk in talks" :key="talk.id">
           <div class="talk-header">
             <img :src="talk.user?.avatar || '/default-avatar.svg'" alt="头像" class="avatar">
             <div class="user-info">
@@ -29,15 +35,13 @@
               <div class="time">{{ talk.createTime }}</div>
             </div>
           </div>
-          <div class="talk-content">
-            {{ talk.talkContent }}
-          </div>
+          <div class="talk-content">{{ talk.talkContent }}</div>
           <div class="talk-images" v-if="talk.talkPic && talk.talkPic.length > 0">
-            <img 
-              v-for="(img, index) in talk.talkPic" 
+            <img
+              v-for="(img, index) in talk.talkPic"
               :key="index"
-              :src="img" 
-              alt="图片" 
+              :src="img"
+              alt="图片"
               class="talk-img"
               @click="previewImages(talk.talkPic, Number(index))"
             >
@@ -45,24 +49,25 @@
           <div class="talk-footer">
             <div class="actions">
               <el-button text class="action-btn" @click="handleLike(talk)">
-                <span class="action-text" :class="{ liked: talk.isLiked }">喜欢</span>
+                <span class="action-text" :class="{ liked: talk.isLiked }">
+                  ❤ {{ talk.likeCount || 0 }}
+                </span>
               </el-button>
               <el-button text class="action-btn" @click="openCommentDialog(talk)">
-                <span class="action-text">评论</span>
+                <span class="action-text">💬 评论</span>
               </el-button>
             </div>
-            <!-- 删除按钮 - 仅博主和超级管理员可见 -->
-            <el-button 
-              v-if="isAuthor" 
-              text 
+            <el-button
+              v-if="isAuthor"
+              text
               class="delete-talk-btn"
               @click="handleDeleteTalk(talk)"
             >
               删除
             </el-button>
           </div>
-          
-          <!-- 评论列表（列表页显示的简单评论） -->
+
+          <!-- 评论列表（列表页） -->
           <div class="comment-list" v-if="talk.comments && talk.comments.length > 0 && !talk.commentsLoaded">
             <template v-for="comment in talk.comments" :key="comment.id">
               <div class="comment-item-bilibili">
@@ -76,28 +81,24 @@
                     <span class="comment-time">{{ formatCommentTime(comment.createTime) }}</span>
                     <div class="comment-actions">
                       <span class="action-btn" @click="openCommentDialog(talk, comment)">回复</span>
-                      <span 
-                        v-if="isAuthor || (userStore.user && comment.user?.id === userStore.user.id)" 
+                      <span
+                        v-if="isAuthor || (userStore.user && comment.user?.id === userStore.user.id)"
                         class="action-btn delete"
                         @click="handleDeleteComment(comment, talk)"
-                      >
-                        删除
-                      </span>
+                      >删除</span>
                     </div>
                   </div>
-                  <!-- 展开/收起回复按钮 -->
                   <div class="expand-replies" v-if="comment.isMessage" @click="toggleCommentReplies(talk, comment)">
                     <span class="expand-text">{{ comment.repliesExpanded ? '收起回复' : '展开回复' }}</span>
                     <span class="expand-icon" :class="{ 'expanded': comment.repliesExpanded }">▼</span>
                   </div>
                 </div>
               </div>
-              
-              <!-- 该评论的回复列表（展开后显示） -->
+
               <div v-if="comment.repliesExpanded && comment.detailReplies && comment.detailReplies.length > 0">
-                <div 
-                  v-for="reply in comment.detailReplies" 
-                  :key="reply.id" 
+                <div
+                  v-for="reply in comment.detailReplies"
+                  :key="reply.id"
                   class="comment-item-bilibili"
                   :style="{ marginLeft: (reply.level || 1) * 52 + 'px' }"
                 >
@@ -113,13 +114,11 @@
                       <span class="comment-time">{{ formatCommentTime(reply.createTime) }}</span>
                       <div class="comment-actions">
                         <span class="action-btn" @click="openCommentDialog(talk, reply)">回复</span>
-                        <span 
-                          v-if="isAuthor || (userStore.user && reply.user?.id === userStore.user.id)" 
+                        <span
+                          v-if="isAuthor || (userStore.user && reply.user?.id === userStore.user.id)"
                           class="action-btn delete"
                           @click="handleDeleteComment(reply, talk)"
-                        >
-                          删除
-                        </span>
+                        >删除</span>
                       </div>
                     </div>
                   </div>
@@ -127,8 +126,8 @@
               </div>
             </template>
           </div>
-          
-          <!-- 完整评论树（点击查看详情后显示，B站风格） -->
+
+          <!-- 完整评论树 -->
           <div class="comment-list" v-if="talk.commentsLoaded && talk.detailComments && talk.detailComments.length > 0">
             <div v-for="comment in talk.detailComments" :key="comment.id" class="comment-item-bilibili">
               <img :src="comment.user?.avatar || '/default-avatar.svg'" alt="头像" class="comment-avatar">
@@ -141,17 +140,13 @@
                   <span class="comment-time">{{ formatCommentTime(comment.createTime) }}</span>
                   <div class="comment-actions">
                     <span class="action-btn">回复</span>
-                    <span 
-                      v-if="isAuthor || (userStore.user && comment.user?.id === userStore.user.id)" 
+                    <span
+                      v-if="isAuthor || (userStore.user && comment.user?.id === userStore.user.id)"
                       class="action-btn delete"
                       @click="handleDeleteComment(comment, talk)"
-                    >
-                      删除
-                    </span>
+                    >删除</span>
                   </div>
                 </div>
-                
-                <!-- 回复列表 -->
                 <div class="replies-container" v-if="comment.replies && comment.replies.length > 0">
                   <div class="reply-item" v-for="reply in flattenComments(comment.replies)" :key="reply.id">
                     <img :src="reply.user?.avatar || '/default-avatar.svg'" alt="头像" class="reply-avatar">
@@ -165,19 +160,15 @@
                       <div class="reply-footer">
                         <span class="reply-time">{{ formatCommentTime(reply.createTime) }}</span>
                         <span class="action-btn" @click="openCommentDialog(talk, reply)">回复</span>
-                        <span 
-                          v-if="isAuthor || (userStore.user && reply.user?.id === userStore.user.id)" 
+                        <span
+                          v-if="isAuthor || (userStore.user && reply.user?.id === userStore.user.id)"
                           class="action-btn delete"
                           @click="handleDeleteComment(reply, talk)"
-                        >
-                          删除
-                        </span>
+                        >删除</span>
                       </div>
                     </div>
                   </div>
                 </div>
-                
-                <!-- 收起回复按钮 -->
                 <div class="expand-replies" @click="loadTalkComments(talk)">
                   <span class="expand-text">收起回复</span>
                   <span class="expand-icon expanded">▼</span>
@@ -186,13 +177,11 @@
             </div>
           </div>
         </div>
-        
+
         <!-- 空状态 -->
-        <div v-if="talks.length === 0 && !loading" class="empty-state">
-          <div class="empty-text">暂无说说</div>
-        </div>
+        <div v-if="talks.length === 0 && !loading" class="empty-state">暂无说说</div>
       </div>
-      
+
       <!-- 分页 -->
       <div class="pagination" v-if="total > 0">
         <el-pagination
@@ -205,16 +194,16 @@
         />
       </div>
     </div>
-    
+
     <!-- 图片预览 -->
-    <el-image-viewer 
+    <el-image-viewer
       v-if="showViewer"
       :url-list="previewImageList"
       :initial-index="previewIndex"
       @close="closeViewer"
       :hide-on-click-modal="true"
     />
-    
+
     <!-- 发表说说弹框 -->
     <el-dialog
       v-model="showPublishDialog"
@@ -234,72 +223,34 @@
             show-word-limit
           />
         </el-form-item>
-        
-        <!-- 表情选择器 -->
         <el-form-item>
           <EmojiPicker @select="insertTalkEmoji" />
         </el-form-item>
-        
         <el-form-item>
           <div class="upload-section">
             <div class="upload-title">上传图片（最多9张）</div>
-            
-            <!-- 图片预览列表 -->
             <div class="image-list" v-if="talkImageList.length > 0">
-              <div 
-                class="image-item" 
-                v-for="(image, index) in talkImageList" 
-                :key="index"
-              >
+              <div class="image-item" v-for="(image, index) in talkImageList" :key="index">
                 <img :src="image.url" alt="预览图">
                 <div class="image-overlay">
-                  <el-icon class="preview-icon" @click="previewTalkImage(image.url)">
-                    <ZoomIn />
-                  </el-icon>
-                  <el-icon class="delete-icon" @click="removeTalkImage(index)">
-                    <Delete />
-                  </el-icon>
+                  <el-icon class="preview-icon" @click="previewTalkImage(image.url)"><ZoomIn /></el-icon>
+                  <el-icon class="delete-icon" @click="removeTalkImage(index)"><Delete /></el-icon>
                 </div>
                 <div class="upload-progress" v-if="image.uploading">
-                  <el-progress 
-                    :percentage="image.progress" 
-                    :stroke-width="3"
-                    :show-text="false"
-                  />
+                  <el-progress :percentage="image.progress" :stroke-width="3" :show-text="false" />
                 </div>
               </div>
-              
-              <!-- 上传按钮 -->
-              <div 
-                class="upload-btn" 
-                v-if="talkImageList.length < 9"
-                @click="triggerTalkUpload"
-              >
+              <div class="upload-btn" v-if="talkImageList.length < 9" @click="triggerTalkUpload">
                 <el-icon><Plus /></el-icon>
               </div>
             </div>
-            
-            <!-- 初始上传区域 -->
-            <div 
-              class="upload-area" 
-              v-else
-              @click="triggerTalkUpload"
-            >
+            <div class="upload-area" v-else @click="triggerTalkUpload">
               <el-icon class="upload-icon"><Upload /></el-icon>
               <div class="upload-text">点击上传图片</div>
             </div>
-            
-            <input 
-              ref="talkFileInput"
-              type="file" 
-              accept="image/*"
-              multiple
-              style="display: none"
-              @change="handleTalkFileChange"
-            />
+            <input ref="talkFileInput" type="file" accept="image/*" multiple style="display: none" @change="handleTalkFileChange" />
           </div>
         </el-form-item>
-        
         <el-form-item>
           <div class="status-select">
             <span class="status-label">状态：</span>
@@ -310,19 +261,12 @@
           </div>
         </el-form-item>
       </el-form>
-      
       <template #footer>
         <el-button @click="showPublishDialog = false">取消</el-button>
-        <el-button 
-          type="primary" 
-          :loading="publishing"
-          @click="submitTalk"
-        >
-          发表
-        </el-button>
+        <el-button type="primary" :loading="publishing" @click="submitTalk">发表</el-button>
       </template>
     </el-dialog>
-    
+
     <!-- 评论弹框 -->
     <el-dialog
       v-model="commentDialogVisible"
@@ -339,21 +283,12 @@
         maxlength="500"
         show-word-limit
       />
-      
-      <!-- 表情选择器 -->
       <div style="margin-top: 12px;">
         <EmojiPicker @select="insertCommentEmoji" />
       </div>
-      
       <template #footer>
         <el-button @click="commentDialogVisible = false">取消</el-button>
-        <el-button 
-          type="primary" 
-          :loading="submittingComment"
-          @click="submitComment"
-        >
-          发表
-        </el-button>
+        <el-button type="primary" :loading="submittingComment" @click="submitComment">发表</el-button>
       </template>
     </el-dialog>
   </div>
@@ -420,18 +355,18 @@ const handleTalkFiles = (files: File[]) => {
     ElMessage.warning(`最多只能上传9张图片，当前还可以上传${remainingSlots}张`)
     files = files.slice(0, remainingSlots)
   }
-  
+
   files.forEach(file => {
     if (!file.type.startsWith('image/')) {
       ElMessage.error(`${file.name} 不是图片文件`)
       return
     }
-    
+
     if (file.size > 5 * 1024 * 1024) {
       ElMessage.error(`${file.name} 大小超过 5MB`)
       return
     }
-    
+
     const reader = new FileReader()
     reader.onload = (e) => {
       const imageItem: ImageItem = {
@@ -450,7 +385,7 @@ const handleTalkFiles = (files: File[]) => {
 // 上传图片
 const uploadTalkImage = async (imageItem: ImageItem) => {
   if (!imageItem.file) return
-  
+
   try {
     const response = await uploadImage(imageItem.file)
     imageItem.url = (response as unknown as string) || imageItem.url
@@ -484,7 +419,7 @@ const submitTalk = async () => {
     ElMessage.warning('请输入说说内容')
     return
   }
-  
+
   if (!userStore.user?.id) {
     ElMessage.warning('请先登录')
     router.push({
@@ -493,15 +428,15 @@ const submitTalk = async () => {
     })
     return
   }
-  
+
   const uploading = talkImageList.value.some(img => img.uploading)
   if (uploading) {
     ElMessage.warning('图片正在上传中，请稍候...')
     return
   }
-  
+
   publishing.value = true
-  
+
   try {
     await publishTalk({
       userId: Number(userStore.user.id),
@@ -509,15 +444,15 @@ const submitTalk = async () => {
       talkPic: talkImageList.value.map(img => img.url),
       talkStatus: talkForm.value.status
     })
-    
+
     ElMessage.success('说说发表成功！')
     showPublishDialog.value = false
-    
+
     // 清空表单
     talkForm.value.content = ''
     talkForm.value.status = 0
     talkImageList.value = []
-    
+
     // 刷新列表
     currentPage.value = 1
     loadTalkList()
@@ -540,10 +475,10 @@ const handleDeleteTalk = async (talk: any) => {
         type: 'warning'
       }
     )
-    
+
     await deleteTalk(talk.id)
     ElMessage.success('说说已删除')
-    
+
     // 刷新列表
     loadTalkList()
   } catch (error: any) {
@@ -565,20 +500,20 @@ const handleDeleteComment = async (comment: any, talk: any) => {
         type: 'warning'
       }
     )
-    
+
     // 判断是否是博主/超级管理员
     const requestData: any = {
       talkCommentId: comment.id
     }
-    
+
     // 如果不是博主/超级管理员，需要传 userId
     if (!isAuthor.value && userStore.user) {
       requestData.userId = Number(userStore.user.id)
     }
-    
+
     await deleteComment(requestData)
     ElMessage.success('评论已删除')
-    
+
     // 刷新评论列表
     if (talk.commentsLoaded) {
       // 如果已经展开了详情，重新加载详情
@@ -605,7 +540,7 @@ const openCommentDialog = (talk: any, comment?: any) => {
     })
     return
   }
-  
+
   currentTalk.value = talk
   replyToComment.value = comment || null
   commentText.value = ''
@@ -618,7 +553,7 @@ const submitComment = async () => {
     ElMessage.warning('请输入评论内容')
     return
   }
-  
+
   if (!userStore.user?.id) {
     ElMessage.warning('请先登录')
     router.push({
@@ -627,29 +562,29 @@ const submitComment = async () => {
     })
     return
   }
-  
+
   submittingComment.value = true
-  
+
   try {
     const requestData: any = {
       talkId: currentTalk.value.id,
       userId: Number(userStore.user.id),
       content: commentText.value
     }
-    
+
     // 如果是回复评论，需要传递额外参数
     if (replyToComment.value) {
       requestData.parentId = replyToComment.value.parentId || replyToComment.value.id
       requestData.replyToId = replyToComment.value.id
       requestData.replyToUserId = replyToComment.value.user?.id
     }
-    
+
     await addComment(requestData)
     ElMessage.success('评论发表成功！')
-    
+
     commentDialogVisible.value = false
     commentText.value = ''
-    
+
     // 刷新评论列表
     if (currentTalk.value.commentsLoaded) {
       // 如果已经展开了详情，重新加载详情
@@ -675,13 +610,13 @@ const CommentItem: any = defineComponent({
       if (!timestamp) return ''
       const date = new Date(timestamp)
       const now = new Date()
-      
+
       if (date.toDateString() === now.toDateString()) {
         const hours = String(date.getHours()).padStart(2, '0')
         const minutes = String(date.getMinutes()).padStart(2, '0')
         return `${hours}:${minutes}`
       }
-      
+
       const year = date.getFullYear()
       const month = String(date.getMonth() + 1).padStart(2, '0')
       const day = String(date.getDate()).padStart(2, '0')
@@ -689,10 +624,10 @@ const CommentItem: any = defineComponent({
       const minutes = String(date.getMinutes()).padStart(2, '0')
       return `${year}-${month}-${day} ${hours}:${minutes}`
     }
-    
+
     return () => {
       const { comment } = props
-      
+
       return h('div', [
         // 评论项
         h('div', { class: 'comment-item' }, [
@@ -721,8 +656,8 @@ const CommentItem: any = defineComponent({
         ]),
         // 递归渲染回复
         comment.replies && comment.replies.length > 0
-          ? h('div', { class: 'replies' }, 
-              comment.replies.map((reply: any) => 
+          ? h('div', { class: 'replies' },
+              comment.replies.map((reply: any) =>
                 h(CommentItem, { comment: reply, level: props.level + 1, key: reply.id })
               )
             )
@@ -755,25 +690,25 @@ const handleLike = async (talk: any) => {
     })
     return
   }
-  
+
   if (!userStore.user?.id) {
     ElMessage.warning('用户信息异常，请重新登录')
     return
   }
-  
+
   try {
     const type = talk.isLiked ? 2 : 1  // 1=点赞, 2=取消点赞
-    
+
     await likeTalk({
       talkId: talk.id,
       userId: Number(userStore.user.id),
       type
     })
-    
+
     // 更新本地状态
     talk.isLiked = !talk.isLiked
     talk.likeCount = talk.isLiked ? (talk.likeCount || 0) + 1 : (talk.likeCount || 0) - 1
-    
+
     ElMessage.success(talk.isLiked ? '点赞成功 ❤️' : '取消点赞')
   } catch (error) {
     ElMessage.error('操作失败，请重试')
@@ -810,18 +745,18 @@ const loadTalkList = async () => {
       pageNo: currentPage.value,
       pageSize: pageSize.value
     }
-    
+
     // 如果用户已登录，传入用户ID
     if (userStore.user?.id) {
       params.userId = Number(userStore.user.id)
     }
-    
+
     const response: any = await getTalkList(params)
-    
+
     // 响应拦截器已经返回了 res.data，所以直接用 response.list
     if (response && response.list) {
       const list = response.list || []
-      
+
       // 格式化数据
       talks.value = list.map((talk: any) => {
         let images = []
@@ -838,7 +773,7 @@ const loadTalkList = async () => {
         } catch (e) {
           images = []
         }
-        
+
         const result = {
           ...talk,  // 保留所有原始字段
           talkPic: images,
@@ -853,10 +788,10 @@ const loadTalkList = async () => {
           commentCount: talk.commentCount || 0,  // 确保 commentCount 存在
           commentsLoaded: false  // 标记评论是否已加载
         }
-        
+
         return result
       })
-      
+
       total.value = response.total || 0
     }
   } catch (error) {
@@ -873,21 +808,21 @@ const loadTalkComments = async (talk: any) => {
     talk.commentsLoaded = false
     return
   }
-  
+
   try {
     const params: any = {
       talkId: talk.id,
       pageNo: 1,
       pageSize: 1
     }
-    
+
     // 如果用户已登录，传入用户ID
     if (userStore.user?.id) {
       params.userId = Number(userStore.user.id)
     }
-    
+
     const response: any = await getTalkDetail(params)
-    
+
     if (response && response.comments) {
       talk.detailComments = response.comments
       talk.commentsLoaded = true
@@ -907,7 +842,7 @@ const toggleCommentReplies = async (talk: any, comment: any) => {
     talks.value = [...talks.value]
     return
   }
-  
+
   // 如果还没有加载过回复，则加载
   if (!comment.detailReplies) {
     try {
@@ -916,14 +851,14 @@ const toggleCommentReplies = async (talk: any, comment: any) => {
         pageNo: 1,
         pageSize: 100
       }
-      
+
       // 如果用户已登录，传入用户ID
       if (userStore.user?.id) {
         params.userId = Number(userStore.user.id)
       }
-      
+
       const response: any = await getTalkDetail(params)
-      
+
       if (response && response.comments) {
         // 找到当前评论在详情中的数据
         const detailComment = response.comments.find((c: any) => c.id === comment.id)
@@ -939,7 +874,7 @@ const toggleCommentReplies = async (talk: any, comment: any) => {
       return
     }
   }
-  
+
   // 展开
   comment.repliesExpanded = true
   // 强制更新
@@ -949,7 +884,7 @@ const toggleCommentReplies = async (talk: any, comment: any) => {
 // 扁平化评论树
 const flattenComments = (comments: any[]): any[] => {
   const result: any[] = []
-  
+
   const flatten = (commentList: any[]) => {
     commentList.forEach(comment => {
       result.push(comment)
@@ -958,7 +893,7 @@ const flattenComments = (comments: any[]): any[] => {
       }
     })
   }
-  
+
   flatten(comments)
   return result
 }
@@ -966,7 +901,7 @@ const flattenComments = (comments: any[]): any[] => {
 // 扁平化评论树并添加层级信息
 const flattenCommentsWithLevel = (comments: any[], level: number = 1): any[] => {
   const result: any[] = []
-  
+
   const flatten = (commentList: any[], currentLevel: number) => {
     commentList.forEach(comment => {
       result.push({
@@ -978,7 +913,7 @@ const flattenCommentsWithLevel = (comments: any[], level: number = 1): any[] => 
       }
     })
   }
-  
+
   flatten(comments, level)
   return result
 }
@@ -1000,14 +935,14 @@ const formatCommentTime = (timestamp: number) => {
   if (!timestamp) return ''
   const date = new Date(timestamp)
   const now = new Date()
-  
+
   // 如果是今天，只显示时分
   if (date.toDateString() === now.toDateString()) {
     const hours = String(date.getHours()).padStart(2, '0')
     const minutes = String(date.getMinutes()).padStart(2, '0')
     return `${hours}:${minutes}`
   }
-  
+
   // 否则显示完整日期时间
   return formatTimestamp(timestamp)
 }
@@ -1019,9 +954,9 @@ const insertTalkEmoji = (emoji: string) => {
     const start = textarea.selectionStart
     const end = textarea.selectionEnd
     const text = talkForm.value.content
-    
+
     talkForm.value.content = text.substring(0, start) + emoji + text.substring(end)
-    
+
     // 恢复光标位置
     setTimeout(() => {
       textarea.focus()
@@ -1041,9 +976,9 @@ const insertCommentEmoji = (emoji: string) => {
     const start = textarea.selectionStart
     const end = textarea.selectionEnd
     const text = commentText.value
-    
+
     commentText.value = text.substring(0, start) + emoji + text.substring(end)
-    
+
     // 恢复光标位置
     setTimeout(() => {
       textarea.focus()
@@ -1063,65 +998,101 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+// ── Banner ────────────────────────────────────────────
+.page-banner {
+  position: relative;
+  height: 200px;
+  background: url('/bg-banner.png') center 30% / cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .banner-mask {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 12, 30, 0.62);
+  }
+
+  .banner-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+
+    .banner-title {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+      margin: 0 0 8px 0;
+      letter-spacing: 0.04em;
+    }
+
+    .banner-sub {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.65);
+      margin: 0;
+      letter-spacing: 0.06em;
+    }
+  }
+}
+
+// ── 容器 ─────────────────────────────────────────────
 .talk {
   min-height: calc(100vh - 200px);
-  padding: 104px 0 64px;
+  background: var(--bg-primary);
 }
 
 .container {
-  max-width: 800px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 48px 24px 80px;
 }
 
-// ── 页头 ──────────────────────────────────────────────
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 40px;
-  border-left: 4px solid var(--color-accent);
-  padding-left: 20px;
+// ── 发布卡片（博主置顶）───────────────────────────────
+.publish-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  margin-bottom: 28px;
 
-  .header-text {
-    flex: 1;
-    min-width: 0;
-
-    h1 {
-      font-family: var(--font-serif);
-      font-size: 32px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--text-primary);
-      margin: 0 0 8px 0;
-    }
-
-    p {
-      font-size: 14px;
-      color: var(--text-tertiary);
-      margin: 0;
-    }
+  .publish-card-bar {
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-accent) 0%, #7b9eff 100%);
   }
 
-  .publish-btn {
-    flex-shrink: 0;
-    height: 38px;
-    padding: 0 20px;
-    border-radius: var(--radius-btn);
-    background: var(--color-accent);
-    border: none;
-    color: #fff;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  .publish-card-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
 
-    &:hover {
-      background: var(--color-accent-hover);
-      transform: translateY(-1px);
-      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+    .publish-hint {
+      font-size: 14px;
+      color: var(--text-tertiary);
+      font-style: italic;
+    }
+
+    .publish-btn {
+      height: 36px;
+      padding: 0 20px;
+      border-radius: var(--radius-btn);
+      background: var(--color-accent);
+      border: none;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+
+      &:hover {
+        background: var(--color-accent-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(22, 93, 255, 0.28);
+      }
     }
   }
 }
@@ -1132,7 +1103,6 @@ onMounted(() => {
   flex-direction: column;
   gap: 20px;
 
-  // 空状态：与 Home.vue 对齐
   .empty-state {
     text-align: center;
     padding: 72px 0;
@@ -1140,11 +1110,8 @@ onMounted(() => {
     font-size: 15px;
   }
 
-  // 说说卡片：玻璃态
   .talk-item {
     background: var(--bg-card);
-    backdrop-filter: var(--blur-glass);
-    -webkit-backdrop-filter: var(--blur-glass);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-card);
     padding: 24px;
@@ -1152,7 +1119,7 @@ onMounted(() => {
     transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
 
     &:hover {
-      transform: translateY(-4px);
+      transform: translateY(-3px);
       box-shadow: var(--shadow-card-hover);
       border-color: var(--color-accent);
     }
@@ -1161,28 +1128,24 @@ onMounted(() => {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
 
       .avatar {
-        width: 42px;
-        height: 42px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
-        border: 1px solid var(--border-strong);
+        border: 2px solid var(--border-color);
         object-fit: cover;
         flex-shrink: 0;
-        box-shadow: 0 0 0 3px var(--bg-card);
       }
 
       .user-info {
-        min-width: 0;
-
         .username {
-          font-family: var(--font-serif);
+          font-family: var(--font-display);
           font-size: 15px;
           font-weight: 700;
           color: var(--text-primary);
-          letter-spacing: -0.01em;
-          margin-bottom: 3px;
+          margin-bottom: 2px;
         }
 
         .time {
@@ -1194,10 +1157,11 @@ onMounted(() => {
     }
 
     .talk-content {
+      font-family: var(--font-sans);
       font-size: 15px;
       line-height: 1.85;
       color: var(--text-secondary);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       white-space: pre-wrap;
       word-break: break-word;
     }
@@ -1205,24 +1169,16 @@ onMounted(() => {
     .talk-images {
       display: grid;
       gap: 8px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
 
       &:has(.talk-img:nth-child(1):nth-last-child(1)) {
         grid-template-columns: 1fr;
         max-width: 360px;
       }
 
-      &:has(.talk-img:nth-child(2)) {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      &:has(.talk-img:nth-child(3)) {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
-      &:has(.talk-img:nth-child(4)) {
-        grid-template-columns: repeat(2, 1fr);
-      }
+      &:has(.talk-img:nth-child(2)) { grid-template-columns: repeat(2, 1fr); }
+      &:has(.talk-img:nth-child(3)) { grid-template-columns: repeat(3, 1fr); }
+      &:has(.talk-img:nth-child(4)) { grid-template-columns: repeat(2, 1fr); }
 
       .talk-img {
         width: 100%;
@@ -1230,43 +1186,37 @@ onMounted(() => {
         object-fit: cover;
         border-radius: var(--radius-btn);
         cursor: pointer;
-        transition: transform 0.35s ease, opacity 0.2s ease;
+        transition: transform 0.3s, opacity 0.2s;
 
-        &:hover {
-          transform: scale(1.015);
-          opacity: 0.94;
-        }
+        &:hover { transform: scale(1.02); opacity: 0.9; }
       }
     }
 
     .talk-footer {
       border-top: 1px solid var(--border-color);
-      padding-top: 14px;
+      padding-top: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
 
       .actions {
         display: flex;
-        gap: 22px;
+        gap: 20px;
 
         .action-btn {
           background: none;
           border: none;
           padding: 0;
           cursor: pointer;
-          display: inline-flex;
-          align-items: center;
-          gap: 5px;
-          transition: opacity 0.15s ease;
+          transition: opacity 0.15s;
 
-          &:hover { opacity: 0.85; }
+          &:hover { opacity: 0.75; }
 
           .action-text {
             font-size: 13px;
             font-weight: 600;
             color: var(--text-tertiary);
-            transition: color 0.15s ease;
+            transition: color 0.15s;
 
             &.liked { color: var(--color-accent); }
           }
@@ -1274,383 +1224,216 @@ onMounted(() => {
       }
 
       .delete-talk-btn {
-        color: var(--color-danger);
-        font-size: 13px;
+        color: var(--color-danger, #f53f3f);
+        font-size: 12px;
         cursor: pointer;
         background: none;
         border: none;
         padding: 0;
-        opacity: 0.78;
-        transition: opacity 0.15s ease;
+        opacity: 0.7;
+        transition: opacity 0.15s;
 
         &:hover { opacity: 1; }
       }
     }
   }
+}
 
-  // ── 评论区 ──
-  .comment-list {
-    margin-top: 18px;
-    padding-top: 18px;
-    border-top: 1px solid var(--border-color);
+// ── 评论区 ────────────────────────────────────────────
+.comment-list {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
 
-    .comment-item-bilibili {
-      display: flex;
-      gap: 12px;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border-color);
+  .comment-item-bilibili {
+    display: flex;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
 
-      &:last-child { border-bottom: none; }
+    &:last-child { border-bottom: none; }
 
-      .comment-avatar {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        border: 1px solid var(--border-color);
-        flex-shrink: 0;
-        object-fit: cover;
-      }
+    .comment-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      flex-shrink: 0;
+      object-fit: cover;
+    }
 
-      .comment-main {
-        flex: 1;
-        min-width: 0;
+    .comment-main {
+      flex: 1;
+      min-width: 0;
 
-        .comment-user {
-          font-size: 13px;
-          font-weight: 600;
-          color: var(--text-secondary);
-          margin-bottom: 6px;
-          display: inline-flex;
-          align-items: center;
+      .comment-user {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
+        display: inline-flex;
+        align-items: center;
 
-          // 博主使用 accent 强调
-          &.author {
-            color: var(--color-accent);
+        &.author {
+          color: var(--color-accent);
 
-            &::after {
-              content: '博主';
-              margin-left: 6px;
-              font-size: 10px;
-              background: var(--gradient-accent);
-              color: #fff;
-              padding: 1px 7px;
-              border-radius: var(--radius-tag);
-              font-weight: 700;
-              letter-spacing: 0.04em;
-            }
+          &::after {
+            content: '博主';
+            margin-left: 6px;
+            font-size: 10px;
+            background: var(--gradient-accent);
+            color: #fff;
+            padding: 1px 6px;
+            border-radius: var(--radius-tag);
+            font-weight: 700;
           }
         }
+      }
 
-        .comment-text {
-          font-size: 14px;
-          color: var(--text-secondary);
-          line-height: 1.75;
-          margin-bottom: 8px;
-          word-break: break-word;
+      .comment-text {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin-bottom: 6px;
+        word-break: break-word;
+
+        .mention { color: var(--color-accent); font-weight: 600; }
+      }
+
+      .comment-footer {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 6px;
+
+        .comment-time {
+          font-size: 11px;
+          color: var(--text-tertiary);
+          font-variant-numeric: tabular-nums;
         }
 
-        .comment-footer {
+        .comment-actions {
           display: flex;
-          align-items: center;
-          gap: 16px;
-          margin-bottom: 8px;
+          gap: 12px;
 
-          .comment-time {
+          .action-btn {
             font-size: 12px;
             color: var(--text-tertiary);
-            font-variant-numeric: tabular-nums;
-          }
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            transition: color 0.15s;
 
-          .comment-actions {
-            display: flex;
-            gap: 14px;
-
-            .action-btn {
-              font-size: 12px;
-              color: var(--text-tertiary);
-              cursor: pointer;
-              background: none;
-              border: none;
-              padding: 0;
-              transition: color 0.15s ease;
-
-              &:hover { color: var(--color-accent); }
-              &.delete:hover { color: var(--color-danger); }
-            }
-          }
-        }
-
-        .expand-replies {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          padding: 4px 12px;
-          background: var(--bg-secondary);
-          border: 1px solid var(--border-color);
-          border-radius: var(--radius-tag);
-          cursor: pointer;
-          transition: background 0.2s ease, border-color 0.2s ease;
-          margin-top: 4px;
-
-          .expand-text {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--color-accent);
-          }
-
-          .expand-icon {
-            font-size: 10px;
-            color: var(--color-accent);
-            transition: transform 0.25s ease;
-
-            &.expanded { transform: rotate(180deg); }
-          }
-
-          &:hover {
-            background: var(--bg-card);
-            border-color: var(--color-accent);
-          }
-        }
-
-        .replies-list {
-          margin-top: 10px;
-          padding-left: 14px;
-          border-left: 2px solid var(--border-color);
-
-          .reply-item {
-            display: flex;
-            gap: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border-color);
-
-            &:last-child { border-bottom: none; }
-
-            .reply-avatar {
-              width: 28px;
-              height: 28px;
-              border-radius: 50%;
-              border: 1px solid var(--border-color);
-              flex-shrink: 0;
-              object-fit: cover;
-            }
-
-            .reply-main {
-              flex: 1;
-              min-width: 0;
-
-              .reply-user {
-                font-size: 12px;
-                font-weight: 600;
-                color: var(--text-secondary);
-                margin-bottom: 4px;
-
-                &.author { color: var(--color-accent); }
-
-                .reply-to {
-                  color: var(--color-accent);
-                  margin: 0 4px;
-                }
-              }
-
-              .reply-text {
-                font-size: 13px;
-                color: var(--text-secondary);
-                line-height: 1.7;
-                margin-bottom: 6px;
-                word-break: break-word;
-              }
-
-              .reply-footer {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-
-                .reply-time {
-                  font-size: 11px;
-                  color: var(--text-tertiary);
-                  font-variant-numeric: tabular-nums;
-                }
-
-                .reply-actions {
-                  display: flex;
-                  gap: 10px;
-
-                  .action-btn {
-                    font-size: 11px;
-                    color: var(--text-tertiary);
-                    cursor: pointer;
-                    background: none;
-                    border: none;
-                    padding: 0;
-                    transition: color 0.15s ease;
-
-                    &:hover { color: var(--color-accent); }
-                    &.delete:hover { color: var(--color-danger); }
-                  }
-                }
-              }
-            }
+            &:hover { color: var(--color-accent); }
+            &.delete:hover { color: var(--color-danger, #f53f3f); }
           }
         }
       }
-    }
-  }
 
-  // ── 评论输入框 ──
-  .comment-input-area {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border-color);
-
-    .input-box {
-      width: 100%;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-btn);
-      padding: 12px 14px;
-      font-size: 14px;
-      color: var(--text-primary);
-      resize: vertical;
-      min-height: 84px;
-      font-family: inherit;
-      line-height: 1.7;
-      transition: border-color 0.2s ease, background 0.2s ease;
-
-      &:focus {
-        outline: none;
-        border-color: var(--color-accent);
-        background: var(--bg-card);
-      }
-
-      &::placeholder { color: var(--text-tertiary); }
-    }
-
-    .input-footer {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 10px;
-
-      .submit-btn {
-        padding: 8px 20px;
-        border-radius: var(--radius-btn);
-        background: var(--color-accent);
-        border: none;
-        color: #fff;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 0.04em;
+      .expand-replies {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 10px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-tag);
         cursor: pointer;
-        transition: background 0.2s ease, transform 0.2s ease;
+        margin-top: 4px;
+        transition: border-color 0.2s, background 0.2s;
+
+        .expand-text {
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--color-accent);
+        }
+
+        .expand-icon {
+          font-size: 10px;
+          color: var(--color-accent);
+          transition: transform 0.25s;
+
+          &.expanded { transform: rotate(180deg); }
+        }
 
         &:hover {
-          background: var(--color-accent-hover);
-          transform: translateY(-1px);
+          background: var(--bg-card);
+          border-color: var(--color-accent);
         }
       }
     }
   }
 }
 
-// ── 发布弹窗 ──────────────────────────────────────────
-.publish-dialog {
-  .publish-form {
-    .form-textarea {
-      width: 100%;
-      background: var(--bg-secondary);
+// reply items in detail view
+.replies-container {
+  margin-top: 10px;
+  padding-left: 14px;
+  border-left: 2px solid var(--border-color);
+
+  .reply-item {
+    display: flex;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+
+    &:last-child { border-bottom: none; }
+
+    .reply-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
       border: 1px solid var(--border-color);
-      border-radius: var(--radius-btn);
-      padding: 14px 16px;
-      font-size: 14px;
-      color: var(--text-primary);
-      resize: vertical;
-      min-height: 130px;
-      font-family: inherit;
-      line-height: 1.75;
-      transition: border-color 0.2s ease, background 0.2s ease;
-
-      &:focus {
-        outline: none;
-        border-color: var(--color-accent);
-        background: var(--bg-card);
-      }
-
-      &::placeholder { color: var(--text-tertiary); }
+      flex-shrink: 0;
+      object-fit: cover;
     }
 
-    .image-upload-section {
-      margin-top: 16px;
+    .reply-content {
+      flex: 1;
+      min-width: 0;
 
-      .upload-title {
-        font-size: 13px;
+      .reply-user {
+        font-size: 12px;
         font-weight: 600;
-        color: var(--text-tertiary);
-        letter-spacing: 0.04em;
-        margin-bottom: 10px;
+        color: var(--text-secondary);
+        margin-bottom: 3px;
+
+        &.author { color: var(--color-accent); }
       }
 
-      .image-list {
+      .reply-text {
+        font-size: 13px;
+        color: var(--text-secondary);
+        line-height: 1.65;
+        margin-bottom: 4px;
+        word-break: break-word;
+
+        .mention { color: var(--color-accent); font-weight: 600; }
+      }
+
+      .reply-footer {
         display: flex;
-        flex-wrap: wrap;
+        align-items: center;
         gap: 10px;
 
-        .image-item {
-          position: relative;
-          width: 84px;
-          height: 84px;
-          border-radius: var(--radius-btn);
-          overflow: hidden;
-          border: 1px solid var(--border-color);
-          background: var(--bg-secondary);
-          transition: border-color 0.2s ease;
-
-          &:hover { border-color: var(--color-accent); }
-
-          img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-          }
-
-          .remove-btn {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.65);
-            color: #fff;
-            font-size: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            transition: background 0.15s ease;
-
-            &:hover { background: var(--color-danger); }
-          }
+        .reply-time {
+          font-size: 11px;
+          color: var(--text-tertiary);
+          font-variant-numeric: tabular-nums;
         }
 
-        .upload-btn {
-          width: 84px;
-          height: 84px;
-          border: 1px dashed var(--border-color);
-          border-radius: var(--radius-btn);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
+        .action-btn {
+          font-size: 11px;
           color: var(--text-tertiary);
-          font-size: 24px;
-          background: var(--bg-secondary);
-          transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+          cursor: pointer;
+          background: none;
+          border: none;
+          padding: 0;
+          transition: color 0.15s;
 
-          &:hover {
-            border-color: var(--color-accent);
-            background: var(--bg-card);
-            color: var(--color-accent);
-          }
+          &:hover { color: var(--color-accent); }
+          &.delete:hover { color: var(--color-danger, #f53f3f); }
         }
       }
     }
@@ -1661,30 +1444,147 @@ onMounted(() => {
 .pagination {
   display: flex;
   justify-content: center;
-  padding: 28px 0 0;
+  padding-top: 32px;
   border-top: 1px solid var(--border-color);
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
+// ── 弹窗内上传区 ──────────────────────────────────────
+.upload-section {
+  width: 100%;
+
+  .upload-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    margin-bottom: 10px;
+  }
+
+  .upload-area {
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-btn);
+    padding: 32px 24px;
+    text-align: center;
+    cursor: pointer;
+    background: var(--bg-secondary);
+    transition: border-color 0.2s, background 0.2s;
+
+    &:hover {
+      border-color: var(--color-accent);
+      background: var(--bg-card);
+
+      .upload-icon { color: var(--color-accent); }
+    }
+
+    .upload-icon { font-size: 28px; color: var(--text-tertiary); margin-bottom: 10px; transition: color 0.2s; }
+    .upload-text { font-size: 13px; color: var(--text-secondary); }
+  }
+
+  .image-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    .image-item {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      border-radius: var(--radius-btn);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+
+      &:hover {
+        border-color: var(--color-accent);
+        .image-overlay { opacity: 1; }
+      }
+
+      img { width: 100%; height: 100%; object-fit: cover; }
+
+      .image-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        opacity: 0;
+        transition: opacity 0.2s;
+
+        :deep(.el-icon) {
+          font-size: 18px;
+          color: rgba(255,255,255,0.9);
+          cursor: pointer;
+          transition: transform 0.15s;
+
+          &:hover { transform: scale(1.15); }
+        }
+
+        .preview-icon:hover { color: var(--color-accent); }
+        .delete-icon:hover { color: #f53f3f; }
+      }
+
+      .upload-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 4px;
+        background: rgba(10,10,15,0.75);
+      }
+    }
+
+    .upload-btn {
+      width: 80px;
+      height: 80px;
+      border: 1px dashed var(--border-color);
+      border-radius: var(--radius-btn);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-tertiary);
+      font-size: 22px;
+      background: var(--bg-secondary);
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+
+      &:hover {
+        border-color: var(--color-accent);
+        background: var(--bg-card);
+        color: var(--color-accent);
+      }
+    }
+  }
+}
+
+.status-select {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .status-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+}
+
+// ── 响应式 ────────────────────────────────────────────
 @media (max-width: 640px) {
-  .talk { padding: 28px 0 48px; }
+  .page-banner { height: 160px; }
+  .page-banner .banner-content .banner-title { font-size: 1.7rem; }
 
-  .page-header {
+  .container { padding: 28px 16px 48px; }
+
+  .publish-card .publish-card-inner {
     flex-direction: column;
+    gap: 12px;
     align-items: flex-start;
-    gap: 14px;
-    margin-bottom: 28px;
 
-    .header-text h1 { font-size: 26px; }
     .publish-btn { width: 100%; }
   }
 
-  .talk-list .talk-item {
-    padding: 18px;
-  }
-
-  .talk-list .talk-item .talk-images .talk-img {
-    height: 140px;
-  }
+  .talk-list .talk-item { padding: 16px; }
+  .talk-list .talk-item .talk-images .talk-img { height: 130px; }
 }
 </style>

@@ -1,47 +1,62 @@
-﻿<template>
+<template>
   <div class="article-list">
-    <div class="container">
-      <!-- 页面标题 -->
-      <div class="page-header">
-        <h1>文章列表</h1>
-        <p class="subtitle">共 {{ total }} 篇文章</p>
+    <!-- ── Banner ──────────────────────────────────────── -->
+    <div class="page-banner">
+      <div class="banner-overlay"></div>
+      <div class="banner-content">
+        <h1 class="banner-title">所有文章</h1>
+        <p class="banner-subtitle">共 {{ total }} 篇</p>
       </div>
-      
-      <!-- 筛选栏 -->
-      <div class="filter-bar">
-        <el-input 
-          v-model="searchKeyword" 
-          placeholder="搜索文章标题..."
-          prefix-icon="Search"
-          clearable
-          class="search-input"
-          @keyup.enter="handleSearch"
-          @clear="handleClear"
-        >
-          <template #append>
-            <el-button @click="handleSearch" icon="Search">搜索</el-button>
-          </template>
-        </el-input>
+    </div>
+
+    <!-- ── 筛选栏（重叠在 Banner 底部）─────────────────── -->
+    <div class="filter-wrap">
+      <div class="container">
+        <div class="filter-bar">
+          <el-input
+            v-model="searchKeyword"
+            placeholder="搜索文章标题..."
+            prefix-icon="Search"
+            clearable
+            class="search-input"
+            @keyup.enter="handleSearch"
+            @clear="handleClear"
+          >
+            <template #append>
+              <el-button @click="handleSearch" icon="Search">搜索</el-button>
+            </template>
+          </el-input>
+        </div>
       </div>
-      
+    </div>
+
+    <!-- ── 主体内容 ─────────────────────────────────────── -->
+    <div class="container main-body">
       <!-- 文章列表 -->
       <div class="articles">
         <!-- 骨架屏 -->
         <Skeleton v-if="loading" type="article-list" :count="6" />
-        
-        <!-- 文章列表 -->
-        <div v-else class="article-card" v-for="article in articles" :key="article.id" @click="viewArticle(article.id)">
-          <!-- 标识标签 -->
+
+        <!-- 文章卡片 -->
+        <div
+          v-else
+          class="article-card"
+          v-for="article in articles"
+          :key="article.id"
+          @click="viewArticle(article.id)"
+        >
+          <!-- 角标 -->
           <div class="badges" v-if="article.isTop === 1 || article.isRecommend === 1">
             <span class="badge badge-top" v-if="article.isTop === 1">置顶</span>
             <span class="badge badge-recommend" v-if="article.isRecommend === 1">推荐</span>
           </div>
-          
+
           <div class="card-left">
             <div class="article-cover">
-              <img v-lazyload="article.articleCover || '/default-cover.svg'" alt="封面">
+              <img v-lazyload="article.articleCover || '/default-cover.svg'" alt="封面" />
             </div>
           </div>
+
           <div class="card-right">
             <h2 class="article-title">{{ article.articleName }}</h2>
             <div class="article-tags" v-if="article.articleTag">
@@ -56,19 +71,17 @@
                 <span class="meta-item">{{ article.readNum || 0 }} 阅读</span>
                 <span class="meta-item">{{ article.likeCount || 0 }} 喜欢</span>
               </div>
-              <div class="read-btn">
-                阅读全文 →
-              </div>
+              <div class="read-btn">阅读全文 →</div>
             </div>
           </div>
         </div>
-        
+
         <!-- 空状态 -->
         <div v-if="!loading && articles.length === 0" class="empty-state">
           <div class="empty-text">暂无文章</div>
         </div>
       </div>
-      
+
       <!-- 分页 -->
       <div class="pagination" v-if="total > 0">
         <el-pagination
@@ -123,20 +136,20 @@ const fetchArticles = async () => {
       pageNo: pageNo.value,
       pageSize: pageSize.value
     }
-    
+
     // 添加搜索关键词
     if (searchKeyword.value) {
       params.articleName = searchKeyword.value
     }
-    
+
     // 添加分类筛选（从URL参数获取）
     const categoryParam = route.query.category as string
     if (categoryParam) {
       params.articleCategory = categoryParam
     }
-    
+
     const res: any = await getArticleList(params)
-    
+
     if (res && res.list) {
       articles.value = res.list
       total.value = res.total || 0
@@ -207,75 +220,100 @@ watch(() => route.path, (newPath) => {
 </script>
 
 <style scoped lang="scss">
-.article-list {
-  min-height: 100vh;
-  padding: 104px 0 80px;
-}
+// ── Banner ────────────────────────────────────────────
+.page-banner {
+  position: relative;
+  height: 200px;
+  background: url('/bg-banner.png') center 30% / cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-// ── 页面标题（与 Home.vue page-header 一致）────────────
-.page-header {
-  border-left: 4px solid var(--color-accent);
-  padding-left: 20px;
-  margin-bottom: 40px;
-
-  h1 {
-    font-family: var(--font-serif);
-    font-size: 32px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--text-primary);
-    margin: 0 0 8px 0;
-    line-height: 1.2;
+  .banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 12, 30, 0.62);
   }
 
-  .subtitle {
-    font-size: 14px;
-    color: var(--text-tertiary);
-    margin: 0;
-  }
-}
+  .banner-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
 
-// ── 筛选栏 ────────────────────────────────────────────
-.filter-bar {
-  margin-bottom: 32px;
-
-  .search-input {
-    :deep(.el-input__wrapper) {
-      border-radius: var(--radius-btn);
-      background: var(--bg-card);
-      backdrop-filter: var(--blur-glass);
-      -webkit-backdrop-filter: var(--blur-glass);
-      transition: box-shadow 0.25s ease;
-
-      &.is-focus {
-        box-shadow: 0 0 0 1px var(--color-accent) inset;
-      }
+    .banner-title {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+      margin: 0 0 8px 0;
+      line-height: 1.2;
     }
 
-    :deep(.el-input-group__append) {
-      background: var(--bg-secondary);
-      border-color: var(--border-color);
-      border-radius: 0 var(--radius-btn) var(--radius-btn) 0;
+    .banner-subtitle {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.65);
+      margin: 0;
+      font-family: var(--font-sans);
+    }
+  }
+}
 
-      .el-button {
-        color: var(--text-secondary);
-        font-family: var(--font-sans);
+// ── 筛选栏（Banner 底部重叠）─────────────────────────
+.filter-wrap {
+  position: relative;
+  z-index: 10;
+  margin-top: -24px;
 
-        &:hover {
-          color: var(--color-accent);
+  .filter-bar {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 18px 24px;
+
+    .search-input {
+      :deep(.el-input__wrapper) {
+        border-radius: var(--radius-btn);
+        background: var(--bg-secondary);
+        transition: box-shadow 0.25s ease;
+
+        &.is-focus {
+          box-shadow: 0 0 0 1px var(--color-accent) inset;
+        }
+      }
+
+      :deep(.el-input-group__append) {
+        background: var(--bg-secondary);
+        border-color: var(--border-color);
+        border-radius: 0 var(--radius-btn) var(--radius-btn) 0;
+
+        .el-button {
+          color: var(--text-secondary);
+          font-family: var(--font-sans);
+
+          &:hover {
+            color: var(--color-accent);
+          }
         }
       }
     }
   }
 }
 
-// ── 文章卡片列表（对齐 Home.vue article-item）────────
+// ── 容器 ──────────────────────────────────────────────
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.main-body {
+  padding-top: 48px;
+  padding-bottom: 80px;
+}
+
+// ── 文章列表 ──────────────────────────────────────────
 .articles {
   display: flex;
   flex-direction: column;
@@ -286,8 +324,6 @@ watch(() => route.path, (newPath) => {
 .article-card {
   display: flex;
   background: var(--bg-card);
-  backdrop-filter: var(--blur-glass);
-  -webkit-backdrop-filter: var(--blur-glass);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
@@ -315,7 +351,6 @@ watch(() => route.path, (newPath) => {
     }
   }
 
-  // 角标（置顶 / 推荐）
   .badges {
     position: absolute;
     top: 12px;
@@ -337,13 +372,14 @@ watch(() => route.path, (newPath) => {
       }
 
       &.badge-recommend {
-        background: linear-gradient(135deg, rgba(22,93,255,0.85) 0%, rgba(114,46,209,0.85) 100%);
+        background: linear-gradient(135deg, rgba(22, 93, 255, 0.85) 0%, rgba(114, 46, 209, 0.85) 100%);
       }
     }
   }
 
   .card-left {
-    width: 220px;
+    width: 200px;
+    height: 140px;
     flex-shrink: 0;
 
     .article-cover {
@@ -371,7 +407,7 @@ watch(() => route.path, (newPath) => {
     min-width: 0;
 
     .article-title {
-      font-family: var(--font-serif);
+      font-family: var(--font-display);
       font-size: 19px;
       font-weight: 700;
       color: var(--text-primary);
@@ -422,6 +458,7 @@ watch(() => route.path, (newPath) => {
         .meta-item {
           font-size: 12px;
           color: var(--text-tertiary);
+          font-family: var(--font-sans);
         }
       }
 
@@ -434,12 +471,13 @@ watch(() => route.path, (newPath) => {
         transform: translateX(-6px);
         transition: opacity 0.25s ease, transform 0.25s ease;
         letter-spacing: 0.02em;
+        font-family: var(--font-sans);
       }
     }
   }
 }
 
-// ── 空状态（对齐 Home.vue）─────────────────────────────
+// ── 空状态 ────────────────────────────────────────────
 .empty-state {
   text-align: center;
   padding: 72px 0;
@@ -447,7 +485,7 @@ watch(() => route.path, (newPath) => {
   font-size: 15px;
 
   .empty-text {
-    font-family: var(--font-serif);
+    font-family: var(--font-display);
   }
 }
 
@@ -478,12 +516,22 @@ watch(() => route.path, (newPath) => {
 }
 
 // ── 响应式 ────────────────────────────────────────────
-@media (max-width: 640px) {
-  .article-list { padding: 28px 0 60px; }
+@media (max-width: 768px) {
+  .page-banner {
+    height: 160px;
 
-  .page-header {
-    margin-bottom: 28px;
-    h1 { font-size: 26px; }
+    .banner-content .banner-title {
+      font-size: 1.8rem;
+    }
+  }
+
+  .filter-wrap .filter-bar {
+    padding: 14px 16px;
+  }
+
+  .main-body {
+    padding-top: 36px;
+    padding-bottom: 60px;
   }
 
   .article-card {
@@ -491,7 +539,7 @@ watch(() => route.path, (newPath) => {
 
     .card-left {
       width: 100%;
-      height: 190px;
+      height: 180px;
     }
 
     .card-right {
