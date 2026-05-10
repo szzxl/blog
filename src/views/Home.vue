@@ -36,13 +36,25 @@
             <span class="title-dot" style="background:linear-gradient(135deg,#ff7d00,#f53f3f)"></span>
             公告
           </div>
-          <p class="notice-text">欢迎来到我的博客，这里记录着技术成长与生活感悟。</p>
+          <ul v-if="notifications.length > 0" class="notice-list">
+            <li
+              v-for="item in notifications.slice(0, 3)"
+              :key="item.id"
+              class="notice-item"
+            >
+              <span class="notice-plain">
+                <span class="notice-dot" :class="`notice-dot--${item.type}`"></span>
+                {{ item.content }}
+              </span>
+            </li>
+          </ul>
+          <p v-else class="notice-text">欢迎来到我的博客，这里记录着技术成长与生活感悟。</p>
         </div>
 
       </aside>
 
       <!-- 中间主内容 -->
-      <main class="main-content">
+      <main class="center-col">
 
         <div class="section-header">
           <h2 class="section-title">最新文章</h2>
@@ -59,7 +71,7 @@
               @click="viewArticle(article.id)"
             >
               <div class="card-cover">
-                <img :src="article.articleCover || '/default-cover.svg'" :alt="article.articleName" />
+                <img :src="article.articleCover || '/default-cover.svg'" :alt="article.articleName" loading="lazy" />
                 <span class="top-badge" v-if="article.isTop === 1">置顶</span>
                 <span class="cat-badge" v-if="article.articleCategory">{{ article.articleCategory }}</span>
               </div>
@@ -123,7 +135,7 @@
             标签云
           </div>
           <div class="tag-sphere-wrap">
-            <div class="tag-sphere" ref="sphereRef">
+            <div class="tag-sphere">
               <span
                 v-for="(tag, i) in tags" :key="tag.id ?? tag.name"
                 class="sphere-tag"
@@ -146,7 +158,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { getMonthArticleList, getCategoryList, getTagList } from '@/api/article'
+import { getMonthArticleList, getCategoryList, getTagList, getNotificationList } from '@/api/article'
 import { formatTimestamp, parseTags } from '@/utils/format'
 import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
 import { Document, View } from '@element-plus/icons-vue'
@@ -183,9 +195,17 @@ interface Tag {
   num?: number
 }
 
+interface NotificationItem {
+  id: number
+  type: string
+  content: string
+  status: number
+}
+
 const articles = ref<Article[]>([])
 const categories = ref<Category[]>([])
 const tags = ref<Tag[]>([])
+const notifications = ref<NotificationItem[]>([])
 const loading = ref(false)
 const siteName = ref('')
 const socialGithub = ref('')
@@ -266,6 +286,14 @@ const fetchConfig = async () => {
     if (config.social_github) socialGithub.value = config.social_github
     if (config.social_gitee) socialGitee.value = config.social_gitee
     if (config.social_email) socialEmail.value = config.social_email
+  } catch { /* 静默 */ }
+}
+
+const fetchCarousel = async () => {
+  try {
+    const res: any = await getNotificationList()
+    const list = Array.isArray(res) ? res : (res?.list ?? [])
+    notifications.value = list.filter((item: NotificationItem) => item.status === 1)
   } catch { /* 静默 */ }
 }
 
@@ -366,7 +394,7 @@ const getTagStyle = (i: number) => {
 const viewArticle = (id: number) => router.push(`/article/${id}`)
 
 onMounted(() => {
-  fetchArticles(); fetchConfig(); fetchCategories(); fetchTags()
+  fetchArticles(); fetchConfig(); fetchCategories(); fetchTags(); fetchCarousel()
   typeTimer = setTimeout(() => runTypewriter(), 800)
 })
 onUnmounted(() => {
@@ -418,7 +446,7 @@ onUnmounted(() => {
   z-index: 1;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 32px 24px 80px;
+  padding: 80px 24px 80px;
   display: grid;
   grid-template-columns: 260px 1fr 220px;
   gap: 24px;
@@ -431,11 +459,11 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 16px;
   position: sticky;
-  top: 80px;
+  top: 72px;
 }
 
 .sidebar-right {
-  top: 80px;
+  top: 72px;
 }
 
 .sidebar-card {
@@ -487,7 +515,7 @@ onUnmounted(() => {
   }
 
   .ac-social {
-    width: 38px; height: 38px;
+    width: 30px; height: 30px;
     border-radius: 50%;
     border: none; cursor: pointer;
     display: flex;
@@ -495,7 +523,7 @@ onUnmounted(() => {
     justify-content: center;
     color: #fff;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    svg { width: 18px; height: 18px; }
+    svg { width: 14px; height: 14px; }
     &:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.22); color: #fff; }
     &.github  { background: #24292f; }
     &.gitee   { background: #c71d23; }
@@ -522,6 +550,48 @@ onUnmounted(() => {
 .notice-text {
   font-size: 13px; color: var(--text-secondary);
   line-height: 1.8; padding: 12px 16px;
+}
+
+.notice-list {
+  list-style: none;
+  padding: 8px 0;
+}
+
+.notice-item {
+  padding: 0;
+}
+
+.notice-link, .notice-plain {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  transition: color 0.2s, background 0.2s;
+  text-decoration: none;
+}
+
+.notice-link {
+  cursor: pointer;
+  &:hover {
+    color: var(--color-accent);
+    background: var(--bg-secondary);
+    .notice-dot { background: var(--color-accent); }
+  }
+}
+
+.notice-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--border-strong);
+  flex-shrink: 0;
+  margin-top: 6px;
+  transition: background 0.2s;
+  &--activity     { background: #ff7d00; }
+  &--announcement { background: #f53f3f; }
+  &--update       { background: #165dff; }
+  &--tip          { background: #00b42a; }
 }
 
 // 分类列表
@@ -598,7 +668,7 @@ onUnmounted(() => {
 }
 
 // ── 主内容 ────────────────────────────────────────────
-.main-content { min-width: 0; }
+.center-col { min-width: 0; }
 
 .section-header {
   display: flex; align-items: center; justify-content: space-between;

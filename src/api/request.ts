@@ -14,10 +14,12 @@ const PUBLIC_APIS = [
   '/web/article/list',
   '/web/article/detail',
   '/web/article/like/num',
+  '/web/month/article',
   '/web/category/list',
   '/web/tag/list',
   '/web/carousel/list',
   '/web/notification/list',
+  '/config/notification/list',
   '/config/background/list',
   '/config/website'
 ]
