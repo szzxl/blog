@@ -103,6 +103,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { getAlbumList, getAlbumPhotos } from '@/api/article'
+import { ElMessage } from 'element-plus'
 
 interface Album {
   id: number
@@ -141,7 +142,7 @@ const fetchAlbums = async () => {
       // 不再自动加载第一个相册
     }
   } catch (error) {
-    // 静默失败
+    ElMessage.error('获取相册列表失败')
   } finally {
     loading.value = false
   }

@@ -201,7 +201,7 @@ const fetchLinks = async () => {
         .sort((a: Link, b: Link) => a.sort - b.sort)
     }
   } catch (error) {
-    // 获取友情链接失败
+    ElMessage.error('获取友链列表失败')
   } finally {
     loading.value = false
   }

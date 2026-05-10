@@ -147,7 +147,7 @@
           <el-input v-model="passwordForm.oldPassword" type="password" show-password />
         </el-form-item>
         <el-form-item label="新密码" prop="newPassword">
-          <el-input v-model="passwordForm.newPassword" type="password" show-password />
+          <el-input v-model="passwordForm.newPassword" type="password" show-password @input="onNewPasswordChange" />
         </el-form-item>
         <el-form-item label="确认密码" prop="confirmPassword">
           <el-input v-model="passwordForm.confirmPassword" type="password" show-password />
@@ -237,9 +237,15 @@ const passwordFormRules = {
         if (value !== passwordForm.value.newPassword) callback(new Error('两次输入的密码不一致'))
         else callback()
       },
-      trigger: 'blur'
+      trigger: ['blur', 'change']
     }
   ]
+}
+
+const onNewPasswordChange = () => {
+  if (passwordForm.value.confirmPassword) {
+    passwordFormRef.value?.validateField('confirmPassword')
+  }
 }
 
 const showChangePasswordDialog = () => {
