@@ -1,31 +1,32 @@
-﻿<template>
+<template>
   <div class="home">
+    <!-- ── 主体布局 ─────────────────────────────────────── -->
     <div class="page-layout">
+
       <!-- 左侧侧边栏 -->
-      <aside class="sidebar">
+      <aside class="sidebar sidebar-left">
+
         <!-- 博主卡片 -->
         <div class="sidebar-card author-card">
-          <div class="author-cover"></div>
-          <div class="author-info">
-            <img src="/default-avatar.svg" class="author-avatar" alt="博主" />
-            <div class="author-name">{{ siteName || '博主' }}</div>
-            <div class="author-desc">{{ siteDescription || '记录技术与生活' }}</div>
+          <span class="ac-deco ac-deco-tl"></span>
+          <span class="ac-deco ac-deco-tr"></span>
+          <div class="author-title gradient-text">{{ siteName || '时光博客' }}</div>
+          <div class="author-desc">
+            <span>{{ displayText }}</span><span class="tw-cursor" :class="{ blink: !isTyping }">|</span>
           </div>
-          <div class="author-stats">
-            <div class="stat-item">
-              <span class="stat-num">{{ totalArticles }}</span>
-              <span class="stat-label">文章</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item">
-              <span class="stat-num">{{ categoryCount }}</span>
-              <span class="stat-label">分类</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item">
-              <span class="stat-num">{{ tagCount }}</span>
-              <span class="stat-label">标签</span>
-            </div>
+          <div class="author-socials">
+            <a v-if="socialGithub" :href="socialGithub" target="_blank" class="ac-social github" title="GitHub">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+            <a v-if="socialGitee" :href="socialGitee" target="_blank" class="ac-social gitee" title="Gitee">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.984 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.016 0zm6.09 5.333c.328 0 .593.266.592.593v1.482a.594.594 0 01-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.63c0 .327.266.592.593.592h5.63c.982 0 1.778-.796 1.778-1.778v-.296a.593.593 0 00-.592-.593h-4.15a.592.592 0 01-.592-.592v-1.482a.593.593 0 01.593-.592h6.815c.327 0 .593.265.593.592v3.408a4 4 0 01-4 4H5.926a.593.593 0 01-.593-.593V9.778a4.444 4.444 0 014.445-4.444h8.296z"/></svg>
+            </a>
+            <button v-if="socialEmail" class="ac-social email" title="复制邮箱" @click="copyEmail">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            </button>
+            <button class="ac-social wechat" title="复制微信号" @click="copyWechat">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.295.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-5.972 2.981-7.853 1.141-.741 2.431-1.242 3.812-1.368.157-4.055-3.735-7.26-8.61-7.26zm-1.47 3.297a1.016 1.016 0 110 2.032 1.016 1.016 0 010-2.032zm4.047 0a1.016 1.016 0 110 2.032 1.016 1.016 0 010-2.032zm4.03 3.867c-3.988 0-7.22 2.73-7.22 6.103 0 3.372 3.232 6.104 7.22 6.104.868 0 1.7-.131 2.47-.363a.728.728 0 01.6.081l1.583.927a.271.271 0 00.14.046c.138 0 .248-.11.248-.249 0-.06-.023-.12-.04-.178l-.325-1.233a.494.494 0 01.178-.556C21.587 19.005 22.5 17.4 22.5 15.455c0-3.372-3.233-6.103-7.202-6.103zm-2.134 2.79a.854.854 0 110 1.708.854.854 0 010-1.708zm4.28 0a.854.854 0 110 1.708.854.854 0 010-1.708z"/></svg>
+            </button>
           </div>
         </div>
 
@@ -38,6 +39,83 @@
           <p class="notice-text">欢迎来到我的博客，这里记录着技术成长与生活感悟。</p>
         </div>
 
+      </aside>
+
+      <!-- 中间主内容 -->
+      <main class="main-content">
+
+        <div class="section-header">
+          <h2 class="section-title">最新文章</h2>
+        </div>
+
+        <div v-loading="loading">
+
+          <!-- 文章网格 -->
+          <div class="article-grid">
+            <div
+              class="article-card"
+              v-for="article in articles"
+              :key="article.id"
+              @click="viewArticle(article.id)"
+            >
+              <div class="card-cover">
+                <img :src="article.articleCover || '/default-cover.svg'" :alt="article.articleName" />
+                <span class="top-badge" v-if="article.isTop === 1">置顶</span>
+                <span class="cat-badge" v-if="article.articleCategory">{{ article.articleCategory }}</span>
+              </div>
+              <div class="card-body">
+                <div class="card-content">
+                  <h3 class="card-title">{{ article.articleName }}</h3>
+                </div>
+                <div class="card-footer">
+                  <span class="card-date">{{ formatTime(article.createTime) }}</span>
+                  <div class="card-meta-right">
+                    <span class="card-reads" v-if="article.readNum"><el-icon style="vertical-align:-1px"><View /></el-icon> {{ article.readNum }}</span>
+                    <div class="card-tags" v-if="article.articleTag">
+                      <span
+                        class="tag"
+                        v-for="(tag, i) in parseTags(article.articleTag).slice(0, 1)"
+                        :key="i"
+                      >{{ tag }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="!loading && articles.length === 0" class="empty-state">
+            <el-icon class="empty-icon" :size="48"><Document /></el-icon>
+            <p>暂无文章，敬请期待</p>
+          </div>
+
+        </div>
+      </main>
+
+      <!-- 右侧侧边栏 -->
+      <aside class="sidebar sidebar-right">
+
+        <!-- 文章分类 -->
+        <div class="sidebar-card">
+          <div class="card-title">
+            <span class="title-dot" style="background:linear-gradient(135deg,#00b42a,#0fc6c2)"></span>
+            文章分类
+          </div>
+          <ul class="cat-list" v-if="categories.length > 0">
+            <li
+              class="cat-item"
+              v-for="cat in categories.slice(0, 10)"
+              :key="cat.id"
+              @click="$router.push(`/articles?category=${cat.name || cat.categoryName}`)"
+            >
+              <span class="cat-dot"></span>
+              <span class="cat-name">{{ cat.name || cat.categoryName || '未命名' }}</span>
+              <span class="cat-count">{{ cat.num ?? cat.articleCount ?? cat.count ?? 0 }}</span>
+            </li>
+          </ul>
+          <p class="notice-text" v-else>暂无分类</p>
+        </div>
+
         <!-- 标签云 -->
         <div class="sidebar-card">
           <div class="card-title">
@@ -47,68 +125,35 @@
           <div class="tag-sphere-wrap">
             <div class="tag-sphere" ref="sphereRef">
               <span
-                v-for="(tag, i) in tags" :key="tag.id"
+                v-for="(tag, i) in tags" :key="tag.id ?? tag.name"
                 class="sphere-tag"
                 :style="getTagStyle(i)"
                 :ref="el => setTagRef(el, i)"
-                @click="$router.push(`/tag/articles?tag=${tag.tagName}`)"
+                @click="$router.push(`/tag/articles?tag=${tag.name || tag.tagName}`)"
                 @mouseenter="pauseSphere"
                 @mouseleave="resumeSphere"
-              >{{ tag.tagName }}</span>
+              >{{ tag.name || tag.tagName }}</span>
             </div>
           </div>
         </div>
+
       </aside>
 
-      <!-- 右侧主内容 -->
-      <main class="main-content">
-        <div class="section-header">
-          <h2 class="section-title">最新文章</h2>
-          <router-link to="/articles" class="section-more">查看全部 →</router-link>
-        </div>
-
-        <div class="article-grid" v-loading="loading">
-          <div
-            class="article-card"
-            v-for="article in articles"
-            :key="article.id"
-            @click="viewArticle(article.id)"
-          >
-            <div class="card-cover">
-              <img :src="article.articleCover || '/default-cover.svg'" :alt="article.articleName" />
-              <span class="top-badge" v-if="article.isTop === 1">置顶</span>
-              <span class="cat-badge" v-if="article.articleCategory">{{ article.articleCategory }}</span>
-            </div>
-            <div class="card-body">
-              <h3 class="card-title">{{ article.articleName }}</h3>
-              <p class="card-abstract" v-if="article.articleAbstract">{{ article.articleAbstract }}</p>
-              <div class="card-footer">
-                <span class="card-date">{{ formatTime(article.createTime) }}</span>
-                <div class="card-tags" v-if="article.articleTag">
-                  <span class="tag" v-for="(tag, i) in parseTags(article.articleTag).slice(0, 2)" :key="i">{{ tag }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="!loading && articles.length === 0" class="empty-state">
-            <div class="empty-icon">📭</div>
-            <p>暂无文章，敬请期待</p>
-          </div>
-        </div>
-      </main>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { getMonthArticleList, getCategoryList, getTagList, getArticleList } from '@/api/article'
+import { getMonthArticleList, getCategoryList, getTagList } from '@/api/article'
 import { formatDate } from '@/utils/format'
 import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
+import { Document, View } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
+
 
 interface Article {
   id: number
@@ -123,28 +168,58 @@ interface Article {
 }
 
 interface Category {
-  id: number
-  categoryName: string
+  id?: number
+  name?: string
+  categoryName?: string
+  num?: number
+  count?: number
   articleCount?: number
 }
 
 interface Tag {
-  id: number
-  tagName: string
+  id?: string | number
+  name?: string
+  tagName?: string
+  num?: number
 }
 
 const articles = ref<Article[]>([])
 const categories = ref<Category[]>([])
 const tags = ref<Tag[]>([])
-const totalArticles = ref(0)
-const totalCategories = ref(0)
-const totalTags = ref(0)
 const loading = ref(false)
 const siteName = ref('')
-const siteDescription = ref('')
+const socialGithub = ref('')
+const socialGitee = ref('')
+const socialEmail = ref('')
+const copyEmail = async () => {
+  if (!socialEmail.value) return
+  try {
+    await navigator.clipboard.writeText(socialEmail.value)
+  } catch {
+    const el = document.createElement('textarea')
+    el.value = socialEmail.value
+    document.body.appendChild(el)
+    el.select()
+    document.execCommand('copy')
+    document.body.removeChild(el)
+  }
+  ElMessage.success('邮箱号已复制到剪贴板')
+}
 
-const categoryCount = computed(() => totalCategories.value || categories.value.length)
-const tagCount = computed(() => totalTags.value || tags.value.length)
+const copyWechat = async () => {
+  try {
+    await navigator.clipboard.writeText('Su_zxl')
+  } catch {
+    const el = document.createElement('textarea')
+    el.value = 'Su_zxl'
+    document.body.appendChild(el)
+    el.select()
+    document.execCommand('copy')
+    document.body.removeChild(el)
+  }
+  ElMessage.success('微信号已复制到剪贴板')
+}
+
 
 const phrases = ['记录技术与生活', '分享所见所闻', '用文字留住时光']
 const displayText = ref('')
@@ -184,34 +259,29 @@ const fetchArticles = async () => {
   }
 }
 
-const fetchStats = async () => {
-  try {
-    const res: any = await getArticleList({ pageNo: 1, pageSize: 1 })
-    if (res?.total != null) totalArticles.value = res.total
-  } catch { /* 静默 */ }
-}
-
 const fetchConfig = async () => {
   try {
     const config = await fetchWebsiteConfigWithCache()
-    if (config.site_name) siteName.value = config.site_name
-    if (config.site_description) siteDescription.value = config.site_description
+    if (config.site_name) siteName.value = config.site_name.replace(/系统$/u, '')
+    if (config.social_github) socialGithub.value = config.social_github
+    if (config.social_gitee) socialGitee.value = config.social_gitee
+    if (config.social_email) socialEmail.value = config.social_email
   } catch { /* 静默 */ }
 }
 
 const fetchCategories = async () => {
   try {
     const res: any = await getCategoryList({ pageSize: 100 })
-    if (res?.list) { categories.value = res.list; totalCategories.value = res.total ?? res.list.length }
-    else if (Array.isArray(res)) { categories.value = res; totalCategories.value = res.length }
+    if (res?.list) { categories.value = res.list }
+    else if (Array.isArray(res)) { categories.value = res }
   } catch { /* 静默 */ }
 }
 
 const fetchTags = async () => {
   try {
     const res: any = await getTagList({ pageSize: 200 })
-    if (res?.list) { tags.value = res.list; totalTags.value = res.total ?? res.list.length }
-    else if (Array.isArray(res)) { tags.value = res; totalTags.value = res.length }
+    if (res?.list) { tags.value = res.list }
+    else if (Array.isArray(res)) { tags.value = res }
     await nextTick()
     initSphere()
   } catch { /* 静默 */ }
@@ -249,10 +319,8 @@ const rotateSphere = () => {
   const cosX = Math.cos(angleX), sinX = Math.sin(angleX)
   const cosY = Math.cos(angleY), sinY = Math.sin(angleY)
   items.forEach(item => {
-    // rotate Y
     const x1 = item.x * cosY - item.z * sinY
     const z1 = item.x * sinY + item.z * cosY
-    // rotate X
     const y2 = item.y * cosX - z1 * sinX
     const z2 = item.y * sinX + z1 * cosX
     item.x = x1; item.y = y2; item.z = z2
@@ -291,24 +359,63 @@ const formatTime = (ts?: number) => ts ? formatDate(new Date(ts), 'YYYY-MM-DD') 
 const parseTags = (s?: string) => s ? s.split(',').map(t => t.trim()).filter(Boolean) : []
 const viewArticle = (id: number) => router.push(`/article/${id}`)
 
-onMounted(() => { fetchArticles(); fetchConfig(); fetchCategories(); fetchTags(); fetchStats(); typeTimer = setTimeout(() => runTypewriter(), 800) })
-onUnmounted(() => { clearTimeout(typeTimer); clearInterval(sphereTimer) })
+onMounted(() => {
+  fetchArticles(); fetchConfig(); fetchCategories(); fetchTags()
+  typeTimer = setTimeout(() => runTypewriter(), 800)
+})
+onUnmounted(() => {
+  clearTimeout(typeTimer)
+  clearInterval(sphereTimer)
+})
 </script>
 
 <style scoped lang="scss">
 .home {
   min-height: 100vh;
   background: var(--bg-primary);
-  padding-top: 64px;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 220px;
+    background: linear-gradient(105deg, #165dff 0%, #722ed1 50%, #f53f3f 100%);
+    opacity: 0.12;
+    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
 }
 
+[data-theme="dark"] .home::before {
+  opacity: 0.18;
+}
+
+
+.tw-cursor {
+  display: inline-block;
+  font-weight: 300;
+  margin-left: 1px;
+  &.blink { animation: blink 1s step-end infinite; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+// ── 主体布局 ──────────────────────────────────────────
 .page-layout {
-  max-width: 1280px;
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 32px 24px 80px;
   display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 28px;
+  grid-template-columns: 260px 1fr 220px;
+  gap: 24px;
   align-items: start;
 }
 
@@ -318,6 +425,10 @@ onUnmounted(() => { clearTimeout(typeTimer); clearInterval(sphereTimer) })
   flex-direction: column;
   gap: 16px;
   position: sticky;
+  top: 80px;
+}
+
+.sidebar-right {
   top: 80px;
 }
 
@@ -332,52 +443,63 @@ onUnmounted(() => { clearTimeout(typeTimer); clearInterval(sphereTimer) })
 }
 
 .author-card {
-  .author-cover {
-    height: 80px;
-    background: linear-gradient(135deg, #165dff 0%, #722ed1 100%);
+  position: relative;
+  padding: 32px 24px 28px;
+  text-align: center;
+  overflow: visible;
+
+  .ac-deco {
+    position: absolute;
+    border-radius: 3px;
+    transform: rotate(45deg);
+    opacity: 0.45;
   }
-  .author-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0 20px 16px;
-    margin-top: -32px;
+  .ac-deco-tl { top: 18px; left: 22px; width: 10px; height: 10px; background: #165dff; }
+  .ac-deco-tr { top: 22px; right: 26px; width: 7px; height: 7px; background: #722ed1; }
+
+  .author-title {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
   }
-  .author-avatar {
-    width: 64px; height: 64px;
-    border-radius: 50%;
-    border: 3px solid var(--bg-card);
-    box-shadow: var(--shadow-card);
-    object-fit: cover;
-    background: var(--bg-secondary);
-  }
-  .author-name {
-    font-family: var(--font-serif);
-    font-size: 16px; font-weight: 700;
-    color: var(--text-primary);
-    margin-top: 10px;
-  }
+
   .author-desc {
-    font-size: 12px; color: var(--text-tertiary);
-    text-align: center; line-height: 1.6; margin-top: 4px;
+    font-size: 13px;
+    color: var(--text-tertiary);
+    line-height: 1.6;
+    min-height: 22px;
   }
-  .author-stats {
+
+  .author-socials {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .ac-social {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: none; cursor: pointer;
     display: flex;
     align-items: center;
-    border-top: 1px solid var(--border-color);
-    padding: 12px 0;
+    justify-content: center;
+    color: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    svg { width: 18px; height: 18px; }
+    &:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.22); color: #fff; }
+    &.github  { background: #24292f; }
+    &.gitee   { background: #c71d23; }
+    &.email   { background: #165dff; }
+    &.wechat  { background: #07c160; }
   }
-  .stat-item {
-    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
-    .stat-num {
-      font-size: 18px; font-weight: 700; line-height: 1;
-      background: var(--gradient-accent);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-    .stat-label { font-size: 11px; color: var(--text-tertiary); }
-  }
-  .stat-divider { width: 1px; height: 28px; background: var(--border-color); }
+
 }
+
+
 
 .card-title {
   display: flex; align-items: center; gap: 8px;
@@ -389,11 +511,56 @@ onUnmounted(() => { clearTimeout(typeTimer); clearInterval(sphereTimer) })
   }
 }
 
+
+// 公告
 .notice-text {
   font-size: 13px; color: var(--text-secondary);
   line-height: 1.8; padding: 12px 16px;
 }
 
+// 分类列表
+.cat-list {
+  list-style: none;
+  padding: 8px 0;
+}
+
+.cat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background: var(--bg-secondary);
+    .cat-name { color: var(--color-accent); }
+    .cat-dot { background: var(--color-accent); }
+  }
+}
+
+.cat-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--border-strong); flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.cat-name {
+  flex: 1;
+  font-size: 13px; color: var(--text-secondary);
+  transition: color 0.2s;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.cat-count {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  background: var(--bg-secondary);
+  padding: 1px 7px;
+  border-radius: 10px;
+  min-width: 24px; text-align: center;
+}
+
+// 标签云
 .tag-sphere-wrap {
   padding: 12px;
   display: flex;
@@ -418,31 +585,9 @@ onUnmounted(() => { clearTimeout(typeTimer); clearInterval(sphereTimer) })
   white-space: nowrap;
   will-change: transform, opacity;
   transition: filter 0.2s, box-shadow 0.2s;
-
   &:hover {
     filter: brightness(0.85) saturate(1.4);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  }
-}
-
-.nav-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  padding: 12px;
-}
-
-.nav-grid-item {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-  padding: 8px 4px;
-  border-radius: 10px;
-  font-size: 11px; color: var(--text-secondary);
-  text-decoration: none;
-  transition: all 0.2s;
-  &:hover { background: var(--bg-secondary); color: var(--color-accent); }
-  .nav-grid-icon {
-    width: 32px; height: 32px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center; font-size: 15px;
   }
 }
 
@@ -475,7 +620,8 @@ onUnmounted(() => { clearTimeout(typeTimer); clearInterval(sphereTimer) })
 .article-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 16px;
+  align-items: stretch;
 }
 
 .article-card {
@@ -494,12 +640,12 @@ onUnmounted(() => { clearTimeout(typeTimer); clearInterval(sphereTimer) })
     transform: translateY(-4px);
     border-color: var(--color-accent);
     .card-cover img { transform: scale(1.06); }
-    .card-title { color: var(--color-accent); }
+    .card-title { color: var(--color-accent-hover); }
   }
 
   .card-cover {
     position: relative;
-    aspect-ratio: 16/10;
+    aspect-ratio: 16/8;
     overflow: hidden;
     background: var(--bg-secondary);
     flex-shrink: 0;
@@ -518,29 +664,52 @@ onUnmounted(() => { clearTimeout(typeTimer); clearInterval(sphereTimer) })
   }
 
   .card-body {
-    flex: 1; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;
+    flex: 1;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .card-title {
     font-family: var(--font-serif);
-    font-size: 15px; font-weight: 700; color: var(--text-primary);
-    line-height: 1.5;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    font-size: 13px; font-weight: 700; color: var(--color-accent);
+    line-height: 1.4;
+    min-height: 1.4em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     transition: color 0.2s; margin: 0;
   }
 
   .card-abstract {
     font-size: 12px; color: var(--text-tertiary); line-height: 1.7;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-    margin: 0; flex: 1;
+    margin: 0;
   }
 
   .card-footer {
     display: flex; align-items: center; justify-content: space-between;
-    margin-top: 4px;
+    padding-top: 8px;
+    margin-top: auto;
   }
 
   .card-date { font-size: 11px; color: var(--text-tertiary); }
+
+  .card-meta-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-reads {
+    font-size: 10px;
+    color: var(--text-tertiary);
+  }
 
   .card-tags { display: flex; gap: 4px; }
 
@@ -561,19 +730,30 @@ onUnmounted(() => { clearTimeout(typeTimer); clearInterval(sphereTimer) })
 }
 
 // ── 响应式 ────────────────────────────────────────────
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
+  .page-layout { grid-template-columns: 240px 1fr 200px; gap: 20px; }
+}
+
+@media (max-width: 1024px) {
+  /* 右 sidebar 折叠到主内容下方 */
+  .page-layout { grid-template-columns: 240px 1fr; }
+  .sidebar-right { grid-column: 2; display: grid; grid-template-columns: repeat(2, 1fr); position: static; }
+}
+
+@media (max-width: 900px) {
   .article-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 860px) {
   .page-layout { grid-template-columns: 1fr; }
-  .sidebar { position: static; display: grid; grid-template-columns: repeat(2, 1fr); }
+  .sidebar-left { display: grid; grid-template-columns: repeat(2, 1fr); position: static; }
   .author-card { grid-column: 1 / -1; }
+  .sidebar-right { grid-column: 1; display: grid; grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 640px) {
   .article-grid { grid-template-columns: 1fr; }
-  .sidebar { grid-template-columns: 1fr; }
+  .sidebar-left, .sidebar-right { grid-template-columns: 1fr; }
   .page-layout { padding: 16px 16px 60px; }
 }
 </style>

@@ -1,57 +1,83 @@
 <template>
   <div class="article-detail">
-    <div class="container">
-      <!-- 骨架屏 -->
-      <Skeleton v-if="loading" type="article-detail" />
-      
-      <!-- 文章内容（包含标题和信息） -->
-      <article v-else class="article-content card" v-if="article">
-        <h1 class="article-title">{{ article.articleName }}</h1>
-        
-        <div class="article-info">
-          <!-- 左侧：标签 -->
-          <span class="info-item tags" v-if="article.articleTag">
+    <!-- ── Banner ─────────────────────────────────────── -->
+    <div class="page-banner">
+      <div class="banner-overlay"></div>
+      <div class="banner-content">
+        <template v-if="loading">
+          <div class="banner-title-skeleton"></div>
+          <div class="banner-sub-skeleton"></div>
+        </template>
+        <template v-else-if="article">
+          <h1 class="banner-title">{{ article.articleName }}</h1>
+          <p class="banner-sub">
+            <span v-if="article.createTime">{{ formatTime(article.createTime) }}</span>
+            <span class="banner-sep" v-if="article.createTime && article.articleCategory">·</span>
+            <span v-if="article.articleCategory">{{ article.articleCategory }}</span>
+            <span class="banner-sep" v-if="article.readNum !== undefined">·</span>
+            <span v-if="article.readNum !== undefined">{{ article.readNum }} 阅读</span>
+          </p>
+        </template>
+      </div>
+    </div>
+
+    <!-- ── 主内容区 ───────────────────────────────────── -->
+    <div class="main-wrap">
+      <div class="container">
+        <!-- 骨架屏 -->
+        <Skeleton v-if="loading" type="article-detail" />
+
+        <!-- 文章内容卡片 -->
+        <article v-else-if="article" class="article-content">
+          <!-- 标签行 -->
+          <div class="article-tags" v-if="article.articleTag">
             <span
-              class="tag" 
-              v-for="(tag, index) in parseTags(article.articleTag)" 
+              class="tag"
+              v-for="(tag, index) in parseTags(article.articleTag)"
               :key="index"
               @click="goToTag(tag)"
             >{{ tag }}</span>
-          </span>
-          
-          <!-- 右侧：阅读数、点赞数、时间 -->
-          <div class="info-right">
-            <span class="info-item" v-if="article.readNum !== undefined">{{ article.readNum }} 阅读</span>
-            <span class="info-item" v-if="article.likeCount">{{ article.likeCount }} 点赞</span>
-            <span class="info-divider" v-if="article.createTime">|</span>
-            <span class="info-item" v-if="article.createTime">{{ formatTime(article.createTime) }}</span>
           </div>
-        </div>
-        
-        <div class="content" v-html="article.articleContent"></div>
-      </article>
-      
-      <!-- 文章操作栏 - 固定在右侧 -->
-      <div class="article-actions" v-if="article">
-        <el-button 
-          class="action-btn like-btn" 
-          size="large"
-          :class="{ liked: article.isLiked }"
-          @click="handleLikeArticle"
-        >
-          <span class="text">点赞</span>
-          <span class="count">{{ article.likeCount || 0 }}</span>
-        </el-button>
-        <el-button class="action-btn" size="large">
-          <span class="text">收藏</span>
-        </el-button>
-        <el-button class="action-btn" size="large" @click="handleShare">
-          <span class="text">分享</span>
-        </el-button>
+
+          <div class="content" v-html="article.articleContent"></div>
+        </article>
+
+        <!-- 评论区 -->
+        <Comment v-if="article" :article-id="article.id" />
       </div>
-      
-      <!-- 评论区 -->
-      <Comment v-if="article" :article-id="article.id" />
+    </div>
+
+    <!-- ── 固定操作栏（右侧） ─────────────────────────── -->
+    <div class="article-actions" v-if="article">
+      <button
+        class="action-btn like-btn"
+        :class="{ liked: article.isLiked }"
+        @click="handleLikeArticle"
+        title="点赞"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+        <span class="count">{{ article.likeCount || 0 }}</span>
+      </button>
+
+      <button class="action-btn" title="收藏">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+        <span class="count">收藏</span>
+      </button>
+
+      <button class="action-btn" @click="handleShare" title="分享">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"></circle>
+          <circle cx="6" cy="12" r="3"></circle>
+          <circle cx="18" cy="19" r="3"></circle>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+        </svg>
+        <span class="count">分享</span>
+      </button>
     </div>
   </div>
 </template>
@@ -99,11 +125,11 @@ const fetchArticleDetail = async () => {
     ElMessage.error('文章ID不存在')
     return
   }
-  
+
   loading.value = true
   try {
     const res: any = await getArticleDetail({ id: id })
-    
+
     if (res) {
       article.value = res
       // 增加查看次数（博主不增加）
@@ -151,18 +177,18 @@ const handleLikeArticle = async () => {
     })
     return
   }
-  
+
   if (!article.value) return
-  
+
   // 保存当前状态
   const wasLiked = article.value.isLiked
-  
+
   try {
     await likeArticle({
       articleId: article.value.id,
       type: wasLiked ? 2 : 1  // 已点赞则取消(2)，未点赞则点赞(1)
     })
-    
+
     // 切换本地状态
     if (wasLiked) {
       // 取消点赞
@@ -171,7 +197,7 @@ const handleLikeArticle = async () => {
       // 点赞
       article.value.isLiked = true
     }
-    
+
     // 查询最新点赞数量
     await fetchLikeCount(article.value.id as string)
   } catch (error) {
@@ -219,10 +245,87 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.article-detail {
-  min-height: calc(100vh - 200px);
-  padding: 112px 0 80px;
+// ── Banner ─────────────────────────────────────────────
+.page-banner {
   position: relative;
+  height: 200px;
+  background: url('/bg-banner.png') center 30% / cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  .banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 12, 30, 0.62);
+  }
+
+  .banner-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 0 24px;
+    max-width: 860px;
+    width: 100%;
+
+    .banner-title {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+      margin: 0 0 10px 0;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+    }
+
+    .banner-sub {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.65);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      font-family: var(--font-sans);
+
+      .banner-sep {
+        opacity: 0.5;
+      }
+    }
+
+    // 骨架占位
+    .banner-title-skeleton {
+      height: 36px;
+      width: 60%;
+      margin: 0 auto 12px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .banner-sub-skeleton {
+      height: 14px;
+      width: 35%;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      animation: pulse 1.5s ease-in-out infinite 0.3s;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  }
+}
+
+// ── 主内容包装器 ───────────────────────────────────────
+.main-wrap {
+  padding-top: 48px;
+  padding-bottom: 80px;
 }
 
 .container {
@@ -231,83 +334,39 @@ onMounted(() => {
   padding: 0 24px;
 }
 
-// ── 文章卡片（玻璃态对齐 Home.vue）────────────────────
+// ── 文章内容卡片 ───────────────────────────────────────
 .article-content {
-  padding: 56px 64px;
-  margin-bottom: 24px;
   background: var(--bg-card);
-  backdrop-filter: var(--blur-glass);
-  -webkit-backdrop-filter: var(--blur-glass);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  padding: 52px 64px;
+  margin-bottom: 32px;
 
-  .article-title {
-    font-family: var(--font-display, var(--font-serif));
-    font-size: 38px;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    color: var(--text-primary);
-    line-height: 1.25;
-    margin: 0 0 24px 0;
-    text-align: center;
-  }
-
-  .article-info {
+  .article-tags {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 10px 18px;
-    font-size: 13px;
-    color: var(--text-tertiary);
-    padding-bottom: 28px;
-    margin-bottom: 36px;
-    border-bottom: 1px solid var(--border-color);
-    font-family: var(--font-sans);
+    gap: 6px;
+    margin-bottom: 32px;
 
-    .info-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
+    .tag {
+      padding: 3px 12px;
+      border-radius: var(--radius-tag);
+      background: var(--bg-secondary);
+      color: var(--text-tertiary);
+      font-size: 12px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      cursor: pointer;
+      font-family: var(--font-sans);
 
-      &.tags {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        flex-wrap: wrap;
-        justify-content: center;
-
-        // 与 Home.vue tag 一致
-        .tag {
-          padding: 2px 10px;
-          border-radius: var(--radius-tag);
-          background: var(--bg-secondary);
-          color: var(--text-tertiary);
-          font-size: 11px;
-          border: 1px solid transparent;
-          transition: all 0.2s;
-          cursor: pointer;
-
-          &:hover {
-            background: transparent;
-            border-color: var(--color-accent);
-            color: var(--color-accent);
-          }
-        }
+      &:hover {
+        background: transparent;
+        border-color: var(--color-accent);
+        color: var(--color-accent);
       }
-    }
-
-    .info-right {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .info-divider {
-      color: var(--border-strong);
-      margin: 0 2px;
-      opacity: 0.6;
     }
   }
 
@@ -315,10 +374,10 @@ onMounted(() => {
     font-size: 16px;
     line-height: 1.9;
     color: var(--text-secondary);
-    font-family: var(--font-sans);
+    font-family: var(--font-article);
 
     :deep(h1), :deep(h2), :deep(h3), :deep(h4), :deep(h5), :deep(h6) {
-      font-family: var(--font-serif);
+      font-family: var(--font-article);
       font-weight: 700;
       color: var(--text-primary);
     }
@@ -406,7 +465,7 @@ onMounted(() => {
     :deep(a) {
       color: var(--color-accent);
       text-decoration: none;
-      border-bottom: 1px solid rgba(74, 140, 110, 0.2);
+      border-bottom: 1px solid rgba(22, 93, 255, 0.2);
       transition: border-color 0.2s;
 
       &:hover {
@@ -450,10 +509,10 @@ onMounted(() => {
   }
 }
 
-// ── 侧边操作栏（精致文字药丸）────────────────────────
+// ── 固定操作栏（右侧） ────────────────────────────────
 .article-actions {
   position: fixed;
-  right: calc((100vw - 860px) / 2 - 96px);
+  right: calc((100vw - 860px) / 2 - 88px);
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -462,61 +521,60 @@ onMounted(() => {
   z-index: 100;
 
   .action-btn {
-    width: 64px;
-    min-height: auto;
-    height: auto;
-    padding: 14px 8px;
-    border-radius: var(--radius-card);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
     border: 1px solid var(--border-color);
     background: var(--bg-card);
     backdrop-filter: var(--blur-glass);
     -webkit-backdrop-filter: var(--blur-glass);
     box-shadow: var(--shadow-card);
     color: var(--text-secondary);
-    font-family: var(--font-sans);
-    transition: box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease, transform 0.25s ease;
+    cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    position: relative;
+    gap: 2px;
+    transition: all 0.25s ease;
+    padding: 0;
 
-    .text {
-      font-size: 12px;
-      color: var(--text-secondary);
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      transition: color 0.2s ease;
+    svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      transition: color 0.2s;
     }
 
     .count {
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 10px;
+      font-family: var(--font-sans);
+      font-weight: 600;
       color: var(--text-tertiary);
-      letter-spacing: 0.02em;
-      transition: color 0.2s ease;
+      line-height: 1;
+      transition: color 0.2s;
     }
 
     &:hover {
-      border-color: var(--border-strong);
-      box-shadow: var(--shadow-card-hover);
+      border-color: var(--color-accent);
+      box-shadow: var(--shadow-glow);
       transform: translateY(-2px);
+      color: var(--color-accent);
 
-      .text { color: var(--color-accent); }
       .count { color: var(--color-accent); }
     }
 
     &.like-btn.liked {
       border-color: var(--color-accent);
       background: rgba(22, 93, 255, 0.08);
+      color: var(--color-accent);
 
-      .text { color: var(--color-accent); }
       .count { color: var(--color-accent); }
     }
   }
 }
 
+// ── 响应式 ────────────────────────────────────────────
 @media (max-width: 1200px) {
   .article-actions {
     display: none;
@@ -524,11 +582,20 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
-  .article-detail {
-    padding: 24px 0 60px;
+  .page-banner {
+    height: 160px;
+
+    .banner-content .banner-title {
+      font-size: 1.6rem;
+    }
   }
 
-  .article-detail .container {
+  .main-wrap {
+    padding-top: 32px;
+    padding-bottom: 60px;
+  }
+
+  .container {
     padding: 0;
   }
 
@@ -536,36 +603,6 @@ onMounted(() => {
     padding: 32px 22px;
     border-radius: 0;
     margin-bottom: 16px;
-
-    .article-title {
-      font-size: 26px;
-      letter-spacing: -0.02em;
-      margin-bottom: 18px;
-    }
-
-    .article-info {
-      gap: 8px;
-      font-size: 12px;
-      padding-bottom: 18px;
-      margin-bottom: 24px;
-      flex-direction: column;
-      align-items: center;
-
-      .info-item.tags {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .info-right {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 6px;
-      }
-
-      .info-divider {
-        display: none;
-      }
-    }
 
     .content {
       font-size: 15px;
@@ -593,7 +630,7 @@ onMounted(() => {
     }
   }
 
-  // 移动端浮动操作条
+  // 移动端底部浮动操作条
   .article-actions {
     position: fixed;
     right: 14px;
@@ -605,11 +642,11 @@ onMounted(() => {
     display: flex;
 
     .action-btn {
-      width: 56px;
-      padding: 10px 6px;
+      width: 46px;
+      height: 46px;
 
-      .text { font-size: 11px; }
-      .count { font-size: 10px; }
+      svg { width: 16px; height: 16px; }
+      .count { font-size: 9px; }
     }
   }
 }
