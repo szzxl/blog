@@ -123,14 +123,7 @@ export const generateSecureToken = (length = 32): string => {
   let result = ''
   const randomValues = new Uint8Array(length)
   
-  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-    crypto.getRandomValues(randomValues)
-  } else {
-    // 降级方案
-    for (let i = 0; i < length; i++) {
-      randomValues[i] = Math.floor(Math.random() * 256)
-    }
-  }
+  crypto.getRandomValues(randomValues)
   
   for (let i = 0; i < length; i++) {
     const index = randomValues[i]
