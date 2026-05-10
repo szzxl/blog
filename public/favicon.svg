@@ -1,29 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
   <defs>
-    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    <linearGradient id="grad" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#165dff"/>
+      <stop offset="100%" stop-color="#722ed1"/>
     </linearGradient>
-    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.3"/>
-    </filter>
+    <radialGradient id="shine" cx="28%" cy="20%" r="55%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.16)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
   </defs>
-  
-  <!-- 背景 -->
-  <rect width="200" height="200" fill="#f5f6fa"/>
-  
-  <!-- 主体圆形 -->
-  <circle cx="100" cy="100" r="85" fill="url(#gradient)" filter="url(#shadow)"/>
-  
-  <!-- 内部设计 - 现代化的"B"字母 -->
-  <g transform="translate(100, 100)">
-    <!-- 竖线 -->
-    <rect x="-15" y="-35" width="12" height="70" rx="6" fill="white" opacity="0.95"/>
-    
-    <!-- 上半部分圆弧 -->
-    <path d="M -3 -35 Q 25 -35 25 -10 Q 25 10 -3 10" fill="none" stroke="white" stroke-width="12" stroke-linecap="round" opacity="0.95"/>
-    
-    <!-- 下半部分圆弧 -->
-    <path d="M -3 10 Q 28 10 28 30 Q 28 35 -3 35" fill="none" stroke="white" stroke-width="12" stroke-linecap="round" opacity="0.95"/>
-  </g>
+
+  <!-- 渐变背景 -->
+  <rect width="200" height="200" rx="44" fill="url(#grad)"/>
+  <rect width="200" height="200" rx="44" fill="url(#shine)"/>
+
+  <!--
+    T 字母：
+    横杠 x=30~170, y=44~70（高 26px）
+    竖杠 x=87~113, y=70~158（宽 26px）
+    外角圆滑，内侧直角，整体居中
+  -->
+  <path d="
+    M 40,44
+    L 160,44 Q 170,44 170,54
+    L 170,70
+    L 113,70
+    L 113,148 Q 113,158 103,158
+    L  97,158 Q  87,158  87,148
+    L  87,70
+    L  30,70
+    L  30,54 Q  30,44  40,44
+    Z
+  " fill="white" opacity="0.97"/>
 </svg>

@@ -3,7 +3,7 @@
     <div class="container">
       <!-- Logo -->
       <router-link to="/" class="logo">
-        <img v-if="siteLogo" :src="siteLogo" class="logo-img" alt="logo" />
+        <img :src="siteLogo" class="logo-img" alt="logo" />
         <span class="logo-name">{{ siteName || '博客' }}</span>
       </router-link>
 
@@ -24,6 +24,11 @@
 
       <!-- 右侧操作区 -->
       <div class="header-actions">
+        <button class="icon-btn" @click="openSearch" title="搜索 Ctrl+K">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.5-4.5"/>
+          </svg>
+        </button>
         <button class="icon-btn" @click="toggleTheme" :title="themeTooltip">
           <el-icon :size="17"><component :is="themeIconComp" /></el-icon>
         </button>
@@ -190,13 +195,14 @@ const navItems = [
 ]
 
 const siteName = ref('')
-const siteLogo = ref('')
+const siteLogo = ref('/logo.svg')
 const showMobileMenu = ref(false)
 const isScrolled = ref(false)
 
 const themeIconComp = computed(() => themeStore.appliedTheme === 'dark' ? Sunny : Moon)
 const themeTooltip = computed(() => themeStore.appliedTheme === 'dark' ? '切换到浅色模式' : '切换到深色模式')
 const toggleTheme = () => themeStore.toggleTheme()
+const openSearch = () => window.dispatchEvent(new CustomEvent('open-search'))
 
 const fetchWebsiteConfig = async () => {
   try {

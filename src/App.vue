@@ -11,25 +11,18 @@
       </div>
 
       <Header />
+      <SearchOverlay />
 
-      <!-- 回到顶部火箭 -->
-      <div class="rocket-wrap" :class="{ show: showBackToTop }" @click="scrollToTop" title="回到顶部">
-        <div class="rocket">
-          <div class="rocket-nose"></div>
-          <div class="rocket-body">
-            <div class="rocket-window"></div>
-          </div>
-          <div class="rocket-fins">
-            <div class="fin fin-left"></div>
-            <div class="fin fin-right"></div>
-          </div>
-          <div class="rocket-nozzle"></div>
-          <div class="rocket-flame">
-            <div class="flame flame-1"></div>
-            <div class="flame flame-2"></div>
-            <div class="flame flame-3"></div>
-          </div>
-        </div>
+      <!-- 回到顶部 -->
+      <div class="back-top-btn" :class="{ show: showBackToTop }" @click="scrollToTop" title="回到顶部">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C9.5 6 8 10.5 8 14a4 4 0 008 0c0-3.5-1.5-8-4-12z" fill="white"/>
+          <path d="M9 16.5L6.5 21 10 20M15 16.5L17.5 21 14 20" fill="rgba(255,255,255,0.75)"/>
+          <circle cx="12" cy="12" r="2" fill="rgba(22,93,255,0.55)"/>
+          <circle cx="12" cy="20.5" r="1.2" fill="rgba(255,255,255,0.85)"/>
+          <circle cx="10.5" cy="21.5" r="0.8" fill="rgba(255,255,255,0.6)"/>
+          <circle cx="13.5" cy="21.5" r="0.8" fill="rgba(255,255,255,0.6)"/>
+        </svg>
       </div>
 
       <main class="main-content" :class="{ 'no-padding': isHome }">
@@ -71,6 +64,7 @@ import { useRoute } from 'vue-router'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'
+import SearchOverlay from './components/SearchOverlay.vue'
 import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
 
 const route = useRoute()
@@ -124,16 +118,16 @@ onUnmounted(() => {
   }
 }
 
-/* ── 火箭回到顶部 ── */
-.rocket-wrap {
+/* ── 回到顶部 ── */
+.back-top-btn {
   position: fixed;
   bottom: 36px;
   right: 36px;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%, #3a2fff, #1a0a8a);
-  box-shadow: 0 0 18px rgba(80, 60, 255, 0.55);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #165dff 0%, #722ed1 100%);
+  box-shadow: 0 4px 16px rgba(22, 93, 255, 0.32);
   cursor: pointer;
   z-index: 997;
   display: flex;
@@ -141,8 +135,14 @@ onUnmounted(() => {
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(20px);
-  transition: opacity 0.35s, visibility 0.35s, transform 0.35s, box-shadow 0.35s;
+  transform: translateY(16px);
+  transition: opacity 0.3s, visibility 0.3s, transform 0.3s, box-shadow 0.3s;
+
+  svg {
+    width: 22px;
+    height: 22px;
+    transition: transform 0.3s ease;
+  }
 
   &.show {
     opacity: 1;
@@ -151,143 +151,25 @@ onUnmounted(() => {
   }
 
   &:hover {
-    box-shadow: 0 0 28px rgba(100, 80, 255, 0.8);
-    transform: translateY(-8px);
+    box-shadow: 0 8px 28px rgba(22, 93, 255, 0.48);
+    transform: translateY(-5px);
 
-    .rocket {
-      animation: rocket-fly 0.6s ease-in-out infinite alternate;
-    }
-
-    .flame-1 { animation-duration: 0.3s; }
-    .flame-2 { animation-duration: 0.4s; }
-    .flame-3 { animation-duration: 0.25s; }
+    svg { animation: rocket-boost 0.55s ease-in-out infinite alternate; }
   }
 }
 
-.rocket {
-  position: relative;
-  width: 22px;
-  height: 44px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 4px;
-}
-
-/* 鼻锥 */
-.rocket-nose {
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-bottom: 14px solid #ff6b35;
-  filter: drop-shadow(0 0 3px rgba(255,107,53,0.6));
-}
-
-/* 机身 */
-.rocket-body {
-  width: 16px;
-  height: 16px;
-  background: linear-gradient(135deg, #ff9a56 0%, #ff6b35 50%, #e8401a 100%);
-  border-radius: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* 舷窗 */
-.rocket-window {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #aee8ff, #3fc4ff);
-  box-shadow: 0 0 4px rgba(63,196,255,0.8);
-}
-
-/* 翼 */
-.rocket-fins {
-  position: relative;
-  width: 16px;
-  height: 8px;
-}
-
-.fin {
-  position: absolute;
-  top: 0;
-  width: 0;
-  height: 0;
-  border-top: 8px solid #e8401a;
-}
-.fin-left {
-  left: -7px;
-  border-right: 7px solid #e8401a;
-  border-left: 4px solid transparent;
-}
-.fin-right {
-  right: -7px;
-  border-left: 7px solid #e8401a;
-  border-right: 4px solid transparent;
-}
-
-/* 喷嘴 */
-.rocket-nozzle {
-  width: 10px;
-  height: 5px;
-  background: linear-gradient(to bottom, #aaa, #666);
-  border-radius: 0 0 4px 4px;
-}
-
-/* 火焰 */
-.rocket-flame {
-  position: absolute;
-  bottom: -16px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 2px;
-  align-items: flex-start;
-}
-
-.flame {
-  border-radius: 50% 50% 30% 30%;
-  animation: flicker 0.5s ease-in-out infinite alternate;
-}
-
-.flame-1 {
-  width: 6px; height: 14px;
-  background: linear-gradient(to top, #fff5a0, #ffb300, #ff4d00);
-  animation-duration: 0.35s;
-}
-.flame-2 {
-  width: 8px; height: 18px;
-  background: linear-gradient(to top, #fff, #ffe066, #ff6a00, #e8001a);
-  margin-top: -4px;
-  animation-duration: 0.45s;
-  animation-delay: 0.1s;
-}
-.flame-3 {
-  width: 6px; height: 14px;
-  background: linear-gradient(to top, #fff5a0, #ffb300, #ff4d00);
-  animation-duration: 0.3s;
-  animation-delay: 0.05s;
-}
-
-@keyframes flicker {
-  0%   { transform: scaleX(1)   scaleY(1);    opacity: 1; }
-  100% { transform: scaleX(0.8) scaleY(1.12); opacity: 0.85; }
-}
-
-@keyframes rocket-fly {
+@keyframes rocket-boost {
   from { transform: translateY(0); }
-  to   { transform: translateY(-4px); }
+  to   { transform: translateY(-3px); }
 }
 
 @media (max-width: 768px) {
-  .rocket-wrap {
+  .back-top-btn {
     bottom: 20px;
     right: 20px;
-    width: 46px;
-    height: 46px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
   }
 }
 

@@ -57,48 +57,22 @@ export const logout = () => {
 }
 
 // 文章相关
-export const getArticleList = async (data: { 
+export const getArticleList = (data: {
   articleName?: string
   articleCategory?: string
   articleTag?: string
   pageNo?: number
   pageSize?: number
-}) => {
-  // 不使用缓存，每次都获取最新数据
-  const result = await request({
-    url: '/web/article/list',
-    method: 'post',
-    data
-  })
-  
-  return result
-}
+}) => request({ url: '/web/article/list', method: 'post', data })
 
 // 获取月度文章列表（首页使用）
-export const getMonthArticleList = async (data: {
+export const getMonthArticleList = (data: {
   pageNo: number
   pageSize: number
-}) => {
-  // 不使用缓存，每次都获取最新数据
-  const result = await request({
-    url: '/web/month/article',
-    method: 'post',
-    data
-  })
-  
-  return result
-}
+}) => request({ url: '/web/month/article', method: 'post', data })
 
-export const getArticleDetail = async (data: { id: string | number }) => {
-  // 不使用缓存，每次都获取最新数据
-  const result = await request({
-    url: '/web/article/detail',
-    method: 'post',
-    data
-  })
-  
-  return result
-}
+export const getArticleDetail = (data: { id: string | number }) =>
+  request({ url: '/web/article/detail', method: 'post', data })
 
 // 增加文章查看次数
 export const addArticleView = (data: { id: string | number }) => {
@@ -398,13 +372,6 @@ export const removeFavorite = (data: {
   })
 }
 
-// 轮播图
-export const getCarousel = () => {
-  return request({
-    url: '/config/carouse',
-    method: 'get'
-  })
-}
 
 // 网站配置
 export const getWebsiteConfig = () => {

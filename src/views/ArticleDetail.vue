@@ -1,5 +1,8 @@
 <template>
   <div class="article-detail">
+    <!-- 阅读进度条 -->
+    <div class="read-progress-bar" :style="{ height: readProgress + '%' }"></div>
+
     <!-- ── Banner ─────────────────────────────────────── -->
     <div class="page-banner">
       <div class="banner-overlay"></div>
@@ -83,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Comment from '@/components/Comment.vue'
 import Skeleton from '@/components/Skeleton.vue'
@@ -114,6 +117,12 @@ interface Article {
 
 const article = ref<Article | null>(null)
 const loading = ref(false)
+const readProgress = ref(0)
+
+const updateProgress = () => {
+  const scrollable = document.documentElement.scrollHeight - window.innerHeight
+  readProgress.value = scrollable > 0 ? Math.min(100, Math.round((window.scrollY / scrollable) * 100)) : 0
+}
 
 // 获取文章详情
 const fetchArticleDetail = async () => {
@@ -225,10 +234,28 @@ const goToTag = (tag: string) => {
 
 onMounted(() => {
   fetchArticleDetail()
+  window.addEventListener('scroll', updateProgress, { passive: true })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', updateProgress)
 })
 </script>
 
 <style scoped lang="scss">
+// ── 阅读进度条 ─────────────────────────────────────────
+.read-progress-bar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, #165dff 0%, #722ed1 60%, #f53f3f 100%);
+  z-index: 1000;
+  transition: height 0.08s linear;
+  border-radius: 0 0 2px 2px;
+  pointer-events: none;
+}
+
 // ── Banner ─────────────────────────────────────────────
 .page-banner {
   position: relative;
