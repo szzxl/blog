@@ -208,11 +208,7 @@ const fetchWebsiteConfig = async () => {
   }
 }
 
-const isAuthor = computed(() => {
-  if (!userStore.isLoggedIn || !userStore.user) return false
-  const roles = userStore.user.roles || []
-  return roles.some((role: any) => role.name === '博主' || role.name === '超级管理员')
-})
+const isAuthor = computed(() => userStore.isAuthor)
 
 const showProfileDialog = ref(false)
 const avatarInput = ref<HTMLInputElement>()

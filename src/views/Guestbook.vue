@@ -151,7 +151,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus, Delete, ZoomIn, Upload } from '@element-plus/icons-vue'
 import { uploadImage, submitGuestbookMessage } from '@/api/article'
@@ -187,13 +187,6 @@ watch(() => userStore.user, (user) => {
     messageForm.value.name = user.nickname || user.username
   }
 }, { immediate: true })
-
-// 初始化时填充用户信息
-onMounted(() => {
-  if (userStore.user) {
-    messageForm.value.name = userStore.user.nickname || userStore.user.username
-  }
-})
 
 // 触发文件选择
 const triggerUpload = () => {

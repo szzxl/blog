@@ -4,6 +4,16 @@ export const formatDate = (date: string | Date, format = 'YYYY-MM-DD HH:mm:ss') 
   return dayjs(date).format(format)
 }
 
+export const formatTimestamp = (timestamp?: number, format = 'YYYY-MM-DD'): string => {
+  if (!timestamp) return ''
+  return dayjs(timestamp).format(format)
+}
+
+export const parseTags = (tagStr?: string): string[] => {
+  if (!tagStr) return []
+  return tagStr.split(',').map(t => t.trim()).filter(Boolean)
+}
+
 export const formatRelativeTime = (date: string | Date) => {
   const now = dayjs()
   const target = dayjs(date)

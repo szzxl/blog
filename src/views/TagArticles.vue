@@ -36,7 +36,7 @@
           <div class="card-body">
             <h3 class="card-title">{{ article.articleName }}</h3>
             <div class="card-meta">
-              <span class="meta-item">{{ formatTime(article.createTime) }}</span>
+              <span class="meta-item">{{ formatTimestamp(article.createTime) }}</span>
               <span class="meta-sep">·</span>
               <span class="meta-item">{{ article.readNum || 0 }} 阅读</span>
               <span class="meta-sep">·</span>
@@ -72,6 +72,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getArticleList } from '@/api/article'
+import { formatTimestamp } from '@/utils/format'
 import { ElMessage } from 'element-plus'
 
 const route = useRoute()
@@ -144,14 +145,6 @@ const handlePageChange = (page: number) => {
 }
 
 // 格式化时间
-const formatTime = (timestamp?: number) => {
-  if (!timestamp) return ''
-  const date = new Date(timestamp)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
 
 onMounted(() => {
   tagName.value = route.query.tag as string || ''

@@ -88,6 +88,7 @@ import { useRoute, useRouter } from 'vue-router'
 import Comment from '@/components/Comment.vue'
 import Skeleton from '@/components/Skeleton.vue'
 import { getArticleDetail, addArticleView, likeArticle, getArticleLikeCount } from '@/api/article'
+import { formatTimestamp, parseTags } from '@/utils/format'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 
@@ -96,11 +97,7 @@ const router = useRouter()
 const userStore = useUserStore()
 
 // 是否是博主
-const isAuthor = computed(() => {
-  if (!userStore.isLoggedIn || !userStore.user) return false
-  const roles = userStore.user.roles || []
-  return roles.some((role: any) => role.name === '博主' || role.name === '超级管理员')
-})
+const isAuthor = computed(() => userStore.isAuthor)
 
 interface Article {
   id: string | number
@@ -217,22 +214,9 @@ const handleShare = async () => {
 }
 
 // 格式化时间
-const formatTime = (timestamp?: number) => {
-  if (!timestamp) return ''
-  const date = new Date(timestamp)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const hour = String(date.getHours()).padStart(2, '0')
-  const minute = String(date.getMinutes()).padStart(2, '0')
-  return `${year}-${month}-${day} ${hour}:${minute}`
-}
+const formatTime = (timestamp?: number) => formatTimestamp(timestamp, 'YYYY-MM-DD HH:mm')
 
 // 解析标签字符串为数组
-const parseTags = (tagStr?: string) => {
-  if (!tagStr) return []
-  return tagStr.split(',').map(t => t.trim()).filter(t => t)
-}
 
 // 跳转到标签文章列表
 const goToTag = (tag: string) => {

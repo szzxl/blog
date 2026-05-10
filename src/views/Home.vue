@@ -68,7 +68,7 @@
                   <h3 class="card-title">{{ article.articleName }}</h3>
                 </div>
                 <div class="card-footer">
-                  <span class="card-date">{{ formatTime(article.createTime) }}</span>
+                  <span class="card-date">{{ formatTimestamp(article.createTime) }}</span>
                   <div class="card-meta-right">
                     <span class="card-reads" v-if="article.readNum"><el-icon style="vertical-align:-1px"><View /></el-icon> {{ article.readNum }}</span>
                     <div class="card-tags" v-if="article.articleTag">
@@ -147,7 +147,7 @@
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { getMonthArticleList, getCategoryList, getTagList } from '@/api/article'
-import { formatDate } from '@/utils/format'
+import { formatTimestamp, parseTags } from '@/utils/format'
 import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
 import { Document, View } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -292,6 +292,7 @@ const tagEls = ref<HTMLElement[]>([])
 let sphereTimer = 0
 let angleX = 0.008
 let angleY = 0.012
+let lastFrameTime = 0
 let items: { el: HTMLElement; x: number; y: number; z: number }[] = []
 
 const setTagRef = (el: any, i: number) => {
@@ -312,12 +313,19 @@ const initSphere = () => {
     }
   })
   renderSphere()
-  sphereTimer = window.setInterval(rotateSphere, 30)
+  sphereTimer = requestAnimationFrame(tick)
 }
 
-const rotateSphere = () => {
-  const cosX = Math.cos(angleX), sinX = Math.sin(angleX)
-  const cosY = Math.cos(angleY), sinY = Math.sin(angleY)
+const tick = (now: number) => {
+  const delta = lastFrameTime ? now - lastFrameTime : 30
+  lastFrameTime = now
+  rotateSphere(delta / 30)
+  sphereTimer = requestAnimationFrame(tick)
+}
+
+const rotateSphere = (scale = 1) => {
+  const cosX = Math.cos(angleX * scale), sinX = Math.sin(angleX * scale)
+  const cosY = Math.cos(angleY * scale), sinY = Math.sin(angleY * scale)
   items.forEach(item => {
     const x1 = item.x * cosY - item.z * sinY
     const z1 = item.x * sinY + item.z * cosY
@@ -355,8 +363,6 @@ const getTagStyle = (i: number) => {
   return { background: bg, color, borderColor: (color ?? '#165dff') + '55' }
 }
 
-const formatTime = (ts?: number) => ts ? formatDate(new Date(ts), 'YYYY-MM-DD') : ''
-const parseTags = (s?: string) => s ? s.split(',').map(t => t.trim()).filter(Boolean) : []
 const viewArticle = (id: number) => router.push(`/article/${id}`)
 
 onMounted(() => {
@@ -365,7 +371,7 @@ onMounted(() => {
 })
 onUnmounted(() => {
   clearTimeout(typeTimer)
-  clearInterval(sphereTimer)
+  cancelAnimationFrame(sphereTimer)
 })
 </script>
 
@@ -698,7 +704,7 @@ onUnmounted(() => {
     margin-top: auto;
   }
 
-  .card-date { font-size: 11px; color: var(--text-tertiary); }
+  .card-date { font-size: 12px; color: var(--text-tertiary); }
 
   .card-meta-right {
     display: flex;
@@ -707,7 +713,7 @@ onUnmounted(() => {
   }
 
   .card-reads {
-    font-size: 10px;
+    font-size: 12px;
     color: var(--text-tertiary);
   }
 
@@ -715,8 +721,8 @@ onUnmounted(() => {
 
   .tag {
     padding: 1px 7px; border-radius: 6px;
-    background: var(--bg-secondary); color: var(--text-tertiary);
-    font-size: 10px; border: 1px solid var(--border-color);
+    background: var(--bg-secondary); color: var(--text-secondary);
+    font-size: 11px; border: 1px solid var(--border-color);
     transition: all 0.2s;
     &:hover { border-color: var(--color-accent); color: var(--color-accent); }
   }

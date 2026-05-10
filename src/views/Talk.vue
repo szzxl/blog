@@ -301,17 +301,14 @@ import { getTalkList, getTalkDetail, publishTalk, uploadImage, deleteTalk, delet
 import { Plus, Delete, ZoomIn, Upload } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
+import { formatTimestamp } from '@/utils/format'
 import EmojiPicker from '@/components/EmojiPicker.vue'
 
 const userStore = useUserStore()
 const router = useRouter()
 
 // 是否是博主（检查 roles 数组中是否有 name 为 "博主" 或 "超级管理员" 的角色）
-const isAuthor = computed(() => {
-  if (!userStore.isLoggedIn || !userStore.user) return false
-  const roles = userStore.user.roles || []
-  return roles.some((role: any) => role.name === '博主' || role.name === '超级管理员')
-})
+const isAuthor = computed(() => userStore.isAuthor)
 
 // 发表说说相关
 const showPublishDialog = ref(false)
@@ -777,7 +774,7 @@ const loadTalkList = async () => {
         const result = {
           ...talk,  // 保留所有原始字段
           talkPic: images,
-          createTime: talk.createTime ? formatTimestamp(talk.createTime) : '',
+          createTime: talk.createTime ? formatTimestamp(talk.createTime, 'YYYY-MM-DD HH:mm:ss') : '',
           user: talk.user || {
             id: 0,
             nickname: '匿名用户',
@@ -838,8 +835,6 @@ const toggleCommentReplies = async (talk: any, comment: any) => {
   // 如果已经展开，则收起
   if (comment.repliesExpanded) {
     comment.repliesExpanded = false
-    // 强制更新
-    talks.value = [...talks.value]
     return
   }
 
@@ -877,8 +872,6 @@ const toggleCommentReplies = async (talk: any, comment: any) => {
 
   // 展开
   comment.repliesExpanded = true
-  // 强制更新
-  talks.value = [...talks.value]
 }
 
 // 扁平化评论树
@@ -919,16 +912,6 @@ const flattenCommentsWithLevel = (comments: any[], level: number = 1): any[] => 
 }
 
 // 格式化时间戳
-const formatTimestamp = (timestamp: number) => {
-  const date = new Date(timestamp)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  const seconds = String(date.getSeconds()).padStart(2, '0')
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
-}
 
 // 格式化评论时间
 const formatCommentTime = (timestamp: number) => {
@@ -944,7 +927,7 @@ const formatCommentTime = (timestamp: number) => {
   }
 
   // 否则显示完整日期时间
-  return formatTimestamp(timestamp)
+  return formatTimestamp(timestamp, 'YYYY-MM-DD HH:mm:ss')
 }
 
 // 插入表情到说说文本框
