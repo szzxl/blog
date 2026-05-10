@@ -213,12 +213,7 @@ const insertEmoji = (emoji: string) => {
   }, 0)
 }
 
-// 是否是博主
-const isAuthor = computed(() => {
-  if (!userStore.isLoggedIn || !userStore.user) return false
-  const roles = userStore.user.roles || []
-  return roles.some((role: any) => role.name === '博主' || role.name === '超级管理员')
-})
+const isAuthor = computed(() => userStore.isAuthor)
 
 // 判断是否可以删除评论
 const canDelete = (comment: any) => {

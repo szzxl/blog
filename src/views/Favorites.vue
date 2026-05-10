@@ -22,7 +22,7 @@
             <h3 class="article-title">{{ article.articleName }}</h3>
             <p class="article-desc" v-if="article.articleDesc">{{ article.articleDesc }}</p>
             <div class="article-meta">
-              <span class="meta-item">{{ formatTime(article.createTime) }}</span>
+              <span class="meta-item">{{ formatTimestamp(article.createTime) }}</span>
               <span class="meta-item">{{ article.readNum || 0 }} 阅读</span>
               <span class="meta-item">{{ article.likeCount || 0 }} 点赞</span>
             </div>
@@ -65,6 +65,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getUserFavorites, removeFavorite } from '@/api/article'
+import { formatTimestamp } from '@/utils/format'
 import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
@@ -151,14 +152,6 @@ const handlePageChange = (page: number) => {
 }
 
 // 格式化时间
-const formatTime = (timestamp?: number) => {
-  if (!timestamp) return ''
-  const date = new Date(timestamp)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
 
 onMounted(() => {
   loadFavorites()

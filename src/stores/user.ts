@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { login as loginApi, getUserInfo as getUserInfoApi, logout as logoutApi } from '@/api/article'
 import { ElMessage } from 'element-plus'
@@ -105,6 +105,12 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  const isAuthor = computed(() => {
+    if (!isLoggedIn.value || !user.value) return false
+    const roles = user.value.roles || []
+    return roles.some(role => role.name === '博主' || role.name === '超级管理员')
+  })
+
   // 手动设置用户信息（用于测试）
   const setUser = (userData: User) => {
     user.value = userData
@@ -116,6 +122,7 @@ export const useUserStore = defineStore('user', () => {
     user,
     isLoggedIn,
     token,
+    isAuthor,
     login,
     logout,
     fetchUserInfo,

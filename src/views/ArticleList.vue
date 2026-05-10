@@ -66,7 +66,7 @@
             </div>
             <div class="article-footer">
               <div class="meta-info">
-                <span class="meta-item">{{ formatTime(article.createTime) }}</span>
+                <span class="meta-item">{{ formatTimestamp(article.createTime) }}</span>
                 <span class="meta-item" v-if="article.articleCategory">{{ article.articleCategory }}</span>
                 <span class="meta-item">{{ article.readNum || 0 }} 阅读</span>
                 <span class="meta-item">{{ article.likeCount || 0 }} 喜欢</span>
@@ -98,9 +98,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onActivated, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getArticleList } from '@/api/article'
+import { formatTimestamp, parseTags } from '@/utils/format'
 import { ElMessage } from 'element-plus'
 import Skeleton from '@/components/Skeleton.vue'
 
@@ -165,21 +166,8 @@ const fetchArticles = async () => {
 }
 
 // 格式化时间
-const formatTime = (timestamp?: number) => {
-  if (!timestamp) return ''
-  const date = new Date(timestamp)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
 
 // 解析标签字符串为数组
-const parseTags = (tagStr?: string) => {
-  if (!tagStr) return []
-  return tagStr.split(',').map(t => t.trim()).filter(t => t)
-}
-
 // 搜索
 const handleSearch = () => {
   pageNo.value = 1
@@ -204,18 +192,6 @@ const viewArticle = (id: number) => {
 
 onMounted(() => {
   fetchArticles()
-})
-
-// 页面激活时重新加载数据（从详情页返回时）
-onActivated(() => {
-  fetchArticles()
-})
-
-// 监听路由变化，当返回到此页面时重新加载数据
-watch(() => route.path, (newPath) => {
-  if (newPath === '/articles') {
-    fetchArticles()
-  }
 })
 </script>
 
