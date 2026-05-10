@@ -49,10 +49,12 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           // 分包策略
-          manualChunks: {
-            'vue-vendor': ['vue', 'vue-router', 'pinia'],
-            'element-plus': ['element-plus', '@element-plus/icons-vue'],
-            'utils': ['axios', 'dayjs', '@vueuse/core']
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (['vue', 'vue-router', 'pinia'].some(p => id.includes(`/node_modules/${p}/`))) return 'vue-vendor'
+              if (['element-plus', '@element-plus'].some(p => id.includes(`/node_modules/${p}/`))) return 'element-plus'
+              if (['axios', 'dayjs', '@vueuse'].some(p => id.includes(`/node_modules/${p}/`))) return 'utils'
+            }
           },
           // 文件名优化
           chunkFileNames: 'js/[name]-[hash].js',

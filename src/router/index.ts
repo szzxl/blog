@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
+import { parseToken } from '@/utils/token'
 import Home from '@/views/Home.vue'
 
 // 根据环境变量动态设置 base 路径
@@ -106,21 +107,10 @@ router.beforeEach(async (to, _from, next) => {
   const tokenStr = localStorage.getItem('ACCESS_TOKEN')
   if (tokenStr && !userStore.user) {
     try {
-      // 解析 token
-      let token = ''
-      try {
-        const tokenObj = JSON.parse(tokenStr)
-        token = tokenObj.v ? JSON.parse(tokenObj.v) : tokenStr
-      } catch {
-        token = tokenStr
-      }
-      
-      // 设置 token 并获取用户信息
-      userStore.token = token
+      userStore.token = parseToken(tokenStr)
       await userStore.fetchUserInfo()
       userStore.isLoggedIn = true
     } catch (error) {
-      // token 无效，清除
       localStorage.removeItem('ACCESS_TOKEN')
       localStorage.removeItem('user')
     }

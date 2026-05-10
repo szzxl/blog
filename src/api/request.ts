@@ -33,20 +33,12 @@ const NO_LOADING_APIS = [
   '/web/article/like'
 ]
 
-// 检查是否是公开接口
-const isPublicApi = (url: string): boolean => {
-  return PUBLIC_APIS.some(api => url.includes(api))
-}
+const matchesApi = (url: string, api: string): boolean =>
+  url === api || url.startsWith(api + '/') || url.startsWith(api + '?')
 
-// 检查是否是静默接口
-const isSilentApi = (url: string): boolean => {
-  return SILENT_APIS.some(api => url.includes(api))
-}
-
-// 检查是否需要显示 Loading
-const needLoading = (url: string): boolean => {
-  return !NO_LOADING_APIS.some(api => url.includes(api))
-}
+const isPublicApi = (url: string): boolean => PUBLIC_APIS.some(api => matchesApi(url, api))
+const isSilentApi = (url: string): boolean => SILENT_APIS.some(api => matchesApi(url, api))
+const needLoading = (url: string): boolean => !NO_LOADING_APIS.some(api => matchesApi(url, api))
 
 // 创建 axios 实例
 const service: AxiosInstance = axios.create({
