@@ -101,8 +101,7 @@ const handleLogin = async () => {
         if (success) {
           // 获取登录前的页面路径
           const redirect = router.currentRoute.value.query.redirect as string
-          // 如果有重定向路径，跳转到该路径，否则跳转到首页
-          router.push(redirect || '/')
+          router.push(redirect?.startsWith('/') ? redirect : '/')
         }
       } catch (error) {
         // 登录失败

@@ -14,8 +14,8 @@
           <div class="tags-section">
             <div class="intro-tags">
               <span 
-                v-for="(tag, index) in tags" 
-                :key="index" 
+                v-for="(tag, index) in tags"
+                :key="tag"
                 class="tag"
               >
                 {{ tag }}

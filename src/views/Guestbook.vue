@@ -60,7 +60,7 @@
                   <div
                     class="image-item"
                     v-for="(image, index) in imageList"
-                    :key="index"
+                    :key="image.url"
                   >
                     <img :src="image.url" alt="预览图">
                     <div class="image-overlay">
