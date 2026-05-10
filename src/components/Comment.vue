@@ -31,8 +31,8 @@
           <div class="image-list" v-if="commentImages.length > 0">
             <div 
               class="image-item" 
-              v-for="(image, index) in commentImages" 
-              :key="index"
+              v-for="(image, index) in commentImages"
+              :key="image"
             >
               <img :src="image" alt="预览图">
               <div class="image-overlay">
@@ -349,7 +349,7 @@ const submitComment = async () => {
       articleId: props.articleId,
       content: commentText.value,
       images: commentImages.value,
-      likeCount: 1,
+      likeCount: 0,
       userId: Number(userStore.user!.id)
     })
     

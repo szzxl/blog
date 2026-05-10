@@ -230,7 +230,7 @@
           <div class="upload-section">
             <div class="upload-title">上传图片（最多9张）</div>
             <div class="image-list" v-if="talkImageList.length > 0">
-              <div class="image-item" v-for="(image, index) in talkImageList" :key="index">
+              <div class="image-item" v-for="(image, index) in talkImageList" :key="image.url">
                 <img :src="image.url" alt="预览图">
                 <div class="image-overlay">
                   <el-icon class="preview-icon" @click="previewTalkImage(image.url)"><ZoomIn /></el-icon>
@@ -704,7 +704,7 @@ const handleLike = async (talk: any) => {
 
     // 更新本地状态
     talk.isLiked = !talk.isLiked
-    talk.likeCount = talk.isLiked ? (talk.likeCount || 0) + 1 : (talk.likeCount || 0) - 1
+    talk.likeCount = talk.isLiked ? (talk.likeCount || 0) + 1 : Math.max(0, (talk.likeCount || 0) - 1)
 
     ElMessage.success(talk.isLiked ? '点赞成功 ❤️' : '取消点赞')
   } catch (error) {

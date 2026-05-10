@@ -33,8 +33,8 @@
           <div class="article-tags" v-if="article.articleTag">
             <span
               class="tag"
-              v-for="(tag, index) in parseTags(article.articleTag)"
-              :key="index"
+              v-for="tag in parseTags(article.articleTag)"
+              :key="tag"
               @click="goToTag(tag)"
             >{{ tag }}</span>
           </div>

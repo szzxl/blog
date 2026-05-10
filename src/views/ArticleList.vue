@@ -60,7 +60,7 @@
           <div class="card-right">
             <h2 class="article-title">{{ article.articleName }}</h2>
             <div class="article-tags" v-if="article.articleTag">
-              <span class="tag" v-for="(tag, index) in parseTags(article.articleTag)" :key="index">
+              <span class="tag" v-for="tag in parseTags(article.articleTag)" :key="tag">
                 {{ tag }}
               </span>
             </div>
