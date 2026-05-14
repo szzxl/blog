@@ -26,16 +26,10 @@ export const useUserStore = defineStore('user', () => {
     
     if (savedUser && savedToken) {
       try {
-        const parsedUser = JSON.parse(savedUser)
-        user.value = parsedUser
+        user.value = JSON.parse(savedUser)
         token.value = savedToken
         isLoggedIn.value = true
-        
-        // 验证 token 是否有效（可选：调用接口验证）
-        // 如果需要验证，可以在这里调用 fetchUserInfo()
-      } catch (error) {
-        console.error('Failed to parse user data:', error)
-        // 清除无效数据
+      } catch {
         localStorage.removeItem('user')
         localStorage.removeItem('ACCESS_TOKEN')
       }

@@ -24,12 +24,12 @@
                 v-model="messageForm.name"
                 placeholder="你的昵称"
                 prefix-icon="User"
-                :disabled="isLoggedIn"
+                :disabled="userStore.isLoggedIn"
                 clearable
                 class="styled-input"
               />
             </el-form-item>
-            <el-form-item v-if="!isLoggedIn">
+            <el-form-item v-if="!userStore.isLoggedIn">
               <el-input
                 v-model="messageForm.email"
                 placeholder="邮箱（选填）"
@@ -51,7 +51,7 @@
             </el-form-item>
 
             <!-- 图片上传 - 仅登录用户可见 -->
-            <el-form-item v-if="isLoggedIn">
+            <el-form-item v-if="userStore.isLoggedIn">
               <div class="upload-section">
                 <div class="upload-title">上传图片（最多9张）</div>
 
@@ -151,7 +151,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus, Delete, ZoomIn, Upload } from '@element-plus/icons-vue'
 import { uploadImage, submitGuestbookMessage } from '@/api/article'
@@ -177,9 +177,6 @@ const fileInput = ref<HTMLInputElement>()
 const submitting = ref(false)
 const showViewer = ref(false)
 const previewImageUrl = ref('')
-
-// 是否已登录
-const isLoggedIn = computed(() => userStore.isLoggedIn)
 
 // 监听登录状态，自动填充昵称
 watch(() => userStore.user, (user) => {
@@ -281,7 +278,6 @@ const uploadImageToServer = async (imageItem: ImageItem) => {
 // 删除图片
 const removeImage = (index: number) => {
   imageList.value.splice(index, 1)
-  ElMessage.success('图片已删除')
 }
 
 // 预览图片
@@ -324,7 +320,7 @@ const submitMessage = async () => {
     }
 
     // 仅登录用户传入 images 字段
-    if (isLoggedIn.value && imageList.value.length > 0) {
+    if (userStore.isLoggedIn.value && imageList.value.length > 0) {
       requestData.images = imageList.value.map(img => img.url)
     }
 
@@ -334,7 +330,7 @@ const submitMessage = async () => {
     ElMessage.success('留言发表成功！')
 
     // 清空表单（已登录用户保留昵称）
-    if (!isLoggedIn.value) {
+    if (!userStore.isLoggedIn.value) {
       messageForm.value.name = ''
     }
     messageForm.value.email = ''

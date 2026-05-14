@@ -47,8 +47,8 @@
           <div class="content" v-html="htmlContent" @click="handleContentClick"></div>
         </article>
 
-        <!-- 上一篇/下一篇 -->
-        <div class="adjacent-nav" v-if="prevArticle || nextArticle">
+        <!-- 上一篇/下一篇 暂时隐藏 -->
+        <!-- <div class="adjacent-nav" v-if="prevArticle || nextArticle">
           <div
             class="adj-card adj-prev"
             v-if="prevArticle"
@@ -65,7 +65,7 @@
             <span class="adj-label">下一篇 →</span>
             <span class="adj-title">{{ nextArticle.articleName }}</span>
           </div>
-        </div>
+        </div> -->
 
         <!-- 评论区 -->
         <Comment v-if="article" :article-id="article.id" />

@@ -285,30 +285,27 @@ loadRecentEmojis()
   .emoji-trigger {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border: 2px solid rgba(255, 154, 158, 0.3);
-    border-radius: 12px;
-    background: linear-gradient(135deg, rgba(255, 154, 158, 0.05) 0%, rgba(254, 207, 239, 0.05) 100%);
+    gap: 4px;
+    padding: 4px 6px;
+    border: none;
+    border-radius: 4px;
+    background: none;
     cursor: pointer;
-    transition: all 0.3s;
-    font-size: 14px;
-    color: #666;
-    font-weight: 600;
-    
+    transition: color 0.2s;
+    font-size: 13px;
+    color: var(--text-tertiary, #999);
+
     .emoji-icon {
-      font-size: 18px;
+      font-size: 17px;
+      line-height: 1;
     }
-    
+
+    .emoji-text {
+      font-weight: 500;
+    }
+
     &:hover {
-      border-color: #ff9a9e;
-      background: linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.1) 100%);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255, 154, 158, 0.2);
-    }
-    
-    &:active {
-      transform: translateY(0);
+      color: #00aeec;
     }
   }
 }

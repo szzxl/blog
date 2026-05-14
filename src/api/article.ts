@@ -207,13 +207,16 @@ export const submitGuestbookMessage = (data: {
 
 
 // 文章评论相关
+export const getCommentReplies = (rootId: number | string) =>
+  request({ url: `/article/comment/reply/${rootId}`, method: 'get' })
+
 export const getArticleComments = (data: {
   articleId: number | string
   pageNo: number
   pageSize: number
 }) => {
   return request({
-    url: '/web/article/comment/list',
+    url: '/article/comment/page',
     method: 'post',
     data
   })
@@ -226,9 +229,11 @@ export const addArticleComment = (data: {
   images?: string[]
   likeCount?: number
   userId: number
+  parentId?: number | string
+  rootId?: number | string
 }) => {
   return request({
-    url: '/web/article/comment/add',
+    url: '/article/add/comment',
     method: 'post',
     data
   })
@@ -239,9 +244,8 @@ export const deleteArticleComment = (data: {
   userId?: number
 }) => {
   return request({
-    url: '/web/article/comment/delete',
-    method: 'delete',
-    data
+    url: `/article/comment/${data.commentId}`,
+    method: 'delete'
   })
 }
 
@@ -337,7 +341,7 @@ export const getBackgroundList = () => {
 export const getAlbumComments = (data: { albumId: number | string; pageNo: number; pageSize: number }) =>
   request({ url: '/web/album/comment/list', method: 'post', data })
 
-export const addAlbumComment = (data: { username: string; albumId: number | string; content: string; images?: string[]; likeCount?: number; userId: number }) =>
+export const addAlbumComment = (data: { username: string; albumId: number | string; content: string; images?: string[]; likeCount?: number; userId: number; parentId?: number | string; rootId?: number | string }) =>
   request({ url: '/web/album/comment/add', method: 'post', data })
 
 export const deleteAlbumComment = (data: { commentId: number; userId?: number }) =>

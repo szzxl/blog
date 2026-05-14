@@ -278,29 +278,22 @@ const fetchLinks = async () => {
 // 提交申请
 const submitApply = async () => {
   if (!formRef.value) return
-
   try {
-    const valid = await formRef.value.validate()
-
-    if (valid) {
-      try {
-        await applyFriendLink({
-          name: applyForm.value.siteName,
-          author: applyForm.value.siteAuthor,
-          url: applyForm.value.siteUrl,
-          description: applyForm.value.siteDescription,
-          email: applyForm.value.email
-        })
-
-        ElMessage.success('友链申请已提交，请耐心等待审核~')
-        showApplyDialog.value = false
-        resetForm()
-      } catch (error: any) {
-        ElMessage.error(error.msg || error.message || '申请失败，请稍后重试')
-      }
+    await formRef.value.validate()
+    await applyFriendLink({
+      name: applyForm.value.siteName,
+      author: applyForm.value.siteAuthor,
+      url: applyForm.value.siteUrl,
+      description: applyForm.value.siteDescription,
+      email: applyForm.value.email
+    })
+    ElMessage.success('友链申请已提交，请耐心等待审核~')
+    showApplyDialog.value = false
+    resetForm()
+  } catch (error: any) {
+    if (error !== false) {
+      ElMessage.error(error?.msg || error?.message || '申请失败，请稍后重试')
     }
-  } catch (error) {
-    // 表单验证失败
   }
 }
 
