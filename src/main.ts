@@ -8,6 +8,8 @@ import ElementPlus from 'element-plus'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import 'element-plus/dist/index.css'
 import './styles/global.scss'
+import { setSiteName } from '@/composables/useSeo'
+import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
 
 const app = createApp(App)
 
@@ -52,4 +54,9 @@ app.mount('#app')
 const themeStore = useThemeStore()
 themeStore.initFromStorage()
 themeStore.setupSystemThemeListener()
+
+// 预加载网站配置并同步 SEO 站点名
+fetchWebsiteConfigWithCache().then(config => {
+  if (config.site_name) setSiteName(config.site_name.replace(/系统$/u, ''))
+})
 

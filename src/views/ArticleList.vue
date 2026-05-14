@@ -98,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getArticleList } from '@/api/article'
 import { formatTimestamp, parseTags } from '@/utils/format'
@@ -129,6 +129,21 @@ const pageNo = ref(1)
 const pageSize = ref(10)
 const loading = ref(false)
 
+// 将当前状态同步到 URL query（不产生历史记录）
+const syncToUrl = () => {
+  const query: Record<string, string> = {}
+  if (pageNo.value > 1) query.page = String(pageNo.value)
+  if (searchKeyword.value) query.keyword = searchKeyword.value
+  if (route.query.category) query.category = route.query.category as string
+  router.replace({ query })
+}
+
+// 从 URL query 恢复状态
+const restoreFromUrl = () => {
+  pageNo.value = Number(route.query.page) || 1
+  searchKeyword.value = (route.query.keyword as string) || ''
+}
+
 // 获取文章列表
 const fetchArticles = async () => {
   loading.value = true
@@ -137,17 +152,8 @@ const fetchArticles = async () => {
       pageNo: pageNo.value,
       pageSize: pageSize.value
     }
-
-    // 添加搜索关键词
-    if (searchKeyword.value) {
-      params.articleName = searchKeyword.value
-    }
-
-    // 添加分类筛选（从URL参数获取）
-    const categoryParam = route.query.category as string
-    if (categoryParam) {
-      params.articleCategory = categoryParam
-    }
+    if (searchKeyword.value) params.articleName = searchKeyword.value
+    if (route.query.category) params.articleCategory = route.query.category
 
     const res: any = await getArticleList(params)
 
@@ -165,32 +171,46 @@ const fetchArticles = async () => {
   }
 }
 
-// 格式化时间
-
-// 解析标签字符串为数组
 // 搜索
 const handleSearch = () => {
   pageNo.value = 1
+  syncToUrl()
   fetchArticles()
 }
 
 // 清除搜索
 const handleClear = () => {
   pageNo.value = 1
+  syncToUrl()
   fetchArticles()
 }
 
 // 分页变化
 const handlePageChange = (page: number) => {
   pageNo.value = page
+  syncToUrl()
   fetchArticles()
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 const viewArticle = (id: number) => {
   router.push(`/article/${id}`)
 }
 
+// 监听浏览器前进/后退，以及外部 category 参数变化
+watch(() => route.query, (newQuery, oldQuery) => {
+  if (
+    newQuery.page !== oldQuery.page ||
+    newQuery.keyword !== oldQuery.keyword ||
+    newQuery.category !== oldQuery.category
+  ) {
+    restoreFromUrl()
+    fetchArticles()
+  }
+})
+
 onMounted(() => {
+  restoreFromUrl()
   fetchArticles()
 })
 </script>

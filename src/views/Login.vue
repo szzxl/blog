@@ -36,7 +36,7 @@
         <el-form-item>
           <div class="form-options">
             <el-checkbox v-model="rememberMe">记住密码</el-checkbox>
-            <el-link type="primary" :underline="false">忘记密码？</el-link>
+            <el-link type="primary" underline="never">忘记密码？</el-link>
           </div>
         </el-form-item>
 
@@ -53,7 +53,7 @@
 
         <el-form-item>
           <div class="register-tip">
-            还没有账号？<el-link type="primary" :underline="false" @click="goToRegister">立即注册</el-link>
+            还没有账号？<el-link type="primary" underline="never" @click="goToRegister">立即注册</el-link>
           </div>
         </el-form-item>
       </el-form>
@@ -80,11 +80,12 @@ const loginForm = ref({
 
 const rules: FormRules = {
   username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' }
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { min: 3, max: 20, message: '用户名长度在 3 到 20 个字符', trigger: 'blur' }
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
+    { min: 6, max: 50, message: '密码长度在 6 到 50 个字符', trigger: 'blur' }
   ]
 }
 

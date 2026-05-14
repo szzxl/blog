@@ -122,13 +122,12 @@ export const getCategoryList = async (data?: {
     data: data || {} 
   })
   
-  // 分类列表缓存15分钟
-  cache.set(cacheKey, result, 15 * 60 * 1000)
+  cache.set(cacheKey, result, 60 * 60 * 1000)
   return result
 }
 
 // 标签相关
-export const getTagList = async (data?: { 
+export const getTagList = async (data?: {
   id?: number
   tagName?: string
   pageNo?: number
@@ -137,15 +136,14 @@ export const getTagList = async (data?: {
   const cacheKey = generateCacheKey('tag_list', data)
   const cached = cache.get(cacheKey)
   if (cached) return cached
-  
-  const result = await request({ 
-    url: '/web/tag/list', 
-    method: 'post', 
-    data: data || {} 
+
+  const result = await request({
+    url: '/web/tag/list',
+    method: 'post',
+    data: data || {}
   })
-  
-  // 标签列表缓存15分钟
-  cache.set(cacheKey, result, 15 * 60 * 1000)
+
+  cache.set(cacheKey, result, 60 * 60 * 1000)
   return result
 }
 
@@ -207,95 +205,6 @@ export const submitGuestbookMessage = (data: {
   })
 }
 
-// 说说相关
-export const getTalkList = (data: {
-  userId?: number | null
-  pageNo: number
-  pageSize: number
-}) => {
-  return request({
-    url: '/web/talk/list',
-    method: 'post',
-    data
-  })
-}
-
-export const getTalkDetail = (data: {
-  userId?: number | null
-  talkId: number
-  pageNo: number
-  pageSize: number
-}) => {
-  return request({
-    url: '/web/talk/detail',
-    method: 'post',
-    data
-  })
-}
-
-// 发表说说
-export const publishTalk = (data: {
-  userId?: number
-  talkContent: string
-  talkPic?: string[]
-  talkStatus?: number
-}) => {
-  return request({
-    url: '/web/talk',
-    method: 'post',
-    data
-  })
-}
-
-// 说说点赞
-export const likeTalk = (data: {
-  talkId: number
-  userId: number
-  type: 1 | 2  // 1=点赞, 2=取消点赞
-}) => {
-  return request({
-    url: '/web/like',
-    method: 'post',
-    data
-  })
-}
-
-// 删除说说
-export const deleteTalk = (talkId: number) => {
-  return request({
-    url: '/web/del/talk',
-    method: 'delete',
-    data: { talkId }
-  })
-}
-
-// 删除评论
-export const deleteComment = (data: {
-  talkCommentId: number
-  userId?: number
-}) => {
-  return request({
-    url: '/web/del/comment',
-    method: 'delete',
-    data
-  })
-}
-
-// 发表评论
-export const addComment = (data: {
-  talkId: number
-  userId: number
-  content: string
-  parentId?: number
-  replyToId?: number
-  replyToUserId?: number
-}) => {
-  return request({
-    url: '/web/add/comment',
-    method: 'post',
-    data
-  })
-}
 
 // 文章评论相关
 export const getArticleComments = (data: {
@@ -412,6 +321,10 @@ export const getNotificationList = () => {
   })
 }
 
+// 上一篇/下一篇
+export const getAdjacentArticles = (data: { id: number | string }) =>
+  request({ url: '/web/article/adjacent', method: 'post', data })
+
 // 获取背景图列表
 export const getBackgroundList = () => {
   return request({
@@ -419,6 +332,19 @@ export const getBackgroundList = () => {
     method: 'get'
   })
 }
+
+// 相册评论
+export const getAlbumComments = (data: { albumId: number | string; pageNo: number; pageSize: number }) =>
+  request({ url: '/web/album/comment/list', method: 'post', data })
+
+export const addAlbumComment = (data: { username: string; albumId: number | string; content: string; images?: string[]; likeCount?: number; userId: number }) =>
+  request({ url: '/web/album/comment/add', method: 'post', data })
+
+export const deleteAlbumComment = (data: { commentId: number; userId?: number }) =>
+  request({ url: '/web/album/comment/delete', method: 'delete', data })
+
+export const likeAlbumComment = (data: { commentId: number | string; type: 1 | 2 }) =>
+  request({ url: '/web/album/comment/like', method: 'post', data })
 
 // 相册相关
 export const getAlbumList = (data?: {

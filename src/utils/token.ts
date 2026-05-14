@@ -9,8 +9,8 @@ export const parseToken = (tokenStr: string | null): string => {
         return tokenObj.v
       }
     }
-    return tokenStr
+    return ''
   } catch {
-    return tokenStr
+    return ''
   }
 }

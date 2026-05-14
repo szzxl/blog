@@ -35,6 +35,12 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
+import Header from './components/Header.vue'
+import Footer from './components/Footer.vue'
+import ErrorBoundary from './components/ErrorBoundary.vue'
+import SearchOverlay from './components/SearchOverlay.vue'
+import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
 
 const rnd = (min: number, max: number) => Math.random() * (max - min) + min
 const LEAF_FILTERS = [
@@ -60,12 +66,6 @@ const leafData = Array.from({ length: 45 }, () => {
     spin: { fontSize: size, opacity, '--spin-dur': spinDur, '--spin-dir': spinDir, '--leaf-filter': LEAF_FILTERS[Math.floor(Math.random() * LEAF_FILTERS.length)] },
   }
 })
-import { useRoute } from 'vue-router'
-import Header from './components/Header.vue'
-import Footer from './components/Footer.vue'
-import ErrorBoundary from './components/ErrorBoundary.vue'
-import SearchOverlay from './components/SearchOverlay.vue'
-import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
 
 const route = useRoute()
 const showBackToTop = ref(false)
@@ -82,8 +82,14 @@ const fetchWebsiteConfig = async () => {
   }
 }
 
+let scrollThrottle: ReturnType<typeof setTimeout> | null = null
+
 const handleScroll = () => {
-  showBackToTop.value = window.scrollY > 300
+  if (scrollThrottle) return
+  scrollThrottle = setTimeout(() => {
+    showBackToTop.value = window.scrollY > 300
+    scrollThrottle = null
+  }, 50)
 }
 
 const scrollToTop = () => {
@@ -91,12 +97,13 @@ const scrollToTop = () => {
 }
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
+  window.addEventListener('scroll', handleScroll, { passive: true })
   fetchWebsiteConfig()
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  if (scrollThrottle) clearTimeout(scrollThrottle)
 })
 </script>
 
@@ -216,5 +223,16 @@ onUnmounted(() => {
 @keyframes leaf-spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .leaf-wrap,
+  .leaf-sway,
+  .leaf-spin {
+    animation: none;
+  }
+  .back-top-btn {
+    transition: none;
+  }
 }
 </style>

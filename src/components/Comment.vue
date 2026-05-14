@@ -88,7 +88,7 @@
         <div class="login-tip">
           <span class="tip-icon">💡</span>
           <span class="tip-text">
-            <router-link to="/login" class="login-link">登录</router-link>
+            <router-link :to="{ path: '/login', query: { redirect: route.fullPath } }" class="login-link">登录</router-link>
             后可以发表评论哦~
           </span>
         </div>
@@ -162,23 +162,43 @@
       </div>
     </div>
   </div>
+
+  <!-- 图片灯箱 -->
+  <Teleport to="body">
+    <Transition name="cmt-lb">
+      <div v-if="lightboxSrc" class="cmt-lightbox" @click="lightboxSrc = ''">
+        <img :src="lightboxSrc" class="cmt-lightbox-img" @click.stop />
+        <button class="cmt-lb-close" @click="lightboxSrc = ''">×</button>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Delete, Upload } from '@element-plus/icons-vue'
-import { getArticleComments, addArticleComment, deleteArticleComment, uploadImage, likeArticleComment } from '@/api/article'
+import {
+  getArticleComments, addArticleComment, deleteArticleComment, likeArticleComment,
+  getAlbumComments, addAlbumComment, deleteAlbumComment, likeAlbumComment,
+  uploadImage
+} from '@/api/article'
 import { useUserStore } from '@/stores/user'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import EmojiPicker from './EmojiPicker.vue'
 
 const props = defineProps<{
-  articleId: string | number
+  articleId?: string | number
+  sourceId?: string | number
+  sourceType?: 'article' | 'album'
 }>()
+
+const resolvedId = computed(() => props.sourceId ?? props.articleId ?? '')
+const isAlbum = computed(() => props.sourceType === 'album')
 
 const userStore = useUserStore()
 const router = useRouter()
+const route = useRoute()
 
 const commentText = ref('')
 const commentInputRef = ref()
@@ -191,6 +211,9 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 
 const commentFileInput = ref<HTMLInputElement>()
+const lightboxSrc = ref('')
+
+const onLbKeydown = (e: KeyboardEvent) => { if (e.key === 'Escape') lightboxSrc.value = '' }
 
 // 插入表情
 const insertEmoji = (emoji: string) => {
@@ -226,11 +249,9 @@ const canDelete = (comment: any) => {
 const loadComments = async () => {
   loading.value = true
   try {
-    const response: any = await getArticleComments({
-      articleId: props.articleId,
-      pageNo: currentPage.value,
-      pageSize: pageSize.value
-    })
+    const response: any = isAlbum.value
+      ? await getAlbumComments({ albumId: resolvedId.value, pageNo: currentPage.value, pageSize: pageSize.value })
+      : await getArticleComments({ articleId: resolvedId.value, pageNo: currentPage.value, pageSize: pageSize.value })
     
     // 响应拦截器已经处理过，直接返回的是 data 数组
     const data = Array.isArray(response) ? response : (response?.list || response?.data || [])
@@ -266,8 +287,7 @@ const loadComments = async () => {
     
     // 如果后端返回了 total，使用它；否则使用数组长度
     total.value = response?.total || comments.value.length
-  } catch (error) {
-    ElMessage.error('加载评论失败')
+  } catch {
     comments.value = []
     total.value = 0
   } finally {
@@ -337,21 +357,41 @@ const submitComment = async () => {
     return
   }
   
-  if (!commentText.value.trim()) {
+  const trimmed = commentText.value.trim()
+  if (!trimmed) {
     ElMessage.warning('请输入评论内容')
+    return
+  }
+  if (trimmed.length < 2) {
+    ElMessage.warning('评论内容至少 2 个字符')
+    return
+  }
+  if (trimmed.length > 500) {
+    ElMessage.warning('评论内容不能超过 500 个字符')
     return
   }
   
   submitting.value = true
   try {
-    await addArticleComment({
-      username: userStore.user!.username || '',
-      articleId: props.articleId,
-      content: commentText.value,
-      images: commentImages.value,
-      likeCount: 0,
-      userId: Number(userStore.user!.id)
-    })
+    if (isAlbum.value) {
+      await addAlbumComment({
+        username: userStore.user!.username || '',
+        albumId: resolvedId.value,
+        content: commentText.value,
+        images: commentImages.value,
+        likeCount: 0,
+        userId: Number(userStore.user!.id)
+      })
+    } else {
+      await addArticleComment({
+        username: userStore.user!.username || '',
+        articleId: resolvedId.value,
+        content: commentText.value,
+        images: commentImages.value,
+        likeCount: 0,
+        userId: Number(userStore.user!.id)
+      })
+    }
     
     ElMessage.success('评论发表成功！')
     commentText.value = ''
@@ -378,21 +418,14 @@ const handleLike = async (comment: any) => {
   const wasLiked = comment.isLiked
   
   try {
-    await likeArticleComment({
-      commentArticleId: comment.id,
-      type: wasLiked ? 2 : 1  // 已点赞则取消(2)，未点赞则点赞(1)
-    })
-    
-    // 切换本地状态
-    if (wasLiked) {
-      // 取消点赞
-      comment.likeCount = Math.max(0, (comment.likeCount || 0) - 1)
-      comment.isLiked = false
+    if (isAlbum.value) {
+      await likeAlbumComment({ commentId: comment.id, type: wasLiked ? 2 : 1 })
     } else {
-      // 点赞
-      comment.likeCount = (comment.likeCount || 0) + 1
-      comment.isLiked = true
+      await likeArticleComment({ commentArticleId: comment.id, type: wasLiked ? 2 : 1 })
     }
+    
+    comment.isLiked = !wasLiked
+    comment.likeCount = Math.max(0, (comment.likeCount || 0) + (wasLiked ? -1 : 1))
   } catch (error) {
     ElMessage.error('操作失败，请重试')
   }
@@ -420,7 +453,11 @@ const handleDelete = async (comment: any) => {
       requestData.userId = userStore.user.id
     }
     
-    await deleteArticleComment(requestData)
+    if (isAlbum.value) {
+      await deleteAlbumComment(requestData)
+    } else {
+      await deleteArticleComment(requestData)
+    }
     ElMessage.success('评论已删除')
     loadComments()
   } catch (error: any) {
@@ -460,11 +497,16 @@ const formatCommentTime = (timestamp: number) => {
 
 // 预览图片
 const previewImage = (url: string) => {
-  window.open(url, '_blank')
+  lightboxSrc.value = url
 }
 
 onMounted(() => {
   loadComments()
+  window.addEventListener('keydown', onLbKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', onLbKeydown)
 })
 </script>
 
@@ -530,7 +572,7 @@ onMounted(() => {
       
       .upload-title {
         font-size: 14px;
-        color: #666;
+        color: var(--text-secondary);
         margin-bottom: 12px;
         display: flex;
         align-items: center;
@@ -565,7 +607,7 @@ onMounted(() => {
         
         .upload-text {
           font-size: 14px;
-          color: #666;
+          color: var(--text-secondary);
           font-weight: 600;
         }
       }
@@ -581,7 +623,7 @@ onMounted(() => {
           padding-bottom: 100%;
           border-radius: 10px;
           overflow: hidden;
-          background: #f5f5f5;
+          background: var(--bg-secondary);
           box-shadow: 0 2px 10px rgba(139, 92, 246, 0.15);
           transition: all 0.3s;
           
@@ -673,10 +715,10 @@ onMounted(() => {
       
       .tip-text {
         font-size: 15px;
-        color: #666;
-        
+        color: var(--text-secondary);
+
         .login-link {
-          color: #8b5cf6;
+          color: var(--color-accent);
           font-weight: 700;
           text-decoration: none;
           transition: all 0.3s;
@@ -693,7 +735,7 @@ onMounted(() => {
   .comment-list {
     .comment-count {
       font-size: 16px;
-      color: #666;
+      color: var(--text-secondary);
       margin-bottom: 20px;
       font-weight: 600;
     }
@@ -715,11 +757,11 @@ onMounted(() => {
         .comment-user {
           font-size: 15px;
           font-weight: 700;
-          color: #5a5a5a;
+          color: var(--text-primary);
           margin-bottom: 8px;
-          
+
           &.author {
-            color: #6366f1;
+            color: var(--color-accent);
             
             &::after {
               content: '作者';
@@ -736,7 +778,7 @@ onMounted(() => {
         
         .comment-text {
           font-size: 15px;
-          color: #666;
+          color: var(--text-secondary);
           line-height: 1.8;
           margin-bottom: 10px;
           word-wrap: break-word;
@@ -771,7 +813,7 @@ onMounted(() => {
           
           .comment-time {
             font-size: 13px;
-            color: #999;
+            color: var(--text-tertiary);
           }
           
           .comment-actions {
@@ -780,7 +822,7 @@ onMounted(() => {
             
             .action-btn {
               font-size: 13px;
-              color: #999;
+              color: var(--text-tertiary);
               cursor: pointer;
               transition: all 0.2s;
               display: flex;
@@ -870,15 +912,15 @@ onMounted(() => {
       
       :deep(.el-pagination) {
         .btn-prev, .btn-next, .el-pager li {
-          background: #fff;
+          background: var(--bg-card);
           border-radius: 8px;
-          
+
           &:hover {
-            color: #8b5cf6;
+            color: var(--color-accent);
           }
-          
+
           &.is-active {
-            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            background: var(--color-accent);
             color: #fff;
           }
         }
@@ -1078,4 +1120,49 @@ onMounted(() => {
     }
   }
 }
+
+// ── 评论图片灯箱 ──────────────────────────────────────
+.cmt-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  cursor: zoom-out;
+  padding: 20px;
+}
+
+.cmt-lightbox-img {
+  max-width: 90vw;
+  max-height: 88vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  cursor: default;
+}
+
+.cmt-lb-close {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+
+  &:hover { background: rgba(255, 255, 255, 0.22); }
+}
+
+.cmt-lb-enter-active, .cmt-lb-leave-active { transition: opacity 0.2s ease; }
+.cmt-lb-enter-from, .cmt-lb-leave-to { opacity: 0; }
 </style>

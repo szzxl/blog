@@ -14,10 +14,16 @@ const PUBLIC_APIS = [
   '/web/article/list',
   '/web/article/detail',
   '/web/article/like/num',
+  '/web/article/addView',
+  '/web/article/adjacent',
   '/web/month/article',
   '/web/category/list',
   '/web/tag/list',
-  '/web/carousel/list',
+  '/web/tag/article/list',
+  '/web/article/comment/list',
+  '/web/album/comment/list',
+  '/album/list',
+  '/album/photo/list',
   '/web/notification/list',
   '/config/notification/list',
   '/config/background/list',
@@ -26,7 +32,8 @@ const PUBLIC_APIS = [
 
 // 静默接口列表（不弹出错误提示）
 const SILENT_APIS = [
-  '/web/article/addView'
+  '/web/article/addView',
+  '/web/article/adjacent'
 ]
 
 // 不显示 Loading 的接口
@@ -59,10 +66,12 @@ service.interceptors.request.use(
       showLoading()
     }
     
-    const token = parseToken(localStorage.getItem('ACCESS_TOKEN'))
-    
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`
+    const rawToken = localStorage.getItem('ACCESS_TOKEN')
+    if (rawToken) {
+      const token = parseToken(rawToken)
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
     }
     
     // XSS 防护：清理请求数据（跳过 FormData）
@@ -90,8 +99,9 @@ service.interceptors.response.use(
     // 根据后端返回的数据结构调整
     // 假设后端返回格式为 { code: 0, data: {}, message: '' }
     if (res.code !== undefined && res.code !== 0) {
-      // 不弹错误提示的接口
-      if (!isSilentApi(url)) {
+      // 公开接口返回 401 表示"未登录但内容仍可访问"，静默处理
+      const silent = isSilentApi(url) || (res.code === 401 && isPublicApi(url))
+      if (!silent) {
         ElMessage.error(res.message || res.msg || '请求失败')
       }
       
