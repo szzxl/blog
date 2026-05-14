@@ -132,7 +132,8 @@ export const lazyload = {
       // 停止旧的观察器
       const oldObserver = observerMap.get(el)
       if (oldObserver) {
-        oldObserver.unobserve(el)
+        oldObserver.disconnect()
+        observerMap.delete(el)
       }
       
       // 创建新的观察器

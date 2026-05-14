@@ -320,7 +320,7 @@ const submitMessage = async () => {
     }
 
     // 仅登录用户传入 images 字段
-    if (userStore.isLoggedIn.value && imageList.value.length > 0) {
+    if (userStore.isLoggedIn && imageList.value.length > 0) {
       requestData.images = imageList.value.map(img => img.url)
     }
 
@@ -330,7 +330,7 @@ const submitMessage = async () => {
     ElMessage.success('留言发表成功！')
 
     // 清空表单（已登录用户保留昵称）
-    if (!userStore.isLoggedIn.value) {
+    if (!userStore.isLoggedIn) {
       messageForm.value.name = ''
     }
     messageForm.value.email = ''

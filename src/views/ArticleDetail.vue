@@ -128,7 +128,7 @@ import DOMPurify from 'dompurify'
 import { useRoute, useRouter } from 'vue-router'
 import Comment from '@/components/Comment.vue'
 import Skeleton from '@/components/Skeleton.vue'
-import { getArticleDetail, addArticleView, likeArticle, getArticleLikeCount, getAdjacentArticles } from '@/api/article'
+import { getArticleDetail, addArticleView, likeArticle, getArticleLikeCount } from '@/api/article'
 import { formatTimestamp, parseTags } from '@/utils/format'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
@@ -158,8 +158,6 @@ interface Article {
 
 const article = ref<Article | null>(null)
 const loading = ref(false)
-const prevArticle = ref<{ id: number | string; articleName: string } | null>(null)
-const nextArticle = ref<{ id: number | string; articleName: string } | null>(null)
 const readProgress = ref(0)
 const tocItems = ref<TocItem[]>([])
 const activeId = ref('')
@@ -279,8 +277,6 @@ const fetchArticleDetail = async () => {
   }
 
   loading.value = true
-  prevArticle.value = null
-  nextArticle.value = null
   try {
     const res: any = await getArticleDetail({ id: id })
 
@@ -292,8 +288,6 @@ const fetchArticleDetail = async () => {
       }
       // 查询最新点赞数量
       await fetchLikeCount(id)
-      // 查询上一篇/下一篇
-      fetchAdjacentArticles(id)
     }
   } catch (error) {
     ElMessage.error('获取文章详情失败')
@@ -312,15 +306,6 @@ const fetchLikeCount = async (id: string) => {
   } catch (error) {
     // 静默失败，不影响用户体验
   }
-}
-
-// 获取上一篇/下一篇
-const fetchAdjacentArticles = async (id: string) => {
-  try {
-    const res: any = await getAdjacentArticles({ id })
-    if (res?.prev) prevArticle.value = res.prev
-    if (res?.next) nextArticle.value = res.next
-  } catch { /* 静默 */ }
 }
 
 // 增加查看次数
@@ -871,65 +856,6 @@ onUnmounted(() => {
 
 .lightbox-enter-active, .lightbox-leave-active { transition: opacity 0.2s ease; }
 .lightbox-enter-from, .lightbox-leave-to { opacity: 0; }
-
-// ── 上一篇/下一篇 ─────────────────────────────────────
-.adjacent-nav {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 32px;
-
-  &:has(.adj-prev:only-child),
-  &:has(.adj-next:only-child) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.adj-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-card);
-  padding: 16px 20px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
-
-  &:hover {
-    border-color: var(--color-accent);
-    box-shadow: var(--shadow-card-hover);
-    transform: translateY(-2px);
-
-    .adj-title { color: var(--color-accent); }
-  }
-
-  &.adj-next {
-    text-align: right;
-    align-items: flex-end;
-  }
-}
-
-.adj-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  font-family: var(--font-sans);
-}
-
-.adj-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
-  transition: color 0.2s;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  line-height: 1.4;
-}
 
 // ── 响应式 ────────────────────────────────────────────
 @media (max-width: 1380px) {
