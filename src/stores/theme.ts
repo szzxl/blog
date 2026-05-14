@@ -46,8 +46,10 @@ export const useThemeStore = defineStore('theme', () => {
     setTheme(newMode)
   }
 
-  // 监听系统主题变化
+  // 监听系统主题变化，返回 cleanup 函数
+  let _cleanupSystemListener: (() => void) | null = null
   const setupSystemThemeListener = () => {
+    if (_cleanupSystemListener) return  // 防止重复注册
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
       if (themeMode.value === 'auto') {
@@ -55,8 +57,8 @@ export const useThemeStore = defineStore('theme', () => {
         document.documentElement.setAttribute('data-theme', appliedTheme.value)
       }
     }
-
     mediaQuery.addEventListener('change', handleChange)
+    _cleanupSystemListener = () => mediaQuery.removeEventListener('change', handleChange)
   }
 
   // 监听主题模式变化

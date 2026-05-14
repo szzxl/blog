@@ -105,16 +105,17 @@ const fetchTags = async () => {
 }
 
 // 气泡字号（14~36px）
+const tagCountRange = computed(() => {
+  const counts = tags.value.map(t => t.num || 0)
+  return { min: Math.min(...counts), max: Math.max(...counts) }
+})
+
 const getTagSize = (num: number = 0) => {
   const minSize = 14
   const maxSize = 36
-  const counts = tags.value.map(t => t.num || 0)
-  const minCount = Math.min(...counts)
-  const maxCount = Math.max(...counts)
-
-  if (maxCount === minCount) return (minSize + maxSize) / 2
-
-  return minSize + ((num - minCount) / (maxCount - minCount)) * (maxSize - minSize)
+  const { min, max } = tagCountRange.value
+  if (max === min) return (minSize + maxSize) / 2
+  return minSize + ((num - min) / (max - min)) * (maxSize - minSize)
 }
 
 // 气泡颜色组

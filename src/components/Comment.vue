@@ -483,10 +483,12 @@ const loadComments = async () => {
     comments.value = topLevel
     total.value = response?.total || topLevel.length
   } catch {
-    comments.value = []
-    total.value = 0
+    if (seq === loadCommentsSeq) {
+      comments.value = []
+      total.value = 0
+    }
   } finally {
-    loading.value = false
+    if (seq === loadCommentsSeq) loading.value = false
   }
 }
 
@@ -559,7 +561,7 @@ const submitComment = async () => {
       await addAlbumComment({
         username: userStore.user!.nickname || userStore.user!.username || '',
         albumId: resolvedId.value,
-        content: commentText.value,
+        content: trimmed,
         images: commentImages.value,
         likeCount: 0,
         userId: Number(userStore.user!.id)
@@ -568,7 +570,7 @@ const submitComment = async () => {
       await addArticleComment({
         username: userStore.user!.nickname || userStore.user!.username || '',
         articleId: resolvedId.value,
-        content: commentText.value,
+        content: trimmed,
         images: commentImages.value,
         likeCount: 0,
         userId: Number(userStore.user!.id)
