@@ -1,120 +1,90 @@
 <template>
   <div class="comment-section card">
-    <h3 class="section-title">💬 评论区</h3>
-    
+    <div class="section-header">
+      <span class="section-title">评论</span>
+      <span class="comment-count-badge" v-if="total > 0">{{ total }}</span>
+    </div>
+
     <!-- 发表评论表单 -->
     <div class="comment-form">
       <template v-if="userStore.isLoggedIn">
-        <el-input 
-          ref="commentInputRef"
-          v-model="commentText" 
-          type="textarea" 
-          :rows="4" 
-          placeholder="说点什么吧~ 分享你的想法..."
-          maxlength="500"
-          show-word-limit
-        />
-        
-        <!-- 工具栏 -->
-        <div class="comment-toolbar">
-          <EmojiPicker @select="insertEmoji" />
-        </div>
-        
-        <!-- 图片上传区域 -->
-        <div class="image-upload-section">
-          <div class="upload-title">
-            <span class="icon">📷</span>
-            上传图片（最多9张）
+        <div class="form-row">
+          <div class="avatar-wrap">
+            <div class="avatar">{{ (userStore.user?.nickname || userStore.user?.username || '?')[0].toUpperCase() }}</div>
           </div>
-          
-          <!-- 图片预览列表 -->
-          <div class="image-list" v-if="commentImages.length > 0">
-            <div 
-              class="image-item" 
-              v-for="(image, index) in commentImages"
-              :key="image"
-            >
-              <img :src="image" alt="预览图">
-              <div class="image-overlay">
-                <el-icon class="delete-icon" @click="removeCommentImage(index)">
-                  <Delete />
-                </el-icon>
+          <div class="form-input-wrap">
+            <el-input
+              ref="commentInputRef"
+              v-model="commentText"
+              type="textarea"
+              :rows="3"
+              placeholder="发一条友善的评论"
+              maxlength="500"
+              show-word-limit
+            />
+            <div class="form-toolbar">
+              <EmojiPicker @select="insertEmoji" />
+              <button class="img-upload-btn" @click="triggerCommentUpload" title="上传图片">
+                <el-icon><Upload /></el-icon>
+              </button>
+              <input
+                ref="commentFileInput"
+                type="file"
+                accept="image/*"
+                multiple
+                style="display:none"
+                @change="handleCommentFileChange"
+              />
+              <el-button
+                type="primary"
+                class="submit-btn"
+                :loading="submitting"
+                @click="submitComment"
+              >发布</el-button>
+            </div>
+            <!-- 图片预览 -->
+            <div class="image-list" v-if="commentImages.length > 0">
+              <div
+                class="image-item"
+                v-for="(image, index) in commentImages"
+                :key="image"
+              >
+                <img :src="image" alt="预览图">
+                <span class="img-del" @click="removeCommentImage(index)">×</span>
+              </div>
+              <div class="upload-btn" v-if="commentImages.length < 9" @click="triggerCommentUpload">
+                <el-icon><Plus /></el-icon>
               </div>
             </div>
-            
-            <!-- 上传按钮 -->
-            <div 
-              class="upload-btn" 
-              v-if="commentImages.length < 9"
-              @click="triggerCommentUpload"
-            >
-              <el-icon><Plus /></el-icon>
-            </div>
           </div>
-          
-          <!-- 初始上传区域 -->
-          <div 
-            class="upload-area" 
-            v-else
-            @click="triggerCommentUpload"
-          >
-            <el-icon class="upload-icon"><Upload /></el-icon>
-            <div class="upload-text">点击上传图片</div>
-          </div>
-          
-          <input 
-            ref="commentFileInput"
-            type="file" 
-            accept="image/*"
-            multiple
-            style="display: none"
-            @change="handleCommentFileChange"
-          />
-        </div>
-        
-        <div class="form-actions">
-          <el-button 
-            type="primary" 
-            class="submit-btn"
-            :loading="submitting"
-            @click="submitComment"
-          >
-            <span class="icon">💕</span>
-            发表评论
-          </el-button>
         </div>
       </template>
       <template v-else>
         <div class="login-tip">
-          <span class="tip-icon">💡</span>
-          <span class="tip-text">
-            <router-link :to="{ path: '/login', query: { redirect: route.fullPath } }" class="login-link">登录</router-link>
-            后可以发表评论哦~
-          </span>
+          <router-link :to="{ path: '/login', query: { redirect: route.fullPath } }" class="login-link">登录</router-link>
+          后参与评论
         </div>
       </template>
     </div>
-    
+
     <!-- 评论列表 -->
     <div class="comment-list" v-loading="loading">
-      <div class="comment-count" v-if="total > 0">
-        共 {{ total }} 条评论
-      </div>
-      
       <template v-if="comments.length > 0">
         <div v-for="comment in comments" :key="comment.id" class="comment-item">
-          <div class="comment-main">
-            <div class="comment-user" :class="{ author: comment.user?.isAuthor }">
-              {{ comment.user?.nickname || '匿名用户' }}
+          <div class="avatar">{{ (comment.user?.nickname || '?')[0].toUpperCase() }}</div>
+          <div class="comment-body">
+            <div class="comment-meta">
+              <span class="username" :class="{ author: comment.user?.isAuthor }">
+                {{ comment.user?.nickname || '匿名用户' }}
+                <span class="author-tag" v-if="comment.user?.isAuthor">博主</span>
+              </span>
             </div>
             <div class="comment-text">{{ comment.content }}</div>
-            
-            <!-- 评论图片 -->
-            <div class="comment-images" v-if="comment.images && comment.images.length > 0">
-              <img 
-                v-for="(img, idx) in comment.images" 
-                :key="idx" 
-                :src="img" 
+            <div class="comment-images" v-if="comment.images?.length">
+              <img
+                v-for="(img, idx) in comment.images"
+                :key="idx"
+                :src="img"
                 alt="评论图片"
                 class="comment-img"
                 @click="previewImage(img)"
@@ -122,34 +92,88 @@
             </div>
             <div class="comment-footer">
               <span class="comment-time">{{ formatCommentTime(comment.createTime) }}</span>
-              <div class="comment-actions">
-                <span 
-                  class="action-btn like-btn" 
-                  :class="{ liked: comment.isLiked }"
-                  @click="handleLike(comment)"
-                >
-                  <span class="icon">{{ comment.isLiked ? '💗' : '🤍' }}</span>
-                  <span class="count">{{ comment.likeCount || 0 }}</span>
-                </span>
-                <span 
-                  v-if="canDelete(comment)" 
-                  class="action-btn delete"
-                  @click="handleDelete(comment)"
-                >
-                  删除
-                </span>
+              <span class="action-btn like-btn" :class="{ liked: comment.isLiked }" @click="handleLike(comment)">
+                <svg class="like-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M7 22V11M2 13v7a2 2 0 002 2h12.5a2 2 0 001.97-1.67l1-6A2 2 0 0017.5 11H13V5a3 3 0 00-3-3H9l-2 6z"/>
+                </svg>
+                <span>{{ comment.likeCount || 0 }}</span>
+              </span>
+              <span class="action-btn" @click="startReply(comment.id, comment.user?.nickname || '匿名用户', comment.id)">回复</span>
+              <span v-if="canDelete(comment)" class="action-btn danger" @click="handleDelete(comment)">删除</span>
+            </div>
+
+            <!-- 展开回复 -->
+            <div class="expand-replies" v-if="comment.replyCount > 0">
+              <span class="expand-btn" @click="toggleReplies(comment)" v-if="!loadingReplies[comment.id]">
+                <svg viewBox="0 0 16 16" fill="currentColor" class="arrow-icon" :class="{ open: expandedReplies[comment.id] }">
+                  <path d="M8 10.5L3 5.5h10z"/>
+                </svg>
+                {{ expandedReplies[comment.id] ? '收起回复' : `${comment.replyCount} 条回复` }}
+              </span>
+              <span v-else class="expand-btn muted">加载中...</span>
+            </div>
+
+            <!-- 回复列表 -->
+            <div class="replies" v-if="expandedReplies[comment.id]?.length">
+              <ReplyItem
+                v-for="reply in expandedReplies[comment.id]"
+                :key="reply.id"
+                :reply="reply"
+                :rootId="comment.id"
+                :depth="0"
+                @like="handleLike"
+                @reply="({ parentId, atName, rootId }) => startReply(parentId, atName, rootId)"
+                @delete="handleDelete"
+              />
+            </div>
+
+            <!-- 回复输入框 -->
+            <div class="reply-box" v-if="replyState?.rootId === comment.id">
+              <el-input
+                ref="replyInputRef"
+                v-model="replyText"
+                type="textarea"
+                :rows="2"
+                :placeholder="`回复 @${replyState.atName}`"
+                maxlength="500"
+                autofocus
+              />
+              <div class="form-toolbar">
+                <EmojiPicker @select="insertReplyEmoji" />
+                <button class="img-upload-btn" @click="triggerReplyUpload" title="上传图片">
+                  <el-icon><Upload /></el-icon>
+                </button>
+                <input
+                  ref="replyFileInput"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  style="display:none"
+                  @change="handleReplyFileChange"
+                />
+                <div class="reply-box-actions">
+                  <el-button size="small" @click="cancelReply">取消</el-button>
+                  <el-button type="primary" size="small" :loading="replySubmitting" @click="submitReply(comment)">发布</el-button>
+                </div>
+              </div>
+              <div class="image-list" v-if="replyImages.length > 0">
+                <div class="image-item" v-for="(img, idx) in replyImages" :key="img">
+                  <img :src="img" alt="预览图">
+                  <span class="img-del" @click="replyImages.splice(idx, 1)">×</span>
+                </div>
+                <div class="upload-btn" v-if="replyImages.length < 9" @click="triggerReplyUpload">
+                  <el-icon><Plus /></el-icon>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </template>
-      
+
       <div v-else-if="!loading" class="empty-state">
-        <div class="empty-icon">💭</div>
-        <div class="empty-text">暂无评论，快来抢沙发吧~</div>
+        <div class="empty-text">还没有评论，快来说点什么吧~</div>
       </div>
-      
-      <!-- 分页 -->
+
       <div class="pagination" v-if="total > pageSize">
         <el-pagination
           background
@@ -175,17 +199,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Delete, Upload } from '@element-plus/icons-vue'
+import { Plus, Upload } from '@element-plus/icons-vue'
 import {
   getArticleComments, addArticleComment, deleteArticleComment, likeArticleComment,
   getAlbumComments, addAlbumComment, deleteAlbumComment, likeAlbumComment,
-  uploadImage
+  getCommentReplies, uploadImage
 } from '@/api/article'
 import { useUserStore } from '@/stores/user'
 import { useRouter, useRoute } from 'vue-router'
 import EmojiPicker from './EmojiPicker.vue'
+import ReplyItem from './ReplyItem.vue'
 
 const props = defineProps<{
   articleId?: string | number
@@ -212,6 +237,152 @@ const pageSize = ref(10)
 
 const commentFileInput = ref<HTMLInputElement>()
 const lightboxSrc = ref('')
+const likingIds = ref<Set<number | string>>(new Set())
+let loadCommentsSeq = 0
+
+// ── 展开回复 ──────────────────────────────────────────
+const expandedReplies = ref<Record<string | number, any[]>>({})
+const loadingReplies = ref<Record<string | number, boolean>>({})
+
+const resolveIsAuthor = (c: any) =>
+  c.isAuthor || (userStore.isAuthor && String(c.creator) === String(userStore.user?.id))
+
+const mapReply = (r: any): any => ({
+  ...r,
+  user: { id: r.userId, nickname: r.username, isAuthor: resolveIsAuthor(r) },
+  createTime: r.createTime || Date.now(),
+  isLiked: r.isLiked || false,
+  likeCount: r.likeCount || 0,
+  replyToName: r.replyToName || '',
+  children: (r.children || []).map(mapReply)
+})
+
+const toggleReplies = async (comment: any) => {
+  const id = comment.id
+  if (expandedReplies.value[id]) {
+    delete expandedReplies.value[id]
+    return
+  }
+  loadingReplies.value[id] = true
+  try {
+    const res: any = await getCommentReplies(id)
+    const list = Array.isArray(res) ? res : (res?.list || res?.data || [])
+    expandedReplies.value[id] = list.map(mapReply)
+  } catch {
+    ElMessage.error('获取回复失败')
+  } finally {
+    loadingReplies.value[id] = false
+  }
+}
+
+// ── 回复状态 ──────────────────────────────────────────
+const replyState = ref<{ parentId: number | string; rootId: number | string; atName: string } | null>(null)
+const replyText = ref('')
+const replyImages = ref<string[]>([])
+const replySubmitting = ref(false)
+const replyInputRef = ref()
+const replyFileInput = ref<HTMLInputElement>()
+
+const startReply = (parentId: number | string, atName: string, rootId: number | string) => {
+  if (replyState.value?.parentId === parentId && replyState.value?.atName === atName) {
+    cancelReply()
+    return
+  }
+  replyState.value = { parentId, rootId, atName }
+  replyText.value = ''
+}
+
+const cancelReply = () => {
+  replyState.value = null
+  replyText.value = ''
+  replyImages.value = []
+}
+
+const submitReply = async (topComment: any) => {
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('请先登录')
+    router.push({ path: '/login', query: { redirect: route.fullPath } })
+    return
+  }
+  const trimmed = replyText.value.trim()
+  if (!trimmed) { ElMessage.warning('请输入回复内容'); return }
+
+  replySubmitting.value = true
+  try {
+    if (isAlbum.value) {
+      await addAlbumComment({
+        username: userStore.user!.nickname || userStore.user!.username || '',
+        albumId: resolvedId.value,
+        content: trimmed,
+        images: replyImages.value,
+        userId: Number(userStore.user!.id),
+        parentId: replyState.value!.parentId,
+        rootId: replyState.value!.rootId
+      })
+    } else {
+      await addArticleComment({
+        username: userStore.user!.nickname || userStore.user!.username || '',
+        articleId: resolvedId.value,
+        content: trimmed,
+        images: replyImages.value,
+        userId: Number(userStore.user!.id),
+        parentId: replyState.value!.parentId,
+        rootId: replyState.value!.rootId
+      })
+    }
+    const rootId = replyState.value!.rootId
+    cancelReply()
+    currentPage.value = 1
+    await loadComments()
+    // 若该评论回复列表已展开，同步刷新
+    if (expandedReplies.value[rootId]) {
+      const res: any = await getCommentReplies(rootId)
+      const list = Array.isArray(res) ? res : (res?.list || res?.data || [])
+      expandedReplies.value[rootId] = list.map(mapReply)
+    }
+    ElMessage.success('回复成功')
+  } catch {
+    ElMessage.error('回复失败，请重试')
+  } finally {
+    replySubmitting.value = false
+  }
+}
+
+const insertReplyEmoji = (emoji: string) => {
+  const textarea = replyInputRef.value?.textarea
+  if (!textarea) { replyText.value += emoji; return }
+  const start = textarea.selectionStart
+  const end = textarea.selectionEnd
+  replyText.value = replyText.value.substring(0, start) + emoji + replyText.value.substring(end)
+  setTimeout(() => {
+    textarea.selectionStart = textarea.selectionEnd = start + emoji.length
+    textarea.focus()
+  }, 0)
+}
+
+const triggerReplyUpload = () => replyFileInput.value?.click()
+
+const handleReplyFileChange = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const files = target.files
+  if (files) handleReplyFiles(Array.from(files))
+  target.value = ''
+}
+
+const handleReplyFiles = async (files: File[]) => {
+  for (const file of files) {
+    if (replyImages.value.length >= 9) {
+      ElMessage.warning('最多只能上传 9 张图片')
+      break
+    }
+    if (!file.type.startsWith('image/')) { ElMessage.error(`${file.name} 不是图片`); continue }
+    if (file.size > 5 * 1024 * 1024) { ElMessage.error(`${file.name} 超过 5MB`); continue }
+    try {
+      const url: any = await uploadImage(file)
+      if (url) replyImages.value.push(url)
+    } catch { ElMessage.error('图片上传失败') }
+  }
+}
 
 const onLbKeydown = (e: KeyboardEvent) => { if (e.key === 'Escape') lightboxSrc.value = '' }
 
@@ -236,57 +407,81 @@ const insertEmoji = (emoji: string) => {
   }, 0)
 }
 
-const isAuthor = computed(() => userStore.isAuthor)
-
 // 判断是否可以删除评论
 const canDelete = (comment: any) => {
   if (!userStore.isLoggedIn || !userStore.user) return false
-  // 博主或评论作者本人可以删除
-  return isAuthor.value || comment.user?.id === userStore.user.id
+  return String(comment.creator) === String(userStore.user.id)
 }
 
 // 加载评论列表
 const loadComments = async () => {
+  const seq = ++loadCommentsSeq
   loading.value = true
   try {
     const response: any = isAlbum.value
       ? await getAlbumComments({ albumId: resolvedId.value, pageNo: currentPage.value, pageSize: pageSize.value })
       : await getArticleComments({ articleId: resolvedId.value, pageNo: currentPage.value, pageSize: pageSize.value })
-    
-    // 响应拦截器已经处理过，直接返回的是 data 数组
-    const data = Array.isArray(response) ? response : (response?.list || response?.data || [])
-    
-    // 处理评论数据，转换字段格式
-    comments.value = data.map((comment: any) => {
-      // 解析 images 字段（从字符串转为数组）
-      let imageList: string[] = []
-      if (comment.images) {
-        try {
-          imageList = typeof comment.images === 'string' 
-            ? JSON.parse(comment.images) 
-            : comment.images
-        } catch (e) {
-          imageList = []
-        }
+
+    // 丢弃过期响应
+    if (seq !== loadCommentsSeq) return
+
+    const rawData = Array.isArray(response) ? response : (response?.list || response?.data || [])
+
+    const parseImages = (raw: any): string[] => {
+      if (!raw) return []
+      try { return typeof raw === 'string' ? JSON.parse(raw) : raw } catch { return [] }
+    }
+
+    // Flatten backend data (handles both flat lists and pre-nested replies arrays)
+    const flatData: any[] = []
+    const flattenItems = (items: any[]) => {
+      for (const item of items) {
+        flatData.push(item)
+        if (item.replies?.length) flattenItems(item.replies)
       }
-      
-      return {
-        ...comment,
-        images: imageList,
-        user: {
-          id: comment.userId,
-          nickname: comment.username,
-          isAuthor: comment.isAuthor || false
-        },
-        createTime: comment.createTime || Date.now(),
-        replies: comment.replies || [],
-        isLiked: comment.isLiked || false,
-        likeCount: comment.likeCount || 0
+    }
+    flattenItems(rawData)
+
+    // Map all items to a uniform shape
+    const mapped = flatData.map((c: any) => ({
+      ...c,
+      images: parseImages(c.images),
+      user: { id: c.userId, nickname: c.username, isAuthor: resolveIsAuthor(c) },
+      createTime: c.createTime || Date.now(),
+      replies: [] as any[],
+      isLiked: c.isLiked || false,
+      likeCount: c.likeCount || 0,
+      replyToName: c.replyToName || ''
+    }))
+
+    // Build parent-child tree: use rootId to attach all replies under their
+    // root comment (2-level only), parentId is only used for @mention display.
+    const byId: Record<string | number, any> = {}
+    for (const c of mapped) byId[c.id] = c
+
+    const topLevel: any[] = []
+    for (const c of mapped) {
+      const rootId = c.rootId
+      const pid = c.parentId
+      // No parent → top-level comment
+      if (!pid && !rootId) {
+        topLevel.push(c)
+        continue
       }
-    })
-    
-    // 如果后端返回了 total，使用它；否则使用数组长度
-    total.value = response?.total || comments.value.length
+      // Find root container (prefer rootId, fall back to parentId)
+      const rootComment = (rootId && byId[rootId]) || (pid && byId[pid])
+      if (rootComment && !rootComment.parentId && !rootComment.rootId) {
+        // Attach directly under root, set @mention from parentId
+        c.replyToName = pid && byId[pid] ? byId[pid].user?.nickname || '' : ''
+        rootComment.replies.push(c)
+      } else {
+        // Orphan or root not in current page — treat as top-level
+        topLevel.push(c)
+      }
+    }
+
+    comments.value = topLevel
+    total.value = response?.total || topLevel.length
   } catch {
     comments.value = []
     total.value = 0
@@ -312,30 +507,17 @@ const handleCommentFileChange = (event: Event) => {
 
 // 处理评论图片文件
 const handleCommentFiles = async (files: File[]) => {
-  const remainingSlots = 9 - commentImages.value.length
-  if (files.length > remainingSlots) {
-    ElMessage.warning(`最多只能上传9张图片，当前还可以上传${remainingSlots}张`)
-    files = files.slice(0, remainingSlots)
-  }
-  
   for (const file of files) {
-    if (!file.type.startsWith('image/')) {
-      ElMessage.error(`${file.name} 不是图片文件`)
-      continue
+    if (commentImages.value.length >= 9) {
+      ElMessage.warning('最多只能上传 9 张图片')
+      break
     }
-    
-    if (file.size > 5 * 1024 * 1024) {
-      ElMessage.error(`${file.name} 大小超过 5MB`)
-      continue
-    }
-    
+    if (!file.type.startsWith('image/')) { ElMessage.error(`${file.name} 不是图片文件`); continue }
+    if (file.size > 5 * 1024 * 1024) { ElMessage.error(`${file.name} 大小超过 5MB`); continue }
     try {
       const response: any = await uploadImage(file)
-      if (response) {
-        commentImages.value.push(response)
-        ElMessage.success('图片上传成功')
-      }
-    } catch (error) {
+      if (response) commentImages.value.push(response)
+    } catch {
       ElMessage.error('图片上传失败')
     }
   }
@@ -375,7 +557,7 @@ const submitComment = async () => {
   try {
     if (isAlbum.value) {
       await addAlbumComment({
-        username: userStore.user!.username || '',
+        username: userStore.user!.nickname || userStore.user!.username || '',
         albumId: resolvedId.value,
         content: commentText.value,
         images: commentImages.value,
@@ -384,7 +566,7 @@ const submitComment = async () => {
       })
     } else {
       await addArticleComment({
-        username: userStore.user!.username || '',
+        username: userStore.user!.nickname || userStore.user!.username || '',
         articleId: resolvedId.value,
         content: commentText.value,
         images: commentImages.value,
@@ -392,14 +574,15 @@ const submitComment = async () => {
         userId: Number(userStore.user!.id)
       })
     }
-    
     ElMessage.success('评论发表成功！')
     commentText.value = ''
     commentImages.value = []
     currentPage.value = 1
-    loadComments()
+    await loadComments()
   } catch (error) {
     ElMessage.error('发表失败，请重试')
+  } finally {
+    submitting.value = false
   }
 }
 
@@ -413,21 +596,23 @@ const handleLike = async (comment: any) => {
     })
     return
   }
-  
-  // 保存当前状态
+
+  if (likingIds.value.has(comment.id)) return
+  likingIds.value.add(comment.id)
+
   const wasLiked = comment.isLiked
-  
   try {
     if (isAlbum.value) {
       await likeAlbumComment({ commentId: comment.id, type: wasLiked ? 2 : 1 })
     } else {
       await likeArticleComment({ commentArticleId: comment.id, type: wasLiked ? 2 : 1 })
     }
-    
     comment.isLiked = !wasLiked
     comment.likeCount = Math.max(0, (comment.likeCount || 0) + (wasLiked ? -1 : 1))
-  } catch (error) {
+  } catch {
     ElMessage.error('操作失败，请重试')
+  } finally {
+    likingIds.value.delete(comment.id)
   }
 }
 
@@ -443,23 +628,27 @@ const handleDelete = async (comment: any) => {
         type: 'warning'
       }
     )
-    
-    const requestData: any = {
-      commentId: comment.id
-    }
-    
-    // 如果不是博主，需要传 userId
-    if (!isAuthor.value && userStore.user) {
-      requestData.userId = userStore.user.id
-    }
-    
+
     if (isAlbum.value) {
-      await deleteAlbumComment(requestData)
+      await deleteAlbumComment({ commentId: comment.id })
     } else {
-      await deleteArticleComment(requestData)
+      await deleteArticleComment({ commentId: comment.id })
     }
     ElMessage.success('评论已删除')
-    loadComments()
+
+    const rootId = comment.rootId
+    if (rootId && expandedReplies.value[rootId] !== undefined) {
+      // 删除的是展开回复里的评论，刷新该回复列表
+      const res: any = await getCommentReplies(rootId)
+      const list = Array.isArray(res) ? res : (res?.list || res?.data || [])
+      expandedReplies.value[rootId] = list.map(mapReply)
+      // 同步更新根评论的 replyCount
+      await loadComments()
+    } else {
+      // 删除的是根评论，清除其展开状态后刷新列表
+      delete expandedReplies.value[comment.id]
+      await loadComments()
+    }
   } catch (error: any) {
     if (error !== 'cancel') {
       ElMessage.error('删除失败，请重试')
@@ -511,418 +700,441 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-.comment-section {
-  margin-top: 40px;
-  padding: 35px;
-  
-  .section-title {
-    font-size: 24px;
-    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 0 0 25px 0;
-    font-weight: 700;
+// ── 变量 ──────────────────────────────────────────────
+$accent: #00aeec;
+$accent-author: #fb7299;
+$text-primary: var(--text-primary);
+$text-secondary: var(--text-secondary);
+$text-muted: var(--text-tertiary);
+$border: var(--border-color);
+$bg-sub: var(--bg-secondary);
+
+// ── 头像 ──────────────────────────────────────────────
+.avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fb7299 0%, #00aeec 100%);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+
+  &.sm {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    margin-top: 2px;
   }
-  
+}
+
+// ── 主容器 ────────────────────────────────────────────
+.comment-section {
+  margin-top: 32px;
+  padding: 28px 32px;
+
+  // 标题行
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid $border;
+    padding-bottom: 16px;
+  }
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: $text-primary;
+  }
+  .comment-count-badge {
+    font-size: 14px;
+    color: $text-muted;
+  }
+
+  // ── 发表表单 ──────────────────────────────────────
   .comment-form {
-    margin-bottom: 30px;
-    
-    .el-textarea {
+    margin-bottom: 28px;
+
+    .form-row {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .avatar-wrap { padding-top: 2px; }
+
+    .form-input-wrap {
+      flex: 1;
+      min-width: 0;
+
       :deep(.el-textarea__inner) {
-        border-radius: 12px;
-        border: 2px solid rgba(139, 92, 246, 0.2);
-        font-size: 15px;
-        
-        &:focus {
-          border-color: #8b5cf6;
-        }
-      }
-    }
-    
-    .comment-toolbar {
-      margin-top: 12px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    
-    .form-actions {
-      margin-top: 15px;
-      display: flex;
-      justify-content: flex-end;
-      
-      .submit-btn {
-        height: 42px;
-        padding: 0 28px;
-        border-radius: 21px;
-        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-        border: none;
-        font-size: 15px;
-        font-weight: 600;
-        
-        .icon {
-          margin-right: 6px;
-        }
-      }
-    }
-    
-    .image-upload-section {
-      margin-top: 15px;
-      
-      .upload-title {
+        border-radius: 6px;
+        border: 1px solid $border;
         font-size: 14px;
-        color: var(--text-secondary);
-        margin-bottom: 12px;
+        resize: none;
+        transition: border-color 0.2s;
+        background: var(--bg-card);
+        color: $text-primary;
+        &:focus { border-color: $accent; box-shadow: none; }
+      }
+
+      .form-toolbar {
         display: flex;
         align-items: center;
-        gap: 6px;
-        font-weight: 600;
-        
-        .icon {
-          font-size: 16px;
+        gap: 8px;
+        margin-top: 8px;
+
+        .img-upload-btn {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: $text-muted;
+          font-size: 18px;
+          padding: 4px 6px;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          transition: color 0.2s;
+          &:hover { color: $accent; }
         }
-      }
-      
-      .upload-area {
-        border: 2px dashed rgba(139, 92, 246, 0.4);
-        border-radius: 12px;
-        padding: 30px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s;
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(99, 102, 241, 0.03) 100%);
-        
-        &:hover {
-          border-color: #8b5cf6;
-          background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
-          transform: translateY(-2px);
-        }
-        
-        .upload-icon {
-          font-size: 36px;
-          color: #8b5cf6;
-          margin-bottom: 10px;
-        }
-        
-        .upload-text {
+
+        .submit-btn {
+          margin-left: auto;
+          border-radius: 20px;
+          padding: 0 22px;
+          height: 34px;
           font-size: 14px;
-          color: var(--text-secondary);
-          font-weight: 600;
+          background: $accent;
+          border-color: $accent;
+          &:hover { opacity: 0.88; }
         }
       }
-      
+
+      // 图片预览
       .image-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        gap: 10px;
-        
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+
         .image-item {
           position: relative;
-          width: 100%;
-          padding-bottom: 100%;
-          border-radius: 10px;
+          width: 80px;
+          height: 80px;
+          border-radius: 6px;
           overflow: hidden;
-          background: var(--bg-secondary);
-          box-shadow: 0 2px 10px rgba(139, 92, 246, 0.15);
-          transition: all 0.3s;
-          
-          &:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.25);
-            
-            .image-overlay {
-              opacity: 1;
-            }
-          }
-          
+          border: 1px solid $border;
+
           img {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
           }
-          
-          .image-overlay {
+
+          .img-del {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s;
-            
-            .el-icon {
-              font-size: 20px;
-              color: #fff;
-              cursor: pointer;
-              transition: all 0.3s;
-              
-              &:hover {
-                transform: scale(1.2);
-                color: #4338ca;
-              }
-            }
+            top: 2px;
+            right: 4px;
+            color: #fff;
+            font-size: 16px;
+            line-height: 1;
+            cursor: pointer;
+            text-shadow: 0 1px 3px rgba(0,0,0,.6);
+            &:hover { color: #ff4d4f; }
           }
         }
-        
+
         .upload-btn {
-          position: relative;
-          width: 100%;
-          padding-bottom: 100%;
-          border: 2px dashed rgba(139, 92, 246, 0.4);
-          border-radius: 10px;
+          width: 80px;
+          height: 80px;
+          border: 1px dashed $border;
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           cursor: pointer;
-          transition: all 0.3s;
-          background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(99, 102, 241, 0.03) 100%);
-          
-          &:hover {
-            border-color: #8b5cf6;
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
-            transform: translateY(-3px);
-          }
-          
-          .el-icon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 28px;
-            color: #8b5cf6;
-          }
+          color: $text-muted;
+          font-size: 22px;
+          transition: border-color 0.2s, color 0.2s;
+          &:hover { border-color: $accent; color: $accent; }
         }
       }
     }
-    
-    .login-tip {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 20px 25px;
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
-      border-radius: 15px;
-      border: 2px solid rgba(139, 92, 246, 0.2);
-      
-      .tip-icon {
-        font-size: 24px;
-      }
-      
-      .tip-text {
-        font-size: 15px;
-        color: var(--text-secondary);
 
-        .login-link {
-          color: var(--color-accent);
-          font-weight: 700;
-          text-decoration: none;
-          transition: all 0.3s;
-          
-          &:hover {
-            color: #6366f1;
-            text-decoration: underline;
-          }
-        }
+    .login-tip {
+      font-size: 14px;
+      color: $text-muted;
+      padding: 14px 0;
+
+      .login-link {
+        color: $accent;
+        font-weight: 600;
+        text-decoration: none;
+        &:hover { text-decoration: underline; }
       }
     }
   }
-  
+
+  // ── 评论列表 ──────────────────────────────────────
   .comment-list {
-    .comment-count {
-      font-size: 16px;
-      color: var(--text-secondary);
-      margin-bottom: 20px;
-      font-weight: 600;
-    }
-    
     .comment-item {
       display: flex;
-      gap: 15px;
-      padding: 20px 0;
-      border-bottom: 1px solid rgba(139, 92, 246, 0.15);
-      
-      &:last-child {
-        border-bottom: none;
-      }
-      
-      .comment-main {
-        flex: 1;
-        min-width: 0;
-        
-        .comment-user {
-          font-size: 15px;
-          font-weight: 700;
-          color: var(--text-primary);
-          margin-bottom: 8px;
+      gap: 14px;
+      padding: 18px 0;
+      border-bottom: 1px solid $border;
+      &:last-child { border-bottom: none; }
+    }
 
-          &.author {
-            color: var(--color-accent);
-            
-            &::after {
-              content: '作者';
-              margin-left: 8px;
-              font-size: 11px;
-              background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-              color: #fff;
-              padding: 2px 8px;
-              border-radius: 10px;
-              font-weight: 600;
-            }
-          }
+    .comment-body, .reply-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    // 用户名行
+    .comment-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .username {
+      font-size: 14px;
+      font-weight: 600;
+      color: $text-secondary;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      &.author { color: $accent-author; }
+
+      .author-tag {
+        font-size: 11px;
+        font-weight: 500;
+        color: $accent-author;
+        border: 1px solid $accent-author;
+        border-radius: 3px;
+        padding: 0 5px;
+        line-height: 16px;
+      }
+    }
+    .reply-at {
+      font-size: 13px;
+      color: $text-muted;
+      em { color: $accent; font-style: normal; }
+    }
+
+    // 正文
+    .comment-text {
+      font-size: 15px;
+      color: $text-primary;
+      line-height: 1.75;
+      margin-bottom: 8px;
+      word-break: break-word;
+    }
+
+    // 图片
+    .comment-images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+
+      .comment-img {
+        width: 110px;
+        height: 110px;
+        object-fit: cover;
+        border-radius: 6px;
+        cursor: zoom-in;
+        border: 1px solid $border;
+        transition: opacity 0.2s;
+        &:hover { opacity: 0.85; }
+      }
+    }
+
+    // 底栏
+    .comment-footer {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .comment-time {
+      font-size: 12px;
+      color: $text-muted;
+    }
+
+    // 操作按钮
+    .action-btn {
+      font-size: 12px;
+      color: $text-muted;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.2s;
+      user-select: none;
+
+      &:hover { color: $accent; }
+      &.danger:hover { color: #f53f3f; }
+
+      &.like-btn {
+        .like-icon {
+          width: 14px;
+          height: 14px;
         }
-        
-        .comment-text {
-          font-size: 15px;
-          color: var(--text-secondary);
-          line-height: 1.8;
-          margin-bottom: 10px;
-          word-wrap: break-word;
+        &.liked { color: $accent; }
+      }
+    }
+
+    // 展开回复
+    .expand-replies {
+      margin-top: 10px;
+
+      .expand-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 13px;
+        color: $accent;
+        cursor: pointer;
+        user-select: none;
+        &:hover { opacity: 0.8; }
+        &.muted { color: $text-muted; cursor: default; }
+
+        .arrow-icon {
+          width: 14px;
+          height: 14px;
+          transition: transform 0.2s;
+          &.open { transform: rotate(180deg); }
         }
-        
-        .comment-images {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-          margin-bottom: 10px;
-          
-          .comment-img {
-            width: 120px;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid rgba(139, 92, 246, 0.2);
-            
-            &:hover {
-              transform: scale(1.05);
-              box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-            }
-          }
-        }
-        
-        .comment-footer {
+      }
+    }
+
+    // 回复列表
+    .replies {
+      margin-top: 10px;
+      background: $bg-sub;
+      border-radius: 8px;
+      padding: 4px 12px;
+
+      .reply-item {
+        display: flex;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid $border;
+        &:last-child { border-bottom: none; }
+      }
+    }
+
+    // 回复输入框
+    .reply-box {
+      margin-top: 12px;
+
+      :deep(.el-textarea__inner) {
+        border-radius: 6px;
+        font-size: 14px;
+        border: 1px solid $border;
+        background: var(--bg-card);
+        &:focus { border-color: $accent; box-shadow: none; }
+      }
+
+      .form-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+
+        .img-upload-btn {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: $text-muted;
+          font-size: 18px;
+          padding: 4px 6px;
+          border-radius: 4px;
           display: flex;
           align-items: center;
-          gap: 20px;
-          
-          .comment-time {
-            font-size: 13px;
-            color: var(--text-tertiary);
-          }
-          
-          .comment-actions {
-            display: flex;
-            gap: 15px;
-            
-            .action-btn {
-              font-size: 13px;
-              color: var(--text-tertiary);
-              cursor: pointer;
-              transition: all 0.2s;
-              display: flex;
-              align-items: center;
-              gap: 5px;
-              
-              &:hover {
-                color: #8b5cf6;
-              }
-              
-              &.like-btn {
-                .icon {
-                  font-size: 16px;
-                }
-                
-                .count {
-                  font-weight: 600;
-                }
-                
-                &.liked {
-                  color: #4338ca;
-                  
-                  .count {
-                    color: #4338ca;
-                  }
-                  
-                  &:hover {
-                    color: #ff5252;
-                    
-                    .count {
-                      color: #ff5252;
-                    }
-                  }
-                }
-              }
-              
-              &.delete:hover {
-                color: #4338ca;
-              }
-            }
+          transition: color 0.2s;
+          &:hover { color: $accent; }
+        }
+      }
+
+      .reply-box-actions {
+        display: flex;
+        gap: 8px;
+        margin-left: auto;
+      }
+
+      .image-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+
+        .image-item {
+          position: relative;
+          width: 64px;
+          height: 64px;
+          border-radius: 6px;
+          overflow: hidden;
+          border: 1px solid $border;
+          img { width: 100%; height: 100%; object-fit: cover; }
+          .img-del {
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            color: #fff;
+            font-size: 16px;
+            line-height: 1;
+            cursor: pointer;
+            text-shadow: 0 1px 3px rgba(0,0,0,.6);
+            &:hover { color: #ff4d4f; }
           }
         }
-        
-        .replies {
-          margin-top: 15px;
-          padding-left: 20px;
-          border-left: 3px solid rgba(139, 92, 246, 0.2);
-          
-          .reply-item {
-            display: flex;
-            gap: 12px;
-            padding: 12px 0;
-            
-            &:first-child {
-              padding-top: 0;
-            }
-            
-            .reply-content {
-              flex: 1;
-              min-width: 0;
-            }
-          }
+
+        .upload-btn {
+          width: 64px;
+          height: 64px;
+          border: 1px dashed $border;
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          color: $text-muted;
+          font-size: 20px;
+          transition: border-color 0.2s, color 0.2s;
+          &:hover { border-color: $accent; color: $accent; }
         }
       }
     }
-    
+
+    // 空态
     .empty-state {
       text-align: center;
-      padding: 60px 20px;
-      
-      .empty-icon {
-        font-size: 60px;
-        margin-bottom: 15px;
-        opacity: 0.5;
-      }
-      
+      padding: 50px 20px;
+
       .empty-text {
-        font-size: 16px;
-        color: #999;
+        font-size: 14px;
+        color: $text-muted;
       }
     }
-    
+
+    // 分页
     .pagination {
       display: flex;
       justify-content: center;
-      margin-top: 30px;
-      
+      margin-top: 24px;
+
       :deep(.el-pagination) {
         .btn-prev, .btn-next, .el-pager li {
           background: var(--bg-card);
-          border-radius: 8px;
-
-          &:hover {
-            color: var(--color-accent);
-          }
-
-          &.is-active {
-            background: var(--color-accent);
-            color: #fff;
-          }
+          border-radius: 6px;
+          &:hover { color: $accent; }
+          &.is-active { background: $accent; color: #fff; }
         }
       }
     }
@@ -931,193 +1143,15 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .comment-section {
-    padding: 20px 15px;
-    border-radius: 20px;
-    
-    .section-title {
-      font-size: 20px;
-      margin-bottom: 20px;
-    }
-    
-    .comment-form {
-      margin-bottom: 25px;
-      
-      .form-header {
-        margin-bottom: 15px;
-        
-        .upload-title {
-          font-size: 14px;
-          
-          .icon {
-            font-size: 18px;
-          }
-        }
-      }
-      
-      .image-list {
-        gap: 10px;
-        
-        .image-item {
-          width: calc(33.333% - 7px);
-          height: 80px;
-          
-          .remove-btn {
-            width: 24px;
-            height: 24px;
-            font-size: 14px;
-          }
-        }
-      }
-      
-      .upload-trigger {
-        width: calc(33.333% - 7px);
-        height: 80px;
-        
-        .upload-icon {
-          font-size: 24px;
-        }
-        
-        .upload-text {
-          font-size: 12px;
-        }
-      }
-      
-      .form-footer {
-        flex-direction: column;
-        gap: 10px;
-        
-        .char-count {
-          order: -1;
-          width: 100%;
-          text-align: right;
-          font-size: 12px;
-        }
-        
-        .submit-btn {
-          width: 100%;
-          padding: 12px;
-          font-size: 15px;
-        }
-      }
-    }
-    
-    .comment-list {
-      gap: 15px;
-    }
-    
-    .comment-item {
-      padding: 15px;
-      
-      .comment-avatar {
-        width: 40px;
-        height: 40px;
-      }
-      
-      .comment-main {
-        .comment-header {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 8px;
-          margin-bottom: 10px;
-          
-          .comment-user {
-            font-size: 14px;
-          }
-          
-          .comment-time {
-            font-size: 11px;
-          }
-        }
-        
-        .comment-content {
-          font-size: 14px;
-          line-height: 1.6;
-          margin-bottom: 10px;
-        }
-        
-        .comment-images {
-          gap: 8px;
-          margin-bottom: 10px;
-          
-          .comment-image {
-            width: calc(33.333% - 6px);
-            height: 80px;
-          }
-        }
-        
-        .comment-actions {
-          gap: 15px;
-          
-          .action-btn {
-            font-size: 12px;
-            padding: 5px 12px;
-            
-            .icon {
-              font-size: 14px;
-            }
-          }
-        }
-      }
-      
-      .replies {
-        margin-top: 12px;
-        padding-left: 20px;
-        gap: 12px;
-        
-        .reply-item {
-          padding: 12px;
-          
-          .reply-avatar {
-            width: 32px;
-            height: 32px;
-          }
-          
-          .reply-content {
-            .reply-header {
-              flex-direction: column;
-              align-items: flex-start;
-              gap: 6px;
-              margin-bottom: 8px;
-              
-              .reply-user {
-                font-size: 13px;
-              }
-              
-              .reply-time {
-                font-size: 11px;
-              }
-            }
-            
-            .reply-text {
-              font-size: 13px;
-              line-height: 1.6;
-              margin-bottom: 8px;
-            }
-            
-            .reply-actions {
-              gap: 12px;
-              
-              .action-btn {
-                font-size: 11px;
-                padding: 4px 10px;
-              }
-            }
-          }
-        }
-      }
-    }
-    
-    .empty-state {
-      padding: 50px 20px;
-      
-      .empty-icon {
-        font-size: 50px;
-      }
-      
-      .empty-text {
-        font-size: 14px;
-      }
-    }
+    padding: 20px 16px;
+
+    .form-row { gap: 10px; }
+
+    .comment-item { gap: 10px; }
+
+    .comment-text { font-size: 14px; }
+
+    .comment-img { width: 80px !important; height: 80px !important; }
   }
 }
 

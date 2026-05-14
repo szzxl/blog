@@ -35,7 +35,7 @@
 
         <el-form-item>
           <div class="form-options">
-            <el-checkbox v-model="rememberMe">记住密码</el-checkbox>
+            <span></span>
             <el-link type="primary" underline="never">忘记密码？</el-link>
           </div>
         </el-form-item>
@@ -72,7 +72,6 @@ const userStore = useUserStore()
 
 const loginFormRef = ref<FormInstance>()
 const loginLoading = ref(false)
-const rememberMe = ref(false)
 const loginForm = ref({
   username: '',
   password: ''

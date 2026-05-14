@@ -20,14 +20,16 @@ const PUBLIC_APIS = [
   '/web/category/list',
   '/web/tag/list',
   '/web/tag/article/list',
-  '/web/article/comment/list',
+  '/article/comment/page',
+  '/article/comment/reply/',
   '/web/album/comment/list',
   '/album/list',
   '/album/photo/list',
   '/web/notification/list',
   '/config/notification/list',
   '/config/background/list',
-  '/config/website'
+  '/config/website',
+  '/config/link'
 ]
 
 // 静默接口列表（不弹出错误提示）

@@ -85,35 +85,46 @@
       </div>
     </div>
 
-    <!-- ── 灯箱 ── -->
+    <!-- ── 灯箱（左图右评论） ── -->
     <Transition name="lb">
       <div v-if="lightboxOpen" class="lightbox" @click.self="closeLightbox">
-        <img :src="photos[lightboxIndex]?.photoUrl" class="lb-img" @click.stop />
 
-        <!-- 上一张 -->
-        <button
-          v-if="lightboxIndex > 0"
-          class="lb-arrow lb-prev"
-          @click.stop="lightboxIndex--"
-          aria-label="上一张"
-        >‹</button>
+        <!-- 左侧：图片区 -->
+        <div class="lb-image-panel">
+          <img :src="photos[lightboxIndex]?.photoUrl" class="lb-img" @click.stop />
 
-        <!-- 下一张 -->
-        <button
-          v-if="lightboxIndex < photos.length - 1"
-          class="lb-arrow lb-next"
-          @click.stop="lightboxIndex++"
-          aria-label="下一张"
-        >›</button>
+          <button
+            v-if="lightboxIndex > 0"
+            class="lb-arrow lb-prev"
+            @click.stop="lightboxIndex--"
+            aria-label="上一张"
+          >‹</button>
+          <button
+            v-if="lightboxIndex < photos.length - 1"
+            class="lb-arrow lb-next"
+            @click.stop="lightboxIndex++"
+            aria-label="下一张"
+          >›</button>
 
-        <!-- 关闭 -->
-        <button class="lb-close" @click="closeLightbox" aria-label="关闭">×</button>
-
-        <!-- 标题 + 计数 -->
-        <div class="lb-caption">
-          <span class="lb-title">{{ photos[lightboxIndex]?.photoName }}</span>
-          <span class="lb-counter">{{ lightboxIndex + 1 }} / {{ photos.length }}</span>
+          <div class="lb-counter">{{ lightboxIndex + 1 }} / {{ photos.length }}</div>
         </div>
+
+        <!-- 右侧：评论面板 -->
+        <div class="lb-comment-panel" @click.stop>
+          <div class="lb-panel-header">
+            <div class="lb-panel-title">
+              <span class="lb-photo-name">{{ photos[lightboxIndex]?.photoName || '图片详情' }}</span>
+            </div>
+            <button class="lb-close-btn" @click="closeLightbox" aria-label="关闭">×</button>
+          </div>
+          <div class="lb-panel-body">
+            <Comment
+              :article-id="photos[lightboxIndex]?.id"
+              :key="photos[lightboxIndex]?.id"
+            />
+          </div>
+        </div>
+
       </div>
     </Transition>
   </div>
@@ -123,6 +134,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { getAlbumList, getAlbumPhotos } from '@/api/article'
 import { ElMessage } from 'element-plus'
+import Comment from '@/components/Comment.vue'
 
 interface Album {
   id: number
@@ -446,85 +458,127 @@ onUnmounted(() => {
   font-size: 15px;
 }
 
-// ── 灯箱 ──────────────────────────────────────────────
+// ── 灯箱（左图右评论） ────────────────────────────────
 .lightbox {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.92);
+  z-index: 2000;
+  display: flex;
+  background: rgba(0, 0, 0, 0.88);
+}
+
+// 左侧图片区
+.lb-image-panel {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
-  padding: 60px 80px 80px;
+  position: relative;
+  padding: 48px 40px;
 }
 
 .lb-img {
   max-width: 100%;
-  max-height: calc(100vh - 160px);
+  max-height: 100%;
   object-fit: contain;
   border-radius: 6px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
   user-select: none;
+  display: block;
 }
 
 .lb-arrow {
-  position: fixed;
+  position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 52px; height: 52px;
+  width: 48px; height: 48px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #fff;
-  font-size: 28px;
+  font-size: 26px;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.2s;
   line-height: 1;
 
   &:hover { background: rgba(255, 255, 255, 0.22); }
-  &.lb-prev { left: 24px; }
-  &.lb-next { right: 24px; }
+  &.lb-prev { left: 16px; }
+  &.lb-next { right: 16px; }
 }
 
-.lb-close {
-  position: fixed;
-  top: 20px; right: 24px;
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff; font-size: 22px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.2s;
-
-  &:hover { background: rgba(255, 255, 255, 0.22); }
+.lb-counter {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: var(--font-sans);
+  white-space: nowrap;
 }
 
-.lb-caption {
-  position: fixed;
-  bottom: 28px; left: 0; right: 0;
+// 右侧评论面板
+.lb-comment-panel {
+  width: 380px;
+  flex-shrink: 0;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.lb-panel-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 0 80px;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
 
-  .lb-title {
+  .lb-photo-name {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.85);
-    font-weight: 500;
-    max-width: 600px;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-
-  .lb-counter {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.45);
-    font-family: var(--font-sans);
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
-    flex-shrink: 0;
+    font-family: var(--font-sans);
+  }
+}
+
+.lb-close-btn {
+  flex-shrink: 0;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, color 0.2s;
+  margin-left: 12px;
+
+  &:hover { background: var(--bg-secondary); color: var(--text-primary); }
+}
+
+.lb-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 4px;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
+  // 覆盖评论组件的外边距，使其贴合面板
+  :deep(.comment-section) {
+    margin-top: 0;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    background: transparent;
   }
 }
 
@@ -548,15 +602,24 @@ onUnmounted(() => {
     gap: 12px;
   }
 
-  .lightbox { padding: 50px 16px 70px; }
+  .lightbox { flex-direction: column; }
+
+  .lb-image-panel {
+    flex: none;
+    height: 45vh;
+    padding: 24px 16px;
+  }
+
+  .lb-comment-panel {
+    width: 100%;
+    flex: 1;
+  }
 
   .lb-arrow {
-    width: 40px; height: 40px; font-size: 22px;
+    width: 36px; height: 36px; font-size: 20px;
     &.lb-prev { left: 8px; }
     &.lb-next { right: 8px; }
   }
-
-  .lb-caption { padding: 0 16px; }
 }
 
 @media (max-width: 480px) {
