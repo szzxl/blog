@@ -175,7 +175,7 @@ import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
 import { uploadImage, updateUserProfile, getUserInfo, updatePassword } from '@/api/article'
 import { ElMessage } from 'element-plus'
 import {
-  House, Document, Folder, CollectionTag, ChatDotRound,
+  House, Document, Folder, CollectionTag,
   PictureFilled, EditPen, Connection, Moon, Sunny,
 } from '@element-plus/icons-vue'
 
@@ -188,8 +188,7 @@ const navItems = [
   { to: '/articles', icon: Document, text: '文章', color: '#722ed1' },
   { to: '/category', icon: Folder, text: '分类', color: '#ff7d00' },
   { to: '/tag', icon: CollectionTag, text: '标签', color: '#f53f3f' },
-  { to: '/talk', icon: ChatDotRound, text: '说说', color: '#00b42a' },
-  { to: '/album', icon: PictureFilled, text: '相册', color: '#0fc6c2' },
+{ to: '/album', icon: PictureFilled, text: '相册', color: '#0fc6c2' },
   { to: '/guestbook', icon: EditPen, text: '留言板', color: '#f77234' },
   { to: '/link', icon: Connection, text: '友链', color: '#9fdb1d' },
 ]
@@ -207,7 +206,7 @@ const openSearch = () => window.dispatchEvent(new CustomEvent('open-search'))
 const fetchWebsiteConfig = async () => {
   try {
     const config = await fetchWebsiteConfigWithCache()
-    if (config.site_name) siteName.value = config.site_name.replace(/系统$/u, '')
+    if (config.site_name) siteName.value = config.site_name
     if (config.logo) siteLogo.value = config.logo
   } catch {
     // 静默失败

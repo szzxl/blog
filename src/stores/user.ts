@@ -111,13 +111,6 @@ export const useUserStore = defineStore('user', () => {
     return roles.some(role => role.name === '博主' || role.name === '超级管理员')
   })
 
-  // 手动设置用户信息（用于测试）
-  const setUser = (userData: User) => {
-    user.value = userData
-    isLoggedIn.value = true
-    localStorage.setItem('user', JSON.stringify(userData))
-  }
-
   return {
     user,
     isLoggedIn,
@@ -125,7 +118,6 @@ export const useUserStore = defineStore('user', () => {
     isAuthor,
     login,
     logout,
-    fetchUserInfo,
-    setUser
+    fetchUserInfo
   }
 })

@@ -58,7 +58,7 @@
           </h3>
           <p class="contact-intro">如果你对这个博客系统感兴趣，或者需要定制开发服务，欢迎联系我！</p>
           <div class="contact-list">
-            <div class="contact-item">
+            <div class="contact-item" v-if="socialEmail">
               <div class="contact-icon email-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
@@ -67,10 +67,10 @@
               </div>
               <div class="contact-body">
                 <span class="contact-label">邮箱</span>
-                <a href="mailto:suz_zxl@126.com" class="contact-value">suz_zxl@126.com</a>
+                <a :href="`mailto:${socialEmail}`" class="contact-value">{{ socialEmail }}</a>
               </div>
             </div>
-            <div class="contact-item">
+            <div class="contact-item" v-if="socialWechat">
               <div class="contact-icon wechat-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -78,7 +78,7 @@
               </div>
               <div class="contact-body">
                 <span class="contact-label">微信</span>
-                <span class="contact-value">Su_zxl</span>
+                <span class="contact-value">{{ socialWechat }}</span>
               </div>
             </div>
           </div>
@@ -94,6 +94,17 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
+
+const socialEmail = ref('')
+const socialWechat = ref('')
+
+onMounted(async () => {
+  const config = await fetchWebsiteConfigWithCache()
+  if (config.social_email) socialEmail.value = config.social_email
+  if (config.social_wechat) socialWechat.value = config.social_wechat
+})
 </script>
 
 <style scoped lang="scss">

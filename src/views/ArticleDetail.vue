@@ -19,6 +19,8 @@
             <span v-if="article.articleCategory">{{ article.articleCategory }}</span>
             <span class="banner-sep" v-if="article.readNum !== undefined">·</span>
             <span v-if="article.readNum !== undefined">{{ article.readNum }} 阅读</span>
+            <span class="banner-sep" v-if="readingTime > 0">·</span>
+            <span v-if="readingTime > 0">约 {{ readingTime }} 分钟</span>
           </p>
         </template>
       </div>
@@ -42,13 +44,55 @@
             >{{ tag }}</span>
           </div>
 
-          <div class="content" v-html="article.articleContent"></div>
+          <div class="content" v-html="htmlContent" @click="handleContentClick"></div>
         </article>
+
+        <!-- 上一篇/下一篇 -->
+        <div class="adjacent-nav" v-if="prevArticle || nextArticle">
+          <div
+            class="adj-card adj-prev"
+            v-if="prevArticle"
+            @click="router.push(`/article/${prevArticle.id}`)"
+          >
+            <span class="adj-label">← 上一篇</span>
+            <span class="adj-title">{{ prevArticle.articleName }}</span>
+          </div>
+          <div
+            class="adj-card adj-next"
+            v-if="nextArticle"
+            @click="router.push(`/article/${nextArticle.id}`)"
+          >
+            <span class="adj-label">下一篇 →</span>
+            <span class="adj-title">{{ nextArticle.articleName }}</span>
+          </div>
+        </div>
 
         <!-- 评论区 -->
         <Comment v-if="article" :article-id="article.id" />
       </div>
     </div>
+
+    <!-- ── 图片灯箱 ──────────────────────────────────── -->
+    <Transition name="lightbox">
+      <div v-if="lightboxSrc" class="lightbox-overlay" @click="closeLightbox">
+        <img :src="lightboxSrc" class="lightbox-img" @click.stop />
+        <button class="lightbox-close" @click="closeLightbox" aria-label="关闭">×</button>
+      </div>
+    </Transition>
+
+    <!-- ── 文章目录（左侧） ──────────────────────────── -->
+    <nav class="toc-panel" v-if="tocItems.length > 1" aria-label="文章目录">
+      <div class="toc-title">目录</div>
+      <ul class="toc-list">
+        <li
+          v-for="item in tocItems"
+          :key="item.id"
+          class="toc-item"
+          :class="[`toc-h${item.level}`, { active: activeId === item.id }]"
+          @click="scrollToHeading(item.id)"
+        >{{ item.text }}</li>
+      </ul>
+    </nav>
 
     <!-- ── 固定操作栏（右侧） ─────────────────────────── -->
     <div class="article-actions" v-if="article">
@@ -62,13 +106,6 @@
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
         </svg>
         <span class="count">{{ article.likeCount || 0 }}</span>
-      </button>
-
-      <button class="action-btn" title="收藏">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-        </svg>
-        <span class="count">收藏</span>
       </button>
 
       <button class="action-btn" @click="handleShare" title="分享">
@@ -86,14 +123,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue'
+import DOMPurify from 'dompurify'
 import { useRoute, useRouter } from 'vue-router'
 import Comment from '@/components/Comment.vue'
 import Skeleton from '@/components/Skeleton.vue'
-import { getArticleDetail, addArticleView, likeArticle, getArticleLikeCount } from '@/api/article'
+import { getArticleDetail, addArticleView, likeArticle, getArticleLikeCount, getAdjacentArticles } from '@/api/article'
 import { formatTimestamp, parseTags } from '@/utils/format'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
+import { useSeo } from '@/composables/useSeo'
+
+interface TocItem { id: string; text: string; level: 2 | 3 }
 
 const route = useRoute()
 const router = useRouter()
@@ -117,12 +158,117 @@ interface Article {
 
 const article = ref<Article | null>(null)
 const loading = ref(false)
+const prevArticle = ref<{ id: number | string; articleName: string } | null>(null)
+const nextArticle = ref<{ id: number | string; articleName: string } | null>(null)
 const readProgress = ref(0)
+const tocItems = ref<TocItem[]>([])
+const activeId = ref('')
+const htmlContent = ref('')
+const lightboxSrc = ref('')
+
+const readingTime = computed(() => {
+  if (!article.value?.articleContent) return 0
+  const text = article.value.articleContent.replace(/<[^>]+>/g, '').replace(/\s+/g, '')
+  return Math.max(1, Math.ceil(text.length / 300))
+})
+
+function injectHeadingIds(html: string): { html: string; toc: TocItem[] } {
+  if (!html) return { html: '', toc: [] }
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  const toc: TocItem[] = []
+  const seen = new Map<string, number>()
+  doc.querySelectorAll('h2, h3').forEach(el => {
+    const text = el.textContent?.trim() || ''
+    const base = text.toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w一-龥-]/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '') || 'h'
+    const n = seen.get(base) ?? 0
+    seen.set(base, n + 1)
+    const id = n === 0 ? base : `${base}-${n}`
+    el.setAttribute('id', id)
+    toc.push({ id, text, level: Number(el.tagName[1]) as 2 | 3 })
+  })
+  return { html: doc.body.innerHTML, toc }
+}
+
+watch(
+  () => article.value?.articleContent,
+  (content) => {
+    if (!content) { htmlContent.value = ''; tocItems.value = []; return }
+    const { html, toc } = injectHeadingIds(DOMPurify.sanitize(content))
+    htmlContent.value = html
+    tocItems.value = toc
+  },
+  { immediate: true }
+)
+
+watch(article, (a) => {
+  if (!a) return
+  useSeo({
+    title: a.articleName,
+    description: a.articleContent,
+    image: a.articleCover,
+  })
+})
+
+// 代码块复制按钮（DOM 渲染后注入）
+const setupCodeCopy = () => {
+  nextTick(() => {
+    document.querySelectorAll('.article-content .content pre').forEach(pre => {
+      if (pre.querySelector('.copy-btn')) return
+      const btn = document.createElement('button')
+      btn.className = 'copy-btn'
+      btn.textContent = '复制'
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation()
+        const text = (pre.querySelector('code')?.textContent ?? pre.textContent ?? '').trim()
+        try {
+          await navigator.clipboard.writeText(text)
+          btn.textContent = '✓ 已复制'
+          btn.classList.add('copied')
+          setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied') }, 2000)
+        } catch { /* 不支持 clipboard API */ }
+      })
+      pre.appendChild(btn)
+    })
+  })
+}
+
+watch(htmlContent, setupCodeCopy)
 
 const updateProgress = () => {
   const scrollable = document.documentElement.scrollHeight - window.innerHeight
   readProgress.value = scrollable > 0 ? Math.min(100, Math.round((window.scrollY / scrollable) * 100)) : 0
+
+  if (tocItems.value.length) {
+    const top = window.scrollY + 100
+    let current = ''
+    for (const item of tocItems.value) {
+      const el = document.getElementById(item.id)
+      if (el && el.offsetTop <= top) current = item.id
+    }
+    if (current) activeId.value = current
+  }
 }
+
+const scrollToHeading = (id: string) => {
+  const el = document.getElementById(id)
+  if (!el) return
+  window.scrollTo({ top: el.offsetTop - 80, behavior: 'smooth' })
+  activeId.value = id
+}
+
+// 灯箱预览
+const handleContentClick = (e: MouseEvent) => {
+  const target = e.target as HTMLElement
+  if (target.tagName === 'IMG') {
+    lightboxSrc.value = (target as HTMLImageElement).src
+  }
+}
+const closeLightbox = () => { lightboxSrc.value = '' }
+const onKeydown = (e: KeyboardEvent) => { if (e.key === 'Escape') closeLightbox() }
 
 // 获取文章详情
 const fetchArticleDetail = async () => {
@@ -133,6 +279,8 @@ const fetchArticleDetail = async () => {
   }
 
   loading.value = true
+  prevArticle.value = null
+  nextArticle.value = null
   try {
     const res: any = await getArticleDetail({ id: id })
 
@@ -144,6 +292,8 @@ const fetchArticleDetail = async () => {
       }
       // 查询最新点赞数量
       await fetchLikeCount(id)
+      // 查询上一篇/下一篇
+      fetchAdjacentArticles(id)
     }
   } catch (error) {
     ElMessage.error('获取文章详情失败')
@@ -162,6 +312,15 @@ const fetchLikeCount = async (id: string) => {
   } catch (error) {
     // 静默失败，不影响用户体验
   }
+}
+
+// 获取上一篇/下一篇
+const fetchAdjacentArticles = async (id: string) => {
+  try {
+    const res: any = await getAdjacentArticles({ id })
+    if (res?.prev) prevArticle.value = res.prev
+    if (res?.next) nextArticle.value = res.next
+  } catch { /* 静默 */ }
 }
 
 // 增加查看次数
@@ -195,14 +354,7 @@ const handleLikeArticle = async () => {
       type: wasLiked ? 2 : 1  // 已点赞则取消(2)，未点赞则点赞(1)
     })
 
-    // 切换本地状态
-    if (wasLiked) {
-      // 取消点赞
-      article.value.isLiked = false
-    } else {
-      // 点赞
-      article.value.isLiked = true
-    }
+    article.value.isLiked = !wasLiked
 
     // 查询最新点赞数量
     await fetchLikeCount(article.value.id as string)
@@ -225,8 +377,6 @@ const handleShare = async () => {
 // 格式化时间
 const formatTime = (timestamp?: number) => formatTimestamp(timestamp, 'YYYY-MM-DD HH:mm')
 
-// 解析标签字符串为数组
-
 // 跳转到标签文章列表
 const goToTag = (tag: string) => {
   router.push(`/tag/articles?tag=${tag}`)
@@ -235,10 +385,12 @@ const goToTag = (tag: string) => {
 onMounted(() => {
   fetchArticleDetail()
   window.addEventListener('scroll', updateProgress, { passive: true })
+  window.addEventListener('keydown', onKeydown)
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', updateProgress)
+  window.removeEventListener('keydown', onKeydown)
 })
 </script>
 
@@ -585,7 +737,207 @@ onUnmounted(() => {
   }
 }
 
+// ── 文章目录 ──────────────────────────────────────────
+.toc-panel {
+  position: fixed;
+  left: calc((100vw - 860px) / 2 - 268px);
+  top: 100px;
+  width: 240px;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 14px 0 10px;
+  z-index: 100;
+
+  &::-webkit-scrollbar { width: 3px; }
+  &::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
+  .toc-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    padding: 0 16px 10px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 6px;
+  }
+
+  .toc-list { list-style: none; padding: 0; margin: 0; }
+
+  .toc-item {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: 5px 16px;
+    line-height: 1.5;
+    border-left: 2px solid transparent;
+    transition: color 0.2s, background 0.2s, border-color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:hover {
+      color: var(--text-primary);
+      background: var(--bg-secondary);
+    }
+
+    &.active {
+      color: var(--color-accent);
+      border-left-color: var(--color-accent);
+      background: rgba(22, 93, 255, 0.05);
+    }
+
+    &.toc-h3 {
+      padding-left: 26px;
+      font-size: 12px;
+    }
+  }
+}
+
+// ── 代码块复制按钮 ────────────────────────────────────
+:deep(pre) {
+  position: relative;
+
+  .copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    color: var(--text-tertiary);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-btn);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s, color 0.2s, border-color 0.2s;
+
+    &.copied {
+      color: #00b42a;
+      border-color: #00b42a;
+    }
+  }
+
+  &:hover .copy-btn { opacity: 1; }
+}
+
+// ── 图片灯箱 ──────────────────────────────────────────
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  cursor: zoom-out;
+  padding: 20px;
+}
+
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 88vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  cursor: default;
+}
+
+.lightbox-close {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+
+  &:hover { background: rgba(255, 255, 255, 0.22); }
+}
+
+.lightbox-enter-active, .lightbox-leave-active { transition: opacity 0.2s ease; }
+.lightbox-enter-from, .lightbox-leave-to { opacity: 0; }
+
+// ── 上一篇/下一篇 ─────────────────────────────────────
+.adjacent-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 32px;
+
+  &:has(.adj-prev:only-child),
+  &:has(.adj-next:only-child) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.adj-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 16px 20px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+
+  &:hover {
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+
+    .adj-title { color: var(--color-accent); }
+  }
+
+  &.adj-next {
+    text-align: right;
+    align-items: flex-end;
+  }
+}
+
+.adj-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+}
+
+.adj-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: color 0.2s;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}
+
 // ── 响应式 ────────────────────────────────────────────
+@media (max-width: 1380px) {
+  .toc-panel {
+    display: none;
+  }
+}
+
 @media (max-width: 1200px) {
   .article-actions {
     display: none;

@@ -13,53 +13,48 @@ interface WebsiteConfig {
   social_email?: string
   social_gitee?: string
   social_github?: string
+  social_wechat?: string
 }
 
 let configCache: WebsiteConfig | null = null
+let pendingRequest: Promise<WebsiteConfig> | null = null
 
 /**
- * 获取网站配置（带缓存）
+ * 获取网站配置（带缓存），并发调用时共享同一个请求
  */
-export const fetchWebsiteConfigWithCache = async (): Promise<WebsiteConfig> => {
-  // 1. 先检查内存缓存
-  if (configCache) {
-    return configCache
-  }
+export const fetchWebsiteConfigWithCache = (): Promise<WebsiteConfig> => {
+  if (configCache) return Promise.resolve(configCache)
 
-  // 2. 检查 sessionStorage 缓存
   const cachedData = sessionStorage.getItem(CACHE_KEY)
   if (cachedData) {
     try {
       configCache = JSON.parse(cachedData)
-      return configCache as WebsiteConfig
-    } catch (error) {
-      // 解析缓存配置失败
+      return Promise.resolve(configCache as WebsiteConfig)
+    } catch {
+      // sessionStorage 数据损坏，重新获取
     }
   }
 
-  // 3. 调用接口获取配置
-  try {
-    const response: any = await getWebsiteConfig()
-    const config: WebsiteConfig = {}
+  if (pendingRequest) return pendingRequest
 
-    if (response && Array.isArray(response)) {
-      response.forEach((item: any) => {
-        const key = item.configKey as keyof WebsiteConfig
-        const value = item.configValue
-        if (value) {
-          config[key] = value
-        }
-      })
-    }
+  pendingRequest = getWebsiteConfig()
+    .then((response: any) => {
+      const config: WebsiteConfig = {}
+      if (response && Array.isArray(response)) {
+        response.forEach((item: any) => {
+          const key = item.configKey as keyof WebsiteConfig
+          if (item.configValue) config[key] = item.configValue
+        })
+      }
+      if (config.site_name) config.site_name = config.site_name.replace(/系统$/u, '')
+      configCache = config
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify(config))
+      return config
+    })
+    .catch(() => ({} as WebsiteConfig))
+    .finally(() => { pendingRequest = null })
 
-    // 4. 保存到缓存
-    configCache = config
-    sessionStorage.setItem(CACHE_KEY, JSON.stringify(config))
-
-    return config
-  } catch (error) {
-    return {}
-  }
+  return pendingRequest
 }
 
 /**

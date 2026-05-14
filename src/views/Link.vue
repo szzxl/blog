@@ -64,65 +64,126 @@
   <!-- ── 申请友链弹窗 ───────────────────────────────── -->
   <el-dialog
     v-model="showApplyDialog"
-    title="申请友链"
-    width="600px"
+    width="560px"
     :close-on-click-modal="false"
+    class="apply-dialog-wrap"
     @close="resetForm"
   >
-    <div class="apply-dialog">
-      <p class="dialog-desc">填写以下信息申请友链，我们会尽快审核~</p>
+    <!-- 自定义 Header -->
+    <template #header>
+      <div class="dialog-header">
+        <div class="header-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="header-title">申请友链</h3>
+          <p class="header-sub">填写信息提交后，审核通过即可展示~</p>
+        </div>
+      </div>
+    </template>
 
+    <!-- 表单主体 -->
+    <div class="apply-body">
       <el-form
         ref="formRef"
         :model="applyForm"
         :rules="formRules"
-        label-width="100px"
+        label-position="top"
         class="apply-form"
       >
-        <el-form-item label="网站名称" prop="siteName">
-          <el-input v-model="applyForm.siteName" placeholder="请输入您的网站名称" />
-        </el-form-item>
+        <!-- 第一行：网站名称 + 站长名称 -->
+        <div class="form-row">
+          <el-form-item label="网站名称" prop="siteName">
+            <el-input v-model="applyForm.siteName" placeholder="我的技术博客">
+              <template #prefix>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+              </template>
+            </el-input>
+          </el-form-item>
+          <el-form-item label="站长名称" prop="siteAuthor">
+            <el-input v-model="applyForm.siteAuthor" placeholder="张三">
+              <template #prefix>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+              </template>
+            </el-input>
+          </el-form-item>
+        </div>
 
+        <!-- 网站地址 -->
         <el-form-item label="网站地址" prop="siteUrl">
-          <el-input v-model="applyForm.siteUrl" placeholder="https://example.com" />
+          <el-input v-model="applyForm.siteUrl" placeholder="https://example.com">
+            <template #prefix>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+            </template>
+          </el-input>
         </el-form-item>
 
+        <!-- 联系邮箱 -->
+        <el-form-item label="联系邮箱" prop="email">
+          <el-input v-model="applyForm.email" placeholder="your@email.com">
+            <template #prefix>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </template>
+          </el-input>
+        </el-form-item>
+
+        <!-- 网站描述 -->
         <el-form-item label="网站描述" prop="siteDescription">
           <el-input
             v-model="applyForm.siteDescription"
             type="textarea"
             :rows="3"
-            placeholder="简单介绍一下您的网站"
+            placeholder="用一两句话介绍你的网站..."
             maxlength="100"
             show-word-limit
           />
         </el-form-item>
-
-        <el-form-item label="站长名称" prop="siteAuthor">
-          <el-input v-model="applyForm.siteAuthor" placeholder="请输入您的名称" />
-        </el-form-item>
-
-        <el-form-item label="联系邮箱" prop="email">
-          <el-input v-model="applyForm.email" placeholder="your@email.com" />
-        </el-form-item>
       </el-form>
 
+      <!-- 申请须知 -->
       <div class="apply-tips">
-        <h4 class="tips-title">
-          <span class="tips-bar"></span>
-          申请要求
-        </h4>
-        <ul class="tips-list">
-          <li>网站内容健康，无违法违规信息</li>
-          <li>网站可以正常访问，更新频率稳定</li>
-          <li>优先考虑原创内容网站</li>
-        </ul>
+        <div class="tips-header">
+          <svg class="tips-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          申请须知
+        </div>
+        <div class="tips-grid">
+          <div class="tip-item" v-for="tip in APPLY_TIPS" :key="tip">
+            <svg class="tip-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>{{ tip }}</span>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- Footer -->
     <template #footer>
-      <el-button @click="resetForm">取消</el-button>
-      <el-button type="primary" @click="submitApply">提交申请</el-button>
+      <div class="dialog-footer">
+        <button class="footer-cancel" @click="resetForm">取消</button>
+        <button class="footer-submit" @click="submitApply">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          提交申请
+        </button>
+      </div>
     </template>
   </el-dialog>
 </template>
@@ -142,6 +203,13 @@ interface Link {
   status: number
   createTime: number
 }
+
+const APPLY_TIPS = [
+  '网站内容健康，无违法违规信息',
+  '网站可以正常访问，更新频率稳定',
+  '优先考虑原创内容网站',
+  '已将本站加入友链更佳',
+]
 
 const links = ref<Link[]>([])
 const loading = ref(false)
@@ -550,57 +618,288 @@ onMounted(() => {
 }
 
 // ── 申请弹窗 ───────────────────────────────────────────
-.apply-dialog {
-  .dialog-desc {
-    color: var(--text-secondary);
-    font-size: 14px;
-    line-height: 1.85;
-    margin-bottom: 20px;
+:deep(.apply-dialog-wrap) {
+  .el-dialog {
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-card-hover);
+    background: var(--bg-card);
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .el-dialog__header {
+    padding: 0;
+    margin: 0;
+  }
+
+  .el-dialog__body {
+    padding: 0;
+  }
+
+  .el-dialog__footer {
+    padding: 0;
+  }
+
+  .el-dialog__headerbtn {
+    top: 18px;
+    right: 18px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s;
+
+    &:hover {
+      background: var(--bg-primary);
+      border-color: var(--border-strong);
+    }
+
+    .el-dialog__close {
+      color: var(--text-tertiary);
+      font-size: 13px;
+    }
+  }
+}
+
+// Header
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 24px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(135deg, rgba(22, 93, 255, 0.04) 0%, rgba(114, 46, 209, 0.04) 100%);
+
+  .header-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--gradient-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(22, 93, 255, 0.28);
+
+    svg {
+      width: 20px;
+      height: 20px;
+      stroke: #fff;
+    }
+  }
+
+  .header-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 3px;
+  }
+
+  .header-sub {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin: 0;
     font-family: var(--font-sans);
   }
+}
 
-  .apply-form {
-    margin: 16px 0;
+// 表单主体
+.apply-body {
+  padding: 22px 24px 20px;
+}
+
+.apply-form {
+  margin-bottom: 18px;
+
+  // 双列布局
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 16px;
   }
 
-  .apply-tips {
-    background: var(--bg-secondary);
-    padding: 18px 20px;
+  :deep(.el-form-item__label) {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    padding-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  :deep(.el-form-item) {
+    margin-bottom: 16px;
+  }
+
+  :deep(.el-input__wrapper) {
     border-radius: var(--radius-btn);
+    background: var(--bg-secondary);
+    box-shadow: 0 0 0 1px var(--border-color) inset;
+    transition: box-shadow 0.2s;
+
+    &:hover {
+      box-shadow: 0 0 0 1px var(--border-strong) inset;
+    }
+
+    &.is-focus {
+      box-shadow: 0 0 0 1px var(--color-accent) inset, 0 0 0 3px rgba(22, 93, 255, 0.1);
+    }
+  }
+
+  :deep(.el-input__prefix) {
+    color: var(--text-tertiary);
+
+    svg {
+      width: 14px;
+      height: 14px;
+      vertical-align: middle;
+    }
+  }
+
+  :deep(.el-textarea__inner) {
+    border-radius: var(--radius-btn);
+    background: var(--bg-secondary);
+    box-shadow: 0 0 0 1px var(--border-color) inset;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    resize: none;
+    transition: box-shadow 0.2s;
+
+    &:focus {
+      box-shadow: 0 0 0 1px var(--color-accent) inset, 0 0 0 3px rgba(22, 93, 255, 0.1);
+    }
+  }
+}
+
+// 须知区域
+.apply-tips {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-btn);
+  padding: 14px 16px;
+
+  .tips-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-family: var(--font-sans);
+
+    .tips-icon {
+      width: 14px;
+      height: 14px;
+      color: var(--color-accent);
+      flex-shrink: 0;
+    }
+  }
+
+  .tips-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+  }
+
+  .tip-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+
+    .tip-check {
+      width: 13px;
+      height: 13px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: #00b42a;
+    }
+  }
+}
+
+// Footer
+.dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 24px 20px;
+  border-top: 1px solid var(--border-color);
+
+  button {
+    height: 38px;
+    padding: 0 22px;
+    border-radius: var(--radius-btn);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .footer-cancel {
+    background: transparent;
     border: 1px solid var(--border-color);
+    color: var(--text-secondary);
 
-    .tips-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-tertiary);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin: 0 0 12px 0;
+    &:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+      background: var(--bg-secondary);
+    }
+  }
 
-      .tips-bar {
-        display: block;
-        width: 3px;
-        height: 14px;
-        background: var(--gradient-accent);
-        border-radius: 2px;
-        flex-shrink: 0;
-      }
+  .footer-submit {
+    background: var(--gradient-accent);
+    border: none;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(22, 93, 255, 0.28);
+
+    svg {
+      width: 14px;
+      height: 14px;
     }
 
-    .tips-list {
-      margin: 0;
-      padding-left: 18px;
-
-      li {
-        color: var(--text-secondary);
-        font-size: 13px;
-        line-height: 1.85;
-        font-family: var(--font-sans);
-      }
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(22, 93, 255, 0.38);
     }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (max-width: 560px) {
+  .apply-form .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .apply-tips .tips-grid {
+    grid-template-columns: 1fr;
+  }
+
+  :deep(.apply-dialog-wrap) .el-dialog {
+    margin: 0 !important;
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100% !important;
   }
 }
 

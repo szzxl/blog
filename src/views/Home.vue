@@ -24,7 +24,7 @@
             <button v-if="socialEmail" class="ac-social email" title="复制邮箱" @click="copyEmail">
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
             </button>
-            <button class="ac-social wechat" title="复制微信号" @click="copyWechat">
+            <button v-if="socialWechat" class="ac-social wechat" title="复制微信号" @click="copyWechat">
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.295.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-5.972 2.981-7.853 1.141-.741 2.431-1.242 3.812-1.368.157-4.055-3.735-7.26-8.61-7.26zm-1.47 3.297a1.016 1.016 0 110 2.032 1.016 1.016 0 010-2.032zm4.047 0a1.016 1.016 0 110 2.032 1.016 1.016 0 010-2.032zm4.03 3.867c-3.988 0-7.22 2.73-7.22 6.103 0 3.372 3.232 6.104 7.22 6.104.868 0 1.7-.131 2.47-.363a.728.728 0 01.6.081l1.583.927a.271.271 0 00.14.046c.138 0 .248-.11.248-.249 0-.06-.023-.12-.04-.178l-.325-1.233a.494.494 0 01.178-.556C21.587 19.005 22.5 17.4 22.5 15.455c0-3.372-3.233-6.103-7.202-6.103zm-2.134 2.79a.854.854 0 110 1.708.854.854 0 010-1.708zm4.28 0a.854.854 0 110 1.708.854.854 0 010-1.708z"/></svg>
             </button>
           </div>
@@ -68,7 +68,12 @@
               class="article-card"
               v-for="article in articles"
               :key="article.id"
+              tabindex="0"
+              role="button"
+              :aria-label="article.articleName"
               @click="viewArticle(article.id)"
+              @keydown.enter="viewArticle(article.id)"
+              @keydown.space.prevent="viewArticle(article.id)"
             >
               <div class="card-cover">
                 <img :src="article.articleCover || '/default-cover.svg'" :alt="article.articleName" loading="lazy" />
@@ -139,7 +144,7 @@
               <span
                 v-for="(tag, i) in tags" :key="tag.id ?? tag.name"
                 class="sphere-tag"
-                :style="getTagStyle(i)"
+                :style="tagStyles[i]"
                 :ref="el => setTagRef(el, i)"
                 @click="$router.push(`/tag/articles?tag=${tag.name || tag.tagName}`)"
                 @mouseenter="pauseSphere"
@@ -156,7 +161,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { getMonthArticleList, getCategoryList, getTagList, getNotificationList } from '@/api/article'
 import { formatTimestamp, parseTags } from '@/utils/format'
@@ -211,34 +216,25 @@ const siteName = ref('')
 const socialGithub = ref('')
 const socialGitee = ref('')
 const socialEmail = ref('')
-const copyEmail = async () => {
-  if (!socialEmail.value) return
+const socialWechat = ref('')
+
+const copyText = async (text: string, label: string) => {
+  if (!text) return
   try {
-    await navigator.clipboard.writeText(socialEmail.value)
+    await navigator.clipboard.writeText(text)
   } catch {
     const el = document.createElement('textarea')
-    el.value = socialEmail.value
+    el.value = text
     document.body.appendChild(el)
     el.select()
     document.execCommand('copy')
     document.body.removeChild(el)
   }
-  ElMessage.success('邮箱号已复制到剪贴板')
+  ElMessage.success(`${label}已复制到剪贴板`)
 }
 
-const copyWechat = async () => {
-  try {
-    await navigator.clipboard.writeText('Su_zxl')
-  } catch {
-    const el = document.createElement('textarea')
-    el.value = 'Su_zxl'
-    document.body.appendChild(el)
-    el.select()
-    document.execCommand('copy')
-    document.body.removeChild(el)
-  }
-  ElMessage.success('微信号已复制到剪贴板')
-}
+const copyEmail  = () => copyText(socialEmail.value,  '邮箱号')
+const copyWechat = () => copyText(socialWechat.value, '微信号')
 
 
 const phrases = ['记录技术与生活', '分享所见所闻', '用文字留住时光']
@@ -282,14 +278,15 @@ const fetchArticles = async () => {
 const fetchConfig = async () => {
   try {
     const config = await fetchWebsiteConfigWithCache()
-    if (config.site_name) siteName.value = config.site_name.replace(/系统$/u, '')
+    if (config.site_name) siteName.value = config.site_name
     if (config.social_github) socialGithub.value = config.social_github
     if (config.social_gitee) socialGitee.value = config.social_gitee
     if (config.social_email) socialEmail.value = config.social_email
+    if (config.social_wechat) socialWechat.value = config.social_wechat
   } catch { /* 静默 */ }
 }
 
-const fetchCarousel = async () => {
+const fetchNotifications = async () => {
   try {
     const res: any = await getNotificationList()
     const list = Array.isArray(res) ? res : (res?.list ?? [])
@@ -316,6 +313,8 @@ const fetchTags = async () => {
 }
 
 // ── 球形标签云 ────────────────────────────────────────
+const prefersReducedMotion = typeof window !== 'undefined' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
 const tagEls = ref<HTMLElement[]>([])
 let sphereTimer = 0
 let angleX = 0.008
@@ -341,7 +340,7 @@ const initSphere = () => {
     }
   })
   renderSphere()
-  sphereTimer = requestAnimationFrame(tick)
+  if (!prefersReducedMotion) sphereTimer = requestAnimationFrame(tick)
 }
 
 const tick = (now: number) => {
@@ -385,16 +384,17 @@ const TAG_COLORS = [
   ['#fff8e8', '#f77234'], ['#f0ffe8', '#9fdb1d'],
 ]
 
-const getTagStyle = (i: number) => {
-  const pair = TAG_COLORS[i % TAG_COLORS.length] ?? ['#e8f0ff', '#165dff']
-  const [bg, color] = pair
-  return { background: bg, color, borderColor: (color ?? '#165dff') + '55' }
-}
+const tagStyles = computed(() =>
+  tags.value.map((_, i) => {
+    const [bg, color] = TAG_COLORS[i % TAG_COLORS.length] ?? ['#e8f0ff', '#165dff']
+    return { background: bg, color, borderColor: color + '55' }
+  })
+)
 
 const viewArticle = (id: number) => router.push(`/article/${id}`)
 
 onMounted(() => {
-  fetchArticles(); fetchConfig(); fetchCategories(); fetchTags(); fetchCarousel()
+  fetchArticles(); fetchConfig(); fetchCategories(); fetchTags(); fetchNotifications()
   typeTimer = setTimeout(() => runTypewriter(), 800)
 })
 onUnmounted(() => {
@@ -641,6 +641,7 @@ onUnmounted(() => {
   padding: 12px;
   display: flex;
   justify-content: center;
+  overflow: hidden;
 }
 
 .tag-sphere {
@@ -831,5 +832,11 @@ onUnmounted(() => {
   .article-grid { grid-template-columns: 1fr; }
   .sidebar-left, .sidebar-right { grid-template-columns: 1fr; }
   .page-layout { padding: 16px 16px 60px; }
+  .tag-sphere { width: 180px; height: 180px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sphere-tag { transition: none; }
+  .article-card { transition: none; &:hover { transform: none; } }
 }
 </style>

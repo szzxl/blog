@@ -4,6 +4,20 @@
   box-sizing: border-box;
 }
 
+html {
+  font-size: 23px;
+}
+
+// ── Element Plus 字体尺寸覆盖 ─────────────────────────────
+:root {
+  --el-font-size-extra-large: 29px;
+  --el-font-size-large: 27px;
+  --el-font-size-medium: 25px;
+  --el-font-size-base: 22px;
+  --el-font-size-small: 20px;
+  --el-font-size-extra-small: 19px;
+}
+
 // ── 浅色主题 ────────────────────────────────────────────
 :root,
 [data-theme="light"] {
@@ -109,6 +123,7 @@
 
 body {
   font-family: var(--font-sans);
+  font-size: 23px;
   color: var(--text-secondary);
   background: var(--bg-primary);
   -webkit-font-smoothing: antialiased;
@@ -149,7 +164,7 @@ button, a, input, textarea { -webkit-tap-highlight-color: transparent; }
 
   h1 {
     font-family: var(--font-serif);
-    font-size: 36px;
+    font-size: 47px;
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 10px;
@@ -157,7 +172,7 @@ button, a, input, textarea { -webkit-tap-highlight-color: transparent; }
     line-height: 1.2;
   }
 
-  p { font-size: 15px; color: var(--text-tertiary); }
+  p { font-size: 22px; color: var(--text-tertiary); }
 
   &::after {
     content: '';
