@@ -262,25 +262,35 @@ export const likeArticleComment = (data: {
 }
 
 // 收藏相关
-export const getUserFavorites = (data: {
+export const addFavorite = (data: {
+  articleId: string | number
+  articleName: string
+  articleTime: string
   userId: number
-  pageNo: number
-  pageSize: number
 }) => {
   return request({
-    url: '/web/user/favorites',
+    url: '/article/add/favorite',
     method: 'post',
     data
   })
 }
 
-export const removeFavorite = (data: {
-  userId: number
-  articleId: number
+export const getUserFavorites = (data: {
+  userId: string | number
+  pageNo: number
+  pageSize: number
 }) => {
   return request({
-    url: '/web/user/favorite/remove',
-    method: 'delete',
+    url: '/article/favorite/page',
+    method: 'post',
+    data
+  })
+}
+
+export const removeFavorite = (data: { articleId: string | number; userId: string | number }) => {
+  return request({
+    url: '/article/delete/favorite',
+    method: 'post',
     data
   })
 }
