@@ -50,7 +50,13 @@ const LEAF_FILTERS = [
   'hue-rotate(12deg)  saturate(1.3) brightness(1.05)',
   'hue-rotate(25deg)  saturate(1.2) brightness(1.1)',
 ]
-const leafData = Array.from({ length: 45 }, () => {
+
+const prefersReducedMotion = typeof window !== 'undefined' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
+const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+const LEAF_COUNT = prefersReducedMotion ? 0 : (isMobile ? 15 : 25)
+
+const leafData = Array.from({ length: LEAF_COUNT }, () => {
   const fallDur   = rnd(5, 10).toFixed(1) + 's'
   const fallDelay = '-' + rnd(0, 12).toFixed(1) + 's'
   const swayDur   = rnd(2, 4).toFixed(1) + 's'
@@ -82,14 +88,14 @@ const fetchWebsiteConfig = async () => {
   }
 }
 
-let scrollThrottle: ReturnType<typeof setTimeout> | null = null
+let scrollRaf: number | null = null
 
 const handleScroll = () => {
-  if (scrollThrottle) return
-  scrollThrottle = setTimeout(() => {
+  if (scrollRaf !== null) return
+  scrollRaf = requestAnimationFrame(() => {
     showBackToTop.value = window.scrollY > 300
-    scrollThrottle = null
-  }, 50)
+    scrollRaf = null
+  })
 }
 
 const scrollToTop = () => {
@@ -103,7 +109,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
-  if (scrollThrottle) clearTimeout(scrollThrottle)
+  if (scrollRaf !== null) cancelAnimationFrame(scrollRaf)
 })
 </script>
 

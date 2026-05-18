@@ -11,7 +11,7 @@ interface CacheItem<T> {
 class CacheManager {
   private cache: Map<string, CacheItem<any>>
   private maxSize: number
-  private _cleanupStarted = false
+  private _cleanupTimer: ReturnType<typeof setInterval> | null = null
 
   constructor(maxSize = 100) {
     this.cache = new Map()
@@ -19,16 +19,20 @@ class CacheManager {
   }
 
   set<T>(key: string, data: T, ttl = 5 * 60 * 1000): void {
-    if (!this._cleanupStarted) {
-      this._cleanupStarted = true
-      setInterval(() => this.clearExpired(), 10 * 60 * 1000)
+    if (this._cleanupTimer === null) {
+      this._cleanupTimer = setInterval(() => this.clearExpired(), 10 * 60 * 1000)
     }
-    // 如果缓存已满，删除最旧的项
+    // 缓存已满时淘汰最久未访问的项（LRU）
     if (this.cache.size >= this.maxSize) {
-      const firstKey = this.cache.keys().next().value
-      if (firstKey) {
-        this.cache.delete(firstKey)
+      let lruKey: string | null = null
+      let lruTime = Infinity
+      for (const [k, v] of this.cache.entries()) {
+        if (v.timestamp < lruTime) {
+          lruTime = v.timestamp
+          lruKey = k
+        }
       }
+      if (lruKey) this.cache.delete(lruKey)
     }
 
     this.cache.set(key, {
@@ -51,6 +55,8 @@ class CacheManager {
       return null
     }
 
+    // 更新最后访问时间（LRU）
+    item.timestamp = Date.now()
     return item.data as T
   }
 
@@ -71,6 +77,14 @@ class CacheManager {
   }
 
   clear(): void {
+    this.cache.clear()
+  }
+
+  destroy(): void {
+    if (this._cleanupTimer !== null) {
+      clearInterval(this._cleanupTimer)
+      this._cleanupTimer = null
+    }
     this.cache.clear()
   }
 

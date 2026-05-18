@@ -51,9 +51,11 @@ export default defineConfig(({ mode }) => {
           // 分包策略
           manualChunks(id) {
             if (id.includes('node_modules')) {
-              if (['vue', 'vue-router', 'pinia'].some(p => id.includes(`/node_modules/${p}/`))) return 'vue-vendor'
+              if (id.includes('/node_modules/vue/')) return 'vue-core'
+              if (id.includes('/node_modules/vue-router/')) return 'vue-router'
+              if (id.includes('/node_modules/pinia/')) return 'pinia'
               if (['element-plus', '@element-plus'].some(p => id.includes(`/node_modules/${p}/`))) return 'element-plus'
-              if (['axios', 'dayjs', '@vueuse'].some(p => id.includes(`/node_modules/${p}/`))) return 'utils'
+              if (['axios', 'dayjs', '@vueuse', 'dompurify'].some(p => id.includes(`/node_modules/${p}/`))) return 'utils'
             }
           },
           // 文件名优化
@@ -90,7 +92,7 @@ export default defineConfig(({ mode }) => {
     },
     // 优化依赖预构建
     optimizeDeps: {
-      include: ['vue', 'vue-router', 'pinia', 'element-plus', 'axios']
+      include: ['vue', 'vue-router', 'pinia', 'element-plus', 'axios', 'dompurify']
     }
   }
 })

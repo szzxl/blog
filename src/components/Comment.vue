@@ -371,15 +371,23 @@ const handleReplyFileChange = (event: Event) => {
 }
 
 const uploadImagesToList = async (files: File[], list: string[]) => {
-  for (const file of files) {
-    if (list.length >= 9) { ElMessage.warning('最多只能上传 9 张图片'); break }
-    if (!file.type.startsWith('image/')) { ElMessage.error(`${file.name} 不是图片文件`); continue }
-    if (file.size > 5 * 1024 * 1024) { ElMessage.error(`${file.name} 大小超过 5MB`); continue }
-    try {
-      const url: any = await uploadImage(file)
-      if (url) list.push(url)
-    } catch { ElMessage.error('图片上传失败') }
-  }
+  const valid = files.filter(file => {
+    if (!file.type.startsWith('image/')) { ElMessage.error(`${file.name} 不是图片文件`); return false }
+    if (file.size > 5 * 1024 * 1024) { ElMessage.error(`${file.name} 大小超过 5MB`); return false }
+    return true
+  })
+
+  const remaining = 9 - list.length
+  if (remaining <= 0) { ElMessage.warning('最多只能上传 9 张图片'); return }
+
+  const toUpload = valid.slice(0, remaining)
+  if (toUpload.length < valid.length) ElMessage.warning('最多只能上传 9 张图片')
+
+  const results = await Promise.allSettled(toUpload.map(file => uploadImage(file)))
+  results.forEach(result => {
+    if (result.status === 'fulfilled' && result.value) list.push(result.value as string)
+    else if (result.status === 'rejected') ElMessage.error('图片上传失败')
+  })
 }
 
 const onLbKeydown = (e: KeyboardEvent) => { if (e.key === 'Escape') lightboxSrc.value = '' }
