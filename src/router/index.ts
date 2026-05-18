@@ -54,6 +54,7 @@ router.beforeEach(async (to, _from, next) => {
       userStore.isLoggedIn = true
     } catch (error) {
       userStore.token = ''
+      userStore.isLoggedIn = false
       localStorage.removeItem('ACCESS_TOKEN')
       localStorage.removeItem('user')
     }
