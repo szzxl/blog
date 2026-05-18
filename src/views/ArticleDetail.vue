@@ -325,10 +325,10 @@ const fetchArticleDetail = async () => {
     const res: any = await getArticleDetail({ id: id })
 
     if (res) {
-      article.value = res
-      if (!article.value.isFavorited && (history.state as any)?.isFavorited) {
-        article.value.isFavorited = true
+      if (!res.isFavorited && (history.state as any)?.isFavorited) {
+        res.isFavorited = true
       }
+      article.value = res
       // 增加查看次数（博主不增加）
       if (!isAuthor.value) {
         incrementViewCount(id)
