@@ -9,9 +9,9 @@
       
       <!-- 文章列表 -->
       <div class="article-list" v-loading="loading">
-        <div 
-          v-for="article in articles" 
-          :key="article.id" 
+        <div
+          v-for="article in articles"
+          :key="article.id"
           class="article-card card"
           @click="goToArticle(article.id)"
         >
@@ -20,16 +20,15 @@
           </div>
           <div class="article-content">
             <h3 class="article-title">{{ article.articleName }}</h3>
-            <p class="article-desc" v-if="article.articleDesc">{{ article.articleDesc }}</p>
             <div class="article-meta">
               <span class="meta-item">{{ formatTimestamp(article.createTime) }}</span>
+              <span class="meta-item" v-if="article.articleCategory">{{ article.articleCategory }}</span>
               <span class="meta-item">{{ article.readNum || 0 }} 阅读</span>
-              <span class="meta-item">{{ article.likeCount || 0 }} 点赞</span>
             </div>
           </div>
           <div class="article-actions">
-            <el-button 
-              class="unfavorite-btn" 
+            <el-button
+              class="unfavorite-btn"
               size="small"
               @click.stop="handleUnfavorite(article)"
             >
@@ -91,15 +90,14 @@ const loadFavorites = async () => {
   loading.value = true
   try {
     const response: any = await getUserFavorites({
-      userId: Number(userStore.user.id),
+      userId: userStore.user.id,
       pageNo: currentPage.value,
       pageSize: pageSize.value
     })
     
-    if (response && response.list) {
-      articles.value = response.list
-      total.value = response.total || 0
-    }
+    const list = response?.list ?? response?.records ?? (Array.isArray(response) ? response : [])
+    articles.value = list
+    total.value = response?.total ?? list.length
   } catch (error) {
     ElMessage.error('加载收藏列表失败')
   } finally {
@@ -119,24 +117,21 @@ const handleUnfavorite = async (article: any) => {
         type: 'warning'
       }
     )
-    
-    await removeFavorite({
-      userId: Number(userStore.user!.id),
-      articleId: article.id
-    })
-    
+
+    await removeFavorite({ articleId: article.id, userId: userStore.user!.id })
+    articles.value = articles.value.filter(a => a.id !== article.id)
+    total.value = Math.max(0, total.value - 1)
     ElMessage.success('已取消收藏')
-    loadFavorites()
   } catch (error: any) {
-    if (error !== 'cancel') {
+    if (error !== 'cancel' && error?.action !== 'cancel') {
       ElMessage.error('操作失败，请重试')
     }
   }
 }
 
 // 跳转到文章详情
-const goToArticle = (id: number) => {
-  router.push(`/article/${id}`)
+const goToArticle = (articleId: string | number) => {
+  router.push({ path: `/article/${articleId}`, state: { isFavorited: true } })
 }
 
 // 跳转到首页

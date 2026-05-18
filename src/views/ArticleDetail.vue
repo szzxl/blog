@@ -108,6 +108,18 @@
         <span class="count">{{ article.likeCount || 0 }}</span>
       </button>
 
+      <button
+        class="action-btn favorite-btn"
+        :class="{ favorited: article.isFavorited }"
+        @click="handleFavorite"
+        :title="article.isFavorited ? '取消收藏' : '收藏'"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span class="count">{{ article.isFavorited ? '已收藏' : '收藏' }}</span>
+      </button>
+
       <button class="action-btn" @click="handleShare" title="分享">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="18" cy="5" r="3"></circle>
@@ -128,7 +140,7 @@ import DOMPurify from 'dompurify'
 import { useRoute, useRouter } from 'vue-router'
 import Comment from '@/components/Comment.vue'
 import Skeleton from '@/components/Skeleton.vue'
-import { getArticleDetail, addArticleView, likeArticle, getArticleLikeCount } from '@/api/article'
+import { getArticleDetail, addArticleView, likeArticle, getArticleLikeCount, addFavorite, removeFavorite } from '@/api/article'
 import { formatTimestamp, parseTags } from '@/utils/format'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
@@ -154,6 +166,7 @@ interface Article {
   likeCount?: number
   createTime?: number
   isLiked?: boolean
+  isFavorited?: boolean
 }
 
 const article = ref<Article | null>(null)
@@ -311,6 +324,9 @@ const fetchArticleDetail = async () => {
 
     if (res) {
       article.value = res
+      if (!article.value.isFavorited && (history.state as any)?.isFavorited) {
+        article.value.isFavorited = true
+      }
       // 增加查看次数（博主不增加）
       if (!isAuthor.value) {
         incrementViewCount(id)
@@ -373,6 +389,36 @@ const handleLikeArticle = async () => {
     // 查询最新点赞数量
     await fetchLikeCount(article.value.id as string)
   } catch (error) {
+    ElMessage.error('操作失败，请重试')
+  }
+}
+
+// 收藏/取消收藏
+const handleFavorite = async () => {
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('请先登录')
+    router.push({ path: '/login', query: { redirect: route.fullPath } })
+    return
+  }
+  if (!article.value || !userStore.user) return
+
+  const wasFavorited = article.value.isFavorited
+  try {
+    if (wasFavorited) {
+      await removeFavorite({ articleId: article.value.id, userId: userStore.user!.id })
+      article.value.isFavorited = false
+      ElMessage.success('已取消收藏')
+    } else {
+      await addFavorite({
+        articleId: article.value.id,
+        articleName: article.value.articleName,
+        articleTime: formatTimestamp(article.value.createTime, 'YYYY-MM-DD HH:mm:ss'),
+        userId: Number(userStore.user.id)
+      })
+      article.value.isFavorited = true
+      ElMessage.success('收藏成功')
+    }
+  } catch {
     ElMessage.error('操作失败，请重试')
   }
 }
@@ -749,6 +795,15 @@ onUnmounted(() => {
       color: var(--color-accent);
 
       .count { color: var(--color-accent); }
+    }
+
+    &.favorite-btn.favorited {
+      border-color: #f7ba2a;
+      background: rgba(247, 186, 42, 0.08);
+      color: #f7ba2a;
+
+      svg { fill: #f7ba2a; stroke: #f7ba2a; }
+      .count { color: #f7ba2a; }
     }
   }
 }

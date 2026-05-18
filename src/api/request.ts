@@ -3,7 +3,6 @@ import type { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'a
 import { ElMessage } from 'element-plus'
 import router from '@/router'
 import { showLoading, hideLoading } from '@/utils/loading'
-import { sanitizeInput } from '@/utils/security'
 import { parseToken } from '@/utils/token'
 
 // 公开接口列表（不需要登录的接口）
@@ -76,11 +75,6 @@ service.interceptors.request.use(
       }
     }
     
-    // XSS 防护：清理请求数据（跳过 FormData）
-    if (config.data && typeof config.data === 'object' && !(config.data instanceof FormData)) {
-      config.data = sanitizeRequestData(config.data)
-    }
-    
     return config
   },
   (error) => {
@@ -134,8 +128,6 @@ service.interceptors.response.use(
             localStorage.removeItem('ACCESS_TOKEN')
             localStorage.removeItem('user')
             router.push('/login')
-          } else {
-            ElMessage.error('操作失败，请重试')
           }
           break
         case 403:
@@ -168,30 +160,5 @@ service.interceptors.response.use(
     return Promise.reject(error)
   }
 )
-
-/**
- * 清理请求数据，防止 XSS
- */
-const sanitizeRequestData = (data: any): any => {
-  if (typeof data === 'string') {
-    return sanitizeInput(data)
-  }
-  
-  if (Array.isArray(data)) {
-    return data.map(item => sanitizeRequestData(item))
-  }
-  
-  if (typeof data === 'object' && data !== null) {
-    const cleaned: any = {}
-    for (const key in data) {
-      if (Object.prototype.hasOwnProperty.call(data, key)) {
-        cleaned[key] = sanitizeRequestData(data[key])
-      }
-    }
-    return cleaned
-  }
-  
-  return data
-}
 
 export default service

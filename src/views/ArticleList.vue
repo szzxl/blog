@@ -175,21 +175,18 @@ const fetchArticles = async () => {
 const handleSearch = () => {
   pageNo.value = 1
   syncToUrl()
-  fetchArticles()
 }
 
 // 清除搜索
 const handleClear = () => {
   pageNo.value = 1
   syncToUrl()
-  fetchArticles()
 }
 
 // 分页变化
 const handlePageChange = (page: number) => {
   pageNo.value = page
   syncToUrl()
-  fetchArticles()
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 

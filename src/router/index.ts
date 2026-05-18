@@ -53,6 +53,7 @@ router.beforeEach(async (to, _from, next) => {
       await userStore.fetchUserInfo()
       userStore.isLoggedIn = true
     } catch (error) {
+      userStore.token = ''
       localStorage.removeItem('ACCESS_TOKEN')
       localStorage.removeItem('user')
     }

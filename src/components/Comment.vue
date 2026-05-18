@@ -128,7 +128,7 @@
             </div>
 
             <!-- 回复输入框 -->
-            <div class="reply-box" v-if="replyState?.rootId === comment.id">
+            <div class="reply-box" v-if="replyState !== null && replyState.rootId === comment.id">
               <el-input
                 ref="replyInputRef"
                 v-model="replyText"
@@ -299,7 +299,7 @@ const cancelReply = () => {
   replyImages.value = []
 }
 
-const submitReply = async (topComment: any) => {
+const submitReply = async (_topComment: any) => {
   if (!userStore.isLoggedIn) {
     ElMessage.warning('请先登录')
     router.push({ path: '/login', query: { redirect: route.fullPath } })
@@ -385,7 +385,7 @@ const uploadImagesToList = async (files: File[], list: string[]) => {
 
   const results = await Promise.allSettled(toUpload.map(file => uploadImage(file)))
   results.forEach(result => {
-    if (result.status === 'fulfilled' && result.value) list.push(result.value as string)
+    if (result.status === 'fulfilled' && result.value) list.push(result.value as unknown as string)
     else if (result.status === 'rejected') ElMessage.error('图片上传失败')
   })
 }

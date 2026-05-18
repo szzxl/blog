@@ -30,13 +30,12 @@ function loadImage(el: HTMLImageElement, src: string, options: LazyLoadOptions):
     el.src = src
     el.classList.remove('lazy-loading')
     el.classList.add('lazy-loaded')
-    
-    // 添加淡入动画
     el.style.opacity = '0'
-    setTimeout(() => {
+    requestAnimationFrame(() => {
+      if (!el.isConnected) return
       el.style.transition = 'opacity 0.3s ease-in-out'
       el.style.opacity = '1'
-    }, 10)
+    })
   }
   
   img.onerror = () => {

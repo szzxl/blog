@@ -317,6 +317,8 @@ const prefersReducedMotion = typeof window !== 'undefined' &&
   window.matchMedia('(prefers-reduced-motion: reduce)').matches
 const tagEls = ref<HTMLElement[]>([])
 let sphereTimer = 0
+let idleId: ReturnType<typeof requestIdleCallback> | null = null
+let idleTimer: ReturnType<typeof setTimeout> | undefined
 let angleX = 0.008
 let angleY = 0.012
 let lastFrameTime = 0
@@ -401,20 +403,19 @@ onMounted(async () => {
   fetchCategories()
 
   // 阶段3：非关键数据，浏览器空闲时加载
-  const scheduleIdle = (fn: () => void) => {
-    if (typeof requestIdleCallback !== 'undefined') {
-      requestIdleCallback(fn, { timeout: 2000 })
-    } else {
-      setTimeout(fn, 200)
-    }
+  if (typeof requestIdleCallback !== 'undefined') {
+    idleId = requestIdleCallback(() => { fetchTags(); fetchNotifications() }, { timeout: 2000 })
+  } else {
+    idleTimer = setTimeout(() => { fetchTags(); fetchNotifications() }, 200)
   }
-  scheduleIdle(() => { fetchTags(); fetchNotifications() })
 
   typeTimer = setTimeout(() => runTypewriter(), 800)
 })
 onUnmounted(() => {
   clearTimeout(typeTimer)
+  clearTimeout(idleTimer)
   cancelAnimationFrame(sphereTimer)
+  if (idleId !== null) cancelIdleCallback(idleId)
 })
 </script>
 
