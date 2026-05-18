@@ -44,9 +44,16 @@ const router = createRouter({
 // 路由守卫 - 检查登录状态
 router.beforeEach(async (to, _from, next) => {
   const userStore = useUserStore()
-  
-  // 如果有 token 但没有用户信息，尝试获取用户信息
+
   const tokenStr = localStorage.getItem('ACCESS_TOKEN')
+
+  // token 已被清除（如 401）但 store 未同步，补清 store
+  if (!tokenStr && userStore.isLoggedIn) {
+    userStore.token = ''
+    userStore.isLoggedIn = false
+  }
+
+  // 如果有 token 但没有用户信息，尝试获取用户信息
   if (tokenStr && !userStore.user) {
     try {
       userStore.token = parseToken(tokenStr)
