@@ -160,6 +160,7 @@ const article = ref<Article | null>(null)
 const loading = ref(false)
 const readProgress = ref(0)
 const tocItems = ref<TocItem[]>([])
+const tocEls = ref<{ id: string; el: HTMLElement }[]>([])
 const activeId = ref('')
 const htmlContent = ref('')
 const lightboxSrc = ref('')
@@ -234,25 +235,31 @@ const setupCodeCopy = () => {
   })
 }
 
-watch(htmlContent, setupCodeCopy)
+watch(htmlContent, () => {
+  setupCodeCopy()
+  nextTick(() => {
+    tocEls.value = tocItems.value
+      .map(item => ({ id: item.id, el: document.getElementById(item.id)! }))
+      .filter(x => x.el)
+  })
+})
 
 const updateProgress = () => {
   const scrollable = document.documentElement.scrollHeight - window.innerHeight
   readProgress.value = scrollable > 0 ? Math.min(100, Math.round((window.scrollY / scrollable) * 100)) : 0
 
-  if (tocItems.value.length) {
+  if (tocEls.value.length) {
     const top = window.scrollY + 100
     let current = ''
-    for (const item of tocItems.value) {
-      const el = document.getElementById(item.id)
-      if (el && el.offsetTop <= top) current = item.id
+    for (const { id, el } of tocEls.value) {
+      if (el.offsetTop <= top) current = id
     }
     if (current) activeId.value = current
   }
 }
 
 const scrollToHeading = (id: string) => {
-  const el = document.getElementById(id)
+  const el = tocEls.value.find(x => x.id === id)?.el ?? document.getElementById(id)
   if (!el) return
   window.scrollTo({ top: el.offsetTop - 80, behavior: 'smooth' })
   activeId.value = id

@@ -199,7 +199,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Upload } from '@element-plus/icons-vue'
 import {
@@ -290,6 +290,7 @@ const startReply = (parentId: number | string, atName: string, rootId: number | 
   }
   replyState.value = { parentId, rootId, atName }
   replyText.value = ''
+  replyImages.value = []
 }
 
 const cancelReply = () => {
@@ -354,10 +355,10 @@ const insertReplyEmoji = (emoji: string) => {
   const start = textarea.selectionStart
   const end = textarea.selectionEnd
   replyText.value = replyText.value.substring(0, start) + emoji + replyText.value.substring(end)
-  setTimeout(() => {
+  nextTick(() => {
     textarea.selectionStart = textarea.selectionEnd = start + emoji.length
     textarea.focus()
-  }, 0)
+  })
 }
 
 const triggerReplyUpload = () => replyFileInput.value?.click()
@@ -365,21 +366,18 @@ const triggerReplyUpload = () => replyFileInput.value?.click()
 const handleReplyFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement
   const files = target.files
-  if (files) handleReplyFiles(Array.from(files))
+  if (files) uploadImagesToList(Array.from(files), replyImages.value)
   target.value = ''
 }
 
-const handleReplyFiles = async (files: File[]) => {
+const uploadImagesToList = async (files: File[], list: string[]) => {
   for (const file of files) {
-    if (replyImages.value.length >= 9) {
-      ElMessage.warning('最多只能上传 9 张图片')
-      break
-    }
-    if (!file.type.startsWith('image/')) { ElMessage.error(`${file.name} 不是图片`); continue }
-    if (file.size > 5 * 1024 * 1024) { ElMessage.error(`${file.name} 超过 5MB`); continue }
+    if (list.length >= 9) { ElMessage.warning('最多只能上传 9 张图片'); break }
+    if (!file.type.startsWith('image/')) { ElMessage.error(`${file.name} 不是图片文件`); continue }
+    if (file.size > 5 * 1024 * 1024) { ElMessage.error(`${file.name} 大小超过 5MB`); continue }
     try {
       const url: any = await uploadImage(file)
-      if (url) replyImages.value.push(url)
+      if (url) list.push(url)
     } catch { ElMessage.error('图片上传失败') }
   }
 }
@@ -400,11 +398,10 @@ const insertEmoji = (emoji: string) => {
   
   commentText.value = text.substring(0, start) + emoji + text.substring(end)
   
-  // 设置光标位置
-  setTimeout(() => {
+  nextTick(() => {
     textarea.selectionStart = textarea.selectionEnd = start + emoji.length
     textarea.focus()
-  }, 0)
+  })
 }
 
 // 判断是否可以删除评论
@@ -508,22 +505,7 @@ const handleCommentFileChange = (event: Event) => {
 }
 
 // 处理评论图片文件
-const handleCommentFiles = async (files: File[]) => {
-  for (const file of files) {
-    if (commentImages.value.length >= 9) {
-      ElMessage.warning('最多只能上传 9 张图片')
-      break
-    }
-    if (!file.type.startsWith('image/')) { ElMessage.error(`${file.name} 不是图片文件`); continue }
-    if (file.size > 5 * 1024 * 1024) { ElMessage.error(`${file.name} 大小超过 5MB`); continue }
-    try {
-      const response: any = await uploadImage(file)
-      if (response) commentImages.value.push(response)
-    } catch {
-      ElMessage.error('图片上传失败')
-    }
-  }
-}
+const handleCommentFiles = (files: File[]) => uploadImagesToList(files, commentImages.value)
 
 // 删除评论图片
 const removeCommentImage = (index: number) => {
@@ -639,18 +621,12 @@ const handleDelete = async (comment: any) => {
     ElMessage.success('评论已删除')
 
     const rootId = comment.rootId
-    if (rootId && expandedReplies.value[rootId] !== undefined) {
-      // 删除的是展开回复里的评论，刷新该回复列表
-      const res: any = await getCommentReplies(rootId)
-      const list = Array.isArray(res) ? res : (res?.list || res?.data || [])
-      expandedReplies.value[rootId] = list.map(mapReply)
-      // 同步更新根评论的 replyCount
-      await loadComments()
+    if (rootId) {
+      delete expandedReplies.value[rootId]
     } else {
-      // 删除的是根评论，清除其展开状态后刷新列表
       delete expandedReplies.value[comment.id]
-      await loadComments()
     }
+    await loadComments()
   } catch (error: any) {
     if (error !== 'cancel') {
       ElMessage.error('删除失败，请重试')
