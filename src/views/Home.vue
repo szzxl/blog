@@ -393,8 +393,23 @@ const tagStyles = computed(() =>
 
 const viewArticle = (id: number) => router.push(`/article/${id}`)
 
-onMounted(() => {
-  fetchArticles(); fetchConfig(); fetchCategories(); fetchTags(); fetchNotifications()
+onMounted(async () => {
+  // 阶段1：关键路径，影响首屏可见内容
+  await Promise.all([fetchArticles(), fetchConfig()])
+
+  // 阶段2：侧边栏次要数据
+  fetchCategories()
+
+  // 阶段3：非关键数据，浏览器空闲时加载
+  const scheduleIdle = (fn: () => void) => {
+    if (typeof requestIdleCallback !== 'undefined') {
+      requestIdleCallback(fn, { timeout: 2000 })
+    } else {
+      setTimeout(fn, 200)
+    }
+  }
+  scheduleIdle(() => { fetchTags(); fetchNotifications() })
+
   typeTimer = setTimeout(() => runTypewriter(), 800)
 })
 onUnmounted(() => {

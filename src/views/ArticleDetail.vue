@@ -161,9 +161,12 @@ const loading = ref(false)
 const readProgress = ref(0)
 const tocItems = ref<TocItem[]>([])
 const tocEls = ref<{ id: string; el: HTMLElement }[]>([])
+const tocOffsets = ref<{ id: string; top: number }[]>([])
 const activeId = ref('')
 const htmlContent = ref('')
 const lightboxSrc = ref('')
+let parseIdleId: number | null = null
+let scrollRaf: number | null = null
 
 const readingTime = computed(() => {
   if (!article.value?.articleContent) return 0
@@ -196,9 +199,18 @@ watch(
   () => article.value?.articleContent,
   (content) => {
     if (!content) { htmlContent.value = ''; tocItems.value = []; return }
-    const { html, toc } = injectHeadingIds(DOMPurify.sanitize(content))
-    htmlContent.value = html
-    tocItems.value = toc
+    const run = () => {
+      const { html, toc } = injectHeadingIds(DOMPurify.sanitize(content))
+      htmlContent.value = html
+      tocItems.value = toc
+    }
+    // 超过 50KB 的文章用空闲时间解析，避免阻塞主线程
+    if (typeof requestIdleCallback !== 'undefined' && content.length > 50_000) {
+      if (parseIdleId !== null) cancelIdleCallback(parseIdleId)
+      parseIdleId = requestIdleCallback(run, { timeout: 800 })
+    } else {
+      run()
+    }
   },
   { immediate: true }
 )
@@ -241,6 +253,8 @@ watch(htmlContent, () => {
     tocEls.value = tocItems.value
       .map(item => ({ id: item.id, el: document.getElementById(item.id)! }))
       .filter(x => x.el)
+    // 缓存各标题的 offsetTop，避免滚动时反复触发强制重排
+    tocOffsets.value = tocEls.value.map(({ id, el }) => ({ id, top: el.offsetTop }))
   })
 })
 
@@ -248,14 +262,22 @@ const updateProgress = () => {
   const scrollable = document.documentElement.scrollHeight - window.innerHeight
   readProgress.value = scrollable > 0 ? Math.min(100, Math.round((window.scrollY / scrollable) * 100)) : 0
 
-  if (tocEls.value.length) {
+  if (tocOffsets.value.length) {
     const top = window.scrollY + 100
     let current = ''
-    for (const { id, el } of tocEls.value) {
-      if (el.offsetTop <= top) current = id
+    for (const { id, top: elTop } of tocOffsets.value) {
+      if (elTop <= top) current = id
     }
     if (current) activeId.value = current
   }
+}
+
+const handleScroll = () => {
+  if (scrollRaf !== null) return
+  scrollRaf = requestAnimationFrame(() => {
+    updateProgress()
+    scrollRaf = null
+  })
 }
 
 const scrollToHeading = (id: string) => {
@@ -376,13 +398,15 @@ const goToTag = (tag: string) => {
 
 onMounted(() => {
   fetchArticleDetail()
-  window.addEventListener('scroll', updateProgress, { passive: true })
+  window.addEventListener('scroll', handleScroll, { passive: true })
   window.addEventListener('keydown', onKeydown)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', updateProgress)
+  window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('keydown', onKeydown)
+  if (scrollRaf !== null) cancelAnimationFrame(scrollRaf)
+  if (parseIdleId !== null) cancelIdleCallback(parseIdleId)
 })
 </script>
 

@@ -99,9 +99,10 @@ const handleLogin = async () => {
         const success = await userStore.login(loginForm.value.username, loginForm.value.password)
 
         if (success) {
-          // 获取登录前的页面路径
+          // 获取登录前的页面路径（只允许同源内部路径，阻止 //evil.com 等跳转）
           const redirect = router.currentRoute.value.query.redirect as string
-          router.push(redirect?.startsWith('/') ? redirect : '/')
+          const isSafeRedirect = redirect && /^\/(?!\/)/.test(redirect) && !redirect.includes(':')
+          router.push(isSafeRedirect ? redirect : '/')
         }
       } catch (error) {
         // 登录失败
