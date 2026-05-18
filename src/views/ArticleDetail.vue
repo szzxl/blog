@@ -111,13 +111,14 @@
       <button
         class="action-btn favorite-btn"
         :class="{ favorited: article.isFavorited }"
+        :disabled="favoriteLoading"
         @click="handleFavorite"
         :title="article.isFavorited ? '取消收藏' : '收藏'"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
         </svg>
-        <span class="count">{{ article.isFavorited ? '已收藏' : '收藏' }}</span>
+        <span class="count">{{ favoriteLoading ? '…' : article.isFavorited ? '已收藏' : '收藏' }}</span>
       </button>
 
       <button class="action-btn" @click="handleShare" title="分享">
@@ -171,6 +172,7 @@ interface Article {
 
 const article = ref<Article | null>(null)
 const loading = ref(false)
+const favoriteLoading = ref(false)
 const readProgress = ref(0)
 const tocItems = ref<TocItem[]>([])
 const tocEls = ref<{ id: string; el: HTMLElement }[]>([])
@@ -403,9 +405,10 @@ const handleFavorite = async () => {
   if (!article.value || !userStore.user) return
 
   const wasFavorited = article.value.isFavorited
+  favoriteLoading.value = true
   try {
     if (wasFavorited) {
-      await removeFavorite({ articleId: article.value.id, userId: userStore.user!.id })
+      await removeFavorite({ articleId: article.value.id, userId: userStore.user.id })
       article.value.isFavorited = false
       ElMessage.success('已取消收藏')
     } else {
@@ -420,6 +423,8 @@ const handleFavorite = async () => {
     }
   } catch {
     ElMessage.error('操作失败，请重试')
+  } finally {
+    favoriteLoading.value = false
   }
 }
 

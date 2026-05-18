@@ -52,11 +52,8 @@ export const useThemeStore = defineStore('theme', () => {
     if (_systemListenerAttached) return
     _systemListenerAttached = true
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    mediaQuery.addEventListener('change', (e) => {
-      if (themeMode.value === 'auto') {
-        appliedTheme.value = e.matches ? 'dark' : 'light'
-        document.documentElement.setAttribute('data-theme', appliedTheme.value)
-      }
+    mediaQuery.addEventListener('change', () => {
+      if (themeMode.value === 'auto') updateAppliedTheme()
     })
   }
 
