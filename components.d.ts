@@ -7,7 +7,6 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    Carousel: typeof import('./src/components/Carousel.vue')['default']
     Comment: typeof import('./src/components/Comment.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
@@ -25,8 +24,6 @@ declare module 'vue' {
     ElPagination: typeof import('element-plus/es')['ElPagination']
     ElPopover: typeof import('element-plus/es')['ElPopover']
     ElProgress: typeof import('element-plus/es')['ElProgress']
-    ElRadio: typeof import('element-plus/es')['ElRadio']
-    ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
     EmojiPicker: typeof import('./src/components/EmojiPicker.vue')['default']
     ErrorBoundary: typeof import('./src/components/ErrorBoundary.vue')['default']
     Footer: typeof import('./src/components/Footer.vue')['default']

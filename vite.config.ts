@@ -51,11 +51,16 @@ export default defineConfig(({ mode }) => {
           // 分包策略
           manualChunks(id) {
             if (id.includes('node_modules')) {
-              if (id.includes('/node_modules/vue/')) return 'vue-core'
+              if (
+                id.includes('/node_modules/vue/') ||
+                id.includes('/node_modules/@vue/') ||
+                id.includes('/node_modules/@vueuse/') ||
+                id.includes('/node_modules/vue-demi/')
+              ) return 'vue-core'
               if (id.includes('/node_modules/vue-router/')) return 'vue-router'
               if (id.includes('/node_modules/pinia/')) return 'pinia'
               if (['element-plus', '@element-plus'].some(p => id.includes(`/node_modules/${p}/`))) return 'element-plus'
-              if (['axios', 'dayjs', '@vueuse', 'dompurify'].some(p => id.includes(`/node_modules/${p}/`))) return 'utils'
+              if (['axios', 'dayjs', 'dompurify'].some(p => id.includes(`/node_modules/${p}/`))) return 'utils'
             }
           },
           // 文件名优化
