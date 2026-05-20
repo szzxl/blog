@@ -177,6 +177,10 @@ export const uploadImage = (file: File) => {
   })
 }
 
+// 查询已审核留言列表
+export const getApprovedGuestbookMessages = (data: { pageNo: number; pageSize: number }) =>
+  request({ url: '/message/guestbook/approved', method: 'post', data })
+
 // 留言板
 export const submitGuestbookMessage = (data: {
   username: string

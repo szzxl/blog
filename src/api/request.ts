@@ -8,6 +8,7 @@ import { parseToken } from '@/utils/token'
 // 公开接口列表（不需要登录的接口）
 const PUBLIC_APIS = [
   '/message/add/guestbook',
+  '/message/guestbook/approved',
   '/system/auth/register',
   '/system/auth/login',
   '/system/user/profile/get',  // session 恢复检查，401 不跳转登录
