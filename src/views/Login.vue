@@ -213,7 +213,7 @@ const goBack = () => {
     .subtitle {
       font-family: var(--font-sans);
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.52);
+      color: rgba(255, 255, 255, 0.72);
       margin: 0;
     }
   }
@@ -223,34 +223,34 @@ const goBack = () => {
     margin-bottom: 18px;
   }
 
-  // 输入框：毛玻璃风格
+  // 输入框：毛玻璃风格（!important 防止浅色主题覆盖）
   :deep(.el-input__wrapper) {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.08) !important;
     border-radius: 10px;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14) inset;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14) inset !important;
     transition: box-shadow 0.2s, background 0.2s;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.12);
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.26) inset;
+      background: rgba(255, 255, 255, 0.12) !important;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.26) inset !important;
     }
 
     &.is-focus {
-      background: rgba(255, 255, 255, 0.12);
-      box-shadow: 0 0 0 1px var(--color-accent) inset, 0 0 12px rgba(22, 93, 255, 0.2);
+      background: rgba(255, 255, 255, 0.12) !important;
+      box-shadow: 0 0 0 1px var(--color-accent) inset, 0 0 12px rgba(22, 93, 255, 0.2) !important;
     }
   }
 
   :deep(.el-input__inner) {
-    color: #fff;
+    color: #fff !important;
     font-family: var(--font-sans);
 
-    &::placeholder { color: rgba(255, 255, 255, 0.38); }
+    &::placeholder { color: rgba(255, 255, 255, 0.62) !important; }
   }
 
   :deep(.el-input__prefix .el-icon),
   :deep(.el-input__suffix .el-icon) {
-    color: rgba(255, 255, 255, 0.45);
+    color: rgba(255, 255, 255, 0.55) !important;
   }
 
   // 记住密码 / 忘记密码行
@@ -308,7 +308,7 @@ const goBack = () => {
     text-align: center;
     font-family: var(--font-sans);
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.72);
     width: 100%;
 
     :deep(.el-link) {

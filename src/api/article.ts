@@ -162,20 +162,6 @@ export const getTagListCount = (data?: {
   })
 }
 
-// 根据标签获取文章列表
-export const getArticlesByTag = (data: {
-  tagName: string
-  tagStatus?: number
-  pageNo: number
-  pageSize: number
-}) => {
-  return request({
-    url: '/web/tag/article/list',
-    method: 'post',
-    data
-  })
-}
-
 // 文件上传
 export const uploadImage = (file: File) => {
   const formData = new FormData()
@@ -332,18 +318,6 @@ export const getNotificationList = () => {
   return request({
     url: '/config/notification/list',
     method: 'post'
-  })
-}
-
-// 上一篇/下一篇
-export const getAdjacentArticles = (data: { id: number | string }) =>
-  request({ url: '/web/article/adjacent', method: 'post', data })
-
-// 获取背景图列表
-export const getBackgroundList = () => {
-  return request({
-    url: '/config/background/list',
-    method: 'get'
   })
 }
 

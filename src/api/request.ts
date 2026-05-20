@@ -10,31 +10,27 @@ const PUBLIC_APIS = [
   '/message/add/guestbook',
   '/system/auth/register',
   '/system/auth/login',
+  '/system/user/profile/get',  // session 恢复检查，401 不跳转登录
   '/web/article/list',
   '/web/article/detail',
   '/web/article/like/num',
   '/web/article/addView',
-  '/web/article/adjacent',
   '/web/month/article',
   '/web/category/list',
   '/web/tag/list',
-  '/web/tag/article/list',
   '/article/comment/page',
   '/article/comment/reply/',
   '/web/album/comment/list',
   '/album/list',
   '/album/photo/list',
-  '/web/notification/list',
   '/config/notification/list',
-  '/config/background/list',
   '/config/website',
   '/config/link'
 ]
 
 // 静默接口列表（不弹出错误提示）
 const SILENT_APIS = [
-  '/web/article/addView',
-  '/web/article/adjacent'
+  '/web/article/addView'
 ]
 
 // 不显示 Loading 的接口
