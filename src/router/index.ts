@@ -53,8 +53,8 @@ router.beforeEach(async (to, _from, next) => {
     userStore.isLoggedIn = false
   }
 
-  // 如果有 token 但没有用户信息，尝试获取用户信息
-  if (tokenStr && !userStore.user) {
+  // 如果有可解析的 token 但没有用户信息，尝试获取用户信息
+  if (tokenStr && parseToken(tokenStr) && !userStore.user) {
     try {
       userStore.token = parseToken(tokenStr)
       await userStore.fetchUserInfo()
