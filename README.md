@@ -21,6 +21,8 @@
 
 `node scripts/validate-requests.cjs` 验证搜索结果乱序、清空与关闭搜索，以及相册切换和离开后的响应隔离。使用现有 TypeScript 和 Vue 依赖，不新增测试框架。
 
+`node scripts/validate-lifecycle.cjs` 验证标签切换重置分页、旧响应隔离、登录失败与退出后的认证清理，以及首页卸载后的延迟响应不会启动动画或定时任务。
+
 相册公开查询使用 `/web/album/list` 和 `/web/album/photo/list`，禁用相册不展示；后端需配套发布。个人中心展示实际账号信息并提供收藏入口。
 
 - **主题切换** - 支持浅色/深色/自动三种主题模式，跟随系统偏好

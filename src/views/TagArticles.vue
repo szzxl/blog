@@ -71,10 +71,11 @@
 <script setup lang="ts">
 import { showRequestError } from '@/utils/requestError'
 
-import { ref, onMounted, watch } from 'vue'
+import { ref, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getArticleList } from '@/api/article'
 import { formatTimestamp } from '@/utils/format'
+import { createLatestRequest } from '@/utils/latestRequest'
 import { ElMessage } from 'element-plus/es/components/message/index'
 
 const route = useRoute()
@@ -86,11 +87,13 @@ const loading = ref(false)
 const total = ref(0)
 const currentPage = ref(1)
 const pageSize = ref(12)
+const articleRequest = createLatestRequest()
 
 // 加载文章列表
 const loadArticles = async () => {
   if (!tagName.value) return
 
+  const requestId = articleRequest.next()
   loading.value = true
   try {
     const response: any = await getArticleList({
@@ -98,6 +101,7 @@ const loadArticles = async () => {
       pageNo: currentPage.value,
       pageSize: pageSize.value
     })
+    if (!articleRequest.isCurrent(requestId)) return
 
     // 处理分页数据
     if (response) {
@@ -121,11 +125,12 @@ const loadArticles = async () => {
       total.value = 0
     }
   } catch (error) {
+    if (!articleRequest.isCurrent(requestId)) return
     showRequestError(error, '加载文章列表失败')
     articles.value = []
     total.value = 0
   } finally {
-    loading.value = false
+    if (articleRequest.isCurrent(requestId)) loading.value = false
   }
 }
 
@@ -146,24 +151,23 @@ const handlePageChange = (page: number) => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-// 格式化时间
-
-onMounted(() => {
-  tagName.value = route.query.tag as string || ''
-  if (tagName.value) {
-    loadArticles()
-  } else {
+watch(() => [route.path, route.query.tag] as const, ([path, tag]) => {
+  articleRequest.invalidate()
+  loading.value = false
+  if (path !== '/tag/articles') return
+  tagName.value = typeof tag === 'string' ? tag.trim() : ''
+  currentPage.value = 1
+  articles.value = []
+  total.value = 0
+  if (!tagName.value) {
     ElMessage.warning('标签参数缺失')
-    router.push('/tag')
+    void router.replace('/tag')
+    return
   }
-})
+  void loadArticles()
+}, { immediate: true })
 
-// 监听路由变化，当返回到此页面时重新加载数据
-watch(() => route.fullPath, (newPath) => {
-  if (newPath.startsWith('/tag/articles')) {
-    loadArticles()
-  }
-})
+onUnmounted(() => articleRequest.invalidate())
 </script>
 
 <style scoped lang="scss">

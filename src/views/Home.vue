@@ -174,6 +174,7 @@ import { Document, View } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus/es/components/message/index'
 
 const router = useRouter()
+let disposed = false
 
 
 interface Article {
@@ -248,6 +249,7 @@ const isTyping = ref(true)
 let typeTimer: ReturnType<typeof setTimeout>
 
 const runTypewriter = (pi = 0, ci = 0, del = false) => {
+  if (disposed) return
   const phrase = phrases[pi] ?? ''
   if (!del) {
     displayText.value = phrase.slice(0, ci + 1)
@@ -274,16 +276,18 @@ const fetchArticles = async () => {
   loading.value = true
   try {
     const res: any = await getMonthArticleList({ pageNo: 1, pageSize: 12 })
+    if (disposed) return
     if (res?.list) articles.value = res.list
     else if (Array.isArray(res)) articles.value = res
-  } catch { loadError.value = true } finally {
-    loading.value = false
+  } catch { if (!disposed) loadError.value = true } finally {
+    if (!disposed) loading.value = false
   }
 }
 
 const fetchConfig = async () => {
   try {
     const config = await fetchWebsiteConfigWithCache()
+    if (disposed) return
     if (config.site_name) siteName.value = config.site_name
     socialGithub.value = config.social_github || ''
     socialGitee.value = config.social_gitee || ''
@@ -295,6 +299,7 @@ const fetchConfig = async () => {
 const fetchNotifications = async () => {
   try {
     const res: any = await getNotificationList()
+    if (disposed) return
     const list = Array.isArray(res) ? res : (res?.list ?? [])
     notifications.value = list.filter((item: NotificationItem) => item.status === 1)
   } catch { /* 静默 */ }
@@ -303,6 +308,7 @@ const fetchNotifications = async () => {
 const fetchCategories = async () => {
   try {
     const res: any = await getCategoryList({ pageSize: 100 })
+    if (disposed) return
     if (res?.list) { categories.value = res.list }
     else if (Array.isArray(res)) { categories.value = res }
   } catch { /* 静默 */ }
@@ -311,9 +317,11 @@ const fetchCategories = async () => {
 const fetchTags = async () => {
   try {
     const res: any = await getTagList({ pageSize: 200 })
+    if (disposed) return
     if (res?.list) { tags.value = res.list }
     else if (Array.isArray(res)) { tags.value = res }
     await nextTick()
+    if (disposed) return
     initSphere()
   } catch { /* 静默 */ }
 }
@@ -335,6 +343,7 @@ const setTagRef = (el: any, i: number) => {
 }
 
 const initSphere = () => {
+  if (disposed) return
   const count = tagEls.value.length
   if (!count) return
   items = tagEls.value.map((el, i) => {
@@ -352,6 +361,7 @@ const initSphere = () => {
 }
 
 const tick = (now: number) => {
+  if (disposed) return
   const delta = lastFrameTime ? now - lastFrameTime : 30
   lastFrameTime = now
   rotateSphere(delta / 30)
@@ -405,20 +415,30 @@ useWebsiteConfigRefresh(() => { void fetchConfig() })
 onMounted(async () => {
   // 阶段1：关键路径，影响首屏可见内容
   await Promise.all([fetchArticles(), fetchConfig()])
+  if (disposed) return
 
   // 阶段2：侧边栏次要数据
   fetchCategories()
 
   // 阶段3：非关键数据，浏览器空闲时加载
   if (typeof requestIdleCallback !== 'undefined') {
-    idleId = requestIdleCallback(() => { fetchTags(); fetchNotifications() }, { timeout: 2000 })
+    idleId = requestIdleCallback(() => {
+      if (disposed) return
+      void fetchTags()
+      void fetchNotifications()
+    }, { timeout: 2000 })
   } else {
-    idleTimer = setTimeout(() => { fetchTags(); fetchNotifications() }, 200)
+    idleTimer = setTimeout(() => {
+      if (disposed) return
+      void fetchTags()
+      void fetchNotifications()
+    }, 200)
   }
 
   typeTimer = setTimeout(() => runTypewriter(), 800)
 })
 onUnmounted(() => {
+  disposed = true
   clearTimeout(typeTimer)
   clearTimeout(idleTimer)
   cancelAnimationFrame(sphereTimer)

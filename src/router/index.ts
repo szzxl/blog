@@ -45,24 +45,21 @@ router.beforeEach(async (to, _from, next) => {
   const userStore = useUserStore()
 
   const tokenStr = localStorage.getItem('ACCESS_TOKEN')
+  const token = parseToken(tokenStr)
 
   // token 已被清除（如 401）但 store 未同步，补清 store
-  if (!tokenStr && userStore.isLoggedIn) {
-    userStore.token = ''
-    userStore.isLoggedIn = false
+  if (!token && (tokenStr || userStore.isLoggedIn || userStore.user)) {
+    userStore.clearAuth()
   }
 
   // 如果有可解析的 token 但没有用户信息，尝试获取用户信息
-  if (tokenStr && parseToken(tokenStr) && !userStore.user) {
+  if (token && !userStore.user) {
     try {
-      userStore.token = parseToken(tokenStr)
+      userStore.token = token
       await userStore.fetchUserInfo()
       userStore.isLoggedIn = true
     } catch (error) {
-      userStore.token = ''
-      userStore.isLoggedIn = false
-      localStorage.removeItem('ACCESS_TOKEN')
-      localStorage.removeItem('user')
+      userStore.clearAuth()
     }
   }
   

@@ -142,7 +142,7 @@ async function validateTracking() {
 
 async function validateInterceptors() {
   let requestHandler, responseHandler, errorHandler
-  let shown = 0, hidden = 0, messages = 0, redirects = 0
+  let shown = 0, hidden = 0, messages = 0, redirects = 0, cleared = 0
   const service = {
     interceptors: {
       request: { use: (handler) => { requestHandler = handler } },
@@ -155,6 +155,7 @@ async function validateInterceptors() {
       showRequestError: () => messages++, markRequestErrorNotified: () => {}
     },
     '@/router': { push: () => redirects++ },
+    '@/stores/user': { useUserStore: () => ({ clearAuth: () => cleared++ }) },
     '@/utils/loading': { showLoading: () => shown++, hideLoading: () => hidden++ },
     '@/utils/token': { parseToken: () => '' }
   }, { localStorage: { getItem: () => null, removeItem: () => {} } })
@@ -178,6 +179,17 @@ async function validateInterceptors() {
   check(messages, 0)
   await assert.rejects(errorHandler({ config: normal, response: { status: 500 } }))
   check(messages, 1)
+  const privateApi = { url: '/article/favorite/page', headers: {} }
+  await assert.rejects(responseHandler({ config: privateApi, data: { code: 401 } }))
+  check(cleared, 1)
+  check(redirects, 1)
+  await assert.rejects(errorHandler({ config: privateApi, response: { status: 401 } }))
+  check(cleared, 2)
+  check(redirects, 2)
+  await assert.rejects(responseHandler({ config: normal, data: { code: 401 } }))
+  await assert.rejects(errorHandler({ config: normal, response: { status: 401 } }))
+  check(cleared, 2) // 公开接口的 401 不清登录状态、不跳转
+  check(redirects, 2)
 }
 
 async function main() {
