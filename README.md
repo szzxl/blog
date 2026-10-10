@@ -4,7 +4,7 @@
 
 [![Vue](https://img.shields.io/badge/Vue-3.5-brightgreen.svg)](https://vuejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-6.4-646CFF.svg)](https://vitejs.dev/)
+[![Vite](https://img.shields.io/badge/Vite-7.3-646CFF.svg)](https://vite.dev/)
 [![Element Plus](https://img.shields.io/badge/Element%20Plus-2.14-409EFF.svg)](https://element-plus.org/)
 
 ## 特性
@@ -34,8 +34,10 @@
 
 ### 环境要求
 
-- Node.js >= 18.0.0
+- Node.js 20.19+ 或 22.12+（推荐 Node.js 22）
 - npm >= 9.0.0
+
+当前构建使用 Vite 7.3，Vue 插件和自动导入插件已配套升级；浏览器构建目标显式保留 Chrome 87、Edge 88、Firefox 78、Safari 14。Pinia、Vue Router 和 TypeScript 本轮保留现有主版本，升级后的依赖以 `package-lock.json` 为准。
 
 ### 安装依赖
 
@@ -71,7 +73,7 @@ npm run preview
 |----|------|------|
 | Vue | 3.5 | 渐进式 JavaScript 框架 |
 | TypeScript | 5.9 | 类型安全 |
-| Vite | 6.4 | 构建工具 |
+| Vite | 7.3 | 构建工具 |
 | Element Plus | 2.14 | UI 组件库 |
 | Pinia | 3.0 | 状态管理 |
 | Vue Router | 4.6 | 客户端路由 |
