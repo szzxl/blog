@@ -189,9 +189,11 @@
 </template>
 
 <script setup lang="ts">
+import { showRequestError } from '@/utils/requestError'
+
 import { ref, onMounted } from 'vue'
 import { getFriendLinks, applyFriendLink } from '@/api/article'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus/es/components/message/index'
 
 interface Link {
   id: number
@@ -269,7 +271,7 @@ const fetchLinks = async () => {
         .sort((a: Link, b: Link) => a.sort - b.sort)
     }
   } catch (error) {
-    ElMessage.error('获取友链列表失败')
+    showRequestError(error, '获取友链列表失败')
   } finally {
     loading.value = false
   }
@@ -292,7 +294,7 @@ const submitApply = async () => {
     resetForm()
   } catch (error: any) {
     if (error !== false) {
-      ElMessage.error(error?.msg || error?.message || '申请失败，请稍后重试')
+      showRequestError(error, error?.msg || error?.message || '申请失败，请稍后重试')
     }
   }
 }
@@ -315,7 +317,7 @@ onMounted(() => {
 .page-banner {
   position: relative;
   height: 200px;
-  background: url('/bg-banner.png') center 30% / cover no-repeat;
+  background: url('/bg-banner.jpg') center 30% / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;

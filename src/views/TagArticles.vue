@@ -69,11 +69,13 @@
 </template>
 
 <script setup lang="ts">
+import { showRequestError } from '@/utils/requestError'
+
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getArticleList } from '@/api/article'
 import { formatTimestamp } from '@/utils/format'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus/es/components/message/index'
 
 const route = useRoute()
 const router = useRouter()
@@ -119,7 +121,7 @@ const loadArticles = async () => {
       total.value = 0
     }
   } catch (error) {
-    ElMessage.error('加载文章列表失败')
+    showRequestError(error, '加载文章列表失败')
     articles.value = []
     total.value = 0
   } finally {
@@ -169,7 +171,7 @@ watch(() => route.fullPath, (newPath) => {
 .page-banner {
   position: relative;
   height: 200px;
-  background: url('/bg-banner.png') center 30% / cover no-repeat;
+  background: url('/bg-banner.jpg') center 30% / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;

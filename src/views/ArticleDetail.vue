@@ -31,6 +31,11 @@
       <div class="container">
         <!-- 骨架屏 -->
         <Skeleton v-if="loading" type="article-detail" />
+        <div v-else-if="loadError" class="load-error" role="alert">
+          <p>文章加载失败，文章可能尚未发布或已被删除。</p>
+          <el-button @click="fetchArticleDetail">重新加载</el-button>
+          <router-link to="/articles">返回文章列表</router-link>
+        </div>
 
         <!-- 文章内容卡片 -->
         <article v-else-if="article" class="article-content">
@@ -68,7 +73,7 @@
         </div> -->
 
         <!-- 评论区 -->
-        <Comment v-if="article" :article-id="article.id" />
+        <Comment v-if="article" :key="article.id" :article-id="article.id" />
       </div>
     </div>
 
@@ -136,6 +141,8 @@
 </template>
 
 <script setup lang="ts">
+import { showRequestError } from '@/utils/requestError'
+
 import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue'
 import DOMPurify from 'dompurify'
 import { useRoute, useRouter } from 'vue-router'
@@ -143,7 +150,7 @@ import Comment from '@/components/Comment.vue'
 import Skeleton from '@/components/Skeleton.vue'
 import { getArticleDetail, addArticleView, likeArticle, getArticleLikeCount, addFavorite, removeFavorite } from '@/api/article'
 import { formatTimestamp, parseTags } from '@/utils/format'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus/es/components/message/index'
 import { useUserStore } from '@/stores/user'
 import { useSeo } from '@/composables/useSeo'
 
@@ -172,6 +179,7 @@ interface Article {
 
 const article = ref<Article | null>(null)
 const loading = ref(false)
+const loadError = ref(false)
 const favoriteLoading = ref(false)
 const readProgress = ref(0)
 const tocItems = ref<TocItem[]>([])
@@ -236,6 +244,7 @@ watch(article, (a) => {
     title: a.articleName,
     description: a.articleContent,
     image: a.articleCover,
+    type: 'article',
   })
 })
 
@@ -320,14 +329,22 @@ const fetchArticleDetail = async () => {
     return
   }
 
+  if (parseIdleId !== null) { cancelIdleCallback(parseIdleId); parseIdleId = null }
+  article.value = null
+  htmlContent.value = ''
+  tocItems.value = []
+  tocEls.value = []
+  tocOffsets.value = []
+  activeId.value = ''
+  readProgress.value = 0
+  lightboxSrc.value = ''
+  loadError.value = false
   loading.value = true
   try {
     const res: any = await getArticleDetail({ id: id })
 
+    if (route.params.id !== id) return
     if (res) {
-      if (!res.isFavorited && (history.state as any)?.isFavorited) {
-        res.isFavorited = true
-      }
       article.value = res
       // 增加查看次数（博主不增加）
       if (!isAuthor.value) {
@@ -335,11 +352,11 @@ const fetchArticleDetail = async () => {
       }
       // 查询最新点赞数量
       await fetchLikeCount(id)
-    }
+    } else loadError.value = true
   } catch (error) {
-    ElMessage.error('获取文章详情失败')
+    if (route.params.id === id) loadError.value = true
   } finally {
-    loading.value = false
+    if (route.params.id === id) loading.value = false
   }
 }
 
@@ -347,7 +364,7 @@ const fetchArticleDetail = async () => {
 const fetchLikeCount = async (id: string) => {
   try {
     const res: any = await getArticleLikeCount(id)
-    if (article.value && res !== undefined) {
+    if (article.value && String(article.value.id) === id && res !== undefined) {
       article.value.likeCount = res
     }
   } catch (error) {
@@ -391,7 +408,7 @@ const handleLikeArticle = async () => {
     // 查询最新点赞数量
     await fetchLikeCount(article.value.id as string)
   } catch (error) {
-    ElMessage.error('操作失败，请重试')
+    showRequestError(error, '操作失败，请重试')
   }
 }
 
@@ -421,8 +438,8 @@ const handleFavorite = async () => {
       article.value.isFavorited = true
       ElMessage.success('收藏成功')
     }
-  } catch {
-    ElMessage.error('操作失败，请重试')
+  } catch (error) {
+    showRequestError(error, '操作失败，请重试')
   } finally {
     favoriteLoading.value = false
   }
@@ -435,7 +452,7 @@ const handleShare = async () => {
     await navigator.clipboard.writeText(url)
     ElMessage.success('链接已复制到剪贴板')
   } catch (error) {
-    ElMessage.error('复制失败，请手动复制链接')
+    showRequestError(error, '复制失败，请手动复制链接')
   }
 }
 
@@ -448,10 +465,11 @@ const goToTag = (tag: string) => {
 }
 
 onMounted(() => {
-  fetchArticleDetail()
   window.addEventListener('scroll', handleScroll, { passive: true })
   window.addEventListener('keydown', onKeydown)
 })
+
+watch(() => route.params.id, () => { void fetchArticleDetail() }, { immediate: true })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
@@ -462,6 +480,9 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
+.load-error { text-align: center; padding: 48px 24px; color: var(--text-secondary); }
+.load-error p { margin-bottom: 20px; }
+.load-error a { margin-left: 16px; color: var(--color-accent); }
 // ── 阅读进度条 ─────────────────────────────────────────
 .read-progress-bar {
   position: fixed;
@@ -479,7 +500,7 @@ onUnmounted(() => {
 .page-banner {
   position: relative;
   height: 200px;
-  background: url('/bg-banner.png') center 30% / cover no-repeat;
+  background: url('/bg-banner.jpg') center 30% / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;

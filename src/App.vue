@@ -1,4 +1,5 @@
 <template>
+  <el-config-provider :locale="zhCn">
   <ErrorBoundary>
     <div id="app">
       <!-- 全局枫叶飘落 -->
@@ -31,16 +32,19 @@
       <Footer />
     </div>
   </ErrorBoundary>
+  </el-config-provider>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import { useRoute } from 'vue-router'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import SearchOverlay from './components/SearchOverlay.vue'
-import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
+import { fetchWebsiteConfigWithCache, useWebsiteConfigRefresh } from '@/utils/websiteConfig'
+import { setSiteName, resetSeo } from '@/composables/useSeo'
 
 const rnd = (min: number, max: number) => Math.random() * (max - min) + min
 const LEAF_FILTERS = [
@@ -80,9 +84,9 @@ const isHome = computed(() => route.path === '/')
 const fetchWebsiteConfig = async () => {
   try {
     const config = await fetchWebsiteConfigWithCache()
-    if (config.seo_title) {
-      document.title = config.seo_title
-    }
+    if (config.site_name) setSiteName(config.site_name)
+    if (route.name === 'home') document.title = config.seo_title || config.site_name || '时光博客'
+    else if (route.meta.title) resetSeo(route.meta.title as string)
   } catch {
     // 静默失败
   }
@@ -102,6 +106,7 @@ const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+useWebsiteConfigRefresh(() => { void fetchWebsiteConfig() })
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true })
   fetchWebsiteConfig()

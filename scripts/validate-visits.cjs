@@ -151,12 +151,14 @@ async function validateInterceptors() {
   }
   loadModule('src/api/request.ts', {
     axios: { create: () => service },
-    'element-plus': { ElMessage: { error: () => messages++ } },
+    '@/utils/requestError': {
+      showRequestError: () => messages++, markRequestErrorNotified: () => {}
+    },
     '@/router': { push: () => redirects++ },
     '@/utils/loading': { showLoading: () => shown++, hideLoading: () => hidden++ },
     '@/utils/token': { parseToken: () => '' }
   }, { localStorage: { getItem: () => null, removeItem: () => {} } })
-  const normal = { url: '/web/article/list', headers: {} }
+  const normal = { url: '/system/auth/login', headers: {} }
   const stats = { url: '/web/visit/report', headers: {} }
   requestHandler(normal)
   requestHandler(stats)

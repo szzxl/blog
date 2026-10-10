@@ -101,7 +101,11 @@
             </div>
           </div>
 
-          <div v-if="!loading && articles.length === 0" class="empty-state">
+          <div v-if="loadError && !loading" class="empty-state" role="alert">
+            <p>文章加载失败</p>
+            <el-button @click="fetchArticles">重新加载</el-button>
+          </div>
+          <div v-else-if="!loading && articles.length === 0" class="empty-state">
             <el-icon class="empty-icon" :size="48"><Document /></el-icon>
             <p>暂无文章，敬请期待</p>
           </div>
@@ -165,9 +169,9 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { getMonthArticleList, getCategoryList, getTagList, getNotificationList } from '@/api/article'
 import { formatTimestamp, parseTags } from '@/utils/format'
-import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
+import { fetchWebsiteConfigWithCache, useWebsiteConfigRefresh } from '@/utils/websiteConfig'
 import { Document, View } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus/es/components/message/index'
 
 const router = useRouter()
 
@@ -212,6 +216,7 @@ const categories = ref<Category[]>([])
 const tags = ref<Tag[]>([])
 const notifications = ref<NotificationItem[]>([])
 const loading = ref(false)
+const loadError = ref(false)
 const siteName = ref('')
 const socialGithub = ref('')
 const socialGitee = ref('')
@@ -265,12 +270,13 @@ const runTypewriter = (pi = 0, ci = 0, del = false) => {
 }
 
 const fetchArticles = async () => {
+  loadError.value = false
   loading.value = true
   try {
     const res: any = await getMonthArticleList({ pageNo: 1, pageSize: 12 })
     if (res?.list) articles.value = res.list
     else if (Array.isArray(res)) articles.value = res
-  } catch { /* 静默 */ } finally {
+  } catch { loadError.value = true } finally {
     loading.value = false
   }
 }
@@ -279,10 +285,10 @@ const fetchConfig = async () => {
   try {
     const config = await fetchWebsiteConfigWithCache()
     if (config.site_name) siteName.value = config.site_name
-    if (config.social_github) socialGithub.value = config.social_github
-    if (config.social_gitee) socialGitee.value = config.social_gitee
-    if (config.social_email) socialEmail.value = config.social_email
-    if (config.social_wechat) socialWechat.value = config.social_wechat
+    socialGithub.value = config.social_github || ''
+    socialGitee.value = config.social_gitee || ''
+    socialEmail.value = config.social_email || ''
+    socialWechat.value = config.social_wechat || ''
   } catch { /* 静默 */ }
 }
 
@@ -395,6 +401,7 @@ const tagStyles = computed(() =>
 
 const viewArticle = (id: number) => router.push(`/article/${id}`)
 
+useWebsiteConfigRefresh(() => { void fetchConfig() })
 onMounted(async () => {
   // 阶段1：关键路径，影响首屏可见内容
   await Promise.all([fetchArticles(), fetchConfig()])

@@ -45,10 +45,11 @@
 </template>
 
 <script setup lang="ts">
+import { showRequestError } from '@/utils/requestError'
+
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getCategoryList } from '@/api/article'
-import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 
@@ -106,7 +107,7 @@ const fetchCategories = async () => {
       }))
     }
   } catch (error) {
-    ElMessage.error('获取分类列表失败')
+    showRequestError(error, '获取分类列表失败')
   } finally {
     loading.value = false
   }
@@ -160,7 +161,7 @@ onMounted(() => {
 .page-banner {
   position: relative;
   height: 200px;
-  background: url('/bg-banner.png') center 30% / cover no-repeat;
+  background: url('/bg-banner.jpg') center 30% / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;

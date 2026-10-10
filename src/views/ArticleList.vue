@@ -16,7 +16,7 @@
           <el-input
             v-model="searchKeyword"
             placeholder="搜索文章标题..."
-            prefix-icon="Search"
+            :prefix-icon="Search"
             clearable
             class="search-input"
             @keyup.enter="handleSearch"
@@ -77,7 +77,11 @@
         </div>
 
         <!-- 空状态 -->
-        <div v-if="!loading && articles.length === 0" class="empty-state">
+        <div v-if="loadError && !loading" class="empty-state" role="alert">
+          <p>文章加载失败，请稍后重试</p>
+          <el-button @click="fetchArticles">重新加载</el-button>
+        </div>
+        <div v-else-if="!loading && articles.length === 0" class="empty-state">
           <div class="empty-text">暂无文章</div>
         </div>
       </div>
@@ -101,8 +105,8 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getArticleList } from '@/api/article'
+import { Search } from '@element-plus/icons-vue'
 import { formatTimestamp, parseTags } from '@/utils/format'
-import { ElMessage } from 'element-plus'
 import Skeleton from '@/components/Skeleton.vue'
 
 const router = useRouter()
@@ -128,6 +132,7 @@ const total = ref(0)
 const pageNo = ref(1)
 const pageSize = ref(10)
 const loading = ref(false)
+const loadError = ref(false)
 
 // 将当前状态同步到 URL query（不产生历史记录）
 const syncToUrl = () => {
@@ -146,6 +151,7 @@ const restoreFromUrl = () => {
 
 // 获取文章列表
 const fetchArticles = async () => {
+  loadError.value = false
   loading.value = true
   try {
     const params: any = {
@@ -165,7 +171,7 @@ const fetchArticles = async () => {
       total.value = res.length
     }
   } catch (error) {
-    ElMessage.error('获取文章列表失败')
+    loadError.value = true
   } finally {
     loading.value = false
   }
@@ -217,7 +223,7 @@ onMounted(() => {
 .page-banner {
   position: relative;
   height: 200px;
-  background: url('/bg-banner.png') center 30% / cover no-repeat;
+  background: url('/bg-banner.jpg') center 30% / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;

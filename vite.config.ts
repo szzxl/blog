@@ -5,6 +5,21 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
+// 直接导入组件模块，避免根导出入口将未使用的组件带入公共分包。
+const elementPlusResolvers = () => ElementPlusResolver({ importStyle: 'sass' }).map(resolver => {
+  if (typeof resolver === 'function') return resolver
+  return {
+  type: resolver.type,
+  async resolve(name: string) {
+    const result = await resolver.resolve(name)
+    if (!result || typeof result === 'string' || !result.from.startsWith('element-plus')) return result
+    const aliases: Record<string, string> = { Loading: 'loading', ElDropdownMenu: 'dropdown', ElDropdownItem: 'dropdown', ElFormItem: 'form' }
+    const directory = aliases[name] || name.replace(/^El/, '').replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
+    return { ...result, from: `element-plus/es/components/${directory}/index` }
+  }
+  }
+})
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   // 从环境变量读取 base 路径，如果没有则使用默认值
@@ -16,12 +31,10 @@ export default defineConfig(({ mode }) => {
     plugins: [
       vue(),
       AutoImport({
-        resolvers: [ElementPlusResolver()],
+        resolvers: elementPlusResolvers(),
       }),
       Components({
-        resolvers: [ElementPlusResolver({
-          importStyle: 'sass'
-        })],
+        resolvers: elementPlusResolvers(),
       }),
     ],
     resolve: {
@@ -87,9 +100,9 @@ export default defineConfig(({ mode }) => {
       minify: 'terser',
       terserOptions: {
         compress: {
-          drop_console: true,
+          drop_console: false,
           drop_debugger: true,
-          pure_funcs: ['console.log']
+          pure_funcs: ['console.log', 'console.debug', 'console.info']
         }
       },
       // chunk 大小警告阈值

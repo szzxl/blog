@@ -1,4 +1,4 @@
-import { ElLoading } from 'element-plus'
+import { ElLoading } from 'element-plus/es/components/loading/index'
 import type { LoadingInstance } from 'element-plus/es/components/loading/src/loading'
 
 let loadingInstance: LoadingInstance | null = null

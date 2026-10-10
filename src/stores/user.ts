@@ -1,7 +1,9 @@
+
+import { showRequestError } from '@/utils/requestError'
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { login as loginApi, getUserInfo as getUserInfoApi, logout as logoutApi } from '@/api/article'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus/es/components/message/index'
 import { parseToken } from '@/utils/token'
 
 export interface User {
@@ -63,7 +65,7 @@ export const useUserStore = defineStore('user', () => {
       ElMessage.success('登录成功！欢迎回来')
       return true
     } catch (error) {
-      ElMessage.error('登录失败，请检查用户名和密码')
+      showRequestError(error, '登录失败，请检查用户名和密码')
       return false
     }
   }

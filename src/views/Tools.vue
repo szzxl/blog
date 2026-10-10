@@ -11,7 +11,7 @@
       <article class="tool-card" aria-labelledby="miniprogram-title">
         <div class="tool-info">
           <span class="tool-label">微信小程序</span>
-          <h2 id="miniprogram-title">工具小程序</h2>
+          <h2 id="miniprogram-title">{{ miniprogramName }}</h2>
           <p class="tool-description">打开微信扫一扫，即可使用小程序。</p>
           <div class="scan-guide">
             <span class="guide-number" aria-hidden="true">01</span>
@@ -21,14 +21,14 @@
             <span class="guide-number" aria-hidden="true">02</span>
             <p>手机浏览时，保存二维码，在微信扫一扫中从相册选择图片。</p>
           </div>
-          <a class="download-link" :href="miniprogramQr" download="工具小程序二维码.jpg">
+          <a class="download-link" :href="miniprogramQr" target="_blank" rel="noopener noreferrer" :download="`${miniprogramName}二维码.jpg`">
             <el-icon aria-hidden="true"><Download /></el-icon>
             保存二维码
           </a>
         </div>
 
         <figure class="qr-panel">
-          <img :src="miniprogramQr" alt="工具小程序二维码，请使用微信扫一扫" width="258" height="294" />
+          <img :src="miniprogramQr" :alt="`${miniprogramName}二维码，请使用微信扫一扫`" width="258" height="294" />
           <figcaption>微信扫一扫，打开小程序</figcaption>
         </figure>
       </article>
@@ -38,7 +38,19 @@
 
 <script setup lang="ts">
 import { Download } from '@element-plus/icons-vue'
-import miniprogramQr from '@/assets/tools/miniprogram-qr.jpg'
+import defaultMiniprogramQr from '@/assets/tools/miniprogram-qr.jpg'
+import { ref, onMounted } from 'vue'
+import { fetchWebsiteConfigWithCache, useWebsiteConfigRefresh } from '@/utils/websiteConfig'
+
+const miniprogramName = ref('工具小程序')
+const miniprogramQr = ref(defaultMiniprogramQr)
+const refreshTool = async () => {
+  const config = await fetchWebsiteConfigWithCache()
+  miniprogramName.value = config.tool_miniprogram_name || '工具小程序'
+  miniprogramQr.value = config.tool_miniprogram_qr || defaultMiniprogramQr
+}
+useWebsiteConfigRefresh(() => { void refreshTool() })
+onMounted(() => { void refreshTool() })
 </script>
 
 <style scoped lang="scss">
@@ -47,7 +59,7 @@ import miniprogramQr from '@/assets/tools/miniprogram-qr.jpg'
   display: grid;
   place-items: center;
   height: 200px;
-  background: url('/bg-banner.png') center 30% / cover no-repeat;
+  background: url('/bg-banner.jpg') center 30% / cover no-repeat;
 
   &::before {
     content: '';

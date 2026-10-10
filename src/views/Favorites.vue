@@ -60,9 +60,12 @@
 </template>
 
 <script setup lang="ts">
+import { showRequestError } from '@/utils/requestError'
+
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus/es/components/message/index'
+import { ElMessageBox } from 'element-plus/es/components/message-box/index'
 import { getUserFavorites, removeFavorite } from '@/api/article'
 import { formatTimestamp } from '@/utils/format'
 import { useUserStore } from '@/stores/user'
@@ -99,7 +102,7 @@ const loadFavorites = async () => {
     articles.value = list
     total.value = response?.total ?? list.length
   } catch (error) {
-    ElMessage.error('加载收藏列表失败')
+    showRequestError(error, '加载收藏列表失败')
   } finally {
     loading.value = false
   }
@@ -124,7 +127,7 @@ const handleUnfavorite = async (article: any) => {
     ElMessage.success('已取消收藏')
   } catch (error: any) {
     if (error !== 'cancel' && error?.action !== 'cancel') {
-      ElMessage.error('操作失败，请重试')
+      showRequestError(error, '操作失败，请重试')
     }
   }
 }
