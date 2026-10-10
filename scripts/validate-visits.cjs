@@ -121,8 +121,8 @@ async function validateTracking() {
   const development = trackingFixture({ development: true })
   development.ready()
   await tick()
-  check(development.reports.length, 0)
-  check(development.reads(), 1)
+  check(development.reports.length, 1)
+  check(development.reads(), 0)
 
   const blocked = trackingFixture({ blockedStorage: true })
   blocked.ready()

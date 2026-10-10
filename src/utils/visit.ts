@@ -57,7 +57,7 @@ export const setupVisitTracking = (router: Router) => {
   started = true
 
   const track = (route: RouteLocationNormalizedLoaded) => {
-    const shouldReport = !import.meta.env.DEV && !useUserStore().isAuthor &&
+    const shouldReport = !useUserStore().isAuthor &&
       typeof route.name === 'string' && CONTENT_ROUTES.has(route.name)
     // 在导航发生时固定事件和路径；串行发送，避免旧响应覆盖新统计。
     const report = shouldReport ? {
