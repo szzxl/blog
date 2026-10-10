@@ -19,6 +19,10 @@
 
 定向验证命令：`node scripts/validate-visits.cjs`、`node scripts/validate-config.cjs`。前者验证访问统计和请求拦截器，后者验证配置过期、存储不可用、失败回退及错误提示去重；均不打开页面或连接后端。
 
+`node scripts/validate-requests.cjs` 验证搜索结果乱序、清空与关闭搜索，以及相册切换和离开后的响应隔离。使用现有 TypeScript 和 Vue 依赖，不新增测试框架。
+
+相册公开查询使用 `/web/album/list` 和 `/web/album/photo/list`，禁用相册不展示；后端需配套发布。个人中心展示实际账号信息并提供收藏入口。
+
 - **主题切换** - 支持浅色/深色/自动三种主题模式，跟随系统偏好
 - **表情包支持** - 评论系统集成 500+ 表情符号
 - **性能优化** - 代码分割、图片懒加载、分类和标签内存缓存、网站配置 sessionStorage 缓存

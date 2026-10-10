@@ -102,12 +102,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getArticleList } from '@/api/article'
 import { Search } from '@element-plus/icons-vue'
 import { formatTimestamp, parseTags } from '@/utils/format'
 import Skeleton from '@/components/Skeleton.vue'
+import { createLatestRequest } from '@/utils/latestRequest'
 
 const router = useRouter()
 const route = useRoute()
@@ -133,6 +134,7 @@ const pageNo = ref(1)
 const pageSize = ref(10)
 const loading = ref(false)
 const loadError = ref(false)
+const articleRequest = createLatestRequest()
 
 // 将当前状态同步到 URL query（不产生历史记录）
 const syncToUrl = () => {
@@ -151,6 +153,7 @@ const restoreFromUrl = () => {
 
 // 获取文章列表
 const fetchArticles = async () => {
+  const requestId = articleRequest.next()
   loadError.value = false
   loading.value = true
   try {
@@ -162,6 +165,7 @@ const fetchArticles = async () => {
     if (route.query.category) params.articleCategory = route.query.category
 
     const res: any = await getArticleList(params)
+    if (!articleRequest.isCurrent(requestId)) return
 
     if (res && res.list) {
       articles.value = res.list
@@ -171,9 +175,9 @@ const fetchArticles = async () => {
       total.value = res.length
     }
   } catch (error) {
-    loadError.value = true
+    if (articleRequest.isCurrent(requestId)) loadError.value = true
   } finally {
-    loading.value = false
+    if (articleRequest.isCurrent(requestId)) loading.value = false
   }
 }
 
@@ -216,6 +220,7 @@ onMounted(() => {
   restoreFromUrl()
   fetchArticles()
 })
+onUnmounted(() => articleRequest.invalidate())
 </script>
 
 <style scoped lang="scss">
