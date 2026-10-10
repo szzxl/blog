@@ -8,7 +8,7 @@ const VISITOR_KEY = 'blog_visitor_id'
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 const CONTENT_ROUTES = new Set([
   'home', 'articles', 'article-detail', 'category', 'tag', 'tag-articles',
-  'album', 'guestbook', 'link', 'about'
+  'album', 'guestbook', 'link', 'about', 'tools'
 ])
 
 const summary = shallowRef<VisitSummary | null>(null)

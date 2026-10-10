@@ -176,7 +176,7 @@ import { uploadImage, updateUserProfile, getUserInfo, updatePassword } from '@/a
 import { ElMessage } from 'element-plus'
 import {
   House, Document, Folder, CollectionTag,
-  PictureFilled, EditPen, Connection, Moon, Sunny,
+  PictureFilled, EditPen, Connection, Tools, Moon, Sunny,
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -191,6 +191,7 @@ const navItems = [
 { to: '/album', icon: PictureFilled, text: '相册', color: '#0fc6c2' },
   { to: '/guestbook', icon: EditPen, text: '留言板', color: '#f77234' },
   { to: '/link', icon: Connection, text: '友链', color: '#9fdb1d' },
+  { to: '/tools', icon: Tools, text: '工具', color: '#00b42a' },
 ]
 
 const siteName = ref('')
@@ -716,7 +717,7 @@ onUnmounted(() => {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .desktop-nav { display: none; }
   .mobile-menu-btn { display: flex; }
   .header .container { gap: 16px; }

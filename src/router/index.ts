@@ -30,6 +30,7 @@ const router = createRouter({
     { path: '/tag',              name: 'tag',              component: () => import('@/views/Tag.vue'),        meta: { title: '标签' } },
     { path: '/tag/articles',     name: 'tag-articles',     component: () => import('@/views/TagArticles.vue'),meta: { title: '标签文章' } },
     { path: '/album',            name: 'album',            component: () => import('@/views/Album.vue'),      meta: { title: '相册' } },
+    { path: '/tools',            name: 'tools',            component: () => import('@/views/Tools.vue'),      meta: { title: '工具' } },
     { path: '/guestbook',        name: 'guestbook',        component: () => import('@/views/Guestbook.vue'),  meta: { title: '留言板' } },
     { path: '/link',             name: 'link',             component: () => import('@/views/Link.vue'),       meta: { title: '友情链接' } },
     { path: '/profile',          name: 'profile',          component: () => import('@/views/Profile.vue'),    meta: { requiresAuth: true, title: '个人中心' } },

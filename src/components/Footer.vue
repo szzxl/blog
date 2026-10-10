@@ -40,6 +40,7 @@
             <router-link to="/tag">标签</router-link>
             <router-link to="/album">相册</router-link>
             <router-link to="/guestbook">留言板</router-link>
+            <router-link to="/tools">工具</router-link>
           </nav>
         </div>
 
