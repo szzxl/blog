@@ -10,11 +10,11 @@ let loadingCount = 0
  */
 export const showLoading = (text = '加载中...') => {
   loadingCount++
-  
+
   if (loadingInstance) {
     return
   }
-  
+
   loadingInstance = ElLoading.service({
     lock: true,
     text,
@@ -28,19 +28,10 @@ export const showLoading = (text = '加载中...') => {
  */
 export const hideLoading = () => {
   loadingCount--
-  
+
   if (loadingCount <= 0) {
     loadingCount = 0
     loadingInstance?.close()
     loadingInstance = null
   }
-}
-
-/**
- * 强制关闭 Loading
- */
-export const forceHideLoading = () => {
-  loadingCount = 0
-  loadingInstance?.close()
-  loadingInstance = null
 }

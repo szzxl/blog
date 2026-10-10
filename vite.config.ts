@@ -52,7 +52,6 @@ export default defineConfig(({ mode }) => {
         '/admin-api': {
           target: 'http://localhost:48080',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/admin-api/, '/admin-api')
         },
         '/rss': {
           target: 'http://localhost:48080',
@@ -62,6 +61,8 @@ export default defineConfig(({ mode }) => {
       }
     },
     build: {
+      // Vite 7 调整了默认浏览器目标，这里保持原有兼容范围。
+      target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
       sourcemap: false,
       // 代码分割优化
       rollupOptions: {

@@ -32,7 +32,7 @@
 
         <!-- 公告 -->
         <div class="sidebar-card">
-          <div class="card-title">
+          <div class="sidebar-heading">
             <span class="title-dot" style="background:linear-gradient(135deg,#ff7d00,#f53f3f)"></span>
             公告
           </div>
@@ -58,6 +58,7 @@
 
         <div class="section-header">
           <h2 class="section-title">最新文章</h2>
+          <router-link class="section-more" to="/articles">全部文章 →</router-link>
         </div>
 
         <div v-loading="loading">
@@ -118,7 +119,7 @@
 
         <!-- 文章分类 -->
         <div class="sidebar-card">
-          <div class="card-title">
+          <div class="sidebar-heading">
             <span class="title-dot" style="background:linear-gradient(135deg,#00b42a,#0fc6c2)"></span>
             文章分类
           </div>
@@ -127,11 +128,12 @@
               class="cat-item"
               v-for="cat in categories.slice(0, 10)"
               :key="cat.id"
-              @click="$router.push(`/articles?category=${cat.name || cat.categoryName}`)"
             >
-              <span class="cat-dot"></span>
-              <span class="cat-name">{{ cat.name || cat.categoryName || '未命名' }}</span>
-              <span class="cat-count">{{ cat.num ?? cat.articleCount ?? cat.count ?? 0 }}</span>
+              <router-link class="cat-link" :to="{ path: '/articles', query: { category: cat.name || cat.categoryName } }">
+                <span class="cat-dot"></span>
+                <span class="cat-name">{{ cat.name || cat.categoryName || '未命名' }}</span>
+                <span class="cat-count">{{ cat.num ?? cat.articleCount ?? cat.count ?? 0 }}</span>
+              </router-link>
             </li>
           </ul>
           <p class="notice-text" v-else>暂无分类</p>
@@ -139,23 +141,19 @@
 
         <!-- 标签云 -->
         <div class="sidebar-card">
-          <div class="card-title">
+          <div class="sidebar-heading">
             <span class="title-dot" style="background:linear-gradient(135deg,#f53f3f,#722ed1)"></span>
             标签云
           </div>
-          <div class="tag-sphere-wrap">
-            <div class="tag-sphere">
-              <span
-                v-for="(tag, i) in tags" :key="tag.id ?? tag.name"
-                class="sphere-tag"
-                :style="tagStyles[i]"
-                :ref="el => setTagRef(el, i)"
-                @click="$router.push(`/tag/articles?tag=${tag.name || tag.tagName}`)"
-                @mouseenter="pauseSphere"
-                @mouseleave="resumeSphere"
-              >{{ tag.name || tag.tagName }}</span>
-            </div>
+          <div v-if="tags.length" class="tag-cloud">
+            <router-link
+              v-for="(tag, i) in tags" :key="tag.id ?? tag.name"
+              class="cloud-tag"
+              :style="tagStyles[i]"
+              :to="{ path: '/tag/articles', query: { tag: tag.name || tag.tagName } }"
+            >{{ tag.name || tag.tagName }}</router-link>
           </div>
+          <p v-else class="notice-text">暂无标签</p>
         </div>
 
       </aside>
@@ -165,7 +163,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getMonthArticleList, getCategoryList, getTagList, getNotificationList } from '@/api/article'
 import { formatTimestamp, parseTags } from '@/utils/format'
@@ -174,6 +172,7 @@ import { Document, View } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus/es/components/message/index'
 
 const router = useRouter()
+let disposed = false
 
 
 interface Article {
@@ -248,6 +247,7 @@ const isTyping = ref(true)
 let typeTimer: ReturnType<typeof setTimeout>
 
 const runTypewriter = (pi = 0, ci = 0, del = false) => {
+  if (disposed) return
   const phrase = phrases[pi] ?? ''
   if (!del) {
     displayText.value = phrase.slice(0, ci + 1)
@@ -274,16 +274,18 @@ const fetchArticles = async () => {
   loading.value = true
   try {
     const res: any = await getMonthArticleList({ pageNo: 1, pageSize: 12 })
+    if (disposed) return
     if (res?.list) articles.value = res.list
     else if (Array.isArray(res)) articles.value = res
-  } catch { loadError.value = true } finally {
-    loading.value = false
+  } catch { if (!disposed) loadError.value = true } finally {
+    if (!disposed) loading.value = false
   }
 }
 
 const fetchConfig = async () => {
   try {
     const config = await fetchWebsiteConfigWithCache()
+    if (disposed) return
     if (config.site_name) siteName.value = config.site_name
     socialGithub.value = config.social_github || ''
     socialGitee.value = config.social_gitee || ''
@@ -295,6 +297,7 @@ const fetchConfig = async () => {
 const fetchNotifications = async () => {
   try {
     const res: any = await getNotificationList()
+    if (disposed) return
     const list = Array.isArray(res) ? res : (res?.list ?? [])
     notifications.value = list.filter((item: NotificationItem) => item.status === 1)
   } catch { /* 静默 */ }
@@ -303,6 +306,7 @@ const fetchNotifications = async () => {
 const fetchCategories = async () => {
   try {
     const res: any = await getCategoryList({ pageSize: 100 })
+    if (disposed) return
     if (res?.list) { categories.value = res.list }
     else if (Array.isArray(res)) { categories.value = res }
   } catch { /* 静默 */ }
@@ -311,80 +315,14 @@ const fetchCategories = async () => {
 const fetchTags = async () => {
   try {
     const res: any = await getTagList({ pageSize: 200 })
+    if (disposed) return
     if (res?.list) { tags.value = res.list }
     else if (Array.isArray(res)) { tags.value = res }
-    await nextTick()
-    initSphere()
   } catch { /* 静默 */ }
 }
 
-// ── 球形标签云 ────────────────────────────────────────
-const prefersReducedMotion = typeof window !== 'undefined' &&
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches
-const tagEls = ref<HTMLElement[]>([])
-let sphereTimer = 0
 let idleId: ReturnType<typeof requestIdleCallback> | null = null
 let idleTimer: ReturnType<typeof setTimeout> | undefined
-let angleX = 0.008
-let angleY = 0.012
-let lastFrameTime = 0
-let items: { el: HTMLElement; x: number; y: number; z: number }[] = []
-
-const setTagRef = (el: any, i: number) => {
-  if (el) tagEls.value[i] = el as HTMLElement
-}
-
-const initSphere = () => {
-  const count = tagEls.value.length
-  if (!count) return
-  items = tagEls.value.map((el, i) => {
-    const phi   = Math.acos(-1 + (2 * i) / count)
-    const theta = Math.sqrt(count * Math.PI) * phi
-    return {
-      el,
-      x: Math.sin(phi) * Math.cos(theta),
-      y: Math.sin(phi) * Math.sin(theta),
-      z: Math.cos(phi),
-    }
-  })
-  renderSphere()
-  if (!prefersReducedMotion) sphereTimer = requestAnimationFrame(tick)
-}
-
-const tick = (now: number) => {
-  const delta = lastFrameTime ? now - lastFrameTime : 30
-  lastFrameTime = now
-  rotateSphere(delta / 30)
-  sphereTimer = requestAnimationFrame(tick)
-}
-
-const rotateSphere = (scale = 1) => {
-  const cosX = Math.cos(angleX * scale), sinX = Math.sin(angleX * scale)
-  const cosY = Math.cos(angleY * scale), sinY = Math.sin(angleY * scale)
-  items.forEach(item => {
-    const x1 = item.x * cosY - item.z * sinY
-    const z1 = item.x * sinY + item.z * cosY
-    const y2 = item.y * cosX - z1 * sinX
-    const z2 = item.y * sinX + z1 * cosX
-    item.x = x1; item.y = y2; item.z = z2
-  })
-  renderSphere()
-}
-
-const renderSphere = () => {
-  const R = 110
-  items.forEach(item => {
-    const scale = (item.z + 1.6) / 2.6
-    const x = item.x * R + R
-    const y = item.y * R + R
-    item.el.style.transform = `translate(${x}px, ${y}px) scale(${scale.toFixed(3)})`
-    item.el.style.opacity   = (scale * 0.7 + 0.2).toFixed(3)
-    item.el.style.zIndex    = Math.round(scale * 10).toString()
-  })
-}
-
-const pauseSphere  = () => { angleX = 0; angleY = 0 }
-const resumeSphere = () => { angleX = 0.008; angleY = 0.012 }
 
 const TAG_COLORS = [
   ['#e8f0ff', '#165dff'], ['#f3e8ff', '#722ed1'], ['#fff3e8', '#ff7d00'],
@@ -405,30 +343,38 @@ useWebsiteConfigRefresh(() => { void fetchConfig() })
 onMounted(async () => {
   // 阶段1：关键路径，影响首屏可见内容
   await Promise.all([fetchArticles(), fetchConfig()])
+  if (disposed) return
 
   // 阶段2：侧边栏次要数据
   fetchCategories()
 
   // 阶段3：非关键数据，浏览器空闲时加载
   if (typeof requestIdleCallback !== 'undefined') {
-    idleId = requestIdleCallback(() => { fetchTags(); fetchNotifications() }, { timeout: 2000 })
+    idleId = requestIdleCallback(() => {
+      if (disposed) return
+      void fetchTags()
+      void fetchNotifications()
+    }, { timeout: 2000 })
   } else {
-    idleTimer = setTimeout(() => { fetchTags(); fetchNotifications() }, 200)
+    idleTimer = setTimeout(() => {
+      if (disposed) return
+      void fetchTags()
+      void fetchNotifications()
+    }, 200)
   }
 
   typeTimer = setTimeout(() => runTypewriter(), 800)
 })
 onUnmounted(() => {
+  disposed = true
   clearTimeout(typeTimer)
   clearTimeout(idleTimer)
-  cancelAnimationFrame(sphereTimer)
   if (idleId !== null) cancelIdleCallback(idleId)
 })
 </script>
 
 <style scoped lang="scss">
 .home {
-  min-height: 100vh;
   background: var(--bg-primary);
   position: relative;
 
@@ -467,11 +413,11 @@ onUnmounted(() => {
 .page-layout {
   position: relative;
   z-index: 1;
-  max-width: 1400px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 80px 24px 80px;
+  padding: 96px 32px 32px;
   display: grid;
-  grid-template-columns: 260px 1fr 220px;
+  grid-template-columns: 220px minmax(0, 1fr) 220px;
   gap: 24px;
   align-items: start;
 }
@@ -483,6 +429,7 @@ onUnmounted(() => {
   gap: 16px;
   position: sticky;
   top: 72px;
+  min-width: 0;
 }
 
 .sidebar-right {
@@ -496,12 +443,12 @@ onUnmounted(() => {
   box-shadow: var(--shadow-card);
   overflow: hidden;
   transition: box-shadow 0.3s;
-  &:hover { box-shadow: var(--shadow-card-hover); }
+  &:hover { box-shadow: var(--shadow-card); }
 }
 
 .author-card {
   position: relative;
-  padding: 32px 24px 28px;
+  padding: 28px 18px 24px;
   text-align: center;
   overflow: visible;
 
@@ -558,7 +505,7 @@ onUnmounted(() => {
 
 
 
-.card-title {
+.sidebar-heading {
   display: flex; align-items: center; gap: 8px;
   font-size: 14px; font-weight: 700; color: var(--text-primary);
   padding: 14px 16px 10px;
@@ -623,11 +570,11 @@ onUnmounted(() => {
   padding: 8px 0;
 }
 
-.cat-item {
+.cat-link {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 10px 16px;
   cursor: pointer;
   transition: background 0.2s;
   &:hover {
@@ -660,43 +607,41 @@ onUnmounted(() => {
 }
 
 // 标签云
-.tag-sphere-wrap {
-  padding: 12px;
+.tag-cloud {
+  padding: 16px;
   display: flex;
-  justify-content: center;
-  overflow: hidden;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 
-.tag-sphere {
-  position: relative;
-  width: 220px;
-  height: 220px;
-}
-
-.sphere-tag {
-  position: absolute;
-  top: 0; left: 0;
-  padding: 3px 10px;
+.cloud-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  max-width: 100%;
+  padding: 5px 11px;
   border-radius: var(--radius-tag);
   border: 1px solid;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  white-space: nowrap;
-  will-change: transform, opacity;
-  transition: filter 0.2s, box-shadow 0.2s;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+  transition: filter 0.2s, transform 0.2s;
   &:hover {
-    filter: brightness(0.85) saturate(1.4);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    filter: brightness(0.95) saturate(1.2);
+    transform: translateY(-2px);
   }
 }
 
 // ── 主内容 ────────────────────────────────────────────
-.center-col { min-width: 0; }
+.center-col { min-width: 0; font-family: var(--font-article); }
 
 .section-header {
   display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 20px;
+  min-height: 32px;
+  margin-bottom: 16px;
 }
 
 .section-title {
@@ -719,8 +664,8 @@ onUnmounted(() => {
 // ── 文章网格 ──────────────────────────────────────────
 .article-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
   align-items: stretch;
 }
 
@@ -731,9 +676,12 @@ onUnmounted(() => {
   box-shadow: var(--shadow-card);
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+
+  &:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; }
 
   &:hover {
     box-shadow: var(--shadow-card-hover);
@@ -745,7 +693,7 @@ onUnmounted(() => {
 
   .card-cover {
     position: relative;
-    aspect-ratio: 16/8;
+    aspect-ratio: 16/9;
     overflow: hidden;
     background: var(--bg-secondary);
     flex-shrink: 0;
@@ -765,7 +713,7 @@ onUnmounted(() => {
 
   .card-body {
     flex: 1;
-    padding: 10px 12px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
   }
@@ -778,11 +726,15 @@ onUnmounted(() => {
   }
 
   .card-title {
-    font-family: var(--font-serif);
-    font-size: 13px; font-weight: 700; color: var(--color-accent);
-    line-height: 1.4;
-    min-height: 1.4em;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-family: var(--font-article);
+    font-size: 15px; font-weight: 600; color: var(--text-primary);
+    line-height: 1.65;
+    min-height: 3.3em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
     transition: color 0.2s; margin: 0;
   }
 
@@ -794,16 +746,20 @@ onUnmounted(() => {
 
   .card-footer {
     display: flex; align-items: center; justify-content: space-between;
-    padding-top: 8px;
-    margin-top: auto;
+    padding-top: 12px;
+    margin-top: 14px;
+    gap: 8px;
+    border-top: 1px solid var(--border-color);
+    flex-wrap: wrap;
   }
 
-  .card-date { font-size: 12px; color: var(--text-tertiary); }
+  .card-date { font-size: 12px; color: var(--text-tertiary); white-space: nowrap; }
 
   .card-meta-right {
     display: flex;
     align-items: center;
     gap: 6px;
+    min-width: 0;
   }
 
   .card-reads {
@@ -814,6 +770,10 @@ onUnmounted(() => {
   .card-tags { display: flex; gap: 4px; }
 
   .tag {
+    max-width: 88px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     padding: 1px 7px; border-radius: 6px;
     background: var(--bg-secondary); color: var(--text-secondary);
     font-size: 11px; border: 1px solid var(--border-color);
@@ -831,35 +791,33 @@ onUnmounted(() => {
 
 // ── 响应式 ────────────────────────────────────────────
 @media (max-width: 1200px) {
-  .page-layout { grid-template-columns: 240px 1fr 200px; gap: 20px; }
+  .page-layout { grid-template-columns: 190px minmax(0, 1fr) 190px; gap: 20px; padding-inline: 24px; }
+  .article-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 1024px) {
   /* 右 sidebar 折叠到主内容下方 */
-  .page-layout { grid-template-columns: 240px 1fr; }
-  .sidebar-right { grid-column: 2; display: grid; grid-template-columns: repeat(2, 1fr); position: static; }
-}
-
-@media (max-width: 900px) {
-  .article-grid { grid-template-columns: repeat(2, 1fr); }
+  .page-layout { grid-template-columns: 200px minmax(0, 1fr); }
+  .sidebar-right { grid-column: 2; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); position: static; align-items: start; }
 }
 
 @media (max-width: 860px) {
-  .page-layout { grid-template-columns: 1fr; }
-  .sidebar-left { display: grid; grid-template-columns: repeat(2, 1fr); position: static; }
-  .author-card { grid-column: 1 / -1; }
-  .sidebar-right { grid-column: 1; display: grid; grid-template-columns: repeat(2, 1fr); }
+  .page-layout { grid-template-columns: minmax(0, 1fr); padding-top: 88px; }
+  .center-col { grid-row: 1; }
+  .sidebar-left { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); position: static; align-items: start; }
+  .sidebar-right { grid-column: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 640px) {
   .article-grid { grid-template-columns: 1fr; }
   .sidebar-left, .sidebar-right { grid-template-columns: 1fr; }
-  .page-layout { padding: 16px 16px 60px; }
-  .tag-sphere { width: 180px; height: 180px; }
+  .page-layout { padding: 84px 16px 24px; gap: 24px; }
+  .section-title { font-size: 19px; }
+  .cloud-tag { min-height: 36px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sphere-tag { transition: none; }
+  .cloud-tag { transition: none; &:hover { transform: none; } }
   .article-card { transition: none; &:hover { transform: none; } }
 }
 </style>

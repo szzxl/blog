@@ -136,6 +136,7 @@ import { showRequestError } from '@/utils/requestError'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { getAlbumList, getAlbumPhotos } from '@/api/article'
 import Comment from '@/components/Comment.vue'
+import { createLatestRequest } from '@/utils/latestRequest'
 
 interface Album {
   id: number
@@ -159,6 +160,7 @@ const currentAlbum = ref<Album | null>(null)
 const photos       = ref<Photo[]>([])
 const albumsLoading = ref(false)
 const photosLoading = ref(false)
+const photoRequest = createLatestRequest()
 
 // ── 灯箱 ──────────────────────────────────────────────
 const lightboxOpen  = ref(false)
@@ -193,22 +195,28 @@ const fetchAlbums = async () => {
 }
 
 const loadAlbumPhotos = async (album: Album) => {
+  const requestId = photoRequest.next()
+  closeLightbox()
   currentAlbum.value = album
   photos.value       = []
   photosLoading.value = true
   window.scrollTo({ top: 0, behavior: 'smooth' })
   try {
     const res: any = await getAlbumPhotos({ id: album.id })
+    if (!photoRequest.isCurrent(requestId)) return
     if (Array.isArray(res))  photos.value = res
     else if (res?.list)      photos.value = res.list
   } catch (error) {
-    showRequestError(error, '获取照片失败')
+    if (photoRequest.isCurrent(requestId)) showRequestError(error, '获取照片失败')
   } finally {
-    photosLoading.value = false
+    if (photoRequest.isCurrent(requestId)) photosLoading.value = false
   }
 }
 
 const backToAlbums = () => {
+  photoRequest.invalidate()
+  photosLoading.value = false
+  closeLightbox()
   currentAlbum.value = null
   photos.value       = []
   window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -220,6 +228,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  photoRequest.invalidate()
   window.removeEventListener('keydown', onKeydown)
 })
 </script>

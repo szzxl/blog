@@ -34,8 +34,6 @@ const router = createRouter({
     { path: '/guestbook',        name: 'guestbook',        component: () => import('@/views/Guestbook.vue'),  meta: { title: '留言板' } },
     { path: '/link',             name: 'link',             component: () => import('@/views/Link.vue'),       meta: { title: '友情链接' } },
     { path: '/profile',          name: 'profile',          component: () => import('@/views/Profile.vue'),    meta: { requiresAuth: true, title: '个人中心' } },
-    { path: '/profile/likes',    name: 'profile-likes',    component: () => import('@/views/Profile.vue'),    meta: { requiresAuth: true, title: '我的点赞' } },
-    { path: '/profile/comments', name: 'profile-comments', component: () => import('@/views/Profile.vue'),    meta: { requiresAuth: true, title: '我的评论' } },
     { path: '/favorites',        name: 'favorites',        component: () => import('@/views/Favorites.vue'),  meta: { requiresAuth: true, title: '我的收藏' } },
     { path: '/about',            name: 'about',            component: () => import('@/views/About.vue'),      meta: { title: '关于我' } },
     { path: '/:pathMatch(.*)*',  name: 'not-found',        component: () => import('@/views/NotFound.vue'),   meta: { title: '页面未找到' } }
@@ -47,24 +45,21 @@ router.beforeEach(async (to, _from, next) => {
   const userStore = useUserStore()
 
   const tokenStr = localStorage.getItem('ACCESS_TOKEN')
+  const token = parseToken(tokenStr)
 
   // token 已被清除（如 401）但 store 未同步，补清 store
-  if (!tokenStr && userStore.isLoggedIn) {
-    userStore.token = ''
-    userStore.isLoggedIn = false
+  if (!token && (tokenStr || userStore.isLoggedIn || userStore.user)) {
+    userStore.clearAuth()
   }
 
   // 如果有可解析的 token 但没有用户信息，尝试获取用户信息
-  if (tokenStr && parseToken(tokenStr) && !userStore.user) {
+  if (token && !userStore.user) {
     try {
-      userStore.token = parseToken(tokenStr)
+      userStore.token = token
       await userStore.fetchUserInfo()
       userStore.isLoggedIn = true
     } catch (error) {
-      userStore.token = ''
-      userStore.isLoggedIn = false
-      localStorage.removeItem('ACCESS_TOKEN')
-      localStorage.removeItem('user')
+      userStore.clearAuth()
     }
   }
   

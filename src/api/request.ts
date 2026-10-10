@@ -4,6 +4,7 @@ import { showRequestError, markRequestErrorNotified } from '@/utils/requestError
 import router from '@/router'
 import { showLoading, hideLoading } from '@/utils/loading'
 import { parseToken } from '@/utils/token'
+import { useUserStore } from '@/stores/user'
 
 // 公开接口列表（不需要登录的接口）
 const PUBLIC_APIS = [
@@ -23,8 +24,8 @@ const PUBLIC_APIS = [
   '/article/comment/page',
   '/article/comment/reply',
   '/web/album/comment/list',
-  '/album/list',
-  '/album/photo/list',
+  '/web/album/list',
+  '/web/album/photo/list',
   '/config/notification/list',
   '/config/website',
   '/config/link'
@@ -47,8 +48,8 @@ const NO_LOADING_APIS = [
   '/article/comment/page',
   '/article/comment/reply',
   '/article/favorite/page',
-  '/album/list',
-  '/album/photo/list',
+  '/web/album/list',
+  '/web/album/photo/list',
   '/config/website',
   '/config/link',
   '/config/notification/list',
@@ -119,8 +120,7 @@ service.interceptors.response.use(
       
       // 401 未授权，只有非公开接口才跳转登录
       if (res.code === 401 && !isPublicApi(url)) {
-        localStorage.removeItem('ACCESS_TOKEN')
-        localStorage.removeItem('user')
+        useUserStore().clearAuth()
         router.push('/login')
       }
       
@@ -143,8 +143,7 @@ service.interceptors.response.use(
         case 401:
           if (!isPublicApi(url)) {
             showRequestError(error, '未授权，请重新登录', true)
-            localStorage.removeItem('ACCESS_TOKEN')
-            localStorage.removeItem('user')
+            useUserStore().clearAuth()
             router.push('/login')
           }
           break

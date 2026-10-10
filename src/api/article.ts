@@ -347,7 +347,7 @@ export const getAlbumList = (data?: {
   pageSize?: number
 }) => {
   return request({
-    url: '/album/list',
+    url: '/web/album/list',
     method: 'post',
     data: data || {}
   })
@@ -357,7 +357,7 @@ export const getAlbumPhotos = (data: {
   id: number
 }) => {
   return request({
-    url: '/album/photo/list',
+    url: '/web/album/photo/list',
     method: 'post',
     data
   })

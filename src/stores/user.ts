@@ -21,6 +21,14 @@ export const useUserStore = defineStore('user', () => {
   const isLoggedIn = ref(false)
   const token = ref<string>('')
 
+  const clearAuth = () => {
+    user.value = null
+    token.value = ''
+    isLoggedIn.value = false
+    localStorage.removeItem('ACCESS_TOKEN')
+    localStorage.removeItem('user')
+  }
+
   // 初始化函数：从 localStorage 恢复登录状态
   const initFromStorage = () => {
     const savedUser = localStorage.getItem('user')
@@ -32,8 +40,7 @@ export const useUserStore = defineStore('user', () => {
         token.value = savedToken
         isLoggedIn.value = true
       } catch {
-        localStorage.removeItem('user')
-        localStorage.removeItem('ACCESS_TOKEN')
+        clearAuth()
       }
     }
   }
@@ -48,6 +55,7 @@ export const useUserStore = defineStore('user', () => {
       
       // 保存 token（使用管理后台的格式）
       const accessToken = res.token || res.accessToken || ''
+      if (!accessToken) throw new Error('登录响应缺少 token')
       token.value = accessToken
       
       // 使用管理后台的格式存储：{ c: 创建时间, e: 过期时间, v: token值 }
@@ -65,6 +73,7 @@ export const useUserStore = defineStore('user', () => {
       ElMessage.success('登录成功！欢迎回来')
       return true
     } catch (error) {
+      clearAuth()
       showRequestError(error, '登录失败，请检查用户名和密码')
       return false
     }
@@ -92,11 +101,7 @@ export const useUserStore = defineStore('user', () => {
     } catch (error) {
       // 退出登录失败
     } finally {
-      user.value = null
-      token.value = ''
-      isLoggedIn.value = false
-      localStorage.removeItem('ACCESS_TOKEN')
-      localStorage.removeItem('user')
+      clearAuth()
       ElMessage.success('已退出登录')
     }
   }
@@ -112,6 +117,7 @@ export const useUserStore = defineStore('user', () => {
     isLoggedIn,
     token,
     isAuthor,
+    clearAuth,
     login,
     logout,
     fetchUserInfo

@@ -62,6 +62,7 @@ import { ref, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getArticleList } from '@/api/article'
 import { formatTimestamp } from '@/utils/format'
+import { createLatestRequest } from '@/utils/latestRequest'
 
 const router = useRouter()
 const show = ref(false)
@@ -71,8 +72,12 @@ const results = ref<any[]>([])
 const selected = ref(-1)
 const inputRef = ref<HTMLInputElement>()
 let searchTimer: ReturnType<typeof setTimeout>
+const searchRequest = createLatestRequest()
 
 const open = async () => {
+  clearTimeout(searchTimer)
+  searchRequest.invalidate()
+  searching.value = false
   show.value = true
   keyword.value = ''
   results.value = []
@@ -81,22 +86,29 @@ const open = async () => {
   inputRef.value?.focus()
 }
 
-const close = () => { show.value = false }
+const close = () => {
+  show.value = false
+  clearTimeout(searchTimer)
+  searchRequest.invalidate()
+  searching.value = false
+}
 
 const onInput = () => {
   selected.value = -1
   clearTimeout(searchTimer)
+  const requestId = searchRequest.next()
   const q = keyword.value.trim()
-  if (!q) { results.value = []; return }
+  if (!q) { results.value = []; searching.value = false; return }
   searching.value = true
   searchTimer = setTimeout(async () => {
     try {
       const res: any = await getArticleList({ articleName: q, pageNo: 1, pageSize: 10 })
+      if (!searchRequest.isCurrent(requestId)) return
       results.value = res?.list ?? (Array.isArray(res) ? res : [])
     } catch {
-      results.value = []
+      if (searchRequest.isCurrent(requestId)) results.value = []
     } finally {
-      searching.value = false
+      if (searchRequest.isCurrent(requestId)) searching.value = false
     }
   }, 280)
 }
@@ -129,6 +141,7 @@ onMounted(() => {
   window.addEventListener('open-search', open as EventListener)
 })
 onUnmounted(() => {
+  searchRequest.invalidate()
   window.removeEventListener('keydown', onKeydown)
   window.removeEventListener('open-search', open as EventListener)
   clearTimeout(searchTimer)
