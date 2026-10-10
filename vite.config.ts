@@ -52,7 +52,6 @@ export default defineConfig(({ mode }) => {
         '/admin-api': {
           target: 'http://localhost:48080',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/admin-api/, '/admin-api')
         },
         '/rss': {
           target: 'http://localhost:48080',

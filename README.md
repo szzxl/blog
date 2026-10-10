@@ -21,8 +21,8 @@
 
 - **主题切换** - 支持浅色/深色/自动三种主题模式，跟随系统偏好
 - **表情包支持** - 评论系统集成 500+ 表情符号
-- **性能优化** - 代码分割、懒加载、三级缓存（内存/localStorage/sessionStorage）
-- **安全防护** - XSS 防护、CSRF Token、输入验证、请求数据清理
+- **性能优化** - 代码分割、图片懒加载、分类和标签内存缓存、网站配置 sessionStorage 缓存
+- **安全防护** - 文章 HTML 经 DOMPurify 清理后渲染
 - **响应式设计** - 适配 PC 和移动端
 - **骨架屏** - 加载态骨架屏，提升感知性能
 
@@ -73,7 +73,6 @@ npm run preview
 | Vue Router | 4.6 | 客户端路由 |
 | Axios | 1.16 | HTTP 客户端 |
 | Day.js | 1.11 | 日期处理 |
-| @vueuse/core | 14.3 | 组合式 API 工具集 |
 | SCSS | - | CSS 预处理器 |
 
 ## 项目结构
@@ -87,7 +86,6 @@ time-blog-web/
 │   │   ├── article.ts          # 所有 API 接口（auth、文章、评论、说说、相册等）
 │   │   └── request.ts          # Axios 实例，含拦截器、XSS 清理、401 处理
 │   ├── components/
-│   │   ├── Carousel.vue        # 轮播图
 │   │   ├── Comment.vue         # 评论组件
 │   │   ├── EmojiPicker.vue     # 表情选择器
 │   │   ├── ErrorBoundary.vue   # 错误边界
@@ -103,12 +101,11 @@ time-blog-web/
 │   ├── styles/
 │   │   └── global.scss         # CSS 变量、主题定义
 │   ├── utils/
-│   │   ├── cache.ts            # 三级缓存（内存 TTL → localStorage → sessionStorage）
+│   │   ├── cache.ts            # 内存 TTL 缓存与缓存键生成
 │   │   ├── format.ts           # 格式化工具
 │   │   ├── loading.ts          # 全局 Loading 管理
-│   │   ├── security.ts         # XSS/CSRF/URL 防护工具
 │   │   ├── token.ts            # Token 解析（parseToken）
-│   │   └── websiteConfig.ts    # 网站配置，三级缓存读取
+│   │   └── websiteConfig.ts    # 网站配置，内存与 sessionStorage 缓存
 │   ├── views/
 │   │   ├── Home.vue
 │   │   ├── ArticleList.vue
@@ -116,7 +113,6 @@ time-blog-web/
 │   │   ├── Category.vue
 │   │   ├── Tag.vue
 │   │   ├── TagArticles.vue
-│   │   ├── Talk.vue
 │   │   ├── Album.vue
 │   │   ├── Guestbook.vue
 │   │   ├── Link.vue
@@ -174,7 +170,6 @@ node scripts/validate-visits.cjs
 
 ### 其他
 
-- 说说动态
 - 留言板
 - 友情链接
 - 公告栏

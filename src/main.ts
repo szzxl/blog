@@ -3,7 +3,7 @@ import App from './App.vue'
 import router from './router'
 import pinia from './stores'
 import { useThemeStore } from './stores/theme'
-import { lazyload, lazyBg } from './directives/lazyload'
+import { lazyload } from './directives/lazyload'
 import { ElLoading } from 'element-plus/es/components/loading/index'
 import 'element-plus/es/components/base/style/css'
 import 'element-plus/es/components/loading/style/css'
@@ -18,7 +18,6 @@ const app = createApp(App)
 
 // 注册全局指令
 app.directive('lazyload', lazyload)
-app.directive('lazy-bg', lazyBg)
 
 // 全局错误处理
 app.config.errorHandler = (err) => {
