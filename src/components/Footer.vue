@@ -68,7 +68,7 @@
           <span class="made-with">Made with <span class="heart">♥</span> &amp; Vue 3</span>
         </div>
         <div class="footer-bottom-right">
-          <div v-if="visitSummary || visitStatsLoading" class="visit-stats" aria-label="网站访问统计" :aria-busy="visitStatsLoading">
+          <div class="visit-stats" aria-label="网站访问统计" :aria-busy="visitStatsLoading">
             <span>累计浏览 <strong>{{ formatVisitCount(visitSummary?.totalPv) }}</strong> 次</span>
             <span>今日浏览 <strong>{{ formatVisitCount(visitSummary?.todayPv) }}</strong> 次</span>
             <span>今日访客 <strong>{{ formatVisitCount(visitSummary?.todayUv) }}</strong> 位</span>
