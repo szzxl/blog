@@ -124,7 +124,7 @@ function homeFixture() {
     '@/utils/format': {}, '@element-plus/icons-vue': {},
     '@/utils/websiteConfig': { fetchWebsiteConfigWithCache: async () => ({}), useWebsiteConfigRefresh() {} },
     'element-plus/es/components/message/index': { ElMessage: {} }
-  }, 'articles, tags, tagEls', {
+  }, 'articles, tags', {
     window: { matchMedia: () => ({ matches: false }) },
     setTimeout: callback => { timers.set(++nextTimer, callback); return nextTimer },
     clearTimeout: id => timers.delete(id),
@@ -149,7 +149,6 @@ async function validateHome() {
   late.article.resolve({ list: [] }); await ready
   assert.equal(late.timers.size, 1)
   late.idle()
-  late.page.tagEls.value = [{ style: {} }]
   late.unmount()
   late.tags.resolve([{ id: 1 }]); await tick()
   assert.equal(late.page.tags.value.length, 0)
