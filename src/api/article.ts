@@ -122,7 +122,7 @@ export const getCategoryList = async (data?: {
     data: data || {} 
   })
   
-  cache.set(cacheKey, result, 60 * 60 * 1000)
+  cache.set(cacheKey, result, 60 * 1000)
   return result
 }
 
@@ -143,7 +143,7 @@ export const getTagList = async (data?: {
     data: data || {}
   })
 
-  cache.set(cacheKey, result, 60 * 60 * 1000)
+  cache.set(cacheKey, result, 60 * 1000)
   return result
 }
 

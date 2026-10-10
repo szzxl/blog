@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus/es/components/message/index'
 import { parseToken } from '@/utils/token'
 import { resetSeo } from '@/composables/useSeo'
 import Home from '@/views/Home.vue'

@@ -24,7 +24,7 @@ export function setSiteName(name: string) {
   _siteName = name
 }
 
-export function useSeo(options: { title?: string; description?: string; image?: string }) {
+export function useSeo(options: { title?: string; description?: string; image?: string; type?: 'article' | 'website' }) {
   const fullTitle = options.title ? `${options.title} | ${_siteName}` : _siteName
   const desc = options.description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''
 
@@ -34,8 +34,8 @@ export function useSeo(options: { title?: string; description?: string; image?: 
   setOgMeta('og:title', fullTitle)
   setOgMeta('og:description', desc)
   setOgMeta('og:url', window.location.href)
-  setOgMeta('og:type', options.title ? 'article' : 'website')
-  if (options.image) setOgMeta('og:image', options.image)
+  setOgMeta('og:type', options.type || 'website')
+  setOgMeta('og:image', options.image ? new URL(options.image, window.location.origin).href : '')
 }
 
 export function resetSeo(pageTitle?: string) {

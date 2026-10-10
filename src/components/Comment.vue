@@ -199,8 +199,11 @@
 </template>
 
 <script setup lang="ts">
+import { showRequestError } from '@/utils/requestError'
+
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus/es/components/message/index'
+import { ElMessageBox } from 'element-plus/es/components/message-box/index'
 import { Plus, Upload } from '@element-plus/icons-vue'
 import {
   getArticleComments, addArticleComment, deleteArticleComment, likeArticleComment,
@@ -268,8 +271,8 @@ const toggleReplies = async (comment: any) => {
     const res: any = await getCommentReplies(id)
     const list = Array.isArray(res) ? res : (res?.list || res?.data || [])
     expandedReplies.value[id] = list.map(mapReply)
-  } catch {
-    ElMessage.error('获取回复失败')
+  } catch (error) {
+    showRequestError(error, '获取回复失败')
   } finally {
     loadingReplies.value[id] = false
   }
@@ -342,8 +345,8 @@ const submitReply = async (_topComment: any) => {
       expandedReplies.value[rootId] = list.map(mapReply)
     }
     ElMessage.success('回复成功')
-  } catch {
-    ElMessage.error('回复失败，请重试')
+  } catch (error) {
+    showRequestError(error, '回复失败，请重试')
   } finally {
     replySubmitting.value = false
   }
@@ -572,7 +575,7 @@ const submitComment = async () => {
     currentPage.value = 1
     await loadComments()
   } catch (error) {
-    ElMessage.error('发表失败，请重试')
+    showRequestError(error, '发表失败，请重试')
   } finally {
     submitting.value = false
   }
@@ -601,8 +604,8 @@ const handleLike = async (comment: any) => {
     }
     comment.isLiked = !wasLiked
     comment.likeCount = Math.max(0, (comment.likeCount || 0) + (wasLiked ? -1 : 1))
-  } catch {
-    ElMessage.error('操作失败，请重试')
+  } catch (error) {
+    showRequestError(error, '操作失败，请重试')
   } finally {
     likingIds.value.delete(comment.id)
   }
@@ -637,7 +640,7 @@ const handleDelete = async (comment: any) => {
     await loadComments()
   } catch (error: any) {
     if (error !== 'cancel') {
-      ElMessage.error('删除失败，请重试')
+      showRequestError(error, '删除失败，请重试')
     }
   }
 }

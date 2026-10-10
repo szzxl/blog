@@ -25,7 +25,7 @@
                   <el-input
                     v-model="messageForm.name"
                     placeholder="你的昵称"
-                    prefix-icon="User"
+                    :prefix-icon="User"
                     :disabled="userStore.isLoggedIn"
                     clearable
                   />
@@ -34,7 +34,7 @@
                   <el-input
                     v-model="messageForm.email"
                     placeholder="邮箱（选填）"
-                    prefix-icon="Message"
+                    :prefix-icon="Message"
                     clearable
                   />
                 </el-form-item>
@@ -164,9 +164,11 @@
 </template>
 
 <script setup lang="ts">
+import { showRequestError } from '@/utils/requestError'
+
 import { ref, watch, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
-import { Plus, Delete, ZoomIn, Upload } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus/es/components/message/index'
+import { Plus, Delete, ZoomIn, Upload, User, Message } from '@element-plus/icons-vue'
 import { uploadImage, submitGuestbookMessage, getApprovedGuestbookMessages } from '@/api/article'
 import { useUserStore } from '@/stores/user'
 
@@ -286,8 +288,8 @@ const uploadImageToServer = async (item: ImageItem) => {
     item.uploading = false
     item.progress = 100
     ElMessage.success('图片上传成功')
-  } catch {
-    ElMessage.error('图片上传失败，请重试')
+  } catch (error) {
+    showRequestError(error, '图片上传失败，请重试')
     const idx = imageList.value.indexOf(item)
     if (idx > -1) imageList.value.splice(idx, 1)
   }
@@ -324,8 +326,8 @@ const submitMessage = async () => {
     messageForm.value.email = ''
     messageForm.value.content = ''
     imageList.value = []
-  } catch {
-    ElMessage.error('留言发表失败，请重试')
+  } catch (error) {
+    showRequestError(error, '留言发表失败，请重试')
   } finally {
     submitting.value = false
   }
@@ -337,7 +339,7 @@ const submitMessage = async () => {
 .page-banner {
   position: relative;
   height: 220px;
-  background: url('/bg-banner.png') center 30% / cover no-repeat;
+  background: url('/bg-banner.jpg') center 30% / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;

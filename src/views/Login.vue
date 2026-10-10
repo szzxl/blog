@@ -16,7 +16,7 @@
           <el-input
             v-model="loginForm.username"
             placeholder="用户名"
-            prefix-icon="User"
+            :prefix-icon="User"
             clearable
           />
         </el-form-item>
@@ -26,7 +26,7 @@
             v-model="loginForm.password"
             type="password"
             placeholder="密码"
-            prefix-icon="Lock"
+            :prefix-icon="Lock"
             show-password
             clearable
             @keyup.enter="handleLogin"
@@ -62,6 +62,7 @@
 </template>
 
 <script setup lang="ts">
+import { User, Lock } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
@@ -132,7 +133,7 @@ const goBack = () => {
   padding: 40px 20px;
   position: relative;
   overflow: hidden;
-  background: url('/bg-banner.png') center center / cover no-repeat fixed;
+  background: url('/bg-banner.jpg') center center / cover no-repeat fixed;
 
   .bg-overlay {
     position: absolute;

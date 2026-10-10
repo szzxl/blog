@@ -59,10 +59,11 @@
 </template>
 
 <script setup lang="ts">
+import { showRequestError } from '@/utils/requestError'
+
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getTagListCount } from '@/api/article'
-import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 
@@ -98,7 +99,7 @@ const fetchTags = async () => {
       }))
     }
   } catch (error) {
-    ElMessage.error('获取标签列表失败')
+    showRequestError(error, '获取标签列表失败')
   } finally {
     loading.value = false
   }
@@ -216,7 +217,7 @@ onMounted(() => {
 .page-banner {
   position: relative;
   height: 200px;
-  background: url('/bg-banner.png') center 30% / cover no-repeat;
+  background: url('/bg-banner.jpg') center 30% / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;

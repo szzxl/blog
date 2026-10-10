@@ -87,8 +87,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { ElMessage } from 'element-plus'
-import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
+import { ElMessage } from 'element-plus/es/components/message/index'
+import { fetchWebsiteConfigWithCache, useWebsiteConfigRefresh } from '@/utils/websiteConfig'
 import { useVisitStats } from '@/utils/visit'
 
 const { visitSummary, visitStatsLoading } = useVisitStats()
@@ -112,10 +112,10 @@ const quotes = [
   { text: '不积跬步，无以至千里。', author: '荀子' },
 ]
 
-const startTime = new Date('2026-01-01 00:00:00').getTime()
+let startTime = new Date('2026-01-01T00:00:00+08:00').getTime()
 
 const calculateRuntime = () => {
-  const diff = Date.now() - startTime
+  const diff = Math.max(0, Date.now() - startTime)
   const days = Math.floor(diff / (1000 * 60 * 60 * 24))
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
@@ -129,16 +129,21 @@ const fetchWebsiteConfig = async () => {
   try {
     const config = await fetchWebsiteConfigWithCache()
     if (config.site_name) websiteName.value = config.site_name.replace(/系统$/u, '')
-    if (config.copyright) copyright.value = config.copyright
-    if (config.icp_number) icpNumber.value = config.icp_number
-    if (config.website_motto) websiteMotto.value = config.website_motto
-    if (config.social_email) socialEmail.value = config.social_email
-    if (config.social_gitee) socialGitee.value = config.social_gitee
-    if (config.social_github) socialGithub.value = config.social_github
-    if (config.social_wechat) socialWechat.value = config.social_wechat
+    copyright.value = config.copyright || `© ${year}`
+    icpNumber.value = config.icp_number || ''
+    websiteMotto.value = config.website_motto || ''
+    socialEmail.value = config.social_email || ''
+    socialGitee.value = config.social_gitee || ''
+    socialGithub.value = config.social_github || ''
+    socialWechat.value = config.social_wechat || ''
+    const configuredStart = config.site_start_time
+      ? Date.parse(config.site_start_time.replace(' ', 'T') + '+08:00') : NaN
+    if (Number.isFinite(configuredStart)) startTime = configuredStart
+    calculateRuntime()
   } catch { /* 静默失败 */ }
 }
 
+useWebsiteConfigRefresh(() => { void fetchWebsiteConfig() })
 onMounted(() => {
   fetchWebsiteConfig()
   calculateRuntime()
@@ -185,7 +190,7 @@ onUnmounted(() => {
 .footer {
   position: relative;
   margin-top: 80px;
-  background-image: url('/bg-banner.png');
+  background-image: url('/bg-banner.jpg');
   background-size: cover;
   background-position: center 80%;
   color: rgba(255,255,255,0.75);

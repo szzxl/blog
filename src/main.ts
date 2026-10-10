@@ -4,12 +4,14 @@ import router from './router'
 import pinia from './stores'
 import { useThemeStore } from './stores/theme'
 import { lazyload, lazyBg } from './directives/lazyload'
-import ElementPlus from 'element-plus'
-import zhCn from 'element-plus/es/locale/lang/zh-cn'
-import 'element-plus/dist/index.css'
+import { ElLoading } from 'element-plus/es/components/loading/index'
+import 'element-plus/es/components/base/style/css'
+import 'element-plus/es/components/loading/style/css'
+import 'element-plus/es/components/message/style/css'
+import 'element-plus/es/components/message-box/style/css'
 import './styles/global.scss'
 import { setSiteName } from '@/composables/useSeo'
-import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
+import { fetchWebsiteConfigWithCache, startWebsiteConfigRefresh } from '@/utils/websiteConfig'
 import { setupVisitTracking } from '@/utils/visit'
 
 const app = createApp(App)
@@ -20,34 +22,15 @@ app.directive('lazy-bg', lazyBg)
 
 // 全局错误处理
 app.config.errorHandler = (err) => {
-  // 忽略 parentNode 相关的错误，这些通常是 Vue 内部的清理操作
-  if (err instanceof Error && err.message.includes('parentNode')) {
-    return
-  }
-  
-  // 忽略一些不影响功能的错误
-  if (err instanceof Error && (
-    err.message.includes('ResizeObserver') ||
-    err.message.includes('Non-Error promise rejection')
-  )) {
-    return
-  }
+  console.error('[博客运行错误]', err)
 }
 
 // 全局警告处理
-app.config.warnHandler = (msg) => {
-  // 忽略某些不重要的警告
-  if (
-    msg.includes('Unhandled error during execution') ||
-    msg.includes('Extraneous non-props attributes')
-  ) {
-    return
-  }
-}
+app.config.warnHandler = (msg) => { console.warn('[博客组件警告]', msg) }
 
 app.use(router)
 app.use(pinia)
-app.use(ElementPlus, { locale: zhCn })
+app.use(ElLoading)
 
 setupVisitTracking(router)
 
@@ -57,6 +40,7 @@ app.mount('#app')
 const themeStore = useThemeStore()
 themeStore.initFromStorage()
 themeStore.setupSystemThemeListener()
+startWebsiteConfigRefresh()
 
 // 预加载网站配置并同步 SEO 站点名
 fetchWebsiteConfigWithCache().then(config => {

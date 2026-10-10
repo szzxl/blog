@@ -1,6 +1,6 @@
 import axios from 'axios'
 import type { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
-import { ElMessage } from 'element-plus'
+import { showRequestError, markRequestErrorNotified } from '@/utils/requestError'
 import router from '@/router'
 import { showLoading, hideLoading } from '@/utils/loading'
 import { parseToken } from '@/utils/token'
@@ -21,7 +21,7 @@ const PUBLIC_APIS = [
   '/web/category/list',
   '/web/tag/list',
   '/article/comment/page',
-  '/article/comment/reply/',
+  '/article/comment/reply',
   '/web/album/comment/list',
   '/album/list',
   '/album/photo/list',
@@ -32,12 +32,27 @@ const PUBLIC_APIS = [
 
 // 静默接口列表（不弹出错误提示）
 const SILENT_APIS = [
+  '/config/website',
   '/web/article/addView',
   '/web/visit'
 ]
 
 // 不显示 Loading 的接口
 const NO_LOADING_APIS = [
+  '/web/article/list',
+  '/web/article/detail',
+  '/web/month/article',
+  '/web/category/list',
+  '/web/tag/list',
+  '/article/comment/page',
+  '/article/comment/reply',
+  '/article/favorite/page',
+  '/album/list',
+  '/album/photo/list',
+  '/config/website',
+  '/config/link',
+  '/config/notification/list',
+  '/system/user/profile/get',
   '/web/article/addView',
   '/web/article/like',
   '/web/visit'
@@ -79,6 +94,7 @@ service.interceptors.request.use(
   },
   (error) => {
     if (error.config && needLoading(error.config.url || '')) hideLoading()
+    showRequestError(error, '请求无法发出，请重试', true)
     return Promise.reject(error)
   }
 )
@@ -97,9 +113,9 @@ service.interceptors.response.use(
     if (res.code !== undefined && res.code !== 0) {
       // 公开接口返回 401 表示"未登录但内容仍可访问"，静默处理
       const silent = isSilentApi(url) || (res.code === 401 && isPublicApi(url))
-      if (!silent) {
-        ElMessage.error(res.message || res.msg || '请求失败')
-      }
+      const failure = new Error(res.message || res.msg || '请求失败')
+      if (!silent) showRequestError(failure)
+      else markRequestErrorNotified(failure)
       
       // 401 未授权，只有非公开接口才跳转登录
       if (res.code === 401 && !isPublicApi(url)) {
@@ -108,7 +124,7 @@ service.interceptors.response.use(
         router.push('/login')
       }
       
-      return Promise.reject(new Error(res.message || res.msg || '请求失败'))
+      return Promise.reject(failure)
     }
     
     // 返回 data 字段，如果 data 不存在则返回整个响应
@@ -118,7 +134,7 @@ service.interceptors.response.use(
     // 隐藏 Loading
     const url = error.config?.url || ''
     if (error.config && needLoading(url)) hideLoading()
-    if (isSilentApi(url)) return Promise.reject(error)
+    if (isSilentApi(url)) { markRequestErrorNotified(error); return Promise.reject(error) }
     
     if (error.response) {
       const url = error.config?.url || ''
@@ -126,39 +142,40 @@ service.interceptors.response.use(
       switch (error.response.status) {
         case 401:
           if (!isPublicApi(url)) {
-            ElMessage.error('未授权，请重新登录')
+            showRequestError(error, '未授权，请重新登录', true)
             localStorage.removeItem('ACCESS_TOKEN')
             localStorage.removeItem('user')
             router.push('/login')
           }
           break
         case 403:
-          ElMessage.error('拒绝访问')
+          showRequestError(error, '拒绝访问', true)
           break
         case 404:
-          ElMessage.error('请求的资源不存在')
+          showRequestError(error, '请求的资源不存在', true)
           break
         case 500:
-          ElMessage.error('服务器错误')
+          showRequestError(error, '服务器错误', true)
           break
         case 502:
-          ElMessage.error('网关错误')
+          showRequestError(error, '网关错误', true)
           break
         case 503:
-          ElMessage.error('服务不可用')
+          showRequestError(error, '服务不可用', true)
           break
         case 504:
-          ElMessage.error('网关超时')
+          showRequestError(error, '网关超时', true)
           break
         default:
-          ElMessage.error(error.response.data?.message || error.response.data?.msg || '请求失败')
+          showRequestError(error, error.response.data?.message || error.response.data?.msg || '请求失败', true)
       }
     } else if (error.code === 'ECONNABORTED') {
-      ElMessage.error('请求超时，请稍后重试')
+      showRequestError(error, '请求超时，请稍后重试', true)
     } else {
-      ElMessage.error('网络错误，请检查网络连接')
+      showRequestError(error, '网络错误，请检查网络连接', true)
     }
     
+    markRequestErrorNotified(error)
     return Promise.reject(error)
   }
 )

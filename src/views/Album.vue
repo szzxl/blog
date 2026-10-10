@@ -131,9 +131,10 @@
 </template>
 
 <script setup lang="ts">
+import { showRequestError } from '@/utils/requestError'
+
 import { ref, onMounted, onUnmounted } from 'vue'
 import { getAlbumList, getAlbumPhotos } from '@/api/article'
-import { ElMessage } from 'element-plus'
 import Comment from '@/components/Comment.vue'
 
 interface Album {
@@ -184,8 +185,8 @@ const fetchAlbums = async () => {
     const res: any = await getAlbumList()
     if (Array.isArray(res))      albums.value = res
     else if (res?.list)          albums.value = res.list
-  } catch {
-    ElMessage.error('获取相册列表失败')
+  } catch (error) {
+    showRequestError(error, '获取相册列表失败')
   } finally {
     albumsLoading.value = false
   }
@@ -200,8 +201,8 @@ const loadAlbumPhotos = async (album: Album) => {
     const res: any = await getAlbumPhotos({ id: album.id })
     if (Array.isArray(res))  photos.value = res
     else if (res?.list)      photos.value = res.list
-  } catch {
-    ElMessage.error('获取照片失败')
+  } catch (error) {
+    showRequestError(error, '获取照片失败')
   } finally {
     photosLoading.value = false
   }
@@ -228,7 +229,7 @@ onUnmounted(() => {
 .page-banner {
   position: relative;
   height: 200px;
-  background: url('/bg-banner.png') center 30% / cover no-repeat;
+  background: url('/bg-banner.jpg') center 30% / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;

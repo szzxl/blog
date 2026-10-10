@@ -12,7 +12,7 @@
           <el-input 
             v-model="registerForm.username" 
             placeholder="用户名"
-            prefix-icon="User"
+            :prefix-icon="User"
             clearable
           />
         </el-form-item>
@@ -21,7 +21,7 @@
           <el-input 
             v-model="registerForm.nickname" 
             placeholder="昵称"
-            prefix-icon="User"
+            :prefix-icon="User"
             clearable
           />
         </el-form-item>
@@ -31,7 +31,7 @@
             v-model="registerForm.password" 
             type="password" 
             placeholder="密码"
-            prefix-icon="Lock"
+            :prefix-icon="Lock"
             show-password
             clearable
           />
@@ -42,7 +42,7 @@
             v-model="registerForm.confirmPassword" 
             type="password" 
             placeholder="确认密码"
-            prefix-icon="Lock"
+            :prefix-icon="Lock"
             show-password
             clearable
             @keyup.enter="handleRegister"
@@ -82,9 +82,12 @@
 </template>
 
 <script setup lang="ts">
+import { User, Lock } from '@element-plus/icons-vue'
+import { showRequestError } from '@/utils/requestError'
+
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus/es/components/message/index'
 import type { FormInstance, FormRules } from 'element-plus'
 import { register } from '@/api/article'
 
@@ -163,7 +166,7 @@ const handleRegister = async () => {
         // 跳转到登录页
         router.push('/login')
       } catch (error) {
-        ElMessage.error('注册失败，请重试')
+        showRequestError(error, '注册失败，请重试')
       } finally {
         registerLoading.value = false
       }

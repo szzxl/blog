@@ -167,13 +167,15 @@
 </template>
 
 <script setup lang="ts">
+import { showRequestError } from '@/utils/requestError'
+
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { useThemeStore } from '@/stores/theme'
-import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
+import { fetchWebsiteConfigWithCache, useWebsiteConfigRefresh } from '@/utils/websiteConfig'
 import { uploadImage, updateUserProfile, getUserInfo, updatePassword } from '@/api/article'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus/es/components/message/index'
 import {
   House, Document, Folder, CollectionTag,
   PictureFilled, EditPen, Connection, Tools, Moon, Sunny,
@@ -208,7 +210,7 @@ const fetchWebsiteConfig = async () => {
   try {
     const config = await fetchWebsiteConfigWithCache()
     if (config.site_name) siteName.value = config.site_name
-    if (config.logo) siteLogo.value = config.logo
+    siteLogo.value = config.logo || '/logo.svg'
   } catch {
     // 静默失败
   }
@@ -282,7 +284,7 @@ const submitEditForm = async () => {
     ElMessage.success('资料修改成功')
     showEditDialog.value = false
   } catch (error: any) {
-    if (error !== false) ElMessage.error(error.msg || error.message || '修改失败，请重试')
+    if (error !== false) showRequestError(error, error.msg || error.message || '修改失败，请重试')
   }
 }
 
@@ -299,7 +301,7 @@ const submitPasswordForm = async () => {
       router.push('/login')
     }, 1000)
   } catch (error: any) {
-    if (error !== false) ElMessage.error(error.msg || error.message || '修改失败，请重试')
+    if (error !== false) showRequestError(error, error.msg || error.message || '修改失败，请重试')
   }
 }
 
@@ -326,7 +328,7 @@ const handleAvatarUpload = async (event: Event) => {
     ElMessage.success('头像更换成功')
   } catch (error: any) {
     loadingMsg.close()
-    ElMessage.error(error.msg || error.message || '上传失败，请重试')
+    showRequestError(error, error.msg || error.message || '上传失败，请重试')
   } finally {
     if (target) target.value = ''
   }
@@ -375,6 +377,7 @@ const handleScroll = () => {
   isScrolled.value = window.scrollY > 10
 }
 
+useWebsiteConfigRefresh(() => { void fetchWebsiteConfig() })
 onMounted(async () => {
   fetchWebsiteConfig()
   window.addEventListener('scroll', handleScroll)
@@ -404,7 +407,7 @@ onUnmounted(() => {
   right: 0;
   height: 64px;
   z-index: 999;
-  background-image: url('/bg-banner.png');
+  background-image: url('/bg-banner.jpg');
   background-size: cover;
   background-position: center 20%;
   box-shadow: 0 4px 24px rgba(0,0,0,0.25);
