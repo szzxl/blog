@@ -16,6 +16,7 @@ const PUBLIC_APIS = [
   '/web/article/detail',
   '/web/article/like/num',
   '/web/article/addView',
+  '/web/visit',
   '/web/month/article',
   '/web/category/list',
   '/web/tag/list',
@@ -31,13 +32,15 @@ const PUBLIC_APIS = [
 
 // 静默接口列表（不弹出错误提示）
 const SILENT_APIS = [
-  '/web/article/addView'
+  '/web/article/addView',
+  '/web/visit'
 ]
 
 // 不显示 Loading 的接口
 const NO_LOADING_APIS = [
   '/web/article/addView',
-  '/web/article/like'
+  '/web/article/like',
+  '/web/visit'
 ]
 
 const matchesApi = (url: string, api: string): boolean =>
@@ -75,7 +78,7 @@ service.interceptors.request.use(
     return config
   },
   (error) => {
-    hideLoading()
+    if (error.config && needLoading(error.config.url || '')) hideLoading()
     return Promise.reject(error)
   }
 )
@@ -84,7 +87,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response: AxiosResponse) => {
     // 隐藏 Loading
-    hideLoading()
+    if (needLoading(response.config.url || '')) hideLoading()
     
     const res = response.data
     const url = response.config.url || ''
@@ -113,7 +116,9 @@ service.interceptors.response.use(
   },
   (error) => {
     // 隐藏 Loading
-    hideLoading()
+    const url = error.config?.url || ''
+    if (error.config && needLoading(url)) hideLoading()
+    if (isSilentApi(url)) return Promise.reject(error)
     
     if (error.response) {
       const url = error.config?.url || ''

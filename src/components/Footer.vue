@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <footer class="footer">
     <div class="container">
 
@@ -68,6 +68,11 @@
           <span class="made-with">Made with <span class="heart">♥</span> &amp; Vue 3</span>
         </div>
         <div class="footer-bottom-right">
+          <div v-if="visitSummary || visitStatsLoading" class="visit-stats" aria-label="网站访问统计" :aria-busy="visitStatsLoading">
+            <span>累计浏览 <strong>{{ formatVisitCount(visitSummary?.totalPv) }}</strong> 次</span>
+            <span>今日浏览 <strong>{{ formatVisitCount(visitSummary?.todayPv) }}</strong> 次</span>
+            <span>今日访客 <strong>{{ formatVisitCount(visitSummary?.todayUv) }}</strong> 位</span>
+          </div>
           <div class="runtime-wrap">
             <span class="runtime-dot"></span>
             <span class="runtime">{{ runtimeText }}</span>
@@ -83,6 +88,12 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
+import { useVisitStats } from '@/utils/visit'
+
+const { visitSummary, visitStatsLoading } = useVisitStats()
+const visitNumberFormat = new Intl.NumberFormat('zh-CN')
+const formatVisitCount = (value?: number) =>
+  value === undefined ? '—' : visitNumberFormat.format(value)
 
 const year = new Date().getFullYear()
 const websiteName = ref('博客')
@@ -396,8 +407,26 @@ onUnmounted(() => {
 
 .footer-bottom-right {
   display: flex;
-  align-items: center;
-  gap: 14px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.visit-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px 14px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.65);
+
+  span { white-space: nowrap; }
+  strong {
+    font-weight: 500;
+    color: rgba(255,255,255,0.9);
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 .runtime-wrap {
@@ -442,6 +471,8 @@ onUnmounted(() => {
   .footer-brand { grid-column: 1 / -1; }
   .footer-bottom { flex-direction: column; align-items: center; gap: 10px; padding: 16px 0 22px; }
   .footer-bottom-left { justify-content: center; }
+  .footer-bottom-right { align-items: center; }
+  .visit-stats { justify-content: center; }
 }
 
 @media (max-width: 480px) {

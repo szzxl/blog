@@ -125,6 +125,18 @@ time-blog-web/
 
 ## 核心功能
 
+### 整站访问统计
+
+页脚展示累计浏览、今日浏览和今日访客。内容页面成功导航或刷新计入浏览次数，同一浏览器当天只计一位访客；日期按北京时间计算，统计从功能启用后开始。
+
+后端需要先手动执行 `F:\gitea\blog-backstage\sql\20261010_blog_visit.sql`，再部署前后端。接口为 `POST /admin-api/web/visit/report` 与 `GET /admin-api/web/visit/summary`；原文章阅读量独立保留。登录、注册、个人中心、收藏和 404 页面不计数，博主与开发环境仅查询统计。统计失败不影响正常阅读。
+
+定向验证路由计数及静默请求行为：
+
+```bash
+node scripts/validate-visits.cjs
+```
+
 ### 文章系统
 
 - 文章列表展示（分页、分类、标签筛选）

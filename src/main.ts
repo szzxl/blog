@@ -10,6 +10,7 @@ import 'element-plus/dist/index.css'
 import './styles/global.scss'
 import { setSiteName } from '@/composables/useSeo'
 import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
+import { setupVisitTracking } from '@/utils/visit'
 
 const app = createApp(App)
 
@@ -47,6 +48,8 @@ app.config.warnHandler = (msg) => {
 app.use(router)
 app.use(pinia)
 app.use(ElementPlus, { locale: zhCn })
+
+setupVisitTracking(router)
 
 app.mount('#app')
 
