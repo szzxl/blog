@@ -1,6 +1,5 @@
 # Logs
 docs
-.claude
 logs
 *.log
 npm-debug.log*
@@ -24,6 +23,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-CLAUDE.md
 # 本地代理协作规则，不随公开仓库发布
 /AGENTS.md
