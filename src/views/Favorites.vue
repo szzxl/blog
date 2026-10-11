@@ -107,6 +107,11 @@ const loadFavorites = async () => {
     })
     
     if (!favoriteRequest.isCurrent(requestId) || userStore.user?.id !== userId) return
+    const lastPage = Math.max(1, Math.ceil((response?.total ?? 0) / pageSize.value))
+    if (!Array.isArray(response) && currentPage.value > lastPage) {
+      currentPage.value = lastPage
+      return loadFavorites()
+    }
     const list = response?.list ?? response?.records ?? (Array.isArray(response) ? response : [])
     articles.value = list
     total.value = response?.total ?? list.length

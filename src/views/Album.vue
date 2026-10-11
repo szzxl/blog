@@ -119,7 +119,8 @@
           </div>
           <div class="lb-panel-body">
             <Comment
-              :article-id="photos[lightboxIndex]?.id"
+              :source-id="photos[lightboxIndex]?.id"
+              source-type="photo"
               :key="photos[lightboxIndex]?.id"
             />
           </div>

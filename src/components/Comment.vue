@@ -207,7 +207,7 @@ import { ElMessageBox } from 'element-plus/es/components/message-box/index'
 import { Plus, Upload } from '@element-plus/icons-vue'
 import {
   getArticleComments, addArticleComment, deleteArticleComment, likeArticleComment,
-  getAlbumComments, addAlbumComment, deleteAlbumComment, likeAlbumComment,
+  getPhotoComments, addPhotoComment, deletePhotoComment, likePhotoComment,
   getCommentReplies, uploadImage
 } from '@/api/article'
 import { useUserStore } from '@/stores/user'
@@ -218,11 +218,11 @@ import ReplyItem from './ReplyItem.vue'
 const props = defineProps<{
   articleId?: string | number
   sourceId?: string | number
-  sourceType?: 'article' | 'album'
+  sourceType?: 'article' | 'photo'
 }>()
 
 const resolvedId = computed(() => props.sourceId ?? props.articleId ?? '')
-const isAlbum = computed(() => props.sourceType === 'album')
+const isPhoto = computed(() => props.sourceType === 'photo')
 
 const userStore = useUserStore()
 const router = useRouter()
@@ -271,7 +271,7 @@ const toggleReplies = async (comment: any) => {
   try {
     const res: any = await getCommentReplies(id)
     const list = Array.isArray(res) ? res : (res?.list || res?.data || [])
-    expandedReplies.value[id] = list.map(mapReply)
+    if (!disposed) expandedReplies.value[id] = list.map(mapReply)
   } catch (error) {
     showRequestError(error, '获取回复失败')
   } finally {
@@ -316,10 +316,10 @@ const submitReply = async (_topComment: any) => {
   const target = replyState.value
   replySubmitting.value = true
   try {
-    if (isAlbum.value) {
-      await addAlbumComment({
+    if (isPhoto.value) {
+      await addPhotoComment({
         username: userStore.user!.nickname || userStore.user!.username || '',
-        albumId: resolvedId.value,
+        photoId: resolvedId.value,
         content: trimmed,
         images: replyImages.value,
         userId: Number(userStore.user!.id),
@@ -433,12 +433,17 @@ const loadComments = async () => {
   const seq = ++loadCommentsSeq
   loading.value = true
   try {
-    const response: any = isAlbum.value
-      ? await getAlbumComments({ albumId: resolvedId.value, pageNo: currentPage.value, pageSize: pageSize.value })
+    const response: any = isPhoto.value
+      ? await getPhotoComments({ photoId: resolvedId.value, pageNo: currentPage.value, pageSize: pageSize.value })
       : await getArticleComments({ articleId: resolvedId.value, pageNo: currentPage.value, pageSize: pageSize.value })
 
     // 丢弃过期响应
     if (seq !== loadCommentsSeq) return
+    const lastPage = Math.max(1, Math.ceil((response?.total ?? 0) / pageSize.value))
+    if (!Array.isArray(response) && currentPage.value > lastPage) {
+      currentPage.value = lastPage
+      return loadComments()
+    }
 
     const rawData = Array.isArray(response) ? response : (response?.list || response?.data || [])
 
@@ -556,14 +561,16 @@ const submitComment = async () => {
     return
   }
   
+  const submittedText = commentText.value
+  const submittedImages = [...commentImages.value]
   submitting.value = true
   try {
-    if (isAlbum.value) {
-      await addAlbumComment({
+    if (isPhoto.value) {
+      await addPhotoComment({
         username: userStore.user!.nickname || userStore.user!.username || '',
-        albumId: resolvedId.value,
+        photoId: resolvedId.value,
         content: trimmed,
-        images: commentImages.value,
+        images: submittedImages,
         likeCount: 0,
         userId: Number(userStore.user!.id)
       })
@@ -572,15 +579,15 @@ const submitComment = async () => {
         username: userStore.user!.nickname || userStore.user!.username || '',
         articleId: resolvedId.value,
         content: trimmed,
-        images: commentImages.value,
+        images: submittedImages,
         likeCount: 0,
         userId: Number(userStore.user!.id)
       })
     }
     if (disposed) return
     ElMessage.success('评论发表成功！')
-    commentText.value = ''
-    commentImages.value = []
+    if (commentText.value === submittedText) commentText.value = ''
+    commentImages.value = commentImages.value.filter(image => !submittedImages.includes(image))
     currentPage.value = 1
     await loadComments()
   } catch (error) {
@@ -606,11 +613,12 @@ const handleLike = async (comment: any) => {
 
   const wasLiked = comment.isLiked
   try {
-    if (isAlbum.value) {
-      await likeAlbumComment({ commentId: comment.id, type: wasLiked ? 2 : 1 })
+    if (isPhoto.value) {
+      await likePhotoComment({ commentId: comment.id, type: wasLiked ? 2 : 1 })
     } else {
       await likeArticleComment({ commentArticleId: comment.id, type: wasLiked ? 2 : 1 })
     }
+    if (disposed) return
     comment.isLiked = !wasLiked
     comment.likeCount = Math.max(0, (comment.likeCount || 0) + (wasLiked ? -1 : 1))
   } catch (error) {
@@ -633,8 +641,8 @@ const handleDelete = async (comment: any) => {
       }
     )
 
-    if (isAlbum.value) {
-      await deleteAlbumComment({ commentId: comment.id })
+    if (isPhoto.value) {
+      await deletePhotoComment({ commentId: comment.id })
     } else {
       await deleteArticleComment({ commentId: comment.id })
     }

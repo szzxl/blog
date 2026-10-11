@@ -54,7 +54,7 @@
                   <div class="upload-section">
                     <div class="upload-title">上传图片（最多9张）</div>
                     <div class="image-list" v-if="imageList.length > 0">
-                      <div class="image-item" v-for="(image, index) in imageList" :key="image.url">
+                      <div class="image-item" v-for="(image, index) in imageList" :key="image.id">
                         <img :src="image.url" alt="预览图">
                         <div class="image-overlay">
                           <el-icon class="preview-icon" @click="previewImage(image.url)"><ZoomIn /></el-icon>
@@ -166,13 +166,16 @@
 <script setup lang="ts">
 import { showRequestError } from '@/utils/requestError'
 
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus/es/components/message/index'
 import { Plus, Delete, ZoomIn, Upload, User, Message } from '@element-plus/icons-vue'
 import { uploadImage, submitGuestbookMessage, getApprovedGuestbookMessages } from '@/api/article'
 import { useUserStore } from '@/stores/user'
+import { createLatestRequest } from '@/utils/latestRequest'
 
 interface ImageItem {
+  id: number
+  previewUrl: string
   url: string
   file?: File
   uploading?: boolean
@@ -207,6 +210,9 @@ const getAvatarColor = (name: string) => {
 
 // 留言列表
 const messages = ref<GuestbookMessage[]>([])
+const listRequest = createLatestRequest()
+let disposed = false
+let imageId = 0
 const messagesLoading = ref(false)
 const total = ref(0)
 const currentPage = ref(1)
@@ -222,16 +228,21 @@ const parseImages = (images: any): string[] => {
 }
 
 const fetchMessages = async () => {
+  if (disposed) return
+  const requestId = listRequest.next()
   messagesLoading.value = true
   try {
     const res: any = await getApprovedGuestbookMessages({ pageNo: currentPage.value, pageSize: pageSize })
+    if (!listRequest.isCurrent(requestId)) return
+    const lastPage = Math.max(1, Math.ceil((res.total || 0) / pageSize))
+    if (currentPage.value > lastPage) { currentPage.value = lastPage; return fetchMessages() }
     const raw = res.list || res.records || res || []
     messages.value = raw.map((msg: any) => ({ ...msg, images: parseImages(msg.images) }))
     total.value = res.total || messages.value.length
   } catch {
     // 静默失败
   } finally {
-    messagesLoading.value = false
+    if (listRequest.isCurrent(requestId)) messagesLoading.value = false
   }
 }
 
@@ -261,41 +272,49 @@ const handleDrop = (event: DragEvent) => {
   if (event.dataTransfer?.files) handleFiles(Array.from(event.dataTransfer.files))
 }
 
+const releaseImage = (item: ImageItem) => URL.revokeObjectURL(item.previewUrl)
 const handleFiles = (files: File[]) => {
-  const remainingSlots = 9 - imageList.value.length
-  if (files.length > remainingSlots) {
-    ElMessage.warning(`最多只能上传9张图片，还可上传${remainingSlots}张`)
-    files = files.slice(0, remainingSlots)
+  if (disposed || !userStore.isLoggedIn) return
+  for (const file of files) {
+    if (imageList.value.length >= 9) { ElMessage.warning('最多只能上传9张图片'); break }
+    if (!file.type.startsWith('image/')) { ElMessage.error(`${file.name} 不是图片`); continue }
+    if (file.size > 5 * 1024 * 1024) { ElMessage.error(`${file.name} 超过 5MB`); continue }
+    const previewUrl = URL.createObjectURL(file)
+    // 立即占用名额，避免连续选图时读取回调尚未完成。
+    imageList.value.push({ id: ++imageId, url: previewUrl, previewUrl, file, uploading: true, progress: 0 })
+    const item = imageList.value[imageList.value.length - 1]!
+    void uploadImageToServer(item)
   }
-  files.forEach(file => {
-    if (!file.type.startsWith('image/')) { ElMessage.error(`${file.name} 不是图片`); return }
-    if (file.size > 5 * 1024 * 1024) { ElMessage.error(`${file.name} 超过 5MB`); return }
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const item: ImageItem = { url: e.target?.result as string, file, uploading: true, progress: 0 }
-      imageList.value.push(item)
-      uploadImageToServer(item)
-    }
-    reader.readAsDataURL(file)
-  })
 }
 
 const uploadImageToServer = async (item: ImageItem) => {
   if (!item.file) return
   try {
     const res = await uploadImage(item.file)
-    item.url = (res as unknown as string) || item.url
+    if (disposed || !imageList.value.some(image => image.id === item.id)) return
+    if (typeof res !== 'string' || !res) throw new Error('上传响应缺少图片地址')
+    item.url = res
     item.uploading = false
     item.progress = 100
-    ElMessage.success('图片上传成功')
   } catch (error) {
+    if (disposed || !imageList.value.some(image => image.id === item.id)) return
     showRequestError(error, '图片上传失败，请重试')
-    const idx = imageList.value.indexOf(item)
-    if (idx > -1) imageList.value.splice(idx, 1)
+    removeImage(imageList.value.findIndex(image => image.id === item.id))
   }
 }
 
-const removeImage = (index: number) => imageList.value.splice(index, 1)
+const removeImage = (index: number) => {
+  const item = imageList.value[index]
+  if (!item) return
+  releaseImage(item)
+  imageList.value.splice(index, 1)
+}
+
+onUnmounted(() => {
+  disposed = true
+  listRequest.invalidate()
+  imageList.value.forEach(releaseImage)
+})
 
 const previewImage = (url: string) => {
   viewerUrls.value = imageList.value.map(img => img.url)
@@ -312,20 +331,26 @@ const previewMsgImage = (imgs: string[], index: number) => {
 const closeViewer = () => { showViewer.value = false }
 
 const submitMessage = async () => {
-  if (!messageForm.value.name) { ElMessage.warning('请输入昵称'); return }
-  if (!messageForm.value.content) { ElMessage.warning('请输入留言内容'); return }
+  if (submitting.value || disposed) return
+  if (!messageForm.value.name.trim()) { ElMessage.warning('请输入昵称'); return }
+  if (!messageForm.value.content.trim()) { ElMessage.warning('请输入留言内容'); return }
   if (imageList.value.some(img => img.uploading)) { ElMessage.warning('图片上传中，请稍候...'); return }
 
+  const snapshot = { ...messageForm.value }
+  const submittedImages = imageList.value.map(img => ({ id: img.id, url: img.url }))
   submitting.value = true
   try {
-    const data: any = { username: messageForm.value.name, contact: messageForm.value.email, content: messageForm.value.content }
-    if (userStore.isLoggedIn && imageList.value.length > 0) data.images = imageList.value.map(img => img.url)
+    const data = { username: snapshot.name.trim(), contact: snapshot.email.trim(), content: snapshot.content.trim(),
+      images: userStore.isLoggedIn ? submittedImages.map(img => img.url) : [] }
     await submitGuestbookMessage(data)
+    if (disposed) return
     ElMessage.success('留言发表成功，等待审核～')
-    if (!userStore.isLoggedIn) messageForm.value.name = ''
-    messageForm.value.email = ''
-    messageForm.value.content = ''
-    imageList.value = []
+    if (!userStore.isLoggedIn && messageForm.value.name === snapshot.name) messageForm.value.name = ''
+    if (messageForm.value.email === snapshot.email) messageForm.value.email = ''
+    if (messageForm.value.content === snapshot.content) messageForm.value.content = ''
+    const submittedIds = new Set(submittedImages.map(img => img.id))
+    imageList.value.filter(img => submittedIds.has(img.id)).forEach(releaseImage)
+    imageList.value = imageList.value.filter(img => !submittedIds.has(img.id))
   } catch (error) {
     showRequestError(error, '留言发表失败，请重试')
   } finally {

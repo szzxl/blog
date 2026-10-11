@@ -57,9 +57,8 @@ router.beforeEach(async (to, _from, next) => {
     try {
       userStore.token = token
       await userStore.fetchUserInfo()
-      userStore.isLoggedIn = true
     } catch (error) {
-      userStore.clearAuth()
+      if (parseToken(localStorage.getItem('ACCESS_TOKEN')) === token) userStore.clearAuth()
     }
   }
   
