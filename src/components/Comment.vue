@@ -242,6 +242,7 @@ const commentFileInput = ref<HTMLInputElement>()
 const lightboxSrc = ref('')
 const likingIds = ref<Set<number | string>>(new Set())
 let loadCommentsSeq = 0
+let disposed = false
 
 // ── 展开回复 ──────────────────────────────────────────
 const expandedReplies = ref<Record<string | number, any[]>>({})
@@ -303,6 +304,7 @@ const cancelReply = () => {
 }
 
 const submitReply = async (_topComment: any) => {
+  if (replySubmitting.value || !replyState.value || disposed) return
   if (!userStore.isLoggedIn) {
     ElMessage.warning('请先登录')
     router.push({ path: '/login', query: { redirect: route.fullPath } })
@@ -311,6 +313,7 @@ const submitReply = async (_topComment: any) => {
   const trimmed = replyText.value.trim()
   if (!trimmed) { ElMessage.warning('请输入回复内容'); return }
 
+  const target = replyState.value
   replySubmitting.value = true
   try {
     if (isAlbum.value) {
@@ -320,8 +323,8 @@ const submitReply = async (_topComment: any) => {
         content: trimmed,
         images: replyImages.value,
         userId: Number(userStore.user!.id),
-        parentId: replyState.value!.parentId,
-        rootId: replyState.value!.rootId
+        parentId: target.parentId,
+        rootId: target.rootId
       })
     } else {
       await addArticleComment({
@@ -330,17 +333,20 @@ const submitReply = async (_topComment: any) => {
         content: trimmed,
         images: replyImages.value,
         userId: Number(userStore.user!.id),
-        parentId: replyState.value!.parentId,
-        rootId: replyState.value!.rootId
+        parentId: target.parentId,
+        rootId: target.rootId
       })
     }
-    const rootId = replyState.value!.rootId
-    cancelReply()
+    if (disposed) return
+    const rootId = target.rootId
+    if (replyState.value === target) cancelReply()
     currentPage.value = 1
     await loadComments()
+    if (disposed) return
     // 若该评论回复列表已展开，同步刷新
     if (expandedReplies.value[rootId]) {
       const res: any = await getCommentReplies(rootId)
+      if (disposed) return
       const list = Array.isArray(res) ? res : (res?.list || res?.data || [])
       expandedReplies.value[rootId] = list.map(mapReply)
     }
@@ -423,6 +429,7 @@ const canDelete = (comment: any) => {
 
 // 加载评论列表
 const loadComments = async () => {
+  if (disposed) return
   const seq = ++loadCommentsSeq
   loading.value = true
   try {
@@ -525,6 +532,7 @@ const removeCommentImage = (index: number) => {
 
 // 发表评论
 const submitComment = async () => {
+  if (submitting.value || disposed) return
   if (!userStore.isLoggedIn) {
     ElMessage.warning('请先登录')
     router.push({
@@ -569,6 +577,7 @@ const submitComment = async () => {
         userId: Number(userStore.user!.id)
       })
     }
+    if (disposed) return
     ElMessage.success('评论发表成功！')
     commentText.value = ''
     commentImages.value = []
@@ -684,6 +693,8 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  disposed = true
+  loadCommentsSeq++
   window.removeEventListener('keydown', onLbKeydown)
 })
 </script>
