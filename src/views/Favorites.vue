@@ -30,6 +30,7 @@
             <el-button
               class="unfavorite-btn"
               size="small"
+              :loading="removingIds.has(article.id)"
               @click.stop="handleUnfavorite(article)"
             >
               取消收藏
@@ -62,13 +63,14 @@
 <script setup lang="ts">
 import { showRequestError } from '@/utils/requestError'
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus/es/components/message/index'
 import { ElMessageBox } from 'element-plus/es/components/message-box/index'
 import { getUserFavorites, removeFavorite } from '@/api/article'
 import { formatTimestamp } from '@/utils/format'
 import { useUserStore } from '@/stores/user'
+import { createLatestRequest } from '@/utils/latestRequest'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -78,9 +80,14 @@ const loading = ref(false)
 const total = ref(0)
 const currentPage = ref(1)
 const pageSize = ref(10)
+const favoriteRequest = createLatestRequest()
+const removingIds = ref(new Set<string | number>())
+let disposed = false
 
 // 加载收藏列表
 const loadFavorites = async () => {
+  if (disposed) return
+  const requestId = favoriteRequest.next()
   if (!userStore.user?.id) {
     ElMessage.warning('请先登录')
     router.push({
@@ -89,27 +96,32 @@ const loadFavorites = async () => {
     })
     return
   }
+  const userId = userStore.user.id
   
   loading.value = true
   try {
     const response: any = await getUserFavorites({
-      userId: userStore.user.id,
+      userId,
       pageNo: currentPage.value,
       pageSize: pageSize.value
     })
     
+    if (!favoriteRequest.isCurrent(requestId) || userStore.user?.id !== userId) return
     const list = response?.list ?? response?.records ?? (Array.isArray(response) ? response : [])
     articles.value = list
     total.value = response?.total ?? list.length
   } catch (error) {
-    showRequestError(error, '加载收藏列表失败')
+    if (favoriteRequest.isCurrent(requestId)) showRequestError(error, '加载收藏列表失败')
   } finally {
-    loading.value = false
+    if (favoriteRequest.isCurrent(requestId)) loading.value = false
   }
 }
 
 // 取消收藏
 const handleUnfavorite = async (article: any) => {
+  const userId = userStore.user?.id
+  if (!userId || disposed || removingIds.value.has(article.id)) return
+  removingIds.value.add(article.id)
   try {
     await ElMessageBox.confirm(
       `确定要取消收藏《${article.articleName}》吗？`,
@@ -121,14 +133,21 @@ const handleUnfavorite = async (article: any) => {
       }
     )
 
-    await removeFavorite({ articleId: article.id, userId: userStore.user!.id })
+    if (disposed || userStore.user?.id !== userId) return
+    await removeFavorite({ articleId: article.id, userId })
+    if (disposed || userStore.user?.id !== userId) return
+    // 删除后重新获取分页数据，避免进行中的列表请求恢复已取消的收藏。
     articles.value = articles.value.filter(a => a.id !== article.id)
     total.value = Math.max(0, total.value - 1)
+    currentPage.value = Math.min(currentPage.value, Math.max(1, Math.ceil(total.value / pageSize.value)))
+    await loadFavorites()
     ElMessage.success('已取消收藏')
   } catch (error: any) {
-    if (error !== 'cancel' && error?.action !== 'cancel') {
+    if (!disposed && error !== 'cancel' && error !== 'close' && error?.action !== 'cancel' && error?.action !== 'close') {
       showRequestError(error, '操作失败，请重试')
     }
+  } finally {
+    removingIds.value.delete(article.id)
   }
 }
 
@@ -153,6 +172,11 @@ const handlePageChange = (page: number) => {
 
 onMounted(() => {
   loadFavorites()
+})
+
+onUnmounted(() => {
+  disposed = true
+  favoriteRequest.invalidate()
 })
 </script>
 

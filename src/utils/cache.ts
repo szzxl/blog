@@ -5,13 +5,12 @@
 interface CacheItem<T> {
   data: T
   expire: number
-  timestamp: number
 }
 
 class CacheManager {
   private cache: Map<string, CacheItem<unknown>>
   private maxSize: number
-  private _cleanupTimer: ReturnType<typeof setInterval> | null = null
+  private pendingRequests = new Map<string, Promise<unknown>>()
 
   constructor(maxSize = 100) {
     this.cache = new Map()
@@ -19,29 +18,19 @@ class CacheManager {
   }
 
   set<T>(key: string, data: T, ttl = 5 * 60 * 1000): void {
-    if (this._cleanupTimer === null) {
-      this._cleanupTimer = setInterval(() => this.clearExpired(), 10 * 60 * 1000)
-    }
     // 缓存已满时淘汰最久未访问的项（LRU）
     if (!this.cache.has(key) && this.cache.size >= this.maxSize) {
       this.clearExpired()
     }
     if (!this.cache.has(key) && this.cache.size >= this.maxSize) {
-      let lruKey: string | null = null
-      let lruTime = Infinity
-      for (const [k, v] of this.cache.entries()) {
-        if (v.timestamp < lruTime) {
-          lruTime = v.timestamp
-          lruKey = k
-        }
-      }
-      if (lruKey !== null) this.cache.delete(lruKey)
+      const lruKey = this.cache.keys().next().value
+      if (lruKey !== undefined) this.cache.delete(lruKey)
     }
 
+    this.cache.delete(key)
     this.cache.set(key, {
       data,
-      expire: Date.now() + ttl,
-      timestamp: Date.now()
+      expire: Date.now() + ttl
     })
   }
 
@@ -53,20 +42,39 @@ class CacheManager {
     }
 
     // 检查是否过期
-    if (item.expire < Date.now()) {
+    if (item.expire <= Date.now()) {
       this.cache.delete(key)
       return null
     }
 
-    // 更新最后访问时间（LRU）
-    item.timestamp = Date.now()
+    // Map 按插入顺序保存，命中后移至末尾即可维护 LRU。
+    this.cache.delete(key)
+    this.cache.set(key, item)
     return item.data as T
+  }
+
+  getOrFetch<T>(key: string, fetcher: () => Promise<T>, ttl = 5 * 60 * 1000): Promise<T> {
+    const cached = this.get<T>(key)
+    if (cached !== null) return Promise.resolve(cached)
+
+    const pending = this.pendingRequests.get(key)
+    if (pending) return pending as Promise<T>
+
+    // 延迟调用 fetcher，保证同步抛错也会释放并发请求记录。
+    const request = Promise.resolve().then(fetcher).then(result => {
+      this.set(key, result, ttl)
+      return result
+    }).finally(() => {
+      this.pendingRequests.delete(key)
+    })
+    this.pendingRequests.set(key, request)
+    return request
   }
 
   private clearExpired(): void {
     const now = Date.now()
     for (const [key, item] of this.cache.entries()) {
-      if (item.expire < now) {
+      if (item.expire <= now) {
         this.cache.delete(key)
       }
     }
