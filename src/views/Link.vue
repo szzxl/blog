@@ -64,6 +64,9 @@
   <!-- ── 申请友链弹窗 ───────────────────────────────── -->
   <el-dialog
     v-model="showApplyDialog"
+    :close-on-press-escape="!submitting"
+    :show-close="!submitting"
+    :before-close="(done: () => void) => { if (!submitting) done() }"
     width="560px"
     :close-on-click-modal="false"
     class="apply-dialog-wrap"
@@ -88,6 +91,7 @@
     <!-- 表单主体 -->
     <div class="apply-body">
       <el-form
+      :disabled="submitting"
         ref="formRef"
         :model="applyForm"
         :rules="formRules"
@@ -176,8 +180,8 @@
     <!-- Footer -->
     <template #footer>
       <div class="dialog-footer">
-        <button class="footer-cancel" @click="resetForm">取消</button>
-        <button class="footer-submit" @click="submitApply">
+        <button class="footer-cancel" :disabled="submitting" @click="resetForm">取消</button>
+        <button class="footer-submit" :disabled="submitting" @click="submitApply">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
           </svg>
@@ -278,29 +282,37 @@ const fetchLinks = async () => {
 }
 
 // 提交申请
+const submitting = ref(false)
 const submitApply = async () => {
-  if (!formRef.value) return
+  if (!formRef.value || submitting.value) return
+  submitting.value = true
   try {
-    await formRef.value.validate()
+    const valid = await formRef.value.validate().catch(() => false)
+    if (!valid) return
+    const data = { ...applyForm.value }
     await applyFriendLink({
-      name: applyForm.value.siteName,
-      author: applyForm.value.siteAuthor,
-      url: applyForm.value.siteUrl,
-      description: applyForm.value.siteDescription,
-      email: applyForm.value.email
+      name: data.siteName,
+      author: data.siteAuthor,
+      url: data.siteUrl,
+      description: data.siteDescription,
+      email: data.email
     })
     ElMessage.success('友链申请已提交，请耐心等待审核~')
+    submitting.value = false
     showApplyDialog.value = false
     resetForm()
   } catch (error: any) {
     if (error !== false) {
       showRequestError(error, error?.msg || error?.message || '申请失败，请稍后重试')
     }
+  } finally {
+    submitting.value = false
   }
 }
 
 // 重置表单
 const resetForm = () => {
+  if (submitting.value) return
   if (formRef.value) {
     formRef.value.resetFields()
   }

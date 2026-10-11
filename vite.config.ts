@@ -53,10 +53,13 @@ export default defineConfig(({ mode }) => {
           target: 'http://localhost:48080',
           changeOrigin: true,
         },
-        '/rss': {
-          target: 'http://localhost:48080',
-          changeOrigin: true,
-          rewrite: (path) => '/admin-api' + path
+        '/sitemap.xml': {
+          target: 'http://localhost:48080', changeOrigin: true,
+          rewrite: () => '/admin-api/seo/sitemap.xml'
+        },
+        '/robots.txt': {
+          target: 'http://localhost:48080', changeOrigin: true,
+          rewrite: () => '/admin-api/seo/robots.txt'
         }
       }
     },

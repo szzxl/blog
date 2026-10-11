@@ -7,7 +7,7 @@
         <h2 class="title">注册账号</h2>
       </div>
       
-      <el-form :model="registerForm" :rules="rules" ref="registerFormRef" size="large">
+      <el-form :disabled="registerLoading" :model="registerForm" :rules="rules" ref="registerFormRef" size="large">
         <el-form-item prop="username">
           <el-input 
             v-model="registerForm.username" 
@@ -53,9 +53,9 @@
           <div class="agreement">
             <el-checkbox v-model="agreeTerms">
               我已阅读并同意
-              <el-link type="primary" underline="never">《用户协议》</el-link>
+              <router-link to="/terms" target="_blank">《用户协议》</router-link>
               和
-              <el-link type="primary" underline="never">《隐私政策》</el-link>
+              <router-link to="/privacy" target="_blank">《隐私政策》</router-link>
             </el-checkbox>
           </div>
         </el-form-item>
@@ -135,7 +135,7 @@ const rules: FormRules = {
   ],
   password: [
     { required: true, validator: validatePass, trigger: 'blur' },
-    { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
+    { min: 6, max: 50, message: '密码长度在 6 到 50 个字符', trigger: 'blur' }
   ],
   confirmPassword: [
     { required: true, validator: validateConfirmPass, trigger: 'blur' }
@@ -143,35 +143,25 @@ const rules: FormRules = {
 }
 
 const handleRegister = async () => {
-  if (!registerFormRef.value) return
+  if (!registerFormRef.value || registerLoading.value) return
   
   if (!agreeTerms.value) {
     ElMessage.warning('请先阅读并同意用户协议和隐私政策')
     return
   }
   
-  await registerFormRef.value.validate(async (valid) => {
-    if (valid) {
-      registerLoading.value = true
-      
-      try {
-        await register({
-          username: registerForm.value.username,
-          nickname: registerForm.value.nickname,
-          password: registerForm.value.password
-        })
-        
-        ElMessage.success('注册成功！请登录')
-        
-        // 跳转到登录页
-        router.push('/login')
-      } catch (error) {
-        showRequestError(error, '注册失败，请重试')
-      } finally {
-        registerLoading.value = false
-      }
-    }
-  })
+  registerLoading.value = true
+  try {
+    const valid = await registerFormRef.value.validate().catch(() => false)
+    if (!valid) return
+    await register({ username: registerForm.value.username, nickname: registerForm.value.nickname, password: registerForm.value.password })
+    ElMessage.success('注册成功！请登录')
+    await router.push('/login')
+  } catch (error) {
+    showRequestError(error, '注册失败，请重试')
+  } finally {
+    registerLoading.value = false
+  }
 }
 
 const goToLogin = () => {

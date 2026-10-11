@@ -5,7 +5,7 @@
       <div class="banner-mask"></div>
       <div class="banner-content">
         <h1 class="banner-title">{{ currentAlbum ? currentAlbum.albumName : '相册' }}</h1>
-        <p class="banner-sub">{{ currentAlbum ? currentAlbum.albumDesc || `${photos.length} 张照片` : '珍藏美好时光' }}</p>
+        <p class="banner-sub">{{ currentAlbum ? currentAlbum.albumDesc || `${photoTotal} 张照片` : '珍藏美好时光' }}</p>
       </div>
     </div>
 
@@ -62,7 +62,7 @@
           >
             <div class="photo-wrapper">
               <img
-                :src="photo.photoUrl || '/default-cover.svg'"
+                :src="photo.thumbnailUrl || photo.photoUrl || '/default-cover.svg'"
                 :alt="photo.photoName"
                 class="photo-img"
                 loading="lazy"
@@ -77,9 +77,13 @@
             </div>
           </div>
 
-          <div v-if="!photosLoading && photos.length === 0" class="empty-state">
+          <div v-if="!photosLoading && !photoError && photos.length === 0" class="empty-state">
             该相册暂无照片
           </div>
+        </div>
+        <div v-if="photoError" class="empty-state" role="alert">照片加载失败 <el-button @click="loadAlbumPhotos(currentAlbum!, photoPage)">重试</el-button></div>
+        <div class="photo-pagination" v-if="photoTotal > PHOTO_PAGE_SIZE">
+          <el-pagination :current-page="photoPage" :page-size="PHOTO_PAGE_SIZE" :total="photoTotal" layout="total, prev, pager, next" @current-change="(page: number) => loadAlbumPhotos(currentAlbum!, page)" />
         </div>
 
       </div>
@@ -152,6 +156,7 @@ interface Photo {
   id: number
   photoName: string
   photoDesc?: string
+  thumbnailUrl?: string
   photoUrl: string
   albumId: number
 }
@@ -161,6 +166,10 @@ const currentAlbum = ref<Album | null>(null)
 const photos       = ref<Photo[]>([])
 const albumsLoading = ref(false)
 const photosLoading = ref(false)
+const photoPage = ref(1)
+const photoTotal = ref(0)
+const photoError = ref(false)
+const PHOTO_PAGE_SIZE = 24
 const photoRequest = createLatestRequest()
 
 // ── 灯箱 ──────────────────────────────────────────────
@@ -195,20 +204,24 @@ const fetchAlbums = async () => {
   }
 }
 
-const loadAlbumPhotos = async (album: Album) => {
+const loadAlbumPhotos = async (album: Album, page = 1) => {
   const requestId = photoRequest.next()
   closeLightbox()
   currentAlbum.value = album
+  photoPage.value = page
+  photoError.value = false
   photos.value       = []
   photosLoading.value = true
   window.scrollTo({ top: 0, behavior: 'smooth' })
   try {
-    const res: any = await getAlbumPhotos({ id: album.id })
+    const res: any = await getAlbumPhotos({ id: album.id, pageNo: page, pageSize: PHOTO_PAGE_SIZE })
     if (!photoRequest.isCurrent(requestId)) return
-    if (Array.isArray(res))  photos.value = res
-    else if (res?.list)      photos.value = res.list
+    photoTotal.value = res?.total ?? 0
+    const lastPage = Math.max(1, Math.ceil(photoTotal.value / PHOTO_PAGE_SIZE))
+    if (page > lastPage) { await loadAlbumPhotos(album, lastPage); return }
+    photos.value = res?.list ?? []
   } catch (error) {
-    if (photoRequest.isCurrent(requestId)) showRequestError(error, '获取照片失败')
+    if (photoRequest.isCurrent(requestId)) { photoError.value = true; showRequestError(error, '获取照片失败') }
   } finally {
     if (photoRequest.isCurrent(requestId)) photosLoading.value = false
   }
@@ -235,6 +248,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
+.photo-pagination { display: flex; justify-content: center; margin: 32px 0; }
 // ── Banner ────────────────────────────────────────────
 .page-banner {
   position: relative;

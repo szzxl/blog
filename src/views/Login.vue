@@ -11,7 +11,7 @@
         <p class="subtitle">登录以继续访问博客</p>
       </div>
 
-      <el-form :model="loginForm" :rules="rules" ref="loginFormRef" size="large">
+      <el-form :disabled="loginLoading" :model="loginForm" :rules="rules" ref="loginFormRef" size="large">
         <el-form-item prop="username">
           <el-input
             v-model="loginForm.username"
@@ -90,28 +90,24 @@ const rules: FormRules = {
 }
 
 const handleLogin = async () => {
-  if (!loginFormRef.value) return
+  if (!loginFormRef.value || loginLoading.value) return
 
-  await loginFormRef.value.validate(async (valid) => {
-    if (valid) {
-      loginLoading.value = true
-
-      try {
-        const success = await userStore.login(loginForm.value.username, loginForm.value.password)
-
-        if (success) {
-          // 获取登录前的页面路径（只允许同源内部路径，阻止 //evil.com 等跳转）
-          const redirect = router.currentRoute.value.query.redirect as string
-          const isSafeRedirect = redirect && /^\/(?!\/)/.test(redirect) && !redirect.includes(':')
-          router.push(isSafeRedirect ? redirect : '/')
-        }
-      } catch (error) {
-        // 登录失败
-      } finally {
-        loginLoading.value = false
-      }
+  loginLoading.value = true
+  try {
+    const valid = await loginFormRef.value.validate().catch(() => false)
+    if (!valid) return
+    const credentials = { ...loginForm.value }
+    const success = await userStore.login(credentials.username, credentials.password)
+    if (success) {
+      const redirect = router.currentRoute.value.query.redirect as string
+      const safe = redirect && /^\/(?!\/)/.test(redirect) && !redirect.includes(':')
+      await router.push(safe ? redirect : '/')
     }
-  })
+  } catch (error) {
+    /* 登录错误由 store 提示 */
+  } finally {
+    loginLoading.value = false
+  }
 }
 
 const goToRegister = () => {

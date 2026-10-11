@@ -253,6 +253,7 @@ watch(article, (a) => {
     description: a.articleContent,
     image: a.articleCover,
     type: 'article',
+    article: { id: String(a.id), published: a.createTime, author: undefined },
   })
 })
 
@@ -279,6 +280,12 @@ const setupCodeCopy = () => {
   })
 }
 
+let contentObserver: ResizeObserver | null = null
+const headingTop = (el: HTMLElement) => el.getBoundingClientRect().top + window.scrollY
+const measureHeadings = () => {
+  tocOffsets.value = tocEls.value.map(({ id, el }) => ({ id, top: headingTop(el) }))
+  updateProgress()
+}
 watch(htmlContent, () => {
   setupCodeCopy()
   nextTick(() => {
@@ -286,7 +293,13 @@ watch(htmlContent, () => {
       .map(item => ({ id: item.id, el: document.getElementById(item.id)! }))
       .filter(x => x.el)
     // 缓存各标题的 offsetTop，避免滚动时反复触发强制重排
-    tocOffsets.value = tocEls.value.map(({ id, el }) => ({ id, top: el.offsetTop }))
+    measureHeadings()
+    contentObserver?.disconnect()
+    const content = document.querySelector('.article-content .content')
+    if (content && typeof ResizeObserver !== 'undefined') {
+      contentObserver = new ResizeObserver(measureHeadings)
+      contentObserver.observe(content)
+    }
   })
 })
 
@@ -315,7 +328,7 @@ const handleScroll = () => {
 const scrollToHeading = (id: string) => {
   const el = tocEls.value.find(x => x.id === id)?.el ?? document.getElementById(id)
   if (!el) return
-  window.scrollTo({ top: el.offsetTop - 80, behavior: 'smooth' })
+  window.scrollTo({ top: headingTop(el) - 80, behavior: 'smooth' })
   activeId.value = id
 }
 
@@ -484,6 +497,7 @@ const goToTag = (tag: string) => {
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('resize', measureHeadings)
   window.addEventListener('keydown', onKeydown)
 })
 
@@ -494,6 +508,8 @@ onUnmounted(() => {
   articleRequest.invalidate()
   likeCountRequest.invalidate()
   window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('resize', measureHeadings)
+  contentObserver?.disconnect()
   window.removeEventListener('keydown', onKeydown)
   if (scrollRaf !== null) cancelAnimationFrame(scrollRaf)
   if (parseIdleId !== null) cancelIdleCallback(parseIdleId)

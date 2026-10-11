@@ -58,6 +58,7 @@ export const logout = () => {
 
 // 文章相关
 export const getArticleList = (data: {
+  keyword?: string
   articleName?: string
   articleCategory?: string
   articleTag?: string
@@ -344,10 +345,12 @@ export const getAlbumList = (data?: {
 }
 
 export const getAlbumPhotos = (data: {
+  pageNo: number
+  pageSize: number
   id: number
 }) => {
   return request({
-    url: '/web/album/photo/list',
+    url: '/web/album/photo/page',
     method: 'post',
     data
   })

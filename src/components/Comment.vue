@@ -632,7 +632,7 @@ const handleLike = async (comment: any) => {
 const handleDelete = async (comment: any) => {
   try {
     await ElMessageBox.confirm(
-      '确定要删除这条评论吗？删除后无法恢复。',
+      '确定删除这条评论及其下的全部回复吗？删除后无法恢复。',
       '删除确认',
       {
         confirmButtonText: '确定',

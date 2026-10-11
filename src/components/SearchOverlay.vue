@@ -14,6 +14,7 @@
               class="s-input"
               placeholder="搜索文章…"
               autocomplete="off"
+              maxlength="100"
               @keydown.escape="close"
               @keydown.enter="goFirst"
               @keydown.up.prevent="moveSelect(-1)"
@@ -30,6 +31,9 @@
             <template v-else-if="searching">
               <p class="s-tip">搜索中…</p>
             </template>
+            <template v-else-if="searchError">
+              <p class="s-tip" role="alert">搜索失败 <button @click="onInput">重试</button></p>
+            </template>
             <template v-else-if="results.length === 0">
               <p class="s-tip">没有找到「{{ keyword }}」相关文章</p>
             </template>
@@ -42,13 +46,14 @@
                 @mouseenter="selected = i"
                 @click="goTo(item)"
               >
-                <div class="s-title">{{ item.articleName }}</div>
+                <div><div class="s-title">{{ item.articleName }}</div><p v-if="item.summary" class="s-summary">{{ item.summary }}</p></div>
                 <div class="s-meta">
                   <span v-if="item.articleCategory" class="s-cat">{{ item.articleCategory }}</span>
                   <span v-if="item.createTime" class="s-date">{{ formatTimestamp(item.createTime) }}</span>
                 </div>
               </li>
             </ul>
+            <button v-if="!searching && !searchError && total > 0" class="s-all" @click="viewAll">查看全部 {{ total }} 条结果 →</button>
           </div>
 
         </div>
@@ -70,6 +75,8 @@ const keyword = ref('')
 const searching = ref(false)
 const results = ref<any[]>([])
 const selected = ref(-1)
+const searchError = ref(false)
+const total = ref(0)
 const inputRef = ref<HTMLInputElement>()
 let searchTimer: ReturnType<typeof setTimeout>
 const searchRequest = createLatestRequest()
@@ -82,6 +89,8 @@ const open = async () => {
   keyword.value = ''
   results.value = []
   selected.value = -1
+  total.value = 0
+  searchError.value = false
   await nextTick()
   inputRef.value?.focus()
 }
@@ -97,20 +106,30 @@ const onInput = () => {
   selected.value = -1
   clearTimeout(searchTimer)
   const requestId = searchRequest.next()
-  const q = keyword.value.trim()
+  results.value = []
+  total.value = 0
+  searchError.value = false
+  const q = keyword.value.trim().slice(0, 100)
   if (!q) { results.value = []; searching.value = false; return }
   searching.value = true
   searchTimer = setTimeout(async () => {
     try {
-      const res: any = await getArticleList({ articleName: q, pageNo: 1, pageSize: 10 })
+      const res: any = await getArticleList({ keyword: q, pageNo: 1, pageSize: 10 })
       if (!searchRequest.isCurrent(requestId)) return
       results.value = res?.list ?? (Array.isArray(res) ? res : [])
+      total.value = res?.total ?? results.value.length
     } catch {
-      if (searchRequest.isCurrent(requestId)) results.value = []
+      if (searchRequest.isCurrent(requestId)) { results.value = []; searchError.value = true }
     } finally {
       if (searchRequest.isCurrent(requestId)) searching.value = false
     }
   }, 280)
+}
+
+const viewAll = () => {
+  const q = keyword.value.trim().slice(0, 100)
+  close()
+  void router.push({ path: '/articles', query: { keyword: q } })
 }
 
 const moveSelect = (dir: 1 | -1) => {
@@ -124,6 +143,7 @@ const goTo = (item: any) => {
 }
 
 const goFirst = () => {
+  if (searching.value || searchError.value) return
   const idx = selected.value >= 0 ? selected.value : 0
   const target = results.value[idx]
   if (target) goTo(target)
@@ -149,6 +169,8 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
+.s-summary { margin: 6px 0 0; color: var(--text-tertiary); font-size: 12px; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.s-all { display: block; width: 100%; padding: 14px; background: var(--bg-secondary); color: var(--color-accent); border: 0; cursor: pointer; }
 .search-overlay {
   position: fixed;
   inset: 0;
