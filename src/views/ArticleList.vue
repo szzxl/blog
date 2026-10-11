@@ -15,7 +15,7 @@
         <div class="filter-bar">
           <el-input
             v-model="searchKeyword"
-            placeholder="搜索文章标题..."
+            placeholder="搜索标题或正文..." maxlength="100"
             :prefix-icon="Search"
             clearable
             class="search-input"
@@ -59,6 +59,7 @@
 
           <div class="card-right">
             <h2 class="article-title">{{ article.articleName }}</h2>
+            <p v-if="article.summary" class="article-summary">{{ article.summary }}</p>
             <div class="article-tags" v-if="article.articleTag">
               <span class="tag" v-for="tag in parseTags(article.articleTag)" :key="tag">
                 {{ tag }}
@@ -102,6 +103,7 @@
 </template>
 
 <script setup lang="ts">
+import { normalizePage, lastPage } from '@/utils/pagination'
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getArticleList } from '@/api/article'
@@ -119,6 +121,7 @@ interface Article {
   articleAbstract?: string
   articleCover?: string
   articleCategory?: string
+  summary?: string
   articleTag?: string
   readNum?: number
   likeCount?: number
@@ -142,13 +145,13 @@ const syncToUrl = () => {
   if (pageNo.value > 1) query.page = String(pageNo.value)
   if (searchKeyword.value) query.keyword = searchKeyword.value
   if (route.query.category) query.category = route.query.category as string
-  router.replace({ query })
+  return router.replace({ query })
 }
 
 // 从 URL query 恢复状态
 const restoreFromUrl = () => {
-  pageNo.value = Number(route.query.page) || 1
-  searchKeyword.value = (route.query.keyword as string) || ''
+  pageNo.value = normalizePage(route.query.page)
+  searchKeyword.value = typeof route.query.keyword === 'string' ? route.query.keyword.slice(0, 100) : ''
 }
 
 // 获取文章列表
@@ -161,13 +164,19 @@ const fetchArticles = async () => {
       pageNo: pageNo.value,
       pageSize: pageSize.value
     }
-    if (searchKeyword.value) params.articleName = searchKeyword.value
+    if (searchKeyword.value) params.keyword = searchKeyword.value.trim()
     if (route.query.category) params.articleCategory = route.query.category
 
     const res: any = await getArticleList(params)
     if (!articleRequest.isCurrent(requestId)) return
 
     if (res && res.list) {
+      const finalPage = lastPage(res.total ?? 0, pageSize.value)
+      if (pageNo.value > finalPage) {
+        pageNo.value = finalPage
+        await syncToUrl()
+        return
+      }
       articles.value = res.list
       total.value = res.total || 0
     } else if (Array.isArray(res)) {
@@ -184,13 +193,15 @@ const fetchArticles = async () => {
 // 搜索
 const handleSearch = () => {
   pageNo.value = 1
-  syncToUrl()
+  if (route.query.keyword === searchKeyword.value && !route.query.page) void fetchArticles()
+  else void syncToUrl()
 }
 
 // 清除搜索
 const handleClear = () => {
   pageNo.value = 1
-  syncToUrl()
+  if (route.query.keyword === searchKeyword.value && !route.query.page) void fetchArticles()
+  else void syncToUrl()
 }
 
 // 分页变化
@@ -224,6 +235,7 @@ onUnmounted(() => articleRequest.invalidate())
 </script>
 
 <style scoped lang="scss">
+.article-summary { color: var(--text-secondary); font-size: 13px; line-height: 1.7; margin: 8px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 // ── Banner ────────────────────────────────────────────
 .page-banner {
   position: relative;

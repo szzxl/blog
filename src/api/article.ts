@@ -58,6 +58,7 @@ export const logout = () => {
 
 // 文章相关
 export const getArticleList = (data: {
+  keyword?: string
   articleName?: string
   articleCategory?: string
   articleTag?: string
@@ -316,17 +317,17 @@ export const getNotificationList = () => {
 }
 
 // 相册评论
-export const getAlbumComments = (data: { albumId: number | string; pageNo: number; pageSize: number }) =>
-  request({ url: '/web/album/comment/list', method: 'post', data })
+export const getPhotoComments = (data: { photoId: number | string; pageNo: number; pageSize: number }) =>
+  request({ url: '/web/photo/comment/list', method: 'post', data })
 
-export const addAlbumComment = (data: { username: string; albumId: number | string; content: string; images?: string[]; likeCount?: number; userId: number; parentId?: number | string; rootId?: number | string }) =>
-  request({ url: '/web/album/comment/add', method: 'post', data })
+export const addPhotoComment = (data: { username: string; photoId: number | string; content: string; images?: string[]; likeCount?: number; userId: number; parentId?: number | string; rootId?: number | string }) =>
+  request({ url: '/web/photo/comment/add', method: 'post', data })
 
-export const deleteAlbumComment = (data: { commentId: number; userId?: number }) =>
-  request({ url: '/web/album/comment/delete', method: 'delete', data })
+export const deletePhotoComment = (data: { commentId: number; userId?: number }) =>
+  request({ url: `/web/photo/comment/${data.commentId}`, method: 'delete' })
 
-export const likeAlbumComment = (data: { commentId: number | string; type: 1 | 2 }) =>
-  request({ url: '/web/album/comment/like', method: 'post', data })
+export const likePhotoComment = (data: { commentId: number | string; type: 1 | 2 }) =>
+  request({ url: '/web/photo/comment/like', method: 'post', data })
 
 // 相册相关
 export const getAlbumList = (data?: {
@@ -344,10 +345,12 @@ export const getAlbumList = (data?: {
 }
 
 export const getAlbumPhotos = (data: {
+  pageNo: number
+  pageSize: number
   id: number
 }) => {
   return request({
-    url: '/web/album/photo/list',
+    url: '/web/album/photo/page',
     method: 'post',
     data
   })

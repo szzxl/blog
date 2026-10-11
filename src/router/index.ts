@@ -33,6 +33,8 @@ const router = createRouter({
     { path: '/tools',            name: 'tools',            component: () => import('@/views/Tools.vue'),      meta: { title: '工具' } },
     { path: '/guestbook',        name: 'guestbook',        component: () => import('@/views/Guestbook.vue'),  meta: { title: '留言板' } },
     { path: '/link',             name: 'link',             component: () => import('@/views/Link.vue'),       meta: { title: '友情链接' } },
+    { path: '/terms', name: 'terms', component: () => import('@/views/Policy.vue'), meta: { title: '用户协议' } },
+    { path: '/privacy', name: 'privacy', component: () => import('@/views/Policy.vue'), meta: { title: '隐私政策' } },
     { path: '/profile',          name: 'profile',          component: () => import('@/views/Profile.vue'),    meta: { requiresAuth: true, title: '个人中心' } },
     { path: '/favorites',        name: 'favorites',        component: () => import('@/views/Favorites.vue'),  meta: { requiresAuth: true, title: '我的收藏' } },
     { path: '/about',            name: 'about',            component: () => import('@/views/About.vue'),      meta: { title: '关于我' } },
@@ -57,9 +59,8 @@ router.beforeEach(async (to, _from, next) => {
     try {
       userStore.token = token
       await userStore.fetchUserInfo()
-      userStore.isLoggedIn = true
     } catch (error) {
-      userStore.clearAuth()
+      if (parseToken(localStorage.getItem('ACCESS_TOKEN')) === token) userStore.clearAuth()
     }
   }
   

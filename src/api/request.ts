@@ -23,12 +23,13 @@ const PUBLIC_APIS = [
   '/web/tag/list',
   '/article/comment/page',
   '/article/comment/reply',
-  '/web/album/comment/list',
+  '/web/photo/comment/list',
   '/web/album/list',
-  '/web/album/photo/list',
+  '/web/album/photo/page',
   '/config/notification/list',
   '/config/website',
-  '/config/link'
+  '/config/link',
+  '/config/link/apply'
 ]
 
 // 静默接口列表（不弹出错误提示）
@@ -48,10 +49,12 @@ const NO_LOADING_APIS = [
   '/article/comment/page',
   '/article/comment/reply',
   '/article/favorite/page',
+  '/web/photo/comment/list',
   '/web/album/list',
-  '/web/album/photo/list',
+  '/web/album/photo/page',
   '/config/website',
   '/config/link',
+  '/config/link/apply',
   '/config/notification/list',
   '/system/user/profile/get',
   '/web/article/addView',
@@ -100,6 +103,11 @@ service.interceptors.request.use(
   }
 )
 
+const isCurrentSession = (config?: InternalAxiosRequestConfig) => {
+  const current = parseToken(localStorage.getItem('ACCESS_TOKEN'))
+  return String(config?.headers?.Authorization || '') === (current ? `Bearer ${current}` : '')
+}
+
 // 响应拦截器
 service.interceptors.response.use(
   (response: AxiosResponse) => {
@@ -119,7 +127,7 @@ service.interceptors.response.use(
       else markRequestErrorNotified(failure)
       
       // 401 未授权，只有非公开接口才跳转登录
-      if (res.code === 401 && !isPublicApi(url)) {
+      if (res.code === 401 && !isPublicApi(url) && isCurrentSession(response.config)) {
         useUserStore().clearAuth()
         router.push('/login')
       }
@@ -141,7 +149,7 @@ service.interceptors.response.use(
       
       switch (error.response.status) {
         case 401:
-          if (!isPublicApi(url)) {
+          if (!isPublicApi(url) && isCurrentSession(error.config)) {
             showRequestError(error, '未授权，请重新登录', true)
             useUserStore().clearAuth()
             router.push('/login')

@@ -96,86 +96,16 @@
         </div>
       </div>
     </el-drawer>
-
-    <!-- 个人中心弹窗 -->
-    <el-dialog v-model="showProfileDialog" title="个人中心" width="480px" class="profile-dialog">
-      <div class="profile-content">
-        <div class="avatar-section">
-          <img :src="userStore.user?.avatar || '/default-avatar.svg'" alt="头像" class="profile-avatar">
-          <button class="change-avatar-btn" @click="triggerAvatarUpload">更换头像</button>
-          <input ref="avatarInput" type="file" accept="image/*" style="display:none" @change="handleAvatarUpload">
-        </div>
-        <div class="profile-info">
-          <div class="info-row">
-            <span class="info-label">昵称</span>
-            <span class="info-value">{{ userStore.user?.nickname || userStore.user?.username }}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">手机</span>
-            <span class="info-value">{{ userStore.user?.mobile || '未设置' }}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">邮箱</span>
-            <span class="info-value">{{ userStore.user?.email || '未设置' }}</span>
-          </div>
-        </div>
-        <div class="profile-actions">
-          <el-button @click="showEditProfileDialog">修改资料</el-button>
-          <el-button @click="showChangePasswordDialog">修改密码</el-button>
-        </div>
-      </div>
-    </el-dialog>
-
-    <!-- 修改资料弹窗 -->
-    <el-dialog v-model="showEditDialog" title="修改资料" width="420px">
-      <el-form ref="editFormRef" :model="editForm" :rules="editFormRules" label-width="60px">
-        <el-form-item label="昵称" prop="nickname">
-          <el-input v-model="editForm.nickname" />
-        </el-form-item>
-        <el-form-item label="手机" prop="mobile">
-          <el-input v-model="editForm.mobile" />
-        </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="editForm.email" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="showEditDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitEditForm">保存</el-button>
-      </template>
-    </el-dialog>
-
-    <!-- 修改密码弹窗 -->
-    <el-dialog v-model="showPasswordDialog" title="修改密码" width="420px">
-      <el-form ref="passwordFormRef" :model="passwordForm" :rules="passwordFormRules" label-width="80px">
-        <el-form-item label="旧密码" prop="oldPassword">
-          <el-input v-model="passwordForm.oldPassword" type="password" show-password />
-        </el-form-item>
-        <el-form-item label="新密码" prop="newPassword">
-          <el-input v-model="passwordForm.newPassword" type="password" show-password @input="onNewPasswordChange" />
-        </el-form-item>
-        <el-form-item label="确认密码" prop="confirmPassword">
-          <el-input v-model="passwordForm.confirmPassword" type="password" show-password />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="showPasswordDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitPasswordForm">确认修改</el-button>
-      </template>
-    </el-dialog>
   </header>
 </template>
 
 <script setup lang="ts">
-import { showRequestError } from '@/utils/requestError'
 
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { useThemeStore } from '@/stores/theme'
 import { fetchWebsiteConfigWithCache, useWebsiteConfigRefresh } from '@/utils/websiteConfig'
-import { uploadImage, updateUserProfile, getUserInfo, updatePassword } from '@/api/article'
-import { ElMessage } from 'element-plus/es/components/message/index'
 import {
   House, Document, Folder, CollectionTag,
   PictureFilled, EditPen, Connection, Tools, Moon, Sunny,
@@ -218,122 +148,6 @@ const fetchWebsiteConfig = async () => {
 
 const isAuthor = computed(() => userStore.isAuthor)
 
-const showProfileDialog = ref(false)
-const avatarInput = ref<HTMLInputElement>()
-const showEditDialog = ref(false)
-const editFormRef = ref()
-const editForm = ref({ nickname: '', mobile: '', email: '' })
-const editFormRules = {
-  nickname: [{ required: true, message: '请输入昵称', trigger: 'blur' }],
-  mobile: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }],
-  email: [{ pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: '请输入正确的邮箱格式', trigger: 'blur' }]
-}
-
-const showPasswordDialog = ref(false)
-const passwordFormRef = ref()
-const passwordForm = ref({ oldPassword: '', newPassword: '', confirmPassword: '' })
-const passwordFormRules = {
-  oldPassword: [{ required: true, message: '请输入旧密码', trigger: 'blur' }],
-  newPassword: [
-    { required: true, message: '请输入新密码', trigger: 'blur' },
-    { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
-  ],
-  confirmPassword: [
-    { required: true, message: '请再次输入新密码', trigger: 'blur' },
-    {
-      validator: (_rule: any, value: string, callback: any) => {
-        if (value !== passwordForm.value.newPassword) callback(new Error('两次输入的密码不一致'))
-        else callback()
-      },
-      trigger: ['blur', 'change']
-    }
-  ]
-}
-
-const onNewPasswordChange = () => {
-  if (passwordForm.value.confirmPassword) {
-    passwordFormRef.value?.validateField('confirmPassword')
-  }
-}
-
-const showChangePasswordDialog = () => {
-  passwordForm.value = { oldPassword: '', newPassword: '', confirmPassword: '' }
-  showPasswordDialog.value = true
-}
-
-const showEditProfileDialog = () => {
-  editForm.value = {
-    nickname: userStore.user?.nickname || userStore.user?.username || '',
-    mobile: userStore.user?.mobile || '',
-    email: userStore.user?.email || ''
-  }
-  showEditDialog.value = true
-}
-
-const submitEditForm = async () => {
-  if (!editFormRef.value) return
-  try {
-    await editFormRef.value.validate()
-    await updateUserProfile({ nickname: editForm.value.nickname, mobile: editForm.value.mobile, email: editForm.value.email })
-    if (userStore.user) {
-      userStore.user.nickname = editForm.value.nickname
-      userStore.user.mobile = editForm.value.mobile
-      userStore.user.email = editForm.value.email
-      localStorage.setItem('user', JSON.stringify(userStore.user))
-    }
-    ElMessage.success('资料修改成功')
-    showEditDialog.value = false
-  } catch (error: any) {
-    if (error !== false) showRequestError(error, error.msg || error.message || '修改失败，请重试')
-  }
-}
-
-const submitPasswordForm = async () => {
-  if (!passwordFormRef.value) return
-  try {
-    await passwordFormRef.value.validate()
-    await updatePassword({ oldPassword: passwordForm.value.oldPassword, newPassword: passwordForm.value.newPassword })
-    showPasswordDialog.value = false
-    showProfileDialog.value = false
-    ElMessage.success('密码修改成功，请重新登录')
-    setTimeout(async () => {
-      await userStore.logout()
-      router.push('/login')
-    }, 1000)
-  } catch (error: any) {
-    if (error !== false) showRequestError(error, error.msg || error.message || '修改失败，请重试')
-  }
-}
-
-const triggerAvatarUpload = () => avatarInput.value?.click()
-
-const handleAvatarUpload = async (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-  if (!file) return
-  if (!file.type.startsWith('image/')) { ElMessage.error('请选择图片文件'); return }
-  if (file.size > 5 * 1024 * 1024) { ElMessage.error('图片大小不能超过5MB'); return }
-  const loadingMsg = ElMessage.info({ message: '正在上传头像...', duration: 0 })
-  try {
-    const uploadResponse: any = await uploadImage(file)
-    const avatarUrl = uploadResponse?.url || uploadResponse?.data?.url || uploadResponse?.path || uploadResponse?.data?.path || uploadResponse?.data || uploadResponse
-    if (!avatarUrl || typeof avatarUrl !== 'string') { loadingMsg.close(); ElMessage.error('上传失败：无法获取图片地址'); return }
-    await updateUserProfile({ avatar: avatarUrl })
-    if (userStore.user) {
-      userStore.user.avatar = avatarUrl
-      localStorage.setItem('user', JSON.stringify(userStore.user))
-      userStore.user = { ...userStore.user }
-    }
-    loadingMsg.close()
-    ElMessage.success('头像更换成功')
-  } catch (error: any) {
-    loadingMsg.close()
-    showRequestError(error, error.msg || error.message || '上传失败，请重试')
-  } finally {
-    if (target) target.value = ''
-  }
-}
-
 const goToLogin = () => {
   router.push({ path: '/login', query: { redirect: router.currentRoute.value.fullPath } })
 }
@@ -341,14 +155,7 @@ const goToLogin = () => {
 const handleCommand = async (command: string) => {
   switch (command) {
     case 'profile':
-      try {
-        const userInfo: any = await getUserInfo()
-        if (userInfo && userStore.user) {
-          userStore.user = { ...userStore.user, ...userInfo }
-          localStorage.setItem('user', JSON.stringify(userStore.user))
-        }
-      } catch { /* 静默失败 */ }
-      showProfileDialog.value = true
+      await router.push('/profile')
       break
     case 'favorites':
       router.push('/favorites')
@@ -660,63 +467,6 @@ onUnmounted(() => {
 
       &:hover { background: var(--color-accent-hover); }
     }
-  }
-}
-
-.profile-content {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-
-  .avatar-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-
-    .profile-avatar {
-      width: 88px;
-      height: 88px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid var(--border-strong);
-      box-shadow: var(--shadow-glow);
-    }
-
-    .change-avatar-btn {
-      padding: 6px 16px;
-      border-radius: var(--radius-btn);
-      background: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-secondary);
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-
-      &:hover { border-color: var(--color-accent); color: var(--color-accent); }
-    }
-  }
-
-  .profile-info {
-    display: flex;
-    flex-direction: column;
-
-    .info-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border-color);
-
-      .info-label { font-size: 13px; color: var(--text-tertiary); width: 40px; flex-shrink: 0; }
-      .info-value { font-size: 14px; color: var(--text-primary); }
-    }
-  }
-
-  .profile-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
   }
 }
 
