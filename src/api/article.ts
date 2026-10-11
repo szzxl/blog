@@ -105,46 +105,36 @@ export const getArticleLikeCount = (articleId: number | string) => {
 }
 
 // 分类相关
-export const getCategoryList = async (data?: { 
+export const getCategoryList = (data?: {
   id?: number
   categoryName?: string
   categoryStatus?: number
   pageNo?: number
   pageSize?: number
 }) => {
-  const cacheKey = generateCacheKey('category_list', data)
-  const cached = cache.get(cacheKey)
-  if (cached) return cached
-  
-  const result = await request({ 
-    url: '/web/category/list', 
-    method: 'post', 
-    data: data || {} 
-  })
-  
-  cache.set(cacheKey, result, 60 * 1000)
-  return result
+  const params = data || {}
+  const cacheKey = generateCacheKey('category_list', params)
+  return cache.getOrFetch(cacheKey, () => request({
+    url: '/web/category/list',
+    method: 'post',
+    data: params
+  }), 60 * 1000)
 }
 
 // 标签相关
-export const getTagList = async (data?: {
+export const getTagList = (data?: {
   id?: number
   tagName?: string
   pageNo?: number
   pageSize?: number
 }) => {
-  const cacheKey = generateCacheKey('tag_list', data)
-  const cached = cache.get(cacheKey)
-  if (cached) return cached
-
-  const result = await request({
+  const params = data || {}
+  const cacheKey = generateCacheKey('tag_list', params)
+  return cache.getOrFetch(cacheKey, () => request({
     url: '/web/tag/list',
     method: 'post',
-    data: data || {}
-  })
-
-  cache.set(cacheKey, result, 60 * 1000)
-  return result
+    data: params
+  }), 60 * 1000)
 }
 
 // 获取标签统计（带文章数量）

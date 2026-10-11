@@ -1,11 +1,20 @@
 /**
  * 图片懒加载指令
  */
+import type { ObjectDirective } from 'vue'
 
 interface LazyLoadOptions {
   loading?: string  // 加载中的占位图
   error?: string    // 加载失败的占位图
   threshold?: number // 触发加载的阈值
+}
+
+type LazyLoadValue = string | (LazyLoadOptions & { src?: string }) | null | undefined
+
+interface LazyLoadState {
+  observer?: IntersectionObserver
+  image?: HTMLImageElement
+  frame?: number
 }
 
 const defaultOptions: LazyLoadOptions = {
@@ -14,31 +23,47 @@ const defaultOptions: LazyLoadOptions = {
   threshold: 0.01
 }
 
-// 存储观察器实例
-const observerMap = new WeakMap<HTMLElement, IntersectionObserver>()
+const states = new WeakMap<HTMLImageElement, LazyLoadState>()
+
+const getSrc = (value: LazyLoadValue) => typeof value === 'string' ? value : value?.src
+
+function cleanup(el: HTMLImageElement): void {
+  const state = states.get(el)
+  if (!state) return
+  state.observer?.disconnect()
+  if (state.image) {
+    state.image.onload = null
+    state.image.onerror = null
+  }
+  if (state.frame !== undefined) cancelAnimationFrame(state.frame)
+  states.delete(el)
+}
 
 /**
  * 加载图片
  */
-function loadImage(el: HTMLImageElement, src: string, options: LazyLoadOptions): void {
+function loadImage(el: HTMLImageElement, src: string, options: LazyLoadOptions, state: LazyLoadState): void {
   const img = new Image()
+  state.image = img
 
   // 添加加载中的类
   el.classList.add('lazy-loading')
 
   img.onload = () => {
+    if (states.get(el) !== state) return
     el.src = src
     el.classList.remove('lazy-loading')
     el.classList.add('lazy-loaded')
     el.style.opacity = '0'
-    requestAnimationFrame(() => {
-      if (!el.isConnected) return
+    state.frame = requestAnimationFrame(() => {
+      if (states.get(el) !== state || !el.isConnected) return
       el.style.transition = 'opacity 0.3s ease-in-out'
       el.style.opacity = '1'
     })
   }
 
   img.onerror = () => {
+    if (states.get(el) !== state) return
     if (options.error) {
       el.src = options.error
     }
@@ -52,13 +77,26 @@ function loadImage(el: HTMLImageElement, src: string, options: LazyLoadOptions):
 /**
  * 创建观察器
  */
-function createObserver(binding: any): IntersectionObserver {
+function observeImage(el: HTMLImageElement, value: LazyLoadValue): void {
+  cleanup(el)
+  el.classList.remove('lazy-loading', 'lazy-loaded', 'lazy-error')
+  el.style.opacity = ''
+  const src = getSrc(value)
   const options: LazyLoadOptions = {
     ...defaultOptions,
-    ...(typeof binding.value === 'object' ? binding.value : {})
+    ...(typeof value === 'object' ? value : {})
   }
 
-  const src = typeof binding.value === 'string' ? binding.value : binding.value?.src
+  if (options.loading) el.src = options.loading
+  else el.removeAttribute('src')
+  if (!src) return
+
+  const state: LazyLoadState = {}
+  states.set(el, state)
+  if (!('IntersectionObserver' in window)) {
+    loadImage(el, src, options, state)
+    return
+  }
 
   const observer = new IntersectionObserver(
     (entries) => {
@@ -67,12 +105,11 @@ function createObserver(binding: any): IntersectionObserver {
           const target = entry.target as HTMLImageElement
 
           // 加载图片
-          if (src) {
-            loadImage(target, src, options)
-          }
+          if (states.get(target) !== state) return
+          loadImage(target, src, options, state)
 
           // 停止观察
-          observer.unobserve(target)
+          observer.disconnect()
         }
       })
     },
@@ -82,7 +119,8 @@ function createObserver(binding: any): IntersectionObserver {
     }
   )
 
-  return observer
+  state.observer = observer
+  observer.observe(el)
 }
 
 /**
@@ -92,62 +130,18 @@ function createObserver(binding: any): IntersectionObserver {
  * 1. 简单使用：v-lazyload="imageUrl"
  * 2. 带配置：v-lazyload="{ src: imageUrl, loading: loadingUrl, error: errorUrl }"
  */
-export const lazyload = {
-  mounted(el: HTMLImageElement, binding: any) {
-    // 检查是否支持 IntersectionObserver
-    if (!('IntersectionObserver' in window)) {
-      // 不支持则直接加载
-      const src = typeof binding.value === 'string' ? binding.value : binding.value?.src
-      if (src) {
-        el.src = src
-      }
-      return
-    }
-
-    const options: LazyLoadOptions = {
-      ...defaultOptions,
-      ...(typeof binding.value === 'object' ? binding.value : {})
-    }
-
-    // 设置占位图
-    if (options.loading && !el.src) {
-      el.src = options.loading
-    }
-
-    // 创建并启动观察器
-    const observer = createObserver(binding)
-    observer.observe(el)
-
-    // 保存观察器实例
-    observerMap.set(el, observer)
+export const lazyload: ObjectDirective<HTMLImageElement, LazyLoadValue> = {
+  mounted(el, binding) {
+    observeImage(el, binding.value)
   },
 
-  updated(el: HTMLImageElement, binding: any) {
-    // 如果 src 改变，重新加载
-    const oldSrc = typeof binding.oldValue === 'string' ? binding.oldValue : binding.oldValue?.src
-    const newSrc = typeof binding.value === 'string' ? binding.value : binding.value?.src
-
-    if (oldSrc !== newSrc && newSrc) {
-      // 停止旧的观察器
-      const oldObserver = observerMap.get(el)
-      if (oldObserver) {
-        oldObserver.disconnect()
-        observerMap.delete(el)
-      }
-
-      // 创建新的观察器
-      const observer = createObserver(binding)
-      observer.observe(el)
-      observerMap.set(el, observer)
+  updated(el, binding) {
+    if (getSrc(binding.oldValue) !== getSrc(binding.value)) {
+      observeImage(el, binding.value)
     }
   },
 
   unmounted(el: HTMLImageElement) {
-    // 清理观察器
-    const observer = observerMap.get(el)
-    if (observer) {
-      observer.unobserve(el)
-      observerMap.delete(el)
-    }
+    cleanup(el)
   }
 }

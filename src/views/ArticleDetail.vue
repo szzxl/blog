@@ -104,6 +104,7 @@
       <button
         class="action-btn like-btn"
         :class="{ liked: article.isLiked }"
+        :disabled="likeLoading"
         @click="handleLikeArticle"
         title="点赞"
       >
@@ -153,6 +154,7 @@ import { formatTimestamp, parseTags } from '@/utils/format'
 import { ElMessage } from 'element-plus/es/components/message/index'
 import { useUserStore } from '@/stores/user'
 import { useSeo } from '@/composables/useSeo'
+import { createLatestRequest } from '@/utils/latestRequest'
 
 interface TocItem { id: string; text: string; level: 2 | 3 }
 
@@ -181,6 +183,10 @@ const article = ref<Article | null>(null)
 const loading = ref(false)
 const loadError = ref(false)
 const favoriteLoading = ref(false)
+const likeLoading = ref(false)
+const articleRequest = createLatestRequest()
+const likeCountRequest = createLatestRequest()
+let disposed = false
 const readProgress = ref(0)
 const tocItems = ref<TocItem[]>([])
 const tocEls = ref<{ id: string; el: HTMLElement }[]>([])
@@ -221,15 +227,17 @@ function injectHeadingIds(html: string): { html: string; toc: TocItem[] } {
 watch(
   () => article.value?.articleContent,
   (content) => {
+    if (parseIdleId !== null) { cancelIdleCallback(parseIdleId); parseIdleId = null }
     if (!content) { htmlContent.value = ''; tocItems.value = []; return }
     const run = () => {
+      parseIdleId = null
+      if (disposed) return
       const { html, toc } = injectHeadingIds(DOMPurify.sanitize(content))
       htmlContent.value = html
       tocItems.value = toc
     }
     // 超过 50KB 的文章用空闲时间解析，避免阻塞主线程
     if (typeof requestIdleCallback !== 'undefined' && content.length > 50_000) {
-      if (parseIdleId !== null) cancelIdleCallback(parseIdleId)
       parseIdleId = requestIdleCallback(run, { timeout: 800 })
     } else {
       run()
@@ -323,6 +331,7 @@ const onKeydown = (e: KeyboardEvent) => { if (e.key === 'Escape') closeLightbox(
 
 // 获取文章详情
 const fetchArticleDetail = async () => {
+  const requestId = articleRequest.next()
   const id = route.params.id as string
   if (!id) {
     ElMessage.error('文章ID不存在')
@@ -343,7 +352,7 @@ const fetchArticleDetail = async () => {
   try {
     const res: any = await getArticleDetail({ id: id })
 
-    if (route.params.id !== id) return
+    if (!articleRequest.isCurrent(requestId)) return
     if (res) {
       article.value = res
       // 增加查看次数（博主不增加）
@@ -351,21 +360,22 @@ const fetchArticleDetail = async () => {
         incrementViewCount(id)
       }
       // 查询最新点赞数量
-      await fetchLikeCount(id)
+      if (article.value) void fetchLikeCount(article.value)
     } else loadError.value = true
   } catch (error) {
-    if (route.params.id === id) loadError.value = true
+    if (articleRequest.isCurrent(requestId)) loadError.value = true
   } finally {
-    if (route.params.id === id) loading.value = false
+    if (articleRequest.isCurrent(requestId)) loading.value = false
   }
 }
 
 // 查询点赞数量
-const fetchLikeCount = async (id: string) => {
+const fetchLikeCount = async (target: Article) => {
+  const requestId = likeCountRequest.next()
   try {
-    const res: any = await getArticleLikeCount(id)
-    if (article.value && String(article.value.id) === id && res !== undefined) {
-      article.value.likeCount = res
+    const res: any = await getArticleLikeCount(target.id)
+    if (!disposed && likeCountRequest.isCurrent(requestId) && article.value === target && res !== undefined) {
+      target.likeCount = res
     }
   } catch (error) {
     // 静默失败，不影响用户体验
@@ -392,23 +402,28 @@ const handleLikeArticle = async () => {
     return
   }
 
-  if (!article.value) return
+  if (!article.value || likeLoading.value) return
 
   // 保存当前状态
-  const wasLiked = article.value.isLiked
+  const target = article.value
+  const wasLiked = target.isLiked
+  likeLoading.value = true
 
   try {
     await likeArticle({
-      articleId: article.value.id,
+      articleId: target.id,
       type: wasLiked ? 2 : 1  // 已点赞则取消(2)，未点赞则点赞(1)
     })
 
-    article.value.isLiked = !wasLiked
+    if (disposed || article.value !== target) return
+    target.isLiked = !wasLiked
 
     // 查询最新点赞数量
-    await fetchLikeCount(article.value.id as string)
+    await fetchLikeCount(target)
   } catch (error) {
     showRequestError(error, '操作失败，请重试')
+  } finally {
+    likeLoading.value = false
   }
 }
 
@@ -419,23 +434,26 @@ const handleFavorite = async () => {
     router.push({ path: '/login', query: { redirect: route.fullPath } })
     return
   }
-  if (!article.value || !userStore.user) return
+  if (!article.value || !userStore.user || favoriteLoading.value) return
 
-  const wasFavorited = article.value.isFavorited
+  const target = article.value
+  const wasFavorited = target.isFavorited
   favoriteLoading.value = true
   try {
     if (wasFavorited) {
-      await removeFavorite({ articleId: article.value.id, userId: userStore.user.id })
-      article.value.isFavorited = false
+      await removeFavorite({ articleId: target.id, userId: userStore.user.id })
+      if (disposed || article.value !== target) return
+      target.isFavorited = false
       ElMessage.success('已取消收藏')
     } else {
       await addFavorite({
-        articleId: article.value.id,
-        articleName: article.value.articleName,
-        articleTime: formatTimestamp(article.value.createTime, 'YYYY-MM-DD HH:mm:ss'),
+        articleId: target.id,
+        articleName: target.articleName,
+        articleTime: formatTimestamp(target.createTime, 'YYYY-MM-DD HH:mm:ss'),
         userId: Number(userStore.user.id)
       })
-      article.value.isFavorited = true
+      if (disposed || article.value !== target) return
+      target.isFavorited = true
       ElMessage.success('收藏成功')
     }
   } catch (error) {
@@ -461,7 +479,7 @@ const formatTime = (timestamp?: number) => formatTimestamp(timestamp, 'YYYY-MM-D
 
 // 跳转到标签文章列表
 const goToTag = (tag: string) => {
-  router.push(`/tag/articles?tag=${tag}`)
+  router.push({ path: '/tag/articles', query: { tag } })
 }
 
 onMounted(() => {
@@ -472,6 +490,9 @@ onMounted(() => {
 watch(() => route.params.id, () => { void fetchArticleDetail() }, { immediate: true })
 
 onUnmounted(() => {
+  disposed = true
+  articleRequest.invalidate()
+  likeCountRequest.invalidate()
   window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('keydown', onKeydown)
   if (scrollRaf !== null) cancelAnimationFrame(scrollRaf)
