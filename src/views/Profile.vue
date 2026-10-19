@@ -19,7 +19,7 @@
             :disabled="busy"
             @change="uploadAvatar"
         /></label>
-        <router-link to="/favorites" class="favorites-link">我的收藏 →</router-link
+        <router-link to="/favorites" class="favorites-link">我的收藏</router-link
         ><button class="logout-btn" :disabled="busy" @click="logoutAccount">退出登录</button>
       </aside>
       <div class="settings">
@@ -122,7 +122,8 @@ import { computed, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus/es/components/message/index'
-import { updatePassword, updateUserProfile, uploadImage } from '@/api/article'
+import { updatePassword, updateUserProfile } from '@/api/auth'
+import { uploadImage } from '@/api/file'
 import { useUserStore } from '@/stores/user'
 import { showRequestError } from '@/utils/requestError'
 

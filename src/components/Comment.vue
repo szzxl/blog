@@ -205,11 +205,8 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus/es/components/message/index'
 import { ElMessageBox } from 'element-plus/es/components/message-box/index'
 import { Plus, Upload } from '@element-plus/icons-vue'
-import {
-  getArticleComments, addArticleComment, deleteArticleComment, likeArticleComment,
-  getPhotoComments, addPhotoComment, deletePhotoComment, likePhotoComment,
-  getCommentReplies, uploadImage
-} from '@/api/article'
+import { getArticleComments, addArticleComment, deleteArticleComment, likeArticleComment, getPhotoComments, addPhotoComment, deletePhotoComment, likePhotoComment, getCommentReplies } from '@/api/comment'
+import { uploadImage } from '@/api/file'
 import { useUserStore } from '@/stores/user'
 import { useRouter, useRoute } from 'vue-router'
 import EmojiPicker from './EmojiPicker.vue'

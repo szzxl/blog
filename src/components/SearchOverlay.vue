@@ -68,7 +68,7 @@
               </li>
             </ul>
             <button v-if="!searching && !searchError && total > 0" class="s-all" @click="viewAll">
-              查看全部 {{ total }} 条结果 →
+              查看全部 {{ total }} 条结果
             </button>
           </div>
         </div>
@@ -80,6 +80,7 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import type { ArticleSummary } from '@/types/article'
 import { getArticleList } from '@/api/article'
 import { formatTimestamp } from '@/utils/format'
 import { createLatestRequest } from '@/utils/latestRequest'
@@ -88,7 +89,7 @@ const router = useRouter()
 const show = ref(false)
 const keyword = ref('')
 const searching = ref(false)
-const results = ref<any[]>([])
+const results = ref<ArticleSummary[]>([])
 const selected = ref(-1)
 const searchError = ref(false)
 const total = ref(0)
@@ -133,10 +134,10 @@ const onInput = () => {
   searching.value = true
   searchTimer = setTimeout(async () => {
     try {
-      const res: any = await getArticleList({ keyword: q, pageNo: 1, pageSize: 10 })
+      const res = await getArticleList({ keyword: q, pageNo: 1, pageSize: 10 })
       if (!searchRequest.isCurrent(requestId)) return
-      results.value = res?.list ?? (Array.isArray(res) ? res : [])
-      total.value = res?.total ?? results.value.length
+      results.value = res.list
+      total.value = res.total
     } catch {
       if (searchRequest.isCurrent(requestId)) {
         results.value = []
@@ -159,7 +160,7 @@ const moveSelect = (dir: 1 | -1) => {
   selected.value = (selected.value + dir + results.value.length) % results.value.length
 }
 
-const goTo = (item: any) => {
+const goTo = (item: ArticleSummary) => {
   close()
   router.push(`/article/${item.id}`)
 }

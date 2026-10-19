@@ -16,51 +16,29 @@
         :to="{ path: '/tag/articles', query: { tag: tag.name } }"
         class="tag-item"
         ><span class="tag-symbol">#</span><strong>{{ tag.name }}</strong
-        ><span>{{ tag.num }} 篇</span><span aria-hidden="true">↗</span></router-link
+        ><span>{{ tag.count ?? 0 }} 篇</span></router-link
       >
     </div>
     <p v-if="!loading && !loadError && !tags.length" class="empty-state">暂时还没有标签。</p>
     <div class="tag-foot">
-      <router-link to="/category">按分类浏览 →</router-link
-      ><router-link to="/articles">全部文章 →</router-link>
+      <router-link to="/category">按分类浏览</router-link
+      ><router-link to="/articles">全部文章</router-link>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { getTagListCount } from '@/api/article'
-interface Tag {
-  name: string
-  num: number
-}
-const tags = ref<Tag[]>([])
-const loading = ref(true)
-const loadError = ref(false)
-let disposed = false
-const sortedTags = computed(() => [...tags.value].sort((a, b) => b.num - a.num))
-const fetchTags = async () => {
-  loading.value = true
-  loadError.value = false
-  try {
-    const response = (await getTagListCount({
-      tagStatus: 1,
-      pageNo: 1,
-      pageSize: 100
-    })) as unknown as Tag[] | { list?: Tag[] }
-    if (!disposed)
-      tags.value = (Array.isArray(response) ? response : response?.list || [])
-        .map((item) => ({ name: item.name, num: item.num || 0 }))
-        .filter((item) => item.name)
-  } catch {
-    if (!disposed) loadError.value = true
-  } finally {
-    if (!disposed) loading.value = false
-  }
-}
+import { computed, onMounted } from 'vue'
+import { getTagListCount } from '@/api/taxonomy'
+import type { Tag } from '@/types/catalog'
+import { useAsyncResource } from '@/composables/useAsyncResource'
+const {
+  data: tags,
+  loading,
+  loadError,
+  execute: fetchTags
+} = useAsyncResource<Tag[]>(() => getTagListCount({ tagStatus: 1, pageNo: 1, pageSize: 100 }), [])
+const sortedTags = computed(() => [...tags.value].sort((a, b) => (b.count ?? 0) - (a.count ?? 0)))
 onMounted(fetchTags)
-onUnmounted(() => {
-  disposed = true
-})
 </script>
 <style scoped lang="scss">
 .tag-page {

@@ -34,6 +34,8 @@ declare module 'vue' {
     ErrorBoundary: typeof import('./src/components/ErrorBoundary.vue')['default']
     Footer: typeof import('./src/components/Footer.vue')['default']
     Header: typeof import('./src/components/Header.vue')['default']
+    HomeFeatured: typeof import('./src/components/home/HomeFeatured.vue')['default']
+    HomeSidebar: typeof import('./src/components/home/HomeSidebar.vue')['default']
     ReplyItem: typeof import('./src/components/ReplyItem.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

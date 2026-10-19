@@ -7,9 +7,9 @@
           <p>{{ websiteMotto || '项目笔记和日常记录。' }}</p>
           <div class="social-row">
             <a v-if="socialGithub" :href="socialGithub" target="_blank" rel="noopener noreferrer"
-              >GitHub ↗</a
+              >GitHub</a
             ><a v-if="socialGitee" :href="socialGitee" target="_blank" rel="noopener noreferrer"
-              >Gitee ↗</a
+              >Gitee</a
             ><button v-if="socialEmail" @click="copyEmail">邮箱</button
             ><button v-if="socialWechat" @click="copyWechat">微信</button>
           </div>
@@ -43,9 +43,10 @@
   </footer>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { watch, ref, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus/es/components/message/index'
-import { fetchWebsiteConfigWithCache, useWebsiteConfigRefresh } from '@/utils/websiteConfig'
+import { useWebsiteConfig } from '@/composables/useWebsiteConfig'
+import { copyText } from '@/utils/clipboard'
 import { useVisitStats } from '@/utils/visit'
 
 const { visitSummary, visitStatsLoading } = useVisitStats()
@@ -77,65 +78,39 @@ const calculateRuntime = () => {
 
 let timer: number | null = null
 
-const fetchWebsiteConfig = async () => {
-  try {
-    const config = await fetchWebsiteConfigWithCache()
-    if (config.site_name) websiteName.value = config.site_name.replace(/系统$/u, '')
-    copyright.value = config.copyright || `© ${year}`
-    icpNumber.value = config.icp_number || ''
-    websiteMotto.value = config.website_motto || ''
-    socialEmail.value = config.social_email || ''
-    socialGitee.value = config.social_gitee || ''
-    socialGithub.value = config.social_github || ''
-    socialWechat.value = config.social_wechat || ''
-    const configuredStart = config.site_start_time
-      ? Date.parse(config.site_start_time.replace(' ', 'T') + '+08:00')
-      : NaN
-    if (Number.isFinite(configuredStart)) startTime = configuredStart
-    calculateRuntime()
-  } catch {
-    /* 静默失败 */
-  }
-}
-
-useWebsiteConfigRefresh(() => {
-  void fetchWebsiteConfig()
+const { config: websiteConfig } = useWebsiteConfig()
+watch(websiteConfig, (config) => {
+  if (config.site_name) websiteName.value = config.site_name.replace(/系统$/u, '')
+  copyright.value = config.copyright || `© ${year}`
+  icpNumber.value = config.icp_number || ''
+  websiteMotto.value = config.website_motto || ''
+  socialEmail.value = config.social_email || ''
+  socialGitee.value = config.social_gitee || ''
+  socialGithub.value = config.social_github || ''
+  socialWechat.value = config.social_wechat || ''
+  const configuredStart = config.site_start_time
+    ? Date.parse(config.site_start_time.replace(' ', 'T') + '+08:00')
+    : NaN
+  if (Number.isFinite(configuredStart)) startTime = configuredStart
+  calculateRuntime()
 })
+
 onMounted(() => {
-  fetchWebsiteConfig()
   calculateRuntime()
   timer = window.setInterval(calculateRuntime, 1000)
 })
 
-const copyWechat = async () => {
-  if (!socialWechat.value) return
+const copyContact = async (value: string, label: string) => {
+  if (!value) return
   try {
-    await navigator.clipboard.writeText(socialWechat.value)
+    await copyText(value)
+    ElMessage.success(`${label}已复制到剪贴板`)
   } catch {
-    const el = document.createElement('textarea')
-    el.value = socialWechat.value
-    document.body.appendChild(el)
-    el.select()
-    document.execCommand('copy')
-    document.body.removeChild(el)
+    ElMessage.info(`${label}：${value}`)
   }
-  ElMessage.success('微信号已复制到剪贴板')
 }
-
-const copyEmail = async () => {
-  if (!socialEmail.value) return
-  try {
-    await navigator.clipboard.writeText(socialEmail.value)
-  } catch {
-    const el = document.createElement('textarea')
-    el.value = socialEmail.value
-    document.body.appendChild(el)
-    el.select()
-    document.execCommand('copy')
-    document.body.removeChild(el)
-  }
-  ElMessage.success('邮箱号已复制到剪贴板')
-}
+const copyWechat = () => copyContact(socialWechat.value, '微信号')
+const copyEmail = () => copyContact(socialEmail.value, '邮箱')
 
 onUnmounted(() => {
   if (timer) clearInterval(timer)
