@@ -3,7 +3,7 @@
     <div class="container">
       <!-- Logo -->
       <router-link to="/" class="logo">
-        <img :src="siteLogo" class="logo-img" alt="logo" />
+        <img :src="siteLogo" class="logo-img" alt="" width="32" height="32" />
         <span class="logo-name">{{ siteName || '博客' }}</span>
       </router-link>
 
@@ -66,7 +66,10 @@
     <!-- 移动端菜单 -->
     <el-drawer v-model="showMobileMenu" direction="ltr" size="280px" :with-header="false">
       <div class="mobile-menu">
-        <div class="mobile-logo">{{ siteName || '博客' }}</div>
+        <div class="mobile-logo">
+          <img :src="siteLogo" alt="" width="32" height="32" />
+          <span>{{ siteName || '博客' }}</span>
+        </div>
         <nav class="mobile-nav">
           <router-link
             v-for="item in navItems"
@@ -393,6 +396,9 @@ onUnmounted(() => {
   gap: 24px;
 
   .mobile-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-family: var(--font-display);
     font-size: 22px;
     font-weight: 900;
@@ -400,6 +406,12 @@ onUnmounted(() => {
     padding-bottom: 16px;
     border-bottom: 1px solid var(--border-color);
     letter-spacing: -0.03em;
+
+    img {
+      flex-shrink: 0;
+      border-radius: 8px;
+      object-fit: cover;
+    }
   }
 
   .mobile-nav {
