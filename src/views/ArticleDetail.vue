@@ -1,143 +1,190 @@
 <template>
-  <div class="article-detail">
-    <!-- 阅读进度条 -->
-    <div class="read-progress-bar" :style="{ height: readProgress + '%' }"></div>
-
-    <!-- ── Banner ─────────────────────────────────────── -->
-    <div class="page-banner">
-      <div class="banner-overlay"></div>
-      <div class="banner-content">
-        <template v-if="loading">
-          <div class="banner-title-skeleton"></div>
-          <div class="banner-sub-skeleton"></div>
-        </template>
-        <template v-else-if="article">
-          <h1 class="banner-title">{{ article.articleName }}</h1>
-          <p class="banner-sub">
-            <span v-if="article.createTime">{{ formatTime(article.createTime) }}</span>
-            <span class="banner-sep" v-if="article.createTime && article.articleCategory">·</span>
-            <span v-if="article.articleCategory">{{ article.articleCategory }}</span>
-            <span class="banner-sep" v-if="article.readNum !== undefined">·</span>
-            <span v-if="article.readNum !== undefined">{{ article.readNum }} 阅读</span>
-            <span class="banner-sep" v-if="readingTime > 0">·</span>
-            <span v-if="readingTime > 0">约 {{ readingTime }} 分钟</span>
-          </p>
-        </template>
-      </div>
+  <div class="article-detail container" :class="{ 'focus-mode': focusMode }">
+    <button v-if="focusMode" class="focus-exit" @click="focusMode = false">退出专注阅读 ×</button>
+    <div
+      class="read-progress-bar"
+      :style="{ width: readProgress + '%' }"
+      role="progressbar"
+      aria-label="正文阅读进度"
+      :aria-valuenow="readProgress"
+      :aria-valuemin="0"
+      :aria-valuemax="100"
+    ></div>
+    <nav class="breadcrumb" aria-label="阅读位置">
+      <router-link to="/">首页</router-link><span>/</span
+      ><router-link :to="articleIndex">文章索引</router-link><span>/</span
+      ><span aria-current="page">正文</span>
+    </nav>
+    <Skeleton v-if="loading" type="article-detail" />
+    <div v-else-if="loadError" class="load-error" role="alert">
+      <p>文章暂时无法加载，也可能尚未发布或已被删除。</p>
+      <el-button @click="fetchArticleDetail">重新加载</el-button
+      ><router-link to="/articles">返回文章索引 →</router-link>
     </div>
-
-    <!-- ── 主内容区 ───────────────────────────────────── -->
-    <div class="main-wrap">
-      <div class="container">
-        <!-- 骨架屏 -->
-        <Skeleton v-if="loading" type="article-detail" />
-        <div v-else-if="loadError" class="load-error" role="alert">
-          <p>文章加载失败，文章可能尚未发布或已被删除。</p>
-          <el-button @click="fetchArticleDetail">重新加载</el-button>
-          <router-link to="/articles">返回文章列表</router-link>
-        </div>
-
-        <!-- 文章内容卡片 -->
-        <article v-else-if="article" class="article-content">
-          <!-- 标签行 -->
-          <div class="article-tags" v-if="article.articleTag">
-            <span
-              class="tag"
+    <div v-else-if="article" class="reading-layout">
+      <nav class="toc-panel" aria-label="文章目录">
+        <strong>本篇目录</strong>
+        <ul v-if="tocItems.length">
+          <li
+            v-for="item in tocItems"
+            :key="item.id"
+            :class="[`toc-h${item.level}`, { active: activeId === item.id }]"
+          >
+            <button
+              @click="scrollToHeading(item.id)"
+              :aria-current="activeId === item.id ? 'location' : undefined"
+            >
+              {{ item.text }}
+            </button>
+          </li>
+        </ul>
+        <p v-else class="toc-empty">这篇文章没有分节。</p>
+        <button class="toc-comment" @click="scrollToComments">参与评论 ↓</button>
+        <p class="toc-progress">阅读进度 {{ readProgress }}%</p>
+      </nav>
+      <div class="reading-main">
+        <article class="article-content">
+          <header class="article-heading">
+            <router-link
+              v-if="article.articleCategory"
+              class="category-link"
+              :to="{ path: '/articles', query: { category: article.articleCategory } }"
+              >{{ article.articleCategory }}</router-link
+            >
+            <h1>{{ article.articleName }}</h1>
+            <div class="article-meta">
+              <time v-if="article.createTime">{{ formatTime(article.createTime) }}</time
+              ><span v-if="article.readNum !== undefined">{{ article.readNum }} 次阅读</span
+              ><span v-if="readingTime">约 {{ readingTime }} 分钟</span>
+            </div>
+          </header>
+          <div class="reading-options" aria-label="阅读设置">
+            <span>字号</span
+            ><button :aria-pressed="readingSize === 16" @click="readingSize = 16">标准</button
+            ><button :aria-pressed="readingSize === 18" @click="readingSize = 18">大字</button
+            ><button class="focus-toggle" :aria-pressed="focusMode" @click="focusMode = !focusMode">
+              {{ focusMode ? '退出专注' : '专注阅读' }}
+            </button>
+          </div>
+          <details
+            v-if="tocItems.length"
+            class="mobile-toc"
+            :open="mobileTocOpen"
+            @toggle="mobileTocOpen = ($event.target as HTMLDetailsElement).open"
+          >
+            <summary>本篇目录 · {{ tocItems.length }} 节</summary>
+            <button v-for="item in tocItems" :key="item.id" @click="scrollToHeading(item.id)">
+              {{ item.text }}
+            </button>
+          </details>
+          <div
+            class="content"
+            :style="{ fontSize: readingSize + 'px' }"
+            v-html="htmlContent"
+            @click="handleContentClick"
+          ></div>
+          <div v-if="article.articleTag" class="article-tags">
+            <button
               v-for="tag in parseTags(article.articleTag)"
               :key="tag"
+              class="tag"
               @click="goToTag(tag)"
-            >{{ tag }}</span>
+            >
+              # {{ tag }}
+            </button>
           </div>
-
-          <div class="content" v-html="htmlContent" @click="handleContentClick"></div>
+          <section id="article-comments" class="reader-comments" aria-label="文章评论">
+            <Comment :key="article.id" :article-id="article.id" />
+          </section>
         </article>
-
-        <!-- 上一篇/下一篇 暂时隐藏 -->
-        <!-- <div class="adjacent-nav" v-if="prevArticle || nextArticle">
-          <div
-            class="adj-card adj-prev"
-            v-if="prevArticle"
-            @click="router.push(`/article/${prevArticle.id}`)"
+        <div class="article-actions" aria-label="文章操作" v-if="article">
+          <button
+            class="action-btn like-btn"
+            :class="{ liked: article.isLiked }"
+            :aria-pressed="!!article.isLiked"
+            :disabled="likeLoading"
+            @click="handleLikeArticle"
+            title="点赞"
           >
-            <span class="adj-label">← 上一篇</span>
-            <span class="adj-title">{{ prevArticle.articleName }}</span>
-          </div>
-          <div
-            class="adj-card adj-next"
-            v-if="nextArticle"
-            @click="router.push(`/article/${nextArticle.id}`)"
-          >
-            <span class="adj-label">下一篇 →</span>
-            <span class="adj-title">{{ nextArticle.articleName }}</span>
-          </div>
-        </div> -->
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+              ></path>
+            </svg>
+            <span class="count">{{ article.likeCount || 0 }}</span>
+          </button>
 
-        <!-- 评论区 -->
-        <Comment v-if="article" :key="article.id" :article-id="article.id" />
+          <button
+            class="action-btn favorite-btn"
+            :class="{ favorited: article.isFavorited }"
+            :aria-pressed="!!article.isFavorited"
+            :disabled="favoriteLoading"
+            @click="handleFavorite"
+            :title="article.isFavorited ? '取消收藏' : '收藏'"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span class="count">{{
+              favoriteLoading ? '…' : article.isFavorited ? '已收藏' : '收藏'
+            }}</span>
+          </button>
+
+          <button class="action-btn" @click="handleShare" title="分享">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            </svg>
+            <span class="count">分享</span>
+          </button>
+          <button class="action-btn" @click="scrollToComments">
+            <span aria-hidden="true">↓</span><span class="count">评论</span>
+          </button>
+        </div>
       </div>
     </div>
-
-    <!-- ── 图片灯箱 ──────────────────────────────────── -->
-    <Transition name="lightbox">
-      <div v-if="lightboxSrc" class="lightbox-overlay" @click="closeLightbox">
-        <img :src="lightboxSrc" class="lightbox-img" @click.stop />
-        <button class="lightbox-close" @click="closeLightbox" aria-label="关闭">×</button>
-      </div>
-    </Transition>
-
-    <!-- ── 文章目录（左侧） ──────────────────────────── -->
-    <nav class="toc-panel" v-if="tocItems.length > 1" aria-label="文章目录">
-      <div class="toc-title">目录</div>
-      <ul class="toc-list">
-        <li
-          v-for="item in tocItems"
-          :key="item.id"
-          class="toc-item"
-          :class="[`toc-h${item.level}`, { active: activeId === item.id }]"
-          @click="scrollToHeading(item.id)"
-        >{{ item.text }}</li>
-      </ul>
-    </nav>
-
-    <!-- ── 固定操作栏（右侧） ─────────────────────────── -->
-    <div class="article-actions" v-if="article">
-      <button
-        class="action-btn like-btn"
-        :class="{ liked: article.isLiked }"
-        :disabled="likeLoading"
-        @click="handleLikeArticle"
-        title="点赞"
+    <Transition name="lightbox"
+      ><div
+        v-if="lightboxSrc"
+        class="lightbox-overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-label="文章图片预览"
+        @click="closeLightbox"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-        </svg>
-        <span class="count">{{ article.likeCount || 0 }}</span>
-      </button>
-
-      <button
-        class="action-btn favorite-btn"
-        :class="{ favorited: article.isFavorited }"
-        :disabled="favoriteLoading"
-        @click="handleFavorite"
-        :title="article.isFavorited ? '取消收藏' : '收藏'"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-        </svg>
-        <span class="count">{{ favoriteLoading ? '…' : article.isFavorited ? '已收藏' : '收藏' }}</span>
-      </button>
-
-      <button class="action-btn" @click="handleShare" title="分享">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="18" cy="5" r="3"></circle>
-          <circle cx="6" cy="12" r="3"></circle>
-          <circle cx="18" cy="19" r="3"></circle>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-        </svg>
-        <span class="count">分享</span>
-      </button>
-    </div>
+        <img :src="lightboxSrc" class="lightbox-img" alt="文章图片大图" @click.stop /><button
+          class="lightbox-close"
+          @click="closeLightbox"
+          aria-label="关闭图片预览"
+        >
+          ×
+        </button>
+      </div></Transition
+    >
   </div>
 </template>
 
@@ -149,14 +196,25 @@ import DOMPurify from 'dompurify'
 import { useRoute, useRouter } from 'vue-router'
 import Comment from '@/components/Comment.vue'
 import Skeleton from '@/components/Skeleton.vue'
-import { getArticleDetail, addArticleView, likeArticle, getArticleLikeCount, addFavorite, removeFavorite } from '@/api/article'
+import {
+  getArticleDetail,
+  addArticleView,
+  likeArticle,
+  getArticleLikeCount,
+  addFavorite,
+  removeFavorite
+} from '@/api/article'
 import { formatTimestamp, parseTags } from '@/utils/format'
 import { ElMessage } from 'element-plus/es/components/message/index'
 import { useUserStore } from '@/stores/user'
 import { useSeo } from '@/composables/useSeo'
 import { createLatestRequest } from '@/utils/latestRequest'
 
-interface TocItem { id: string; text: string; level: 2 | 3 }
+interface TocItem {
+  id: string
+  text: string
+  level: 2 | 3
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -194,6 +252,15 @@ const tocOffsets = ref<{ id: string; top: number }[]>([])
 const activeId = ref('')
 const htmlContent = ref('')
 const lightboxSrc = ref('')
+const readingSize = ref(16)
+const focusMode = ref(false)
+const mobileTocOpen = ref(false)
+const articleIndex =
+  typeof window.history.state?.back === 'string' &&
+  /^\/(articles|tag\/articles)([?#]|$)/.test(window.history.state.back)
+    ? window.history.state.back
+    : '/articles'
+watch(focusMode, (value) => document.body.classList.toggle('reading-focus', value))
 let parseIdleId: number | null = null
 let scrollRaf: number | null = null
 
@@ -208,13 +275,15 @@ function injectHeadingIds(html: string): { html: string; toc: TocItem[] } {
   const doc = new DOMParser().parseFromString(html, 'text/html')
   const toc: TocItem[] = []
   const seen = new Map<string, number>()
-  doc.querySelectorAll('h2, h3').forEach(el => {
+  doc.querySelectorAll('h2, h3').forEach((el) => {
     const text = el.textContent?.trim() || ''
-    const base = text.toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w一-龥-]/g, '')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '') || 'h'
+    const base =
+      text
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w一-龥-]/g, '')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '') || 'h'
     const n = seen.get(base) ?? 0
     seen.set(base, n + 1)
     const id = n === 0 ? base : `${base}-${n}`
@@ -227,8 +296,15 @@ function injectHeadingIds(html: string): { html: string; toc: TocItem[] } {
 watch(
   () => article.value?.articleContent,
   (content) => {
-    if (parseIdleId !== null) { cancelIdleCallback(parseIdleId); parseIdleId = null }
-    if (!content) { htmlContent.value = ''; tocItems.value = []; return }
+    if (parseIdleId !== null) {
+      cancelIdleCallback(parseIdleId)
+      parseIdleId = null
+    }
+    if (!content) {
+      htmlContent.value = ''
+      tocItems.value = []
+      return
+    }
     const run = () => {
       parseIdleId = null
       if (disposed) return
@@ -253,14 +329,14 @@ watch(article, (a) => {
     description: a.articleContent,
     image: a.articleCover,
     type: 'article',
-    article: { id: String(a.id), published: a.createTime, author: undefined },
+    article: { id: String(a.id), published: a.createTime, author: undefined }
   })
 })
 
 // 代码块复制按钮（DOM 渲染后注入）
 const setupCodeCopy = () => {
   nextTick(() => {
-    document.querySelectorAll('.article-content .content pre').forEach(pre => {
+    document.querySelectorAll('.article-content .content pre').forEach((pre) => {
       if (pre.querySelector('.copy-btn')) return
       const btn = document.createElement('button')
       btn.className = 'copy-btn'
@@ -272,8 +348,13 @@ const setupCodeCopy = () => {
           await navigator.clipboard.writeText(text)
           btn.textContent = '✓ 已复制'
           btn.classList.add('copied')
-          setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied') }, 2000)
-        } catch { /* 不支持 clipboard API */ }
+          setTimeout(() => {
+            btn.textContent = '复制'
+            btn.classList.remove('copied')
+          }, 2000)
+        } catch {
+          /* 不支持 clipboard API */
+        }
       })
       pre.appendChild(btn)
     })
@@ -290,8 +371,8 @@ watch(htmlContent, () => {
   setupCodeCopy()
   nextTick(() => {
     tocEls.value = tocItems.value
-      .map(item => ({ id: item.id, el: document.getElementById(item.id)! }))
-      .filter(x => x.el)
+      .map((item) => ({ id: item.id, el: document.getElementById(item.id)! }))
+      .filter((x) => x.el)
     // 缓存各标题的 offsetTop，避免滚动时反复触发强制重排
     measureHeadings()
     contentObserver?.disconnect()
@@ -304,8 +385,15 @@ watch(htmlContent, () => {
 })
 
 const updateProgress = () => {
-  const scrollable = document.documentElement.scrollHeight - window.innerHeight
-  readProgress.value = scrollable > 0 ? Math.min(100, Math.round((window.scrollY / scrollable) * 100)) : 0
+  const content = document.querySelector<HTMLElement>('.article-content .content')
+  if (content) {
+    const start = content.getBoundingClientRect().top + window.scrollY - 100
+    const length = Math.max(1, content.offsetHeight - window.innerHeight * 0.5)
+    readProgress.value = Math.min(
+      100,
+      Math.max(0, Math.round(((window.scrollY - start) / length) * 100))
+    )
+  } else readProgress.value = 0
 
   if (tocOffsets.value.length) {
     const top = window.scrollY + 100
@@ -326,10 +414,11 @@ const handleScroll = () => {
 }
 
 const scrollToHeading = (id: string) => {
-  const el = tocEls.value.find(x => x.id === id)?.el ?? document.getElementById(id)
+  const el = tocEls.value.find((x) => x.id === id)?.el ?? document.getElementById(id)
   if (!el) return
   window.scrollTo({ top: headingTop(el) - 80, behavior: 'smooth' })
   activeId.value = id
+  mobileTocOpen.value = false
 }
 
 // 灯箱预览
@@ -339,8 +428,15 @@ const handleContentClick = (e: MouseEvent) => {
     lightboxSrc.value = (target as HTMLImageElement).src
   }
 }
-const closeLightbox = () => { lightboxSrc.value = '' }
-const onKeydown = (e: KeyboardEvent) => { if (e.key === 'Escape') closeLightbox() }
+const closeLightbox = () => {
+  lightboxSrc.value = ''
+}
+const onKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') {
+    closeLightbox()
+    focusMode.value = false
+  }
+}
 
 // 获取文章详情
 const fetchArticleDetail = async () => {
@@ -351,7 +447,10 @@ const fetchArticleDetail = async () => {
     return
   }
 
-  if (parseIdleId !== null) { cancelIdleCallback(parseIdleId); parseIdleId = null }
+  if (parseIdleId !== null) {
+    cancelIdleCallback(parseIdleId)
+    parseIdleId = null
+  }
   article.value = null
   htmlContent.value = ''
   tocItems.value = []
@@ -387,7 +486,12 @@ const fetchLikeCount = async (target: Article) => {
   const requestId = likeCountRequest.next()
   try {
     const res: any = await getArticleLikeCount(target.id)
-    if (!disposed && likeCountRequest.isCurrent(requestId) && article.value === target && res !== undefined) {
+    if (
+      !disposed &&
+      likeCountRequest.isCurrent(requestId) &&
+      article.value === target &&
+      res !== undefined
+    ) {
       target.likeCount = res
     }
   } catch (error) {
@@ -425,7 +529,7 @@ const handleLikeArticle = async () => {
   try {
     await likeArticle({
       articleId: target.id,
-      type: wasLiked ? 2 : 1  // 已点赞则取消(2)，未点赞则点赞(1)
+      type: wasLiked ? 2 : 1 // 已点赞则取消(2)，未点赞则点赞(1)
     })
 
     if (disposed || article.value !== target) return
@@ -501,9 +605,21 @@ onMounted(() => {
   window.addEventListener('keydown', onKeydown)
 })
 
-watch(() => route.params.id, () => { void fetchArticleDetail() }, { immediate: true })
+watch(
+  () => route.params.id,
+  () => {
+    focusMode.value = false
+    mobileTocOpen.value = false
+    void fetchArticleDetail()
+  },
+  { immediate: true }
+)
+watch([readingSize, focusMode], () => {
+  void nextTick(measureHeadings)
+})
 
 onUnmounted(() => {
+  document.body.classList.remove('reading-focus')
   disposed = true
   articleRequest.invalidate()
   likeCountRequest.invalidate()
@@ -514,578 +630,467 @@ onUnmounted(() => {
   if (scrollRaf !== null) cancelAnimationFrame(scrollRaf)
   if (parseIdleId !== null) cancelIdleCallback(parseIdleId)
 })
-</script>
 
+const scrollToComments = () =>
+  document
+    .getElementById('article-comments')
+    ?.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'
+    })
+</script>
 <style scoped lang="scss">
-.load-error { text-align: center; padding: 48px 24px; color: var(--text-secondary); }
-.load-error p { margin-bottom: 20px; }
-.load-error a { margin-left: 16px; color: var(--color-accent); }
-// ── 阅读进度条 ─────────────────────────────────────────
+.article-detail {
+  padding-top: 24px;
+  padding-bottom: 60px;
+}
 .read-progress-bar {
   position: fixed;
+  height: 3px;
   top: 0;
-  right: 0;
-  width: 3px;
-  background: linear-gradient(to bottom, #165dff 0%, #722ed1 60%, #f53f3f 100%);
-  z-index: 1000;
-  transition: height 0.08s linear;
-  border-radius: 0 0 2px 2px;
+  left: 0;
+  background: var(--color-accent);
+  z-index: 200;
   pointer-events: none;
 }
-
-// ── Banner ─────────────────────────────────────────────
-.page-banner {
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.reading-layout {
+  display: grid;
+  grid-template-columns: clamp(160px, 14vw, 220px) minmax(0, 1fr);
+  gap: 36px;
+  align-items: start;
+}
+.reading-main {
+  min-width: 0;
+}
+.article-content {
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  border-radius: 5px;
+  padding: 40px clamp(24px, 4vw, 64px);
+}
+.article-content > * {
+  max-width: 780px;
+  margin-inline: auto;
+}
+.category-link {
+  font-size: 12px;
+  color: var(--color-accent);
+}
+.article-heading h1 {
+  font: 600 clamp(28px, 2.6vw, 38px)/1.5 var(--font-serif);
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+  margin: 16px 0 18px;
+}
+.article-meta {
+  display: flex;
+  gap: 10px 18px;
+  flex-wrap: wrap;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  padding-bottom: 26px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 22px;
+}
+.reading-options {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 28px;
+}
+.reading-options button {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.reading-options button[aria-pressed='true'] {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  background: var(--bg-soft);
+}
+.reading-options .focus-toggle {
+  margin-left: auto;
+}
+.content {
+  line-height: 1.95;
+  color: var(--text-primary);
+  font-family: var(--font-article);
+  overflow-wrap: anywhere;
+}
+.content :deep(h1),
+.content :deep(h2),
+.content :deep(h3),
+.content :deep(h4),
+.content :deep(h5),
+.content :deep(h6) {
+  font-family: var(--font-serif);
+  line-height: 1.6;
+  font-weight: 600;
+  margin: 32px 0 16px;
+  scroll-margin-top: 100px;
+}
+.content :deep(h1) {
+  font-size: 1.8em;
+}
+.content :deep(h2) {
+  font-size: 1.5em;
+}
+.content :deep(h3) {
+  font-size: 1.25em;
+}
+.content :deep(p) {
+  margin: 17px 0;
+}
+.content :deep(img) {
+  display: block;
+  height: auto;
+  margin: 26px auto;
+  border-radius: 4px;
+  max-width: 100%;
+  cursor: zoom-in;
+}
+.content :deep(blockquote) {
+  margin: 26px 0;
+  border-left: 2px solid var(--color-ochre);
+  padding: 4px 20px;
+  color: var(--text-secondary);
+  font-size: 0.95em;
+}
+.content :deep(blockquote p) {
+  margin: 0;
+}
+.content :deep(code) {
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: var(--bg-soft);
+  color: var(--color-accent);
+  font-family: Consolas, monospace;
+  font-size: 0.88em;
+}
+.content :deep(pre) {
   position: relative;
-  height: 200px;
-  background: url('/bg-banner.jpg') center 30% / cover no-repeat;
+  max-width: 100%;
+  margin: 24px 0;
+  padding: 40px 22px 20px;
+  background: #20322d;
+  border: 1px solid #43584d;
+  border-radius: 4px;
+  color: #f0eddd;
+  overflow: auto;
+  line-height: 1.8;
+  font-size: 13px;
+  overflow-wrap: normal;
+  white-space: pre;
+}
+.content :deep(pre code) {
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  font-size: inherit;
+}
+.content :deep(.code-copy-btn) {
+  position: absolute;
+  top: 7px;
+  right: 9px;
+  background: transparent;
+  border: 1px solid #6c8274;
+  color: #dedecd;
+  font-size: 11px;
+  padding: 4px 9px;
+  border-radius: 3px;
+}
+.content :deep(ul),
+.content :deep(ol) {
+  margin: 18px 0;
+  padding-left: 25px;
+}
+.content :deep(ul) {
+  list-style: disc;
+}
+.content :deep(ol) {
+  list-style: decimal;
+}
+.content :deep(li) {
+  margin-block: 7px;
+}
+.content :deep(a) {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.content :deep(table) {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 22px 0;
+  font-size: 14px;
+}
+.content :deep(th),
+.content :deep(td) {
+  border: 1px solid var(--border-color);
+  padding: 10px 14px;
+  text-align: left;
+}
+.content :deep(th) {
+  background: var(--bg-secondary);
+}
+.content :deep(hr) {
+  border: 0;
+  border-top: 1px solid var(--border-color);
+  margin: 30px 0;
+}
+.article-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+.tag {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  min-height: 36px;
+  padding: 6px 11px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--color-accent);
+}
+.reader-comments {
+  margin-top: 38px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+  scroll-margin-top: 100px;
+}
+.toc-panel {
+  position: sticky;
+  top: 106px;
+  align-self: start;
+}
+.toc-panel strong {
+  display: block;
+  font: 18px var(--font-serif);
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+.toc-panel button {
+  border: 0;
+  background: transparent;
+  min-height: 44px;
+  text-align: left;
+  font-size: 12px;
+  padding: 9px 0;
+  line-height: 1.8;
+  color: var(--text-tertiary);
+  width: 100%;
+  overflow-wrap: anywhere;
+}
+.toc-panel .active button {
+  color: var(--color-accent);
+  border-left: 2px solid var(--color-accent);
+  padding-left: 10px;
+}
+.toc-h3 {
+  padding-left: 12px;
+}
+.toc-progress {
+  border-top: 1px solid var(--border-color);
+  padding-top: 18px;
+  margin-top: 24px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.toc-empty {
+  font-size: 12px;
+}
+.mobile-toc {
+  display: none;
+}
+.article-actions {
+  position: sticky;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  width: max-content;
+  max-width: 100%;
+  margin: 22px auto 0;
+  padding: 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-card);
+  display: flex;
+  gap: 4px;
+  z-index: 8;
+  box-shadow: 0 4px 18px #0000000a;
+}
+.action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-
-  .banner-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(5, 12, 30, 0.62);
-  }
-
-  .banner-content {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    padding: 0 24px;
-    max-width: 860px;
-    width: 100%;
-
-    .banner-title {
-      font-family: var(--font-display);
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: #fff;
-      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
-      margin: 0 0 10px 0;
-      line-height: 1.3;
-      letter-spacing: -0.01em;
-    }
-
-    .banner-sub {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.65);
-      margin: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      flex-wrap: wrap;
-      font-family: var(--font-sans);
-
-      .banner-sep {
-        opacity: 0.5;
-      }
-    }
-
-    // 骨架占位
-    .banner-title-skeleton {
-      height: 36px;
-      width: 60%;
-      margin: 0 auto 12px;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 6px;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-
-    .banner-sub-skeleton {
-      height: 14px;
-      width: 35%;
-      margin: 0 auto;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
-      animation: pulse 1.5s ease-in-out infinite 0.3s;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-  }
+  gap: 7px;
+  background: transparent;
+  border: 0;
+  padding: 8px 14px;
+  min-height: 44px;
+  font-size: 12px;
+  border-radius: 4px;
 }
-
-// ── 主内容包装器 ───────────────────────────────────────
-.main-wrap {
-  padding-top: 48px;
-  padding-bottom: 80px;
+.action-btn svg {
+  width: 16px;
+  height: 16px;
 }
-
-.container {
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 0 24px;
+.action-btn.liked,
+.action-btn.favorited {
+  color: var(--color-accent);
+  background: var(--bg-soft);
 }
-
-// ── 文章内容卡片 ───────────────────────────────────────
-.article-content {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  backdrop-filter: var(--blur-glass);
-  -webkit-backdrop-filter: var(--blur-glass);
-  padding: 52px 64px;
-  margin-bottom: 32px;
-
-  .article-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 32px;
-
-    .tag {
-      padding: 3px 12px;
-      border-radius: var(--radius-tag);
-      background: var(--bg-secondary);
-      color: var(--text-tertiary);
-      font-size: 12px;
-      border: 1px solid transparent;
-      transition: all 0.2s;
-      cursor: pointer;
-      font-family: var(--font-sans);
-
-      &:hover {
-        background: transparent;
-        border-color: var(--color-accent);
-        color: var(--color-accent);
-      }
-    }
-  }
-
-  .content {
-    font-size: 16px;
-    line-height: 1.9;
-    color: var(--text-secondary);
-    font-family: var(--font-article);
-
-    :deep(h1), :deep(h2), :deep(h3), :deep(h4), :deep(h5), :deep(h6) {
-      font-family: var(--font-article);
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    :deep(h2) {
-      font-size: 24px;
-      border-bottom: 2px solid var(--border-color);
-      padding-bottom: 8px;
-      margin: 40px 0 16px;
-    }
-
-    :deep(h3) {
-      font-size: 20px;
-      margin: 32px 0 12px;
-    }
-
-    :deep(h4) {
-      font-size: 17px;
-      margin: 24px 0 10px;
-    }
-
-    :deep(p) {
-      margin: 16px 0;
-    }
-
-    :deep(img) {
-      max-width: 100%;
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-card);
-      margin: 24px 0;
-      display: block;
-    }
-
-    :deep(blockquote) {
-      margin: 24px 0;
-      padding: 16px 20px;
-      background: var(--bg-secondary);
-      border-left: 3px solid var(--color-accent);
-      border-radius: 0 var(--radius-btn) var(--radius-btn) 0;
-      color: var(--text-secondary);
-      font-style: italic;
-
-      p {
-        margin: 0;
-      }
-    }
-
-    :deep(code) {
-      padding: 2px 6px;
-      background: var(--bg-secondary);
-      border-radius: 4px;
-      font-family: 'Fira Code', 'Consolas', monospace;
-      font-size: 0.88em;
-      color: var(--color-accent);
-    }
-
-    :deep(pre) {
-      margin: 24px 0;
-      padding: 20px 24px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-card);
-      overflow-x: auto;
-
-      code {
-        padding: 0;
-        background: none;
-        color: var(--text-secondary);
-        font-size: 13px;
-        line-height: 1.7;
-        border: none;
-      }
-    }
-
-    :deep(ul), :deep(ol) {
-      padding-left: 24px;
-      margin: 16px 0;
-
-      li {
-        margin: 8px 0;
-        color: var(--text-secondary);
-      }
-    }
-
-    :deep(a) {
-      color: var(--color-accent);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(22, 93, 255, 0.2);
-      transition: border-color 0.2s;
-
-      &:hover {
-        border-bottom-color: var(--color-accent);
-      }
-    }
-
-    :deep(table) {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
-      font-size: 14px;
-
-      th {
-        background: var(--bg-secondary);
-        color: var(--text-primary);
-        font-weight: 700;
-        padding: 10px 14px;
-        border: 1px solid var(--border-color);
-        text-align: left;
-        font-family: var(--font-sans);
-        font-size: 13px;
-      }
-
-      td {
-        padding: 10px 14px;
-        border: 1px solid var(--border-color);
-        color: var(--text-secondary);
-      }
-
-      tr:hover td {
-        background: var(--bg-secondary);
-      }
-    }
-
-    :deep(hr) {
-      border: none;
-      border-top: 1px solid var(--border-color);
-      margin: 32px 0;
-    }
-  }
+.action-btn:disabled {
+  opacity: 0.6;
 }
-
-// ── 固定操作栏（右侧） ────────────────────────────────
-.article-actions {
-  position: fixed;
-  right: calc((100vw - 860px) / 2 - 88px);
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 100;
-
-  .action-btn {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    border: 1px solid var(--border-color);
-    background: var(--bg-card);
-    backdrop-filter: var(--blur-glass);
-    -webkit-backdrop-filter: var(--blur-glass);
-    box-shadow: var(--shadow-card);
-    color: var(--text-secondary);
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    transition: all 0.25s ease;
-    padding: 0;
-
-    svg {
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
-      transition: color 0.2s;
-    }
-
-    .count {
-      font-size: 10px;
-      font-family: var(--font-sans);
-      font-weight: 600;
-      color: var(--text-tertiary);
-      line-height: 1;
-      transition: color 0.2s;
-    }
-
-    &:hover {
-      border-color: var(--color-accent);
-      box-shadow: var(--shadow-glow);
-      transform: translateY(-2px);
-      color: var(--color-accent);
-
-      .count { color: var(--color-accent); }
-    }
-
-    &.like-btn.liked {
-      border-color: var(--color-accent);
-      background: rgba(22, 93, 255, 0.08);
-      color: var(--color-accent);
-
-      .count { color: var(--color-accent); }
-    }
-
-    &.favorite-btn.favorited {
-      border-color: #f7ba2a;
-      background: rgba(247, 186, 42, 0.08);
-      color: #f7ba2a;
-
-      svg { fill: #f7ba2a; stroke: #f7ba2a; }
-      .count { color: #f7ba2a; }
-    }
-  }
-}
-
-// ── 文章目录 ──────────────────────────────────────────
-.toc-panel {
-  position: fixed;
-  left: calc((100vw - 860px) / 2 - 268px);
-  top: 100px;
-  width: 240px;
-  max-height: calc(100vh - 140px);
-  overflow-y: auto;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  padding: 14px 0 10px;
-  z-index: 100;
-
-  &::-webkit-scrollbar { width: 3px; }
-  &::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
-
-  .toc-title {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-tertiary);
-    padding: 0 16px 10px;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 6px;
-  }
-
-  .toc-list { list-style: none; padding: 0; margin: 0; }
-
-  .toc-item {
-    font-size: 13px;
-    color: var(--text-tertiary);
-    cursor: pointer;
-    padding: 5px 16px;
-    line-height: 1.5;
-    border-left: 2px solid transparent;
-    transition: color 0.2s, background 0.2s, border-color 0.2s;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    &:hover {
-      color: var(--text-primary);
-      background: var(--bg-secondary);
-    }
-
-    &.active {
-      color: var(--color-accent);
-      border-left-color: var(--color-accent);
-      background: rgba(22, 93, 255, 0.05);
-    }
-
-    &.toc-h3 {
-      padding-left: 26px;
-      font-size: 12px;
-    }
-  }
-}
-
-// ── 代码块复制按钮 ────────────────────────────────────
-:deep(pre) {
-  position: relative;
-
-  .copy-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 3px 10px;
-    font-size: 11px;
-    font-family: var(--font-sans);
-    font-weight: 600;
-    color: var(--text-tertiary);
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-btn);
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.2s, color 0.2s, border-color 0.2s;
-
-    &.copied {
-      color: #00b42a;
-      border-color: #00b42a;
-    }
-  }
-
-  &:hover .copy-btn { opacity: 1; }
-}
-
-// ── 图片灯箱 ──────────────────────────────────────────
 .lightbox-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.88);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: #111b16ed;
+  display: grid;
+  place-items: center;
+  padding: 50px 24px;
   z-index: 2000;
-  cursor: zoom-out;
-  padding: 20px;
 }
-
 .lightbox-img {
-  max-width: 90vw;
-  max-height: 88vh;
+  max-width: 100%;
+  max-height: 90vh;
   object-fit: contain;
-  border-radius: 8px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
-  cursor: default;
 }
-
 .lightbox-close {
-  position: fixed;
-  top: 20px;
-  right: 24px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  font-size: 22px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-
-  &:hover { background: rgba(255, 255, 255, 0.22); }
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 44px;
+  height: 44px;
+  color: white;
+  border: 1px solid #ffffff50;
+  border-radius: 4px;
+  background: #0004;
+  font-size: 28px;
 }
-
-.lightbox-enter-active, .lightbox-leave-active { transition: opacity 0.2s ease; }
-.lightbox-enter-from, .lightbox-leave-to { opacity: 0; }
-
-// ── 响应式 ────────────────────────────────────────────
-@media (max-width: 1380px) {
+.focus-mode .reading-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+.focus-mode .toc-panel {
+  display: none;
+}
+.focus-mode .article-content {
+  max-width: 1000px;
+  margin-inline: auto;
+}
+.load-error a {
+  margin-left: 15px;
+  color: var(--color-accent);
+}
+@media (max-width: 1000px) {
+  .reading-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .toc-panel {
     display: none;
   }
-}
-
-@media (max-width: 1200px) {
-  .article-actions {
-    display: none;
+  .mobile-toc {
+    display: block;
+    background: var(--bg-soft);
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    font-size: 13px;
   }
-}
-
-@media (max-width: 768px) {
-  .page-banner {
-    height: 160px;
-
-    .banner-content .banner-title {
-      font-size: 1.6rem;
-    }
+  .mobile-toc summary {
+    cursor: pointer;
+    min-height: 30px;
   }
-
-  .main-wrap {
-    padding-top: 32px;
-    padding-bottom: 60px;
+  .mobile-toc button {
+    display: block;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    padding: 10px 0;
+    min-height: 44px;
+    font-size: 12px;
   }
-
-  .container {
-    padding: 0;
-  }
-
   .article-content {
-    padding: 32px 22px;
-    border-radius: 0;
-    margin-bottom: 16px;
-
-    .content {
-      font-size: 15px;
-      line-height: 1.85;
-
-      :deep(h2) {
-        font-size: 20px;
-        margin: 32px 0 12px;
-      }
-
-      :deep(h3) {
-        font-size: 17px;
-        margin: 24px 0 10px;
-      }
-
-      :deep(pre) {
-        padding: 14px 16px;
-        font-size: 12px;
-      }
-
-      :deep(table) {
-        display: block;
-        overflow-x: auto;
-      }
-    }
+    padding: 30px 32px;
   }
-
-  // 移动端底部浮动操作条
+}
+@media (max-width: 760px) {
+  .article-detail {
+    padding-top: 18px;
+    padding-bottom: 30px;
+  }
+  .breadcrumb {
+    font-size: 11px;
+  }
+  .article-content {
+    padding: 24px 18px;
+  }
+  .article-heading h1 {
+    font-size: 27px;
+  }
+  .article-meta {
+    font-size: 11px;
+    gap: 8px 12px;
+    padding-bottom: 20px;
+  }
+  .reading-options {
+    gap: 6px;
+  }
+  .reading-options button {
+    font-size: 11px;
+    padding-inline: 9px;
+  }
+  .content :deep(pre) {
+    padding-inline: 12px;
+    font-size: 12px;
+  }
   .article-actions {
-    position: fixed;
-    right: 14px;
-    bottom: 80px;
-    top: auto;
-    transform: none;
-    flex-direction: row;
-    gap: 10px;
-    display: flex;
-
-    .action-btn {
-      width: 46px;
-      height: 46px;
-
-      svg { width: 16px; height: 16px; }
-      .count { font-size: 9px; }
-    }
+    width: 100%;
+    gap: 0;
+    justify-content: space-around;
   }
+  .action-btn {
+    font-size: 11px;
+    padding-inline: 9px;
+  }
+  .action-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  .reader-comments {
+    padding-top: 10px;
+  }
+}
+.focus-exit {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  min-height: 44px;
+  padding: 8px 14px;
+  z-index: 110;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 12px;
+}
+.focus-mode {
+  padding-top: 70px;
 }
 </style>

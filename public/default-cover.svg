@@ -1,10 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
-  <rect width="800" height="450" fill="#f2ede8"/>
-  <circle cx="645" cy="78" r="155" fill="#e9e1d7"/>
-  <path d="M0 345Q200 240 400 345T800 345V450H0Z" fill="#d9d0c7"/>
-  <g fill="none" stroke="#86909c" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M335 160h100v110H335zM355 185h60M355 205h60M355 225h40"/>
-    <path d="m435 160 30 30v100H355v-20"/>
-  </g>
-  <text x="400" y="330" text-anchor="middle" fill="#4e5969" font-size="24" font-family="sans-serif">记录技术与生活</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400"><rect width="640" height="400" fill="#eae6d8"/><g stroke="#c5c8b5" fill="none"><path d="M58 72H582M58 136H582M58 200H582M58 264H582M58 328H582"/><path d="M116 40V360" stroke="#b59b66"/></g><rect x="160" y="112" width="310" height="176" rx="3" fill="#f8f5e9" stroke="#a6b09b"/><path d="M188 150H440M188 181H382M188 212H416M188 243H343" stroke="#687b68" stroke-width="5"/><path d="M490 97V297" stroke="#42634f" stroke-width="8"/></svg>

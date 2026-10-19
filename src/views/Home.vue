@@ -1,807 +1,710 @@
 <template>
-  <div class="home">
-    <!-- ── 主体布局 ─────────────────────────────────────── -->
-    <div class="page-layout">
-
-      <!-- 左侧侧边栏 -->
-      <aside class="sidebar sidebar-left">
-
-        <!-- 博主卡片 -->
-        <div class="sidebar-card author-card">
-          <span class="ac-deco ac-deco-tl"></span>
-          <span class="ac-deco ac-deco-tr"></span>
-          <div class="author-title gradient-text">{{ siteName || '时光博客' }}</div>
-          <div class="author-desc">
-            <span>{{ displayText }}</span><span class="tw-cursor" :class="{ blink: !isTyping }">|</span>
+  <div class="home container">
+    <section class="home-heading">
+      <div>
+        <p class="eyebrow">个人博客</p>
+        <h1>笔记与日常</h1>
+        <p>{{ config.site_description || '项目笔记、排错过程，偶尔记点别的。' }}</p>
+      </div>
+      <router-link to="/about">关于我 ↗</router-link>
+    </section>
+    <Skeleton v-if="loading" type="article-list" :count="3" />
+    <div v-else-if="loadError" class="empty-state" role="alert">
+      <h2>文章暂时没有加载出来</h2>
+      <p>稍后再试，或从文章索引继续浏览。</p>
+      <el-button @click="fetchArticles">重新加载</el-button
+      ><router-link to="/articles" class="text-link">文章索引 →</router-link>
+    </div>
+    <template v-else>
+      <section v-if="featured" class="feature-board" aria-label="选读与关于博客">
+        <router-link
+          :to="`/article/${featured.id}`"
+          class="feature-photo"
+          :class="{ 'without-cover': !featured.articleCover || failedFeatured }"
+        >
+          <img
+            v-if="featured.articleCover && !failedFeatured"
+            :src="featured.articleCover"
+            :alt="featured.articleName"
+            fetchpriority="high"
+            @error="failedFeatured = true"
+          />
+          <div class="feature-top">
+            <span>{{ featured.isRecommend === 1 ? '推荐选读' : '本月选读' }}</span
+            ><span>{{ featured.articleCategory }}</span>
           </div>
-          <div class="author-socials">
-            <a v-if="socialGithub" :href="socialGithub" target="_blank" class="ac-social github" title="GitHub">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
-            </a>
-            <a v-if="socialGitee" :href="socialGitee" target="_blank" class="ac-social gitee" title="Gitee">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.984 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.016 0zm6.09 5.333c.328 0 .593.266.592.593v1.482a.594.594 0 01-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.63c0 .327.266.592.593.592h5.63c.982 0 1.778-.796 1.778-1.778v-.296a.593.593 0 00-.592-.593h-4.15a.592.592 0 01-.592-.592v-1.482a.593.593 0 01.593-.592h6.815c.327 0 .593.265.593.592v3.408a4 4 0 01-4 4H5.926a.593.593 0 01-.593-.593V9.778a4.444 4.444 0 014.445-4.444h8.296z"/></svg>
-            </a>
-            <button v-if="socialEmail" class="ac-social email" title="复制邮箱" @click="copyEmail">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-            </button>
-            <button v-if="socialWechat" class="ac-social wechat" title="复制微信号" @click="copyWechat">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.295.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-5.972 2.981-7.853 1.141-.741 2.431-1.242 3.812-1.368.157-4.055-3.735-7.26-8.61-7.26zm-1.47 3.297a1.016 1.016 0 110 2.032 1.016 1.016 0 010-2.032zm4.047 0a1.016 1.016 0 110 2.032 1.016 1.016 0 010-2.032zm4.03 3.867c-3.988 0-7.22 2.73-7.22 6.103 0 3.372 3.232 6.104 7.22 6.104.868 0 1.7-.131 2.47-.363a.728.728 0 01.6.081l1.583.927a.271.271 0 00.14.046c.138 0 .248-.11.248-.249 0-.06-.023-.12-.04-.178l-.325-1.233a.494.494 0 01.178-.556C21.587 19.005 22.5 17.4 22.5 15.455c0-3.372-3.233-6.103-7.202-6.103zm-2.134 2.79a.854.854 0 110 1.708.854.854 0 010-1.708zm4.28 0a.854.854 0 110 1.708.854.854 0 010-1.708z"/></svg>
-            </button>
+          <div class="feature-caption">
+            <time>{{ formatTimestamp(featured.createTime) }}</time>
+            <h2>{{ featured.articleName }}</h2>
+            <p v-if="featured.summary">{{ featured.summary }}</p>
+            <span class="feature-open">翻开这篇文章 ↗</span>
           </div>
-        </div>
-
-        <!-- 公告 -->
-        <div class="sidebar-card">
-          <div class="sidebar-heading">
-            <span class="title-dot" style="background:linear-gradient(135deg,#ff7d00,#f53f3f)"></span>
-            公告
-          </div>
-          <ul v-if="notifications.length > 0" class="notice-list">
-            <li
-              v-for="item in notifications.slice(0, 3)"
-              :key="item.id"
-              class="notice-item"
-            >
-              <span class="notice-plain">
-                <span class="notice-dot" :class="`notice-dot--${item.type}`"></span>
-                {{ item.content }}
-              </span>
-            </li>
-          </ul>
-          <p v-else class="notice-text">欢迎来到我的博客，这里记录着技术成长与生活感悟。</p>
-        </div>
-
-      </aside>
-
-      <!-- 中间主内容 -->
-      <main class="center-col">
-
-        <div class="section-header">
-          <h2 class="section-title">最新文章</h2>
-          <router-link class="section-more" to="/articles">全部文章 →</router-link>
-        </div>
-
-        <div v-loading="loading">
-
-          <!-- 文章网格 -->
-          <div class="article-grid">
-            <div
-              class="article-card"
-              v-for="article in articles"
-              :key="article.id"
-              tabindex="0"
-              role="button"
-              :aria-label="article.articleName"
-              @click="viewArticle(article.id)"
-              @keydown.enter="viewArticle(article.id)"
-              @keydown.space.prevent="viewArticle(article.id)"
-            >
-              <div class="card-cover">
-                <img :src="article.articleCover || '/default-cover.svg'" :alt="article.articleName" loading="lazy" />
-                <span class="top-badge" v-if="article.isTop === 1">置顶</span>
-                <span class="cat-badge" v-if="article.articleCategory">{{ article.articleCategory }}</span>
+        </router-link>
+        <div class="feature-rail">
+          <router-link v-if="secondary" :to="`/article/${secondary.id}`" class="feature-note"
+            ><div>
+              <span class="eyebrow">接着读</span>
+              <h2>{{ secondary.articleName }}</h2>
+              <p>
+                {{ secondary.articleCategory }}
+                <span v-if="secondary.createTime"
+                  >· {{ formatTimestamp(secondary.createTime) }}</span
+                >
+                ↗
+              </p>
+            </div>
+            <img
+              v-if="secondary.articleCover"
+              :src="secondary.articleCover"
+              alt=""
+              @error="hideFailedImage"
+          /></router-link>
+          <aside class="author-note">
+            <span class="author-monogram" aria-hidden="true">{{
+              (config.site_name || '时光').slice(0, 1)
+            }}</span>
+            <div>
+              <div class="author-title">
+                <strong>{{ config.site_name || '时光博客' }}</strong
+                ><router-link to="/about">认识一下 ↗</router-link>
               </div>
-              <div class="card-body">
-                <div class="card-content">
-                  <h3 class="card-title">{{ article.articleName }}</h3>
-                </div>
-                <div class="card-footer">
-                  <span class="card-date">{{ formatTimestamp(article.createTime) }}</span>
-                  <div class="card-meta-right">
-                    <span class="card-reads" v-if="article.readNum"><el-icon style="vertical-align:-1px"><View /></el-icon> {{ article.readNum }}</span>
-                    <div class="card-tags" v-if="article.articleTag">
-                      <span
-                        class="tag"
-                        v-for="(tag, i) in parseTags(article.articleTag).slice(0, 1)"
-                        :key="i"
-                      >{{ tag }}</span>
-                    </div>
-                  </div>
-                </div>
+              <p>{{ config.website_motto || '写下解决问题的过程，也留住日常里的片刻。' }}</p>
+              <div class="author-socials">
+                <a
+                  v-if="config.social_github"
+                  :href="config.social_github"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >GitHub ↗</a
+                ><a
+                  v-if="config.social_gitee"
+                  :href="config.social_gitee"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Gitee ↗</a
+                ><button
+                  v-if="config.social_email"
+                  @click="copyContact(config.social_email, '邮箱')"
+                >
+                  邮箱</button
+                ><button
+                  v-if="config.social_wechat"
+                  @click="copyContact(config.social_wechat, '微信号')"
+                >
+                  微信
+                </button>
               </div>
             </div>
-          </div>
-
-          <div v-if="loadError && !loading" class="empty-state" role="alert">
-            <p>文章加载失败</p>
-            <el-button @click="fetchArticles">重新加载</el-button>
-          </div>
-          <div v-else-if="!loading && articles.length === 0" class="empty-state">
-            <el-icon class="empty-icon" :size="48"><Document /></el-icon>
-            <p>暂无文章，敬请期待</p>
-          </div>
-
+          </aside>
         </div>
-      </main>
-
-      <!-- 右侧侧边栏 -->
-      <aside class="sidebar sidebar-right">
-
-        <!-- 文章分类 -->
-        <div class="sidebar-card">
-          <div class="sidebar-heading">
-            <span class="title-dot" style="background:linear-gradient(135deg,#00b42a,#0fc6c2)"></span>
-            文章分类
+      </section>
+      <div class="content-layout">
+        <section>
+          <div class="section-heading">
+            <h2>最近更新 <small>本月文章</small></h2>
+            <router-link to="/articles">全部文章 →</router-link>
           </div>
-          <ul class="cat-list" v-if="categories.length > 0">
-            <li
-              class="cat-item"
-              v-for="cat in categories.slice(0, 10)"
-              :key="cat.id"
-            >
-              <router-link class="cat-link" :to="{ path: '/articles', query: { category: cat.name || cat.categoryName } }">
-                <span class="cat-dot"></span>
-                <span class="cat-name">{{ cat.name || cat.categoryName || '未命名' }}</span>
-                <span class="cat-count">{{ cat.num ?? cat.articleCount ?? cat.count ?? 0 }}</span>
-              </router-link>
-            </li>
-          </ul>
-          <p class="notice-text" v-else>暂无分类</p>
-        </div>
-
-        <!-- 标签云 -->
-        <div class="sidebar-card">
-          <div class="sidebar-heading">
-            <span class="title-dot" style="background:linear-gradient(135deg,#f53f3f,#722ed1)"></span>
-            标签云
+          <ArticleCard v-for="article in recentArticles" :key="article.id" :article="article" />
+          <div v-if="!articles.length" class="empty-state">
+            <h3>本月还没有新文章</h3>
+            <p>可以先看看往期笔记。</p>
+            <router-link to="/articles" class="text-link">浏览全部文章 →</router-link>
           </div>
-          <div v-if="tags.length" class="tag-cloud">
-            <router-link
-              v-for="(tag, i) in tags" :key="tag.id ?? tag.name"
-              class="cloud-tag"
-              :style="tagStyles[i]"
-              :to="{ path: '/tag/articles', query: { tag: tag.name || tag.tagName } }"
-            >{{ tag.name || tag.tagName }}</router-link>
-          </div>
-          <p v-else class="notice-text">暂无标签</p>
-        </div>
-
-      </aside>
-
-    </div>
+          <p v-else-if="!recentArticles.length" class="list-end">
+            本月的更新都在上方。<router-link to="/articles">继续看往期文章 →</router-link>
+          </p>
+        </section>
+        <aside class="sidebar">
+          <section class="side-block">
+            <h2>关于这里</h2>
+            <p>{{ config.site_description || '技术实践与日常记录，慢慢整理在这里。' }}</p>
+            <router-link to="/about" class="text-link">关于我 →</router-link>
+          </section>
+          <section v-if="notifications.length" class="side-block">
+            <h2>公告</h2>
+            <p v-for="notice in notifications.slice(0, 3)" :key="notice.id" class="notice">
+              {{ notice.content }}
+            </p>
+          </section>
+          <section class="side-block">
+            <h2>分类</h2>
+            <div class="category-list">
+              <router-link
+                v-for="category in categories"
+                :key="category.id || category.categoryName || category.name"
+                :to="{
+                  path: '/articles',
+                  query: { category: category.categoryName || category.name }
+                }"
+                >{{ category.categoryName || category.name
+                }}<span
+                  v-if="(category.articleCount ?? category.count ?? category.num) !== undefined"
+                  >{{ category.articleCount ?? category.count ?? category.num }}</span
+                ></router-link
+              >
+            </div>
+            <router-link to="/category" class="text-link">全部分类 →</router-link>
+          </section>
+          <section class="side-block">
+            <h2>标签</h2>
+            <div class="tag-list">
+              <router-link
+                v-for="tag in tags.slice(0, 12)"
+                :key="tag.id || tag.tagName || tag.name"
+                :to="{ path: '/tag/articles', query: { tag: tag.tagName || tag.name } }"
+                >#{{ tag.tagName || tag.name }}</router-link
+              >
+            </div>
+            <router-link to="/tag" class="text-link">浏览标签 →</router-link>
+          </section>
+          <router-link to="/album" class="album-link"
+            ><span>换个心情</span><strong>去相册走走 ↗</strong>
+            <p>看看文字之外的日常。</p></router-link
+          >
+        </aside>
+      </div>
+    </template>
   </div>
 </template>
-
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { getMonthArticleList, getCategoryList, getTagList, getNotificationList } from '@/api/article'
-import { formatTimestamp, parseTags } from '@/utils/format'
-import { fetchWebsiteConfigWithCache, useWebsiteConfigRefresh } from '@/utils/websiteConfig'
-import { Document, View } from '@element-plus/icons-vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { ElMessage } from 'element-plus/es/components/message/index'
-
-const router = useRouter()
-let disposed = false
-
-
-interface Article {
-  id: number
-  articleName: string
-  articleCover?: string
-  articleTag?: string
-  articleCategory?: string
-  readNum?: number
-  createTime?: number
-  isTop?: number
-}
+import {
+  getCategoryList,
+  getMonthArticleList,
+  getNotificationList,
+  getTagList
+} from '@/api/article'
+import { fetchWebsiteConfigWithCache, useWebsiteConfigRefresh } from '@/utils/websiteConfig'
+import type { WebsiteConfig } from '@/utils/websiteConfig'
+import type { ArticleSummary } from '@/types/article'
+import { formatTimestamp } from '@/utils/format'
+import { createLatestRequest } from '@/utils/latestRequest'
+import ArticleCard from '@/components/ArticleCard.vue'
+import Skeleton from '@/components/Skeleton.vue'
 
 interface Category {
   id?: number
-  name?: string
   categoryName?: string
-  num?: number
-  count?: number
-  articleCount?: number
-}
-
-interface Tag {
-  id?: string | number
   name?: string
-  tagName?: string
+  articleCount?: number
+  count?: number
   num?: number
 }
-
-interface NotificationItem {
+interface Tag {
+  id?: number | string
+  tagName?: string
+  name?: string
+}
+interface Notice {
   id: number
-  type: string
   content: string
   status: number
 }
-
-const articles = ref<Article[]>([])
+const articles = ref<ArticleSummary[]>([])
 const categories = ref<Category[]>([])
 const tags = ref<Tag[]>([])
-const notifications = ref<NotificationItem[]>([])
-const loading = ref(false)
+const notifications = ref<Notice[]>([])
+const config = ref<WebsiteConfig>({})
+const loading = ref(true)
 const loadError = ref(false)
-const siteName = ref('')
-const socialGithub = ref('')
-const socialGitee = ref('')
-const socialEmail = ref('')
-const socialWechat = ref('')
-
-const copyText = async (text: string, label: string) => {
-  if (!text) return
-  try {
-    await navigator.clipboard.writeText(text)
-  } catch {
-    const el = document.createElement('textarea')
-    el.value = text
-    document.body.appendChild(el)
-    el.select()
-    document.execCommand('copy')
-    document.body.removeChild(el)
-  }
-  ElMessage.success(`${label}已复制到剪贴板`)
-}
-
-const copyEmail  = () => copyText(socialEmail.value,  '邮箱号')
-const copyWechat = () => copyText(socialWechat.value, '微信号')
-
-
-const phrases = ['记录技术与生活', '分享所见所闻', '用文字留住时光']
-const displayText = ref('')
-const isTyping = ref(true)
-let typeTimer: ReturnType<typeof setTimeout>
-
-const runTypewriter = (pi = 0, ci = 0, del = false) => {
-  if (disposed) return
-  const phrase = phrases[pi] ?? ''
-  if (!del) {
-    displayText.value = phrase.slice(0, ci + 1)
-    isTyping.value = true
-    if (ci < phrase.length - 1) {
-      typeTimer = setTimeout(() => runTypewriter(pi, ci + 1), 100)
-    } else {
-      isTyping.value = false
-      typeTimer = setTimeout(() => runTypewriter(pi, ci, true), 2200)
-    }
-  } else {
-    displayText.value = phrase.slice(0, ci)
-    isTyping.value = true
-    if (ci > 0) {
-      typeTimer = setTimeout(() => runTypewriter(pi, ci - 1, true), 55)
-    } else {
-      typeTimer = setTimeout(() => runTypewriter((pi + 1) % phrases.length, 0), 400)
-    }
-  }
-}
-
-const fetchArticles = async () => {
-  loadError.value = false
-  loading.value = true
-  try {
-    const res: any = await getMonthArticleList({ pageNo: 1, pageSize: 12 })
-    if (disposed) return
-    if (res?.list) articles.value = res.list
-    else if (Array.isArray(res)) articles.value = res
-  } catch { if (!disposed) loadError.value = true } finally {
-    if (!disposed) loading.value = false
-  }
-}
-
-const fetchConfig = async () => {
-  try {
-    const config = await fetchWebsiteConfigWithCache()
-    if (disposed) return
-    if (config.site_name) siteName.value = config.site_name
-    socialGithub.value = config.social_github || ''
-    socialGitee.value = config.social_gitee || ''
-    socialEmail.value = config.social_email || ''
-    socialWechat.value = config.social_wechat || ''
-  } catch { /* 静默 */ }
-}
-
-const fetchNotifications = async () => {
-  try {
-    const res: any = await getNotificationList()
-    if (disposed) return
-    const list = Array.isArray(res) ? res : (res?.list ?? [])
-    notifications.value = list.filter((item: NotificationItem) => item.status === 1)
-  } catch { /* 静默 */ }
-}
-
-const fetchCategories = async () => {
-  try {
-    const res: any = await getCategoryList({ pageSize: 100 })
-    if (disposed) return
-    if (res?.list) { categories.value = res.list }
-    else if (Array.isArray(res)) { categories.value = res }
-  } catch { /* 静默 */ }
-}
-
-const fetchTags = async () => {
-  try {
-    const res: any = await getTagList({ pageSize: 200 })
-    if (disposed) return
-    if (res?.list) { tags.value = res.list }
-    else if (Array.isArray(res)) { tags.value = res }
-  } catch { /* 静默 */ }
-}
-
-let idleId: ReturnType<typeof requestIdleCallback> | null = null
-let idleTimer: ReturnType<typeof setTimeout> | undefined
-
-const TAG_COLORS = [
-  ['#e8f0ff', '#165dff'], ['#f3e8ff', '#722ed1'], ['#fff3e8', '#ff7d00'],
-  ['#ffe8e8', '#f53f3f'], ['#e8fff0', '#00b42a'], ['#e8fffe', '#0fc6c2'],
-  ['#fff8e8', '#f77234'], ['#f0ffe8', '#9fdb1d'],
-]
-
-const tagStyles = computed(() =>
-  tags.value.map((_, i) => {
-    const [bg, color] = TAG_COLORS[i % TAG_COLORS.length] ?? ['#e8f0ff', '#165dff']
-    return { background: bg, color, borderColor: color + '55' }
-  })
+const failedFeatured = ref(false)
+const articleRequest = createLatestRequest()
+let disposed = false
+const listOf = <T,>(value: unknown): T[] =>
+  Array.isArray(value) ? (value as T[]) : (value as { list?: T[] } | null)?.list || []
+const featured = computed(
+  () =>
+    articles.value.find((a) => a.isRecommend === 1 && a.articleCover) ||
+    articles.value.find((a) => a.articleCover) ||
+    articles.value[0]
 )
-
-const viewArticle = (id: number) => router.push(`/article/${id}`)
-
-useWebsiteConfigRefresh(() => { void fetchConfig() })
-onMounted(async () => {
-  // 阶段1：关键路径，影响首屏可见内容
-  await Promise.all([fetchArticles(), fetchConfig()])
-  if (disposed) return
-
-  // 阶段2：侧边栏次要数据
-  fetchCategories()
-
-  // 阶段3：非关键数据，浏览器空闲时加载
-  if (typeof requestIdleCallback !== 'undefined') {
-    idleId = requestIdleCallback(() => {
-      if (disposed) return
-      void fetchTags()
-      void fetchNotifications()
-    }, { timeout: 2000 })
-  } else {
-    idleTimer = setTimeout(() => {
-      if (disposed) return
-      void fetchTags()
-      void fetchNotifications()
-    }, 200)
+const secondary = computed(() => articles.value.find((a) => a.id !== featured.value?.id))
+const recentArticles = computed(() =>
+  articles.value.filter((a) => a.id !== featured.value?.id && a.id !== secondary.value?.id)
+)
+const fetchArticles = async () => {
+  const requestId = articleRequest.next()
+  loading.value = true
+  loadError.value = false
+  try {
+    const response = await getMonthArticleList({ pageNo: 1, pageSize: 12 })
+    if (disposed || !articleRequest.isCurrent(requestId)) return
+    articles.value = listOf<ArticleSummary>(response)
+    failedFeatured.value = false
+  } catch {
+    if (!disposed && articleRequest.isCurrent(requestId)) loadError.value = true
+  } finally {
+    if (!disposed && articleRequest.isCurrent(requestId)) loading.value = false
   }
-
-  typeTimer = setTimeout(() => runTypewriter(), 800)
+}
+const fetchConfig = async () => {
+  const value = await fetchWebsiteConfigWithCache()
+  if (!disposed) config.value = value
+}
+const hideFailedImage = (event: Event) => {
+  ;(event.target as HTMLImageElement).style.display = 'none'
+}
+const copyContact = async (value: string, label: string) => {
+  try {
+    await navigator.clipboard.writeText(value)
+    ElMessage.success(`${label}已复制`)
+  } catch {
+    ElMessage.info(`${label}：${value}`)
+  }
+}
+useWebsiteConfigRefresh(() => {
+  void fetchConfig()
+})
+onMounted(() => {
+  void fetchArticles()
+  void fetchConfig()
+  void Promise.allSettled([
+    getCategoryList({ pageSize: 100 }),
+    getTagList({ pageSize: 200 }),
+    getNotificationList()
+  ]).then((results) => {
+    if (disposed) return
+    const [categoryResult, tagResult, noticeResult] = results
+    if (categoryResult?.status === 'fulfilled')
+      categories.value = listOf<Category>(categoryResult.value)
+    if (tagResult?.status === 'fulfilled') tags.value = listOf<Tag>(tagResult.value)
+    if (noticeResult?.status === 'fulfilled')
+      notifications.value = listOf<Notice>(noticeResult.value).filter((item) => item.status === 1)
+  })
 })
 onUnmounted(() => {
   disposed = true
-  clearTimeout(typeTimer)
-  clearTimeout(idleTimer)
-  if (idleId !== null) cancelIdleCallback(idleId)
+  articleRequest.invalidate()
 })
 </script>
-
 <style scoped lang="scss">
 .home {
-  background: var(--bg-primary);
-  position: relative;
-
-  &::before {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 220px;
-    background: linear-gradient(105deg, #165dff 0%, #722ed1 50%, #f53f3f 100%);
-    opacity: 0.12;
-    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
-    pointer-events: none;
-    z-index: 0;
-  }
+  padding-top: 24px;
+  padding-bottom: 60px;
 }
-
-[data-theme="dark"] .home::before {
-  opacity: 0.18;
-}
-
-
-.tw-cursor {
-  display: inline-block;
-  font-weight: 300;
-  margin-left: 1px;
-  &.blink { animation: blink 1s step-end infinite; }
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-// ── 主体布局 ──────────────────────────────────────────
-.page-layout {
-  position: relative;
-  z-index: 1;
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 96px 32px 32px;
-  display: grid;
-  grid-template-columns: 220px minmax(0, 1fr) 220px;
-  gap: 24px;
-  align-items: start;
-}
-
-// ── 侧边栏 ────────────────────────────────────────────
-.sidebar {
+.home-heading {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-  position: sticky;
-  top: 72px;
-  min-width: 0;
-}
-
-.sidebar-right {
-  top: 72px;
-}
-
-.sidebar-card {
-  background: var(--bg-card);
-  border-radius: var(--radius-card);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
-  transition: box-shadow 0.3s;
-  &:hover { box-shadow: var(--shadow-card); }
-}
-
-.author-card {
-  position: relative;
-  padding: 28px 18px 24px;
-  text-align: center;
-  overflow: visible;
-
-  .ac-deco {
-    position: absolute;
-    border-radius: 3px;
-    transform: rotate(45deg);
-    opacity: 0.45;
-  }
-  .ac-deco-tl { top: 18px; left: 22px; width: 10px; height: 10px; background: #165dff; }
-  .ac-deco-tr { top: 22px; right: 26px; width: 7px; height: 7px; background: #722ed1; }
-
-  .author-title {
-    font-family: var(--font-display);
-    font-size: 26px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    margin-bottom: 10px;
-  }
-
-  .author-desc {
-    font-size: 13px;
-    color: var(--text-tertiary);
-    line-height: 1.6;
-    min-height: 22px;
-  }
-
-  .author-socials {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
-    flex-wrap: wrap;
-  }
-
-  .ac-social {
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    border: none; cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    svg { width: 14px; height: 14px; }
-    &:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.22); color: #fff; }
-    &.github  { background: #24292f; }
-    &.gitee   { background: #c71d23; }
-    &.email   { background: #165dff; }
-    &.wechat  { background: #07c160; }
-  }
-
-}
-
-
-
-.sidebar-heading {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 14px; font-weight: 700; color: var(--text-primary);
-  padding: 14px 16px 10px;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 0 22px;
   border-bottom: 1px solid var(--border-color);
-  .title-dot {
-    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-  }
+  margin-bottom: 22px;
+  gap: 20px;
 }
-
-
-// 公告
-.notice-text {
-  font-size: 13px; color: var(--text-secondary);
-  line-height: 1.8; padding: 12px 16px;
+.home-heading h1 {
+  font: 500 36px/1.4 var(--font-serif);
+  margin: 5px 0 8px;
 }
-
-.notice-list {
-  list-style: none;
-  padding: 8px 0;
-}
-
-.notice-item {
-  padding: 0;
-}
-
-.notice-plain {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 7px 16px;
+.home-heading p:last-child {
   font-size: 13px;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  transition: color 0.2s, background 0.2s;
-  text-decoration: none;
+  max-width: 760px;
 }
-
-.notice-dot {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: var(--border-strong);
-  flex-shrink: 0;
-  margin-top: 6px;
-  transition: background 0.2s;
-  &--activity     { background: #ff7d00; }
-  &--announcement { background: #f53f3f; }
-  &--update       { background: #165dff; }
-  &--tip          { background: #00b42a; }
-}
-
-// 分类列表
-.cat-list {
-  list-style: none;
-  padding: 8px 0;
-}
-
-.cat-link {
+.home-heading > a {
+  font-size: 12px;
+  white-space: nowrap;
+  min-height: 44px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  cursor: pointer;
-  transition: background 0.2s;
-  &:hover {
-    background: var(--bg-secondary);
-    .cat-name { color: var(--color-accent); }
-    .cat-dot { background: var(--color-accent); }
-  }
 }
-
-.cat-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--border-strong); flex-shrink: 0;
-  transition: background 0.2s;
+.feature-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(300px, 1fr);
+  gap: 22px;
+  margin-bottom: 38px;
 }
-
-.cat-name {
-  flex: 1;
-  font-size: 13px; color: var(--text-secondary);
-  transition: color 0.2s;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+.feature-photo {
+  position: relative;
+  min-height: 380px;
+  color: #fffdf4;
+  background: var(--bg-feature);
+  border-radius: 4px;
+  overflow: hidden;
 }
-
-.cat-count {
+.feature-photo > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+.feature-photo:hover > img {
+  transform: scale(1.02);
+}
+.feature-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #14201a18 20%, #101d13e6);
+}
+.feature-photo.without-cover {
+  background-color: #203631;
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, #ffffff09 40px);
+}
+.feature-top {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
   font-size: 11px;
-  color: var(--text-tertiary);
-  background: var(--bg-secondary);
-  padding: 1px 7px;
-  border-radius: 10px;
-  min-width: 24px; text-align: center;
+  z-index: 1;
 }
-
-// 标签云
-.tag-cloud {
-  padding: 16px;
+.feature-top span:first-child {
+  background: #f3ecda;
+  color: #4d513e;
+  padding: 4px 9px;
+}
+.feature-top span:last-child {
+  text-shadow: 0 1px 4px #000;
+}
+.feature-caption {
+  position: absolute;
+  bottom: 26px;
+  left: 28px;
+  right: 28px;
+  z-index: 1;
+}
+.feature-caption time {
+  color: #e0ddc9;
+  font-size: 11px;
+}
+.feature-caption h2 {
+  color: inherit;
+  font: 500 clamp(27px, 2.7vw, 40px)/1.45 var(--font-serif);
+  max-width: 820px;
+  margin-top: 10px;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.feature-caption p {
+  font-size: 13px;
+  margin-top: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #ebe8dc;
+}
+.feature-open {
+  display: inline-block;
+  font-size: 12px;
+  margin-top: 16px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #d1c6a6;
+}
+.feature-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+.feature-note {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 18px;
+  padding: 24px;
+  background: var(--bg-feature);
+  color: var(--text-on-feature);
+  border-radius: 4px;
+}
+.feature-note > div {
+  min-width: 0;
+  flex: 1;
+}
+.feature-note .eyebrow {
+  color: #d1bc85;
+}
+.feature-note h2 {
+  color: inherit;
+  font: 500 23px/1.6 var(--font-serif);
+  margin: 10px 0 14px;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.feature-note p {
+  font-size: 11px;
+  color: #c3d0bd;
+}
+.feature-note img {
+  width: 120px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 3px;
+}
+.author-note {
+  background: var(--bg-secondary);
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 14px;
+  border-radius: 4px;
+  flex: 1;
+  align-content: center;
+}
+.author-monogram {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border-strong);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font: 23px var(--font-serif);
+  color: var(--color-accent);
+}
+.author-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  font-size: 13px;
+}
+.author-title strong {
+  color: var(--text-primary);
+}
+.author-title a {
+  white-space: nowrap;
+  font-size: 11px;
+}
+.author-note p {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.9;
+}
+.author-socials {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 11px;
 }
-
-.cloud-tag {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  max-width: 100%;
-  padding: 5px 11px;
-  border-radius: var(--radius-tag);
-  border: 1px solid;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  overflow-wrap: anywhere;
-  line-height: 1.5;
-  transition: filter 0.2s, transform 0.2s;
-  &:hover {
-    filter: brightness(0.95) saturate(1.2);
-    transform: translateY(-2px);
-  }
+.author-socials button {
+  background: transparent;
+  border: 0;
+  color: var(--color-accent);
 }
-
-// ── 主内容 ────────────────────────────────────────────
-.center-col { min-width: 0; font-family: var(--font-article); }
-
-.section-header {
-  display: flex; align-items: center; justify-content: space-between;
-  min-height: 32px;
-  margin-bottom: 16px;
-}
-
-.section-title {
-  font-family: var(--font-serif);
-  font-size: 20px; font-weight: 700; color: var(--text-primary);
-  display: flex; align-items: center; gap: 10px;
-  &::before {
-    content: '';
-    display: block; width: 4px; height: 20px;
-    background: var(--gradient-accent); border-radius: 2px;
-  }
-}
-
-.section-more {
-  font-size: 13px; color: var(--color-accent); font-weight: 500;
-  transition: opacity 0.2s;
-  &:hover { opacity: 0.7; }
-}
-
-// ── 文章网格 ──────────────────────────────────────────
-.article-grid {
+.content-layout {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-  align-items: stretch;
+  grid-template-columns: minmax(0, 1fr) clamp(250px, 20vw, 340px);
+  gap: 40px;
 }
-
-.article-card {
-  background: var(--bg-card);
-  border-radius: var(--radius-card);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-  display: flex;
-  flex-direction: column;
+.content-layout > section {
   min-width: 0;
-
-  &:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; }
-
-  &:hover {
-    box-shadow: var(--shadow-card-hover);
-    transform: translateY(-4px);
-    border-color: var(--color-accent);
-    .card-cover img { transform: scale(1.06); }
-    .card-title { color: var(--color-accent-hover); }
+}
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.section-heading h2 {
+  font: 500 23px var(--font-serif);
+}
+.section-heading h2::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 17px;
+  background: var(--color-ochre);
+  margin-right: 10px;
+}
+.section-heading small {
+  font: 11px var(--font-sans);
+  color: var(--text-tertiary);
+  margin-left: 8px;
+}
+.section-heading > a {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.side-block {
+  padding: 24px 0;
+  border-top: 1px solid var(--border-color);
+}
+.side-block:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+.side-block h2 {
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+.side-block p {
+  font-size: 13px;
+  line-height: 1.9;
+}
+.notice + .notice {
+  margin-top: 12px;
+}
+.text-link {
+  display: inline-block;
+  font-size: 12px;
+  color: var(--color-accent);
+  padding-block: 10px;
+}
+.category-list a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 44px;
+  font-size: 13px;
+}
+.category-list span {
+  color: var(--text-tertiary);
+  font-size: 11px;
+}
+.tag-list {
+  display: flex;
+  gap: 8px 16px;
+  flex-wrap: wrap;
+}
+.tag-list a {
+  font-size: 12px;
+  min-height: 28px;
+}
+.album-link {
+  display: block;
+  padding: 24px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+.album-link span {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+.album-link strong {
+  display: block;
+  font: 22px var(--font-serif);
+  margin: 9px 0;
+}
+.album-link p {
+  font-size: 12px;
+}
+.list-end {
+  padding: 28px 0;
+  font-size: 13px;
+}
+.list-end a {
+  margin-left: 8px;
+  color: var(--color-accent);
+}
+@media (min-width: 1600px) {
+  .feature-photo {
+    min-height: 420px;
   }
-
-  .card-cover {
-    position: relative;
-    aspect-ratio: 16/9;
-    overflow: hidden;
-    background: var(--bg-secondary);
-    flex-shrink: 0;
-    img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
-    .top-badge {
-      position: absolute; top: 8px; left: 8px;
-      background: var(--gradient-warm); color: #fff;
-      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 8px;
-    }
-    .cat-badge {
-      position: absolute; bottom: 8px; left: 8px;
-      background: rgba(0,0,0,0.55); color: #fff;
-      backdrop-filter: blur(4px);
-      font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 8px;
-    }
+}
+@media (max-width: 1100px) {
+  .feature-board {
+    grid-template-columns: 1.3fr 1fr;
   }
-
-  .card-body {
-    flex: 1;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
+  .feature-note img {
+    display: none;
   }
-
-  .card-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  .content-layout {
+    gap: 28px;
   }
-
-  .card-title {
-    font-family: var(--font-article);
-    font-size: 15px; font-weight: 600; color: var(--text-primary);
-    line-height: 1.65;
-    min-height: 3.3em;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    overflow-wrap: anywhere;
-    transition: color 0.2s; margin: 0;
+  .author-note {
+    padding: 18px;
   }
-
-  .card-footer {
-    display: flex; align-items: center; justify-content: space-between;
-    padding-top: 12px;
-    margin-top: 14px;
-    gap: 8px;
-    border-top: 1px solid var(--border-color);
-    flex-wrap: wrap;
+  .feature-note {
+    padding: 20px;
   }
-
-  .card-date { font-size: 12px; color: var(--text-tertiary); white-space: nowrap; }
-
-  .card-meta-right {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
+}
+@media (max-width: 760px) {
+  .home {
+    padding-top: 20px;
   }
-
-  .card-reads {
+  .home-heading h1 {
+    font-size: 29px;
+  }
+  .home-heading p:last-child {
     font-size: 12px;
-    color: var(--text-tertiary);
   }
-
-  .card-tags { display: flex; gap: 4px; }
-
-  .tag {
-    max-width: 88px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    padding: 1px 7px; border-radius: 6px;
-    background: var(--bg-secondary); color: var(--text-secondary);
-    font-size: 11px; border: 1px solid var(--border-color);
-    transition: all 0.2s;
-    &:hover { border-color: var(--color-accent); color: var(--color-accent); }
+  .home-heading > a {
+    font-size: 11px;
+  }
+  .feature-board {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    margin-bottom: 30px;
+  }
+  .feature-photo {
+    min-height: 310px;
+  }
+  .feature-caption {
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+  }
+  .feature-caption h2 {
+    font-size: 28px;
+  }
+  .feature-top {
+    left: 20px;
+    right: 20px;
+    top: 16px;
+  }
+  .feature-caption p {
+    font-size: 12px;
+  }
+  .feature-rail {
+    gap: 12px;
+  }
+  .feature-note {
+    padding: 18px;
+  }
+  .feature-note h2 {
+    font-size: 20px;
+    margin: 5px 0 10px;
+  }
+  .feature-note img {
+    display: block;
+    width: 96px;
+    height: 78px;
+  }
+  .author-note {
+    padding: 18px;
+  }
+  .author-note p {
+    font-size: 12px;
+  }
+  .content-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+  .section-heading h2 {
+    font-size: 20px;
+  }
+  .section-heading small {
+    display: none;
+  }
+  .sidebar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+  .side-block:first-child {
+    border-top: 1px solid var(--border-color);
+    padding-top: 24px;
+  }
+  .album-link {
+    grid-column: 1 / -1;
   }
 }
-
-.empty-state {
-  grid-column: 1 / -1;
-  text-align: center; padding: 64px 0; color: var(--text-tertiary);
-  .empty-icon { font-size: 48px; margin-bottom: 12px; }
-  p { font-size: 15px; }
-}
-
-// ── 响应式 ────────────────────────────────────────────
-@media (max-width: 1200px) {
-  .page-layout { grid-template-columns: 190px minmax(0, 1fr) 190px; gap: 20px; padding-inline: 24px; }
-  .article-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-@media (max-width: 1024px) {
-  /* 右 sidebar 折叠到主内容下方 */
-  .page-layout { grid-template-columns: 200px minmax(0, 1fr); }
-  .sidebar-right { grid-column: 2; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); position: static; align-items: start; }
-}
-
-@media (max-width: 860px) {
-  .page-layout { grid-template-columns: minmax(0, 1fr); padding-top: 88px; }
-  .center-col { grid-row: 1; }
-  .sidebar-left { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); position: static; align-items: start; }
-  .sidebar-right { grid-column: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-@media (max-width: 640px) {
-  .article-grid { grid-template-columns: 1fr; }
-  .sidebar-left, .sidebar-right { grid-template-columns: 1fr; }
-  .page-layout { padding: 84px 16px 24px; gap: 24px; }
-  .section-title { font-size: 19px; }
-  .cloud-tag { min-height: 36px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cloud-tag { transition: none; &:hover { transform: none; } }
-  .article-card { transition: none; &:hover { transform: none; } }
+@media (max-width: 400px) {
+  .sidebar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .feature-caption h2 {
+    font-size: 26px;
+  }
 }
 </style>

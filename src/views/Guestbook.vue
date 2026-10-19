@@ -1,13 +1,10 @@
 <template>
   <div class="guestbook">
     <!-- Banner -->
-    <div class="page-banner">
-      <div class="banner-mask"></div>
-      <div class="banner-content">
-        <h1 class="banner-title">留言板</h1>
-        <p class="banner-sub">欢迎留下你的足迹 · 每一条留言都是珍贵的缘分</p>
-      </div>
-    </div>
+    <header class="page-header container">
+      <h1>留言板</h1>
+      <p>有问题或建议可以写在这里。留言审核通过后公开展示。</p>
+    </header>
 
     <div class="container">
       <div class="layout">
@@ -21,7 +18,7 @@
                 写下你的留言
               </h3>
               <el-form :model="messageForm" label-width="0">
-                <el-form-item>
+                <el-form-item label="昵称（必填）" label-position="top">
                   <el-input
                     v-model="messageForm.name"
                     placeholder="你的昵称"
@@ -30,7 +27,11 @@
                     clearable
                   />
                 </el-form-item>
-                <el-form-item v-if="!userStore.isLoggedIn">
+                <el-form-item
+                  v-if="!userStore.isLoggedIn"
+                  label="联系邮箱（选填，不公开）"
+                  label-position="top"
+                >
                   <el-input
                     v-model="messageForm.email"
                     placeholder="邮箱（选填）"
@@ -38,12 +39,12 @@
                     clearable
                   />
                 </el-form-item>
-                <el-form-item>
+                <el-form-item label="留言内容" label-position="top">
                   <el-input
                     v-model="messageForm.content"
                     type="textarea"
                     :rows="5"
-                    placeholder="说点什么吧~ 分享你的心情、想法或者祝福..."
+                    placeholder="分享你的想法，或留下一个问题。"
                     maxlength="500"
                     show-word-limit
                   />
@@ -55,30 +56,56 @@
                     <div class="upload-title">上传图片（最多9张）</div>
                     <div class="image-list" v-if="imageList.length > 0">
                       <div class="image-item" v-for="(image, index) in imageList" :key="image.id">
-                        <img :src="image.url" alt="预览图">
+                        <img :src="image.url" alt="预览图" />
                         <div class="image-overlay">
-                          <el-icon class="preview-icon" @click="previewImage(image.url)"><ZoomIn /></el-icon>
-                          <el-icon class="delete-icon" @click="removeImage(index)"><Delete /></el-icon>
+                          <el-icon class="preview-icon" @click="previewImage(image.url)"
+                            ><ZoomIn
+                          /></el-icon>
+                          <el-icon class="delete-icon" @click="removeImage(index)"
+                            ><Delete
+                          /></el-icon>
                         </div>
                         <div class="upload-progress" v-if="image.uploading">
-                          <el-progress :percentage="image.progress" :stroke-width="3" :show-text="false" />
+                          <el-progress
+                            :percentage="image.progress"
+                            :stroke-width="3"
+                            :show-text="false"
+                          />
                         </div>
                       </div>
                       <div class="upload-btn" v-if="imageList.length < 9" @click="triggerUpload">
                         <el-icon><Plus /></el-icon>
                       </div>
                     </div>
-                    <div class="upload-area" v-else @click="triggerUpload" @dragover.prevent @drop.prevent="handleDrop">
+                    <div
+                      class="upload-area"
+                      v-else
+                      @click="triggerUpload"
+                      @dragover.prevent
+                      @drop.prevent="handleDrop"
+                    >
                       <el-icon class="upload-icon"><Upload /></el-icon>
                       <div class="upload-text">点击或拖拽图片上传</div>
                       <div class="upload-tip">JPG · PNG · GIF，单张 ≤ 5MB</div>
                     </div>
-                    <input ref="fileInput" type="file" accept="image/*" multiple style="display:none" @change="handleFileChange" />
+                    <input
+                      ref="fileInput"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      style="display: none"
+                      @change="handleFileChange"
+                    />
                   </div>
                 </el-form-item>
 
                 <el-form-item>
-                  <el-button type="primary" class="submit-btn" :loading="submitting" @click="submitMessage">
+                  <el-button
+                    type="primary"
+                    class="submit-btn"
+                    :loading="submitting"
+                    @click="submitMessage"
+                  >
                     发表留言
                   </el-button>
                 </el-form-item>
@@ -372,7 +399,7 @@ const submitMessage = async () => {
   .banner-mask {
     position: absolute;
     inset: 0;
-    background: rgba(5, 12, 30, 0.60);
+    background: rgba(5, 12, 30, 0.6);
   }
 
   .banner-content {
@@ -392,7 +419,7 @@ const submitMessage = async () => {
 
     .banner-sub {
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.70);
+      color: rgba(255, 255, 255, 0.7);
       margin: 0;
       letter-spacing: 0.06em;
     }
@@ -431,7 +458,9 @@ const submitMessage = async () => {
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
   overflow: hidden;
-  transition: box-shadow 0.3s, border-color 0.3s;
+  transition:
+    box-shadow 0.3s,
+    border-color 0.3s;
 
   &:hover {
     box-shadow: var(--shadow-card-hover);
@@ -466,7 +495,9 @@ const submitMessage = async () => {
       }
     }
 
-    :deep(.el-form-item) { margin-bottom: 14px; }
+    :deep(.el-form-item) {
+      margin-bottom: 14px;
+    }
 
     :deep(.el-input__wrapper) {
       border-radius: 10px;
@@ -474,7 +505,10 @@ const submitMessage = async () => {
       box-shadow: 0 0 0 1px var(--border-color) inset;
       transition: box-shadow 0.2s;
 
-      &:hover, &.is-focus { box-shadow: 0 0 0 1px var(--color-accent) inset; }
+      &:hover,
+      &.is-focus {
+        box-shadow: 0 0 0 1px var(--color-accent) inset;
+      }
     }
 
     :deep(.el-textarea__inner) {
@@ -486,7 +520,9 @@ const submitMessage = async () => {
       resize: vertical;
       transition: border-color 0.2s;
 
-      &:focus { border-color: var(--color-accent); }
+      &:focus {
+        border-color: var(--color-accent);
+      }
     }
 
     .submit-btn {
@@ -499,7 +535,10 @@ const submitMessage = async () => {
       font-weight: 700;
       letter-spacing: 0.08em;
       color: #fff;
-      transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+      transition:
+        opacity 0.2s,
+        transform 0.2s,
+        box-shadow 0.2s;
       box-shadow: 0 4px 16px rgba(22, 93, 255, 0.28);
 
       &:hover {
@@ -507,7 +546,9 @@ const submitMessage = async () => {
         transform: translateY(-1px);
         box-shadow: 0 8px 24px rgba(22, 93, 255, 0.36);
       }
-      &:active { transform: translateY(0); }
+      &:active {
+        transform: translateY(0);
+      }
     }
 
     // 上传区
@@ -528,17 +569,33 @@ const submitMessage = async () => {
         text-align: center;
         cursor: pointer;
         background: var(--bg-secondary);
-        transition: border-color 0.2s, background 0.2s;
+        transition:
+          border-color 0.2s,
+          background 0.2s;
 
         &:hover {
           border-color: var(--color-accent);
           background: var(--bg-card);
-          .upload-icon { color: var(--color-accent); }
+          .upload-icon {
+            color: var(--color-accent);
+          }
         }
 
-        .upload-icon { font-size: 26px; color: var(--text-tertiary); margin-bottom: 8px; transition: color 0.2s; }
-        .upload-text { font-size: 13px; color: var(--text-secondary); margin-bottom: 2px; }
-        .upload-tip { font-size: 11px; color: var(--text-tertiary); }
+        .upload-icon {
+          font-size: 26px;
+          color: var(--text-tertiary);
+          margin-bottom: 8px;
+          transition: color 0.2s;
+        }
+        .upload-text {
+          font-size: 13px;
+          color: var(--text-secondary);
+          margin-bottom: 2px;
+        }
+        .upload-tip {
+          font-size: 11px;
+          color: var(--text-tertiary);
+        }
       }
 
       .image-list {
@@ -555,14 +612,22 @@ const submitMessage = async () => {
           background: var(--bg-secondary);
           border: 1px solid var(--border-color);
 
-          &:hover .image-overlay { opacity: 1; }
+          &:hover .image-overlay {
+            opacity: 1;
+          }
 
-          img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+          img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
 
           .image-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -574,9 +639,13 @@ const submitMessage = async () => {
               font-size: 16px;
               color: #fff;
               cursor: pointer;
-              &:hover { transform: scale(1.15); }
+              &:hover {
+                transform: scale(1.15);
+              }
             }
-            .delete-icon:hover { color: #f53f3f; }
+            .delete-icon:hover {
+              color: #f53f3f;
+            }
           }
 
           .upload-progress {
@@ -585,7 +654,7 @@ const submitMessage = async () => {
             left: 0;
             right: 0;
             padding: 3px;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
           }
         }
 
@@ -597,16 +666,21 @@ const submitMessage = async () => {
           border-radius: 8px;
           cursor: pointer;
           background: var(--bg-secondary);
-          transition: border-color 0.2s, background 0.2s;
+          transition:
+            border-color 0.2s,
+            background 0.2s;
 
           &:hover {
             border-color: var(--color-accent);
-            :deep(.el-icon) { color: var(--color-accent); }
+            :deep(.el-icon) {
+              color: var(--color-accent);
+            }
           }
 
           :deep(.el-icon) {
             position: absolute;
-            top: 50%; left: 50%;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
             font-size: 20px;
             color: var(--text-tertiary);
@@ -698,13 +772,22 @@ const submitMessage = async () => {
   background: var(--border-color);
   animation: skeleton-pulse 1.5s ease-in-out infinite;
 
-  &.short { width: 30%; }
-  &.medium { width: 60%; }
+  &.short {
+    width: 30%;
+  }
+  &.medium {
+    width: 60%;
+  }
 }
 
 @keyframes skeleton-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
 }
 
 // ── 空状态 ────────────────────────────────────────────
@@ -747,7 +830,10 @@ const submitMessage = async () => {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
-  transition: box-shadow 0.3s, border-color 0.3s, transform 0.3s;
+  transition:
+    box-shadow 0.3s,
+    border-color 0.3s,
+    transform 0.3s;
 
   &:hover {
     box-shadow: var(--shadow-card-hover);
@@ -820,7 +906,9 @@ const submitMessage = async () => {
         border-radius: 8px;
         cursor: pointer;
         border: 1px solid var(--border-color);
-        transition: opacity 0.2s, transform 0.2s;
+        transition:
+          opacity 0.2s,
+          transform 0.2s;
 
         &:hover {
           opacity: 0.88;
@@ -850,9 +938,151 @@ const submitMessage = async () => {
 }
 
 @media (max-width: 640px) {
-  .page-banner { height: 170px; }
-  .page-banner .banner-content .banner-title { font-size: 1.8rem; }
-  .container { padding: 24px 16px 48px; }
-  .message-form .form-body { padding: 20px 18px 16px; }
+  .page-banner {
+    height: 170px;
+  }
+  .page-banner .banner-content .banner-title {
+    font-size: 1.8rem;
+  }
+  .container {
+    padding: 24px 16px 48px;
+  }
+  .message-form .form-body {
+    padding: 20px 18px 16px;
+  }
 }
+
+.container {
+  width: 100%;
+  max-width: none;
+  padding: 0 clamp(24px, 2vw, 32px) 50px;
+}
+.page-header.container {
+  padding-top: 28px;
+  padding-bottom: 24px;
+  margin-bottom: 28px;
+  width: calc(100% - clamp(48px, 4vw, 64px));
+  padding-inline: 0;
+}
+.page-header h1 {
+  font: 500 34px/1.4 var(--font-serif);
+}
+.page-header p {
+  font-size: 14px;
+}
+.form-aside {
+  top: 100px;
+}
+.layout {
+  grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+}
+.message-form {
+  border-radius: 5px;
+  box-shadow: none;
+}
+.message-form:hover {
+  box-shadow: none;
+  border-color: var(--border-color);
+}
+.form-bar,
+.title-dot {
+  display: none;
+}
+.form-body {
+  padding: 26px;
+}
+.form-title {
+  font: 500 24px var(--font-serif);
+}
+.submit-btn {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  border-radius: 4px;
+}
+.upload-area {
+  border-radius: 4px;
+}
+.msg-card {
+  box-shadow: none;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 0;
+  padding: 10px 0 26px;
+}
+.msg-card:hover {
+  box-shadow: none;
+  transform: none;
+}
+.card-name {
+  font-size: 14px;
+}
+.card-time {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+.card-content {
+  font-size: 14px;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+.list-title {
+  font: 24px var(--font-serif);
+}
+.list-count {
+  font-size: 12px;
+  background: var(--bg-soft);
+  color: var(--color-accent);
+}
+.empty-icon {
+  display: none;
+}
+.list-main {
+  min-width: 0;
+}
+@media (max-width: 760px) {
+  .container {
+    padding-inline: 16px;
+  }
+  .page-header.container {
+    width: calc(100% - 32px);
+    padding-top: 22px;
+    padding-inline: 0;
+  }
+  .page-header h1 {
+    font-size: 29px;
+  }
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 30px;
+  }
+  .form-aside {
+    position: static;
+  }
+  .form-body {
+    padding: 22px 20px;
+  }
+  .msg-card {
+    gap: 12px;
+  }
+  .card-header {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .card-body {
+    min-width: 0;
+  }
+}
+
+.message-form .form-body .submit-btn {
+  background: var(--color-accent);
+  background-image: none;
+  border-color: var(--color-accent);
+  border-radius: 4px;
+  box-shadow: none;
+  color: var(--bg-card);
+  font-size: 14px;
+}
+.message-form .form-body .form-title { font: 500 23px var(--font-serif); }
+.message-form .form-title::before, .message-form .form-body .form-title .title-dot { display: none; }
 </style>

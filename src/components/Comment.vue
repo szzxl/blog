@@ -1201,4 +1201,31 @@ $bg-sub: var(--bg-secondary);
 
 .cmt-lb-enter-active, .cmt-lb-leave-active { transition: opacity 0.2s ease; }
 .cmt-lb-enter-from, .cmt-lb-leave-to { opacity: 0; }
+
+.comment-section {
+  padding: 8px 0 20px;
+  margin-top: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.comment-section .section-title {
+  font: 500 24px var(--font-serif);
+}
+.comment-section .comment-form .form-input-wrap .form-toolbar .submit-btn {
+  border-radius: 4px;
+  min-height: 40px;
+}
+.comment-section .comment-form .form-input-wrap .form-toolbar .img-upload-btn {
+  min-width: 40px;
+  min-height: 40px;
+}
+.comment-section .section-header {
+  margin-bottom: 22px;
+}
+@media (max-width: 760px) {
+  .comment-section { padding: 8px 0; }
+  .comment-section .section-title { font-size: 21px; }
+  .comment-section .comment-form .form-row { gap: 10px; }
+}
+
 </style>

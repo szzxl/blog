@@ -11,7 +11,13 @@
         <p class="subtitle">登录以继续访问博客</p>
       </div>
 
-      <el-form :disabled="loginLoading" :model="loginForm" :rules="rules" ref="loginFormRef" size="large">
+      <el-form
+        :disabled="loginLoading"
+        :model="loginForm"
+        :rules="rules"
+        ref="loginFormRef"
+        size="large"
+      >
         <el-form-item prop="username">
           <el-input
             v-model="loginForm.username"
@@ -36,24 +42,21 @@
         <el-form-item>
           <div class="form-options">
             <span></span>
-            <el-link type="primary" underline="never">忘记密码？</el-link>
+            <router-link to="/guestbook" class="password-help">账号问题？联系博主</router-link>
           </div>
         </el-form-item>
 
         <el-form-item>
-          <el-button
-            type="primary"
-            class="login-btn"
-            :loading="loginLoading"
-            @click="handleLogin"
-          >
+          <el-button type="primary" class="login-btn" :loading="loginLoading" @click="handleLogin">
             登 录
           </el-button>
         </el-form-item>
 
         <el-form-item>
           <div class="register-tip">
-            还没有账号？<el-link type="primary" underline="never" @click="goToRegister">立即注册</el-link>
+            还没有账号？<el-link type="primary" underline="never" @click="goToRegister"
+              >立即注册</el-link
+            >
           </div>
         </el-form-item>
       </el-form>
@@ -174,7 +177,10 @@ const goBack = () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    transition:
+      background 0.2s,
+      border-color 0.2s,
+      color 0.2s;
 
     &:hover {
       background: rgba(255, 255, 255, 0.14);
@@ -225,7 +231,9 @@ const goBack = () => {
     background: rgba(255, 255, 255, 0.08) !important;
     border-radius: 10px;
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14) inset !important;
-    transition: box-shadow 0.2s, background 0.2s;
+    transition:
+      box-shadow 0.2s,
+      background 0.2s;
 
     &:hover {
       background: rgba(255, 255, 255, 0.12) !important;
@@ -234,7 +242,9 @@ const goBack = () => {
 
     &.is-focus {
       background: rgba(255, 255, 255, 0.12) !important;
-      box-shadow: 0 0 0 1px var(--color-accent) inset, 0 0 12px rgba(22, 93, 255, 0.2) !important;
+      box-shadow:
+        0 0 0 1px var(--color-accent) inset,
+        0 0 12px rgba(22, 93, 255, 0.2) !important;
     }
   }
 
@@ -242,7 +252,9 @@ const goBack = () => {
     color: #fff !important;
     font-family: var(--font-sans);
 
-    &::placeholder { color: rgba(255, 255, 255, 0.62) !important; }
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.62) !important;
+    }
   }
 
   :deep(.el-input__prefix .el-icon),
@@ -271,7 +283,9 @@ const goBack = () => {
       font-size: 13px;
       color: rgba(255, 255, 255, 0.65);
 
-      &:hover { color: #fff; }
+      &:hover {
+        color: #fff;
+      }
     }
   }
 
@@ -288,7 +302,10 @@ const goBack = () => {
     letter-spacing: 0.1em;
     color: #fff;
     cursor: pointer;
-    transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+    transition:
+      opacity 0.2s,
+      transform 0.2s,
+      box-shadow 0.2s;
     box-shadow: 0 4px 18px rgba(22, 93, 255, 0.38);
 
     &:hover {
@@ -297,7 +314,9 @@ const goBack = () => {
       box-shadow: 0 8px 28px rgba(22, 93, 255, 0.48);
     }
 
-    &:active { transform: translateY(0); }
+    &:active {
+      transform: translateY(0);
+    }
   }
 
   // 注册提示
@@ -313,7 +332,9 @@ const goBack = () => {
       margin-left: 4px;
       font-weight: 600;
 
-      &:hover { color: #fff; }
+      &:hover {
+        color: #fff;
+      }
     }
   }
 }
@@ -325,6 +346,82 @@ const goBack = () => {
     border-radius: 16px;
   }
 
-  .login-container .login-header .title { font-size: 22px; }
+  .login-container .login-header .title {
+    font-size: 22px;
+  }
+}
+
+.login-page,
+.register-page {
+  min-height: 70vh;
+  background: var(--bg-primary);
+  padding: 40px 16px 60px;
+}
+.bg-overlay,
+.logo-ring {
+  display: none;
+}
+.login-container,
+.register-container {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  backdrop-filter: none;
+  box-shadow: none;
+  padding: 36px 32px;
+}
+.login-header .title,
+.register-header .title {
+  font: 500 30px var(--font-serif);
+  color: var(--text-primary);
+  background: none;
+  -webkit-text-fill-color: var(--text-primary);
+}
+.subtitle,
+.register-tip,
+.login-tip {
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+.close-btn {
+  color: var(--text-tertiary);
+  background: transparent;
+  border: 0;
+  min-width: 44px;
+  min-height: 44px;
+}
+.password-help {
+  font-size: 12px;
+  color: var(--color-accent);
+}
+.login-btn,
+.register-btn {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  border-radius: 4px;
+  box-shadow: none;
+  color: var(--bg-card);
+  font-size: 14px;
+  min-height: 44px;
+}
+.agreement {
+  font-size: 11px;
+}
+.agreement :deep(.el-checkbox__label) {
+  white-space: normal;
+  font-size: 11px;
+}
+.agreement :deep(.el-checkbox) {
+  height: auto;
+  min-height: 32px;
+  align-items: flex-start;
+}
+@media (max-width: 500px) {
+  .login-container,
+  .register-container {
+    padding: 30px 22px;
+  }
 }
 </style>
