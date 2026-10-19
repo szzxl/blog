@@ -178,7 +178,6 @@ let disposed = false
 interface Article {
   id: number
   articleName: string
-  articleAbstract?: string
   articleCover?: string
   articleTag?: string
   articleCategory?: string
@@ -531,7 +530,7 @@ onUnmounted(() => {
   padding: 0;
 }
 
-.notice-link, .notice-plain {
+.notice-plain {
   display: flex;
   align-items: flex-start;
   gap: 8px;
@@ -541,15 +540,6 @@ onUnmounted(() => {
   line-height: 1.6;
   transition: color 0.2s, background 0.2s;
   text-decoration: none;
-}
-
-.notice-link {
-  cursor: pointer;
-  &:hover {
-    color: var(--color-accent);
-    background: var(--bg-secondary);
-    .notice-dot { background: var(--color-accent); }
-  }
 }
 
 .notice-dot {
@@ -736,12 +726,6 @@ onUnmounted(() => {
     overflow: hidden;
     overflow-wrap: anywhere;
     transition: color 0.2s; margin: 0;
-  }
-
-  .card-abstract {
-    font-size: 12px; color: var(--text-tertiary); line-height: 1.7;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-    margin: 0;
   }
 
   .card-footer {

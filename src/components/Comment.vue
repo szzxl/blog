@@ -897,7 +897,7 @@ $bg-sub: var(--bg-secondary);
       &:last-child { border-bottom: none; }
     }
 
-    .comment-body, .reply-body {
+    .comment-body {
       flex: 1;
       min-width: 0;
     }
@@ -929,12 +929,6 @@ $bg-sub: var(--bg-secondary);
         line-height: 16px;
       }
     }
-    .reply-at {
-      font-size: 13px;
-      color: $text-muted;
-      em { color: $accent; font-style: normal; }
-    }
-
     // 正文
     .comment-text {
       font-size: 15px;
