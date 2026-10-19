@@ -132,7 +132,7 @@ const goBack = () => {
   padding: 40px 20px;
   position: relative;
   overflow: hidden;
-  background: url('/bg-banner.jpg') center center / cover no-repeat fixed;
+  background: var(--bg-primary);
 
   .bg-overlay {
     position: absolute;

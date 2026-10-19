@@ -63,39 +63,9 @@ onMounted(() => { void refreshTool() })
 </script>
 
 <style scoped lang="scss">
-.page-banner {
-  position: relative;
-  display: grid;
-  place-items: center;
-  height: 200px;
-  background: url('/bg-banner.jpg') center 30% / cover no-repeat;
 
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(5, 12, 30, 0.62);
-  }
-}
 
-.banner-content {
-  position: relative;
-  text-align: center;
-  padding: 0 24px;
-  color: #fff;
 
-  h1 {
-    font-family: var(--font-display);
-    font-size: 2.2rem;
-    line-height: 1.3;
-    margin-bottom: 8px;
-  }
-
-  p {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.75);
-  }
-}
 
 .tools-content {
   padding-top: 48px;
