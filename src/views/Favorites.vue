@@ -50,7 +50,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus/es/components/message/index'
 import { ElMessageBox } from 'element-plus/es/components/message-box/index'
-import { getUserFavorites, removeFavorite } from '@/api/article'
+import { getUserFavorites, removeFavorite } from '@/api/favorite'
 
 import { useUserStore } from '@/stores/user'
 import { createLatestRequest } from '@/utils/latestRequest'

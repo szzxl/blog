@@ -11,3 +11,9 @@ export interface ArticleSummary {
   isTop?: number
   isRecommend?: number
 }
+
+export interface ArticleDetail extends ArticleSummary {
+  articleContent: string
+  isLiked?: boolean
+  isFavorited?: boolean
+}

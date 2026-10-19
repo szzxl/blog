@@ -46,20 +46,14 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { Download } from '@element-plus/icons-vue'
 import defaultMiniprogramQr from '@/assets/tools/miniprogram-qr.jpg'
-import { ref, onMounted } from 'vue'
-import { fetchWebsiteConfigWithCache, useWebsiteConfigRefresh } from '@/utils/websiteConfig'
+import { useWebsiteConfig } from '@/composables/useWebsiteConfig'
+const { config } = useWebsiteConfig()
+const miniprogramName = computed(() => config.value.tool_miniprogram_name || '工具小程序')
+const miniprogramQr = computed(() => config.value.tool_miniprogram_qr || defaultMiniprogramQr)
 
-const miniprogramName = ref('工具小程序')
-const miniprogramQr = ref(defaultMiniprogramQr)
-const refreshTool = async () => {
-  const config = await fetchWebsiteConfigWithCache()
-  miniprogramName.value = config.tool_miniprogram_name || '工具小程序'
-  miniprogramQr.value = config.tool_miniprogram_qr || defaultMiniprogramQr
-}
-useWebsiteConfigRefresh(() => { void refreshTool() })
-onMounted(() => { void refreshTool() })
 </script>
 
 <style scoped lang="scss">

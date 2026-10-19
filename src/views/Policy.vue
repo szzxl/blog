@@ -15,17 +15,17 @@
       <section><h2>发布与交流</h2><p>请只发布有权分享的文字和图片，尊重他人的隐私，避免垃圾广告、冒充他人或干扰网站运行。留言及友链申请在审核通过后公开。</p></section>
       <section><h2>内容管理</h2><p>你可以删除自己的评论。删除评论会同时删除其下的回复分支，请谨慎操作。博主可以管理文章、评论、留言和友链。</p></section>
     </template>
-    <section><h2>联系与信息更正</h2><p>如需更正或删除账号及已提交的信息，请联系博主。{{ email ? '联系邮箱：' + email : '可通过网站留言板联系。' }}</p><router-link to="/guestbook">前往留言板 →</router-link></section>
+    <section><h2>联系与信息更正</h2><p>如需更正或删除账号及已提交的信息，请联系博主。{{ email ? '联系邮箱：' + email : '可通过网站留言板联系。' }}</p><router-link to="/guestbook">前往留言板</router-link></section>
   </main>
 </template>
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
+import { useWebsiteConfig } from '@/composables/useWebsiteConfig'
 const route = useRoute()
 const privacy = computed(() => route.path.endsWith('/privacy'))
-const email = ref('')
-onMounted(async () => { email.value = (await fetchWebsiteConfigWithCache()).social_email || '' })
+const { config } = useWebsiteConfig()
+const email = computed(() => config.value.social_email || '')
 </script>
 <style scoped lang="scss">
 .policy { max-width: 760px; margin: auto; padding: 48px 24px 80px; color: var(--text-primary); }

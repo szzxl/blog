@@ -272,7 +272,7 @@
 import { showRequestError } from '@/utils/requestError'
 
 import { ref, onMounted } from 'vue'
-import { getFriendLinks, applyFriendLink } from '@/api/article'
+import { getFriendLinks, applyFriendLink } from '@/api/website'
 import { ElMessage } from 'element-plus/es/components/message/index'
 
 interface Link {

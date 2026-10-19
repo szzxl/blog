@@ -1,24 +1,10 @@
+import type { WebsiteConfig } from '@/types/website'
 import { onMounted, onUnmounted } from 'vue'
-import { getWebsiteConfig } from '@/api/article'
+import { getWebsiteConfig } from '@/api/website'
 
 const CACHE_KEY = 'website_config'
 const CACHE_TTL = 60_000
-export interface WebsiteConfig {
-  site_name?: string
-  site_description?: string
-  logo?: string
-  seo_title?: string
-  copyright?: string
-  icp_number?: string
-  website_motto?: string
-  social_email?: string
-  social_gitee?: string
-  social_github?: string
-  social_wechat?: string
-  site_start_time?: string
-  tool_miniprogram_name?: string
-  tool_miniprogram_qr?: string
-}
+
 let configCache: WebsiteConfig | null = null
 let expiresAt = 0
 let pendingRequest: Promise<WebsiteConfig> | null = null

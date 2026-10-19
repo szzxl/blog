@@ -21,29 +21,25 @@
   </el-config-provider>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { watch, ref, onMounted, onUnmounted } from 'vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import { useRoute } from 'vue-router'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import SearchOverlay from './components/SearchOverlay.vue'
-import { fetchWebsiteConfigWithCache, useWebsiteConfigRefresh } from '@/utils/websiteConfig'
+import { useWebsiteConfig } from '@/composables/useWebsiteConfig'
 import { setSiteName, resetSeo } from '@/composables/useSeo'
 
 const route = useRoute()
 const showBackToTop = ref(false)
 
-const fetchWebsiteConfig = async () => {
-  try {
-    const config = await fetchWebsiteConfigWithCache()
-    if (config.site_name) setSiteName(config.site_name)
-    if (route.name === 'home') document.title = config.seo_title || config.site_name || '时光博客'
-    else if (route.meta.title) resetSeo(route.meta.title as string)
-  } catch {
-    // 静默失败
-  }
-}
+const { config: websiteConfig } = useWebsiteConfig()
+watch(websiteConfig, (config) => {
+  if (config.site_name) setSiteName(config.site_name)
+  if (route.name === 'home') document.title = config.seo_title || config.site_name || '时光博客'
+  else if (route.meta.title) resetSeo(route.meta.title as string)
+})
 
 let scrollRaf: number | null = null
 
@@ -62,12 +58,8 @@ const scrollToTop = () => {
   })
 }
 
-useWebsiteConfigRefresh(() => {
-  void fetchWebsiteConfig()
-})
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true })
-  fetchWebsiteConfig()
 })
 
 onUnmounted(() => {

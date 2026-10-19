@@ -19,7 +19,7 @@
     <div v-else-if="loadError" class="load-error" role="alert">
       <p>文章暂时无法加载，也可能尚未发布或已被删除。</p>
       <el-button @click="fetchArticleDetail">重新加载</el-button
-      ><router-link to="/articles">返回文章索引 →</router-link>
+      ><router-link to="/articles">返回文章索引</router-link>
     </div>
     <div v-else-if="article" class="reading-layout">
       <nav class="toc-panel" aria-label="文章目录">
@@ -196,18 +196,14 @@ import DOMPurify from 'dompurify'
 import { useRoute, useRouter } from 'vue-router'
 import Comment from '@/components/Comment.vue'
 import Skeleton from '@/components/Skeleton.vue'
-import {
-  getArticleDetail,
-  addArticleView,
-  likeArticle,
-  getArticleLikeCount,
-  addFavorite,
-  removeFavorite
-} from '@/api/article'
+import { getArticleDetail, addArticleView, likeArticle, getArticleLikeCount } from '@/api/article'
+import { addFavorite, removeFavorite } from '@/api/favorite'
 import { formatTimestamp, parseTags } from '@/utils/format'
 import { ElMessage } from 'element-plus/es/components/message/index'
 import { useUserStore } from '@/stores/user'
 import { useSeo } from '@/composables/useSeo'
+import type { ArticleDetail as Article } from '@/types/article'
+import { copyText } from '@/utils/clipboard'
 import { createLatestRequest } from '@/utils/latestRequest'
 
 interface TocItem {
@@ -222,20 +218,6 @@ const userStore = useUserStore()
 
 // 是否是博主
 const isAuthor = computed(() => userStore.isAuthor)
-
-interface Article {
-  id: string | number
-  articleName: string
-  articleContent: string
-  articleCover?: string
-  articleCategory?: string
-  articleTag?: string
-  readNum?: number
-  likeCount?: number
-  createTime?: number
-  isLiked?: boolean
-  isFavorited?: boolean
-}
 
 const article = ref<Article | null>(null)
 const loading = ref(false)
@@ -345,7 +327,7 @@ const setupCodeCopy = () => {
         e.stopPropagation()
         const text = (pre.querySelector('code')?.textContent ?? pre.textContent ?? '').trim()
         try {
-          await navigator.clipboard.writeText(text)
+          await copyText(text)
           btn.textContent = '✓ 已复制'
           btn.classList.add('copied')
           setTimeout(() => {
@@ -462,7 +444,7 @@ const fetchArticleDetail = async () => {
   loadError.value = false
   loading.value = true
   try {
-    const res: any = await getArticleDetail({ id: id })
+    const res = await getArticleDetail({ id })
 
     if (!articleRequest.isCurrent(requestId)) return
     if (res) {
@@ -584,7 +566,7 @@ const handleFavorite = async () => {
 const handleShare = async () => {
   try {
     const url = window.location.href
-    await navigator.clipboard.writeText(url)
+    await copyText(url)
     ElMessage.success('链接已复制到剪贴板')
   } catch (error) {
     showRequestError(error, '复制失败，请手动复制链接')
@@ -802,7 +784,7 @@ const scrollToComments = () =>
   background: transparent;
   font-size: inherit;
 }
-.content :deep(.code-copy-btn) {
+.content :deep(.copy-btn) {
   position: absolute;
   top: 7px;
   right: 9px;

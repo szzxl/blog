@@ -12,60 +12,36 @@
     <div v-else class="catalog-grid" v-loading="loading">
       <router-link
         v-for="(category, index) in categories"
-        :key="category.id ?? category.name ?? category.categoryName"
-        :to="{ path: '/articles', query: { category: category.name || category.categoryName } }"
+        :key="category.id ?? category.name"
+        :to="{ path: '/articles', query: { category: category.name } }"
         class="catalog-card"
         ><div class="catalog-index">
           <span>{{ String(index + 1).padStart(2, '0') }}</span
-          ><span>{{ category.num ?? category.count ?? category.articleCount ?? 0 }} 篇</span>
+          ><span>{{ category.count ?? 0 }} 篇</span>
         </div>
-        <h2>{{ category.name || category.categoryName }}</h2>
+        <h2>{{ category.name }}</h2>
         <p v-if="category.description">{{ category.description }}</p>
-        <span class="catalog-open">查看文章 →</span></router-link
+        <span class="catalog-open">查看文章</span></router-link
       >
     </div>
     <p v-if="!loading && !loadError && !categories.length" class="empty-state">暂时还没有分类。</p>
     <div class="catalog-footer">
-      <span>也可以用更具体的关键词查找。</span><router-link to="/tag">浏览全部标签 →</router-link>
+      <span>也可以用更具体的关键词查找。</span><router-link to="/tag">浏览全部标签</router-link>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
-import { getCategoryList } from '@/api/article'
-interface Category {
-  id?: number
-  name?: string
-  categoryName?: string
-  num?: number
-  count?: number
-  articleCount?: number
-  description?: string
-}
-const categories = ref<Category[]>([])
-const loading = ref(true)
-const loadError = ref(false)
-let disposed = false
-const fetchCategories = async () => {
-  loading.value = true
-  loadError.value = false
-  try {
-    const response = (await getCategoryList({ pageNo: 1, pageSize: 100 })) as unknown as
-      Category[] | { list?: Category[] }
-    if (!disposed)
-      categories.value = (Array.isArray(response) ? response : response?.list || []).filter(
-        (item) => item.name || item.categoryName
-      )
-  } catch {
-    if (!disposed) loadError.value = true
-  } finally {
-    if (!disposed) loading.value = false
-  }
-}
+import { onMounted } from 'vue'
+import { getCategoryList } from '@/api/taxonomy'
+import type { Category } from '@/types/catalog'
+import { useAsyncResource } from '@/composables/useAsyncResource'
+const {
+  data: categories,
+  loading,
+  loadError,
+  execute: fetchCategories
+} = useAsyncResource<Category[]>(() => getCategoryList({ pageNo: 1, pageSize: 100 }), [])
 onMounted(fetchCategories)
-onUnmounted(() => {
-  disposed = true
-})
 </script>
 <style scoped lang="scss">
 .catalog-page {

@@ -17,17 +17,17 @@
             '这里整理项目中的技术笔记、解决问题的过程，也分享一些日常记录。'
           }}
         </p>
-        <router-link to="/guestbook" class="text-link">有想法，给我留言 →</router-link>
+        <router-link to="/guestbook" class="text-link">有想法，给我留言</router-link>
       </section>
       <div>
         <section class="about-section">
           <h2>从这里开始</h2>
           <router-link to="/articles"
-            ><span>文章笔记</span><small>看看最近在记录什么 ↗</small></router-link
+            ><span>文章笔记</span><small>看看最近在记录什么 </small></router-link
           ><router-link to="/category"
-            ><span>分类与主题</span><small>找到你感兴趣的内容 ↗</small></router-link
+            ><span>分类与主题</span><small>找到你感兴趣的内容 </small></router-link
           ><router-link to="/album"
-            ><span>日常相册</span><small>文字之外的片刻 ↗</small></router-link
+            ><span>日常相册</span><small>文字之外的片刻 </small></router-link
           >
         </section>
         <section class="about-section">
@@ -39,13 +39,13 @@
             :href="config.social_github"
             target="_blank"
             rel="noopener noreferrer"
-            ><span>GitHub</span><small>看看我的代码 ↗</small></a
+            ><span>GitHub</span><small>看看我的代码 </small></a
           ><a
             v-if="config.social_gitee"
             :href="config.social_gitee"
             target="_blank"
             rel="noopener noreferrer"
-            ><span>Gitee</span><small>看看我的代码 ↗</small></a
+            ><span>Gitee</span><small>看看我的代码 </small></a
           >
           <p v-if="config.social_wechat" class="wechat">微信：{{ config.social_wechat }}</p>
           <p>问题、建议，或只是打个招呼，都可以留在留言板。</p>
@@ -55,22 +55,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
-import { fetchWebsiteConfigWithCache, useWebsiteConfigRefresh } from '@/utils/websiteConfig'
-import type { WebsiteConfig } from '@/utils/websiteConfig'
-const config = ref<WebsiteConfig>({})
-let disposed = false
-const fetchConfig = async () => {
-  const value = await fetchWebsiteConfigWithCache()
-  if (!disposed) config.value = value
-}
-onMounted(fetchConfig)
-useWebsiteConfigRefresh(() => {
-  void fetchConfig()
-})
-onUnmounted(() => {
-  disposed = true
-})
+import { useWebsiteConfig } from '@/composables/useWebsiteConfig'
+const { config } = useWebsiteConfig()
 </script>
 <style scoped lang="scss">
 .about {

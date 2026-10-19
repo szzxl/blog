@@ -25,14 +25,14 @@
           全部</button
         ><button
           v-for="category in categories"
-          :key="category.id || category.categoryName || category.name"
-          :aria-pressed="selectedCategory === (category.categoryName || category.name)"
-          :class="{ active: selectedCategory === (category.categoryName || category.name) }"
-          @click="updateQuery({ category: category.categoryName || category.name || '' })"
+          :key="category.id || category.name"
+          :aria-pressed="selectedCategory === (category.name)"
+          :class="{ active: selectedCategory === (category.name) }"
+          @click="updateQuery({ category: category.name || '' })"
         >
-          {{ category.categoryName || category.name
-          }}<small v-if="(category.articleCount ?? category.count ?? category.num) !== undefined">{{
-            category.articleCount ?? category.count ?? category.num
+          {{ category.name
+          }}<small v-if="(category.count) !== undefined">{{
+            category.count
           }}</small>
         </button>
       </nav>
@@ -100,21 +100,15 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getArticleList, getCategoryList } from '@/api/article'
+import { getArticleList } from '@/api/article'
+import { getCategoryList } from '@/api/taxonomy'
 import { normalizePage, lastPage } from '@/utils/pagination'
 import { createLatestRequest } from '@/utils/latestRequest'
 import type { ArticleSummary } from '@/types/article'
 import ArticleCard from '@/components/ArticleCard.vue'
 import Skeleton from '@/components/Skeleton.vue'
 
-interface Category {
-  id?: number
-  categoryName?: string
-  name?: string
-  articleCount?: number
-  count?: number
-  num?: number
-}
+import type { Category } from '@/types/catalog'
 const route = useRoute()
 const router = useRouter()
 const searchKeyword = ref('')
@@ -157,16 +151,16 @@ const fetchArticles = async () => {
   loading.value = true
   loadError.value = false
   try {
-    const response = (await getArticleList({
+    const response = await getArticleList({
       pageNo: pageNo.value,
       pageSize,
       keyword: queryText('keyword') || undefined,
       articleCategory: selectedCategory.value || undefined,
       articleTag: queryText('tag') || undefined
-    })) as unknown as { list?: ArticleSummary[]; total?: number } | ArticleSummary[]
+    })
     if (disposed || !articleRequest.isCurrent(requestId)) return
-    const list = Array.isArray(response) ? response : response?.list || []
-    const count = Array.isArray(response) ? response.length : (response?.total ?? list.length)
+    const list = response.list
+    const count = response.total
     const finalPage = lastPage(count, pageSize)
     if (pageNo.value > finalPage) {
       await router.replace({
@@ -193,9 +187,8 @@ watch(
 )
 onMounted(async () => {
   try {
-    const response = (await getCategoryList({ pageSize: 100 })) as unknown as
-      { list?: Category[] } | Category[]
-    if (!disposed) categories.value = Array.isArray(response) ? response : response?.list || []
+    const response = await getCategoryList({ pageSize: 100 })
+    if (!disposed) categories.value = response
   } catch {
     /* 分类不可用时，仍可搜索文章 */
   }

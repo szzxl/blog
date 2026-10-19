@@ -127,22 +127,22 @@
             </button>
           </div>
           <template v-if="userStore.isLoggedIn"
-            ><button v-if="isAuthor" @click="handleMobileCommand('admin')">管理后台 ↗</button
+            ><button v-if="isAuthor" @click="handleMobileCommand('admin')">管理后台</button
             ><button @click="handleMobileCommand('profile')">个人资料</button
             ><button @click="handleMobileCommand('favorites')">我的收藏</button
             ><button @click="handleMobileCommand('logout')">退出登录</button></template
-          ><button v-else @click="handleMobileLogin">登录账号 →</button>
+          ><button v-else @click="handleMobileLogin">登录账号</button>
         </div>
       </div>
     </el-drawer>
   </header>
 </template>
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { watch, ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { useThemeStore } from '@/stores/theme'
-import { fetchWebsiteConfigWithCache, useWebsiteConfigRefresh } from '@/utils/websiteConfig'
+import { useWebsiteConfig } from '@/composables/useWebsiteConfig'
 import {
   House,
   Document,
@@ -191,15 +191,11 @@ const handleLogoError = () => {
   siteLogo.value = DEFAULT_SITE_LOGO
 }
 
-const fetchWebsiteConfig = async () => {
-  try {
-    const config = await fetchWebsiteConfigWithCache()
-    if (config.site_name) siteName.value = config.site_name
-    siteLogo.value = config.logo?.trim() || DEFAULT_SITE_LOGO
-  } catch {
-    // 静默失败
-  }
-}
+const { config: websiteConfig } = useWebsiteConfig()
+watch(websiteConfig, (config) => {
+  if (config.site_name) siteName.value = config.site_name
+  siteLogo.value = config.logo?.trim() || DEFAULT_SITE_LOGO
+})
 
 const isAuthor = computed(() => userStore.isAuthor)
 
@@ -239,11 +235,7 @@ const handleScroll = () => {
   isScrolled.value = window.scrollY > 10
 }
 
-useWebsiteConfigRefresh(() => {
-  void fetchWebsiteConfig()
-})
 onMounted(async () => {
-  fetchWebsiteConfig()
   window.addEventListener('scroll', handleScroll)
   if (userStore.isLoggedIn && userStore.token) {
     try {

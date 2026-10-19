@@ -2,7 +2,7 @@
 import { showRequestError } from '@/utils/requestError'
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { login as loginApi, getUserInfo as getUserInfoApi, logout as logoutApi } from '@/api/article'
+import { login as loginApi, getUserInfo as getUserInfoApi, logout as logoutApi } from '@/api/auth'
 import { ElMessage } from 'element-plus/es/components/message/index'
 import { parseToken } from '@/utils/token'
 

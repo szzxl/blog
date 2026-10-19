@@ -30,7 +30,7 @@
               class="cover-img"
               loading="lazy"
               @error="fallbackCover"
-            /><span class="cover-caption">翻开相册 ↗</span>
+            /><span class="cover-caption">翻开相册 </span>
           </div>
           <div class="album-info">
             <h2>{{ album.albumName }}</h2>
@@ -150,7 +150,7 @@
 import { showRequestError } from '@/utils/requestError'
 
 import { ref, onMounted, onUnmounted } from 'vue'
-import { getAlbumList, getAlbumPhotos } from '@/api/article'
+import { getAlbumList, getAlbumPhotos } from '@/api/album'
 import Comment from '@/components/Comment.vue'
 import { createLatestRequest } from '@/utils/latestRequest'
 
