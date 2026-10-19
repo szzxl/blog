@@ -118,7 +118,6 @@ const route = useRoute()
 interface Article {
   id: number
   articleName: string
-  articleAbstract?: string
   articleCover?: string
   articleCategory?: string
   summary?: string

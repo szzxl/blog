@@ -24,15 +24,10 @@ html {
   --bg-primary: #faf8f5;
   --bg-secondary: #f2ede8;
   --bg-card: #ffffff;
-  --bg-card-solid: #ffffff;
-  --bg-header: rgba(250, 248, 245, 0.92);
-  --bg-overlay: rgba(255, 255, 255, 0.97);
-  --bg-sidebar: #ffffff;
 
   --text-primary: #1d2129;
   --text-secondary: #4e5969;
   --text-tertiary: #86909c;
-  --text-inverse: #ffffff;
 
   --border-color: #ede8e1;
   --border-strong: #d9d0c7;
@@ -44,15 +39,11 @@ html {
   --color-pink: #f53f3f;
   --color-cyan: #00b42a;
   --color-danger: #f53f3f;
-  --color-warning: #ff7d00;
   --color-success: #00b42a;
 
   --gradient-accent: linear-gradient(135deg, #165dff 0%, #722ed1 100%);
   --gradient-warm: linear-gradient(135deg, #ff7d00 0%, #f53f3f 100%);
-  --gradient-cool: linear-gradient(135deg, #00b42a 0%, #165dff 100%);
-  --gradient-hero: linear-gradient(135deg, #0a0e27 0%, #1a1040 50%, #0d1a3a 100%);
 
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
   --shadow-card: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
   --shadow-card-hover: 0 16px 48px rgba(0,0,0,0.14), 0 6px 16px rgba(0,0,0,0.08);
   --shadow-glow: 0 0 0 3px rgba(22, 93, 255, 0.2);
@@ -75,15 +66,10 @@ html {
   --bg-primary: #0d1117;
   --bg-secondary: #161b22;
   --bg-card: #1c2128;
-  --bg-card-solid: #1c2128;
-  --bg-header: rgba(13, 17, 23, 0.92);
-  --bg-overlay: rgba(28, 33, 40, 0.97);
-  --bg-sidebar: #1c2128;
 
   --text-primary: #e6edf3;
   --text-secondary: #8b949e;
   --text-tertiary: #6e7681;
-  --text-inverse: #0d1117;
 
   --border-color: #30363d;
   --border-strong: #484f58;
@@ -95,15 +81,11 @@ html {
   --color-pink: #ff7b72;
   --color-cyan: #3fb950;
   --color-danger: #ff7b72;
-  --color-warning: #ffa657;
   --color-success: #3fb950;
 
   --gradient-accent: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%);
   --gradient-warm: linear-gradient(135deg, #ffa657 0%, #ff7b72 100%);
-  --gradient-cool: linear-gradient(135deg, #3fb950 0%, #58a6ff 100%);
-  --gradient-hero: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
 
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
   --shadow-card: 0 4px 20px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.3);
   --shadow-card-hover: 0 20px 60px rgba(0,0,0,0.6), 0 8px 20px rgba(0,0,0,0.4);
   --shadow-glow: 0 0 0 3px rgba(88, 166, 255, 0.25);
@@ -254,35 +236,6 @@ button, a, input, textarea { -webkit-tap-highlight-color: transparent; }
     font-family: var(--font-serif) !important;
   }
 }
-
-.page-enter-active,
-.page-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.page-enter-from,
-.page-leave-to {
-  opacity: 0;
-  transform: translateY(8px);
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
-.animate-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.animate-fade-in { animation: fadeIn 0.5s ease both; }
 
 .gradient-text {
   background: var(--gradient-accent);

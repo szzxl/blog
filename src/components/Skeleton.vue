@@ -18,7 +18,7 @@
     </div>
 
     <!-- 文章详情骨架屏 -->
-    <div v-else-if="type === 'article-detail'" class="skeleton-article-detail">
+    <div v-else class="skeleton-article-detail">
       <div class="skeleton-header">
         <div class="skeleton-title large"></div>
         <div class="skeleton-meta-row">
@@ -32,43 +32,16 @@
         <div v-for="n in 8" :key="n" class="skeleton-paragraph"></div>
       </div>
     </div>
-
-    <!-- 评论骨架屏 -->
-    <div v-else-if="type === 'comment'" class="skeleton-comment">
-      <div v-for="n in count" :key="n" class="skeleton-comment-item">
-        <div class="skeleton-avatar"></div>
-        <div class="skeleton-comment-content">
-          <div class="skeleton-name"></div>
-          <div class="skeleton-text"></div>
-          <div class="skeleton-text short"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 卡片骨架屏 -->
-    <div v-else-if="type === 'card'" class="skeleton-card">
-      <div v-for="n in count" :key="n" class="skeleton-card-item">
-        <div class="skeleton-card-image"></div>
-        <div class="skeleton-card-title"></div>
-        <div class="skeleton-card-text"></div>
-      </div>
-    </div>
-
-    <!-- 通用骨架屏 -->
-    <div v-else class="skeleton-generic">
-      <div v-for="n in count" :key="n" class="skeleton-line"></div>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 interface Props {
-  type?: 'article-list' | 'article-detail' | 'comment' | 'card' | 'generic'
+  type: 'article-list' | 'article-detail'
   count?: number
 }
 
 withDefaults(defineProps<Props>(), {
-  type: 'generic',
   count: 3
 })
 </script>
@@ -236,124 +209,4 @@ withDefaults(defineProps<Props>(), {
   }
 }
 
-// 评论骨架屏
-.skeleton-comment {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-
-  .skeleton-comment-item {
-    display: flex;
-    gap: 15px;
-
-    .skeleton-avatar {
-      @include skeleton-base;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .skeleton-comment-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-
-      .skeleton-name {
-        @include skeleton-base;
-        height: 20px;
-        width: 120px;
-      }
-
-      .skeleton-text {
-        @include skeleton-base;
-        height: 16px;
-        width: 100%;
-
-        &.short {
-          width: 70%;
-        }
-      }
-    }
-  }
-}
-
-// 卡片骨架屏
-.skeleton-card {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-
-  .skeleton-card-item {
-    background: var(--bg-card);
-    border-radius: 16px;
-    padding: 20px;
-
-    .skeleton-card-image {
-      @include skeleton-base;
-      height: 180px;
-      width: 100%;
-      margin-bottom: 15px;
-    }
-
-    .skeleton-card-title {
-      @include skeleton-base;
-      height: 24px;
-      width: 80%;
-      margin-bottom: 10px;
-    }
-
-    .skeleton-card-text {
-      @include skeleton-base;
-      height: 16px;
-      width: 100%;
-    }
-  }
-}
-
-// 通用骨架屏
-.skeleton-generic {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
-  .skeleton-line {
-    @include skeleton-base;
-    height: 20px;
-    width: 100%;
-
-    &:nth-child(2n) {
-      width: 90%;
-    }
-
-    &:nth-child(3n) {
-      width: 75%;
-    }
-  }
-}
-
-// 深色主题适配
-[data-theme='dark'] {
-  .skeleton-article-item,
-  .skeleton-card-item {
-    background: var(--bg-card);
-  }
-
-  @mixin skeleton-base {
-    background: linear-gradient(
-      90deg,
-      rgba(148, 163, 184, 0.1) 25%,
-      rgba(148, 163, 184, 0.2) 50%,
-      rgba(148, 163, 184, 0.1) 75%
-    );
-    background-size: 200% 100%;
-    animation: skeleton-loading 1.5s ease-in-out infinite;
-    border-radius: 8px;
-  }
-}
 </style>
