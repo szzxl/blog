@@ -1,11 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="-4 -4 72 72" fill="none">
   <title>时光博客</title>
-  <desc>展开的书页与时钟，寓意用文字留住时光。</desc>
-  <rect width="64" height="64" rx="16" fill="#123E43"/>
-  <path d="M12 18C19 16 25 18 32 23C39 18 45 16 52 18V46C45 44 39 46 32 51C25 46 19 44 12 46V18Z" fill="#F6F1E5"/>
-  <path d="M32 23V51" stroke="#123E43" stroke-width="2.5"/>
-  <path d="M19 27C22 27 24 28 26 29M19 34C22 34 24 35 26 36" stroke="#78958C" stroke-width="2.5" stroke-linecap="round"/>
-  <circle cx="43" cy="26" r="13" fill="#123E43"/>
-  <circle cx="43" cy="26" r="9.5" stroke="#EFB866" stroke-width="2.5"/>
-  <path d="M43 20V26L47 29" stroke="#F6F1E5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <desc>向右上方飞行的蓝色纸飞机，象征分享与出发。</desc>
+  <g fill="#0866EB">
+    <path d="M4 26L60 4L18 31Z"/>
+    <path d="M60 4L45 52L23 35Z"/>
+    <path d="M23 38L31 44L21 55Z"/>
+  </g>
 </svg>
