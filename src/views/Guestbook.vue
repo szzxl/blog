@@ -388,43 +388,7 @@ const submitMessage = async () => {
 
 <style scoped lang="scss">
 // ── Banner ────────────────────────────────────────────
-.page-banner {
-  position: relative;
-  height: 220px;
-  background: url('/bg-banner.jpg') center 30% / cover no-repeat;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 
-  .banner-mask {
-    position: absolute;
-    inset: 0;
-    background: rgba(5, 12, 30, 0.6);
-  }
-
-  .banner-content {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-
-    .banner-title {
-      font-family: var(--font-display);
-      font-size: 2.4rem;
-      font-weight: 700;
-      color: #fff;
-      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
-      margin: 0 0 10px;
-      letter-spacing: 0.04em;
-    }
-
-    .banner-sub {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.7);
-      margin: 0;
-      letter-spacing: 0.06em;
-    }
-  }
-}
 
 // ── 容器 ──────────────────────────────────────────────
 .guestbook {
