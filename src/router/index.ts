@@ -10,11 +10,15 @@ const getBasePath = () => {
   return import.meta.env.VITE_BASE_PATH || '/'
 }
 
+const articleListPositions = new Map<string, { left: number; top: number }>()
+const isArticleIndex = (name: unknown) => name === 'articles' || name === 'tag-articles'
+
 const router = createRouter({
   history: createWebHistory(getBasePath()),
   scrollBehavior(_to, _from, savedPosition) {
     if (savedPosition) return savedPosition
-    return { top: 0, behavior: 'smooth' }
+    if (isArticleIndex(_to.name)) return articleListPositions.get(_to.fullPath) || { top: 0 }
+    return { top: 0 }
   },
   routes: [
     {
@@ -22,28 +26,114 @@ const router = createRouter({
       name: 'home',
       component: Home
     },
-    { path: '/login',            name: 'login',            component: () => import('@/views/Login.vue'),      meta: { title: '登录' } },
-    { path: '/register',         name: 'register',         component: () => import('@/views/Register.vue'),   meta: { title: '注册' } },
-    { path: '/articles',         name: 'articles',         component: () => import('@/views/ArticleList.vue'),meta: { title: '所有文章' } },
-    { path: '/article/:id',      name: 'article-detail',   component: () => import('@/views/ArticleDetail.vue') },
-    { path: '/category',         name: 'category',         component: () => import('@/views/Category.vue'),   meta: { title: '文章分类' } },
-    { path: '/tag',              name: 'tag',              component: () => import('@/views/Tag.vue'),        meta: { title: '标签' } },
-    { path: '/tag/articles',     name: 'tag-articles',     component: () => import('@/views/TagArticles.vue'),meta: { title: '标签文章' } },
-    { path: '/album',            name: 'album',            component: () => import('@/views/Album.vue'),      meta: { title: '相册' } },
-    { path: '/tools',            name: 'tools',            component: () => import('@/views/Tools.vue'),      meta: { title: '工具' } },
-    { path: '/guestbook',        name: 'guestbook',        component: () => import('@/views/Guestbook.vue'),  meta: { title: '留言板' } },
-    { path: '/link',             name: 'link',             component: () => import('@/views/Link.vue'),       meta: { title: '友情链接' } },
-    { path: '/terms', name: 'terms', component: () => import('@/views/Policy.vue'), meta: { title: '用户协议' } },
-    { path: '/privacy', name: 'privacy', component: () => import('@/views/Policy.vue'), meta: { title: '隐私政策' } },
-    { path: '/profile',          name: 'profile',          component: () => import('@/views/Profile.vue'),    meta: { requiresAuth: true, title: '个人中心' } },
-    { path: '/favorites',        name: 'favorites',        component: () => import('@/views/Favorites.vue'),  meta: { requiresAuth: true, title: '我的收藏' } },
-    { path: '/about',            name: 'about',            component: () => import('@/views/About.vue'),      meta: { title: '关于我' } },
-    { path: '/:pathMatch(.*)*',  name: 'not-found',        component: () => import('@/views/NotFound.vue'),   meta: { title: '页面未找到' } }
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/Login.vue'),
+      meta: { title: '登录' }
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: () => import('@/views/Register.vue'),
+      meta: { title: '注册' }
+    },
+    {
+      path: '/articles',
+      name: 'articles',
+      component: () => import('@/views/ArticleList.vue'),
+      meta: { title: '所有文章' }
+    },
+    {
+      path: '/article/:id',
+      name: 'article-detail',
+      component: () => import('@/views/ArticleDetail.vue')
+    },
+    {
+      path: '/category',
+      name: 'category',
+      component: () => import('@/views/Category.vue'),
+      meta: { title: '文章分类' }
+    },
+    {
+      path: '/tag',
+      name: 'tag',
+      component: () => import('@/views/Tag.vue'),
+      meta: { title: '标签' }
+    },
+    {
+      path: '/tag/articles',
+      name: 'tag-articles',
+      component: () => import('@/views/TagArticles.vue'),
+      meta: { title: '标签文章' }
+    },
+    {
+      path: '/album',
+      name: 'album',
+      component: () => import('@/views/Album.vue'),
+      meta: { title: '相册' }
+    },
+    {
+      path: '/tools',
+      name: 'tools',
+      component: () => import('@/views/Tools.vue'),
+      meta: { title: '工具' }
+    },
+    {
+      path: '/guestbook',
+      name: 'guestbook',
+      component: () => import('@/views/Guestbook.vue'),
+      meta: { title: '留言板' }
+    },
+    {
+      path: '/link',
+      name: 'link',
+      component: () => import('@/views/Link.vue'),
+      meta: { title: '友情链接' }
+    },
+    {
+      path: '/terms',
+      name: 'terms',
+      component: () => import('@/views/Policy.vue'),
+      meta: { title: '用户协议' }
+    },
+    {
+      path: '/privacy',
+      name: 'privacy',
+      component: () => import('@/views/Policy.vue'),
+      meta: { title: '隐私政策' }
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('@/views/Profile.vue'),
+      meta: { requiresAuth: true, title: '个人中心' }
+    },
+    {
+      path: '/favorites',
+      name: 'favorites',
+      component: () => import('@/views/Favorites.vue'),
+      meta: { requiresAuth: true, title: '我的收藏' }
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: () => import('@/views/About.vue'),
+      meta: { title: '关于我' }
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('@/views/NotFound.vue'),
+      meta: { title: '页面未找到' }
+    }
   ]
 })
 
 // 路由守卫 - 检查登录状态
 router.beforeEach(async (to, _from, next) => {
+  if (isArticleIndex(_from.name))
+    articleListPositions.set(_from.fullPath, { left: window.scrollX, top: window.scrollY })
   const userStore = useUserStore()
 
   const tokenStr = localStorage.getItem('ACCESS_TOKEN')
@@ -63,7 +153,7 @@ router.beforeEach(async (to, _from, next) => {
       if (parseToken(localStorage.getItem('ACCESS_TOKEN')) === token) userStore.clearAuth()
     }
   }
-  
+
   // 只有明确标记 requiresAuth 的路由才需要登录
   if (to.meta.requiresAuth === true && !userStore.isLoggedIn) {
     ElMessage.warning('请先登录')

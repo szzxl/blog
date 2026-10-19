@@ -11,6 +11,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ArticleCard: typeof import('./src/components/ArticleCard.vue')['default']
     Comment: typeof import('./src/components/Comment.vue')['default']
     ElButton: typeof import('element-plus/es/components/button/index')['ElButton']
     ElCheckbox: typeof import('element-plus/es/components/checkbox/index')['ElCheckbox']

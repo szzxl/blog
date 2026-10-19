@@ -2,45 +2,51 @@
   <div class="register-page">
     <div class="register-container card">
       <button class="close-btn" @click="goBack">×</button>
-      
+
       <div class="register-header">
         <h2 class="title">注册账号</h2>
       </div>
-      
-      <el-form :disabled="registerLoading" :model="registerForm" :rules="rules" ref="registerFormRef" size="large">
+
+      <el-form
+        :disabled="registerLoading"
+        :model="registerForm"
+        :rules="rules"
+        ref="registerFormRef"
+        size="large"
+      >
         <el-form-item prop="username">
-          <el-input 
-            v-model="registerForm.username" 
+          <el-input
+            v-model="registerForm.username"
             placeholder="用户名"
             :prefix-icon="User"
             clearable
           />
         </el-form-item>
-        
+
         <el-form-item prop="nickname">
-          <el-input 
-            v-model="registerForm.nickname" 
+          <el-input
+            v-model="registerForm.nickname"
             placeholder="昵称"
             :prefix-icon="User"
             clearable
           />
         </el-form-item>
-        
+
         <el-form-item prop="password">
-          <el-input 
-            v-model="registerForm.password" 
-            type="password" 
+          <el-input
+            v-model="registerForm.password"
+            type="password"
             placeholder="密码"
             :prefix-icon="Lock"
             show-password
             clearable
           />
         </el-form-item>
-        
+
         <el-form-item prop="confirmPassword">
-          <el-input 
-            v-model="registerForm.confirmPassword" 
-            type="password" 
+          <el-input
+            v-model="registerForm.confirmPassword"
+            type="password"
             placeholder="确认密码"
             :prefix-icon="Lock"
             show-password
@@ -48,7 +54,7 @@
             @keyup.enter="handleRegister"
           />
         </el-form-item>
-        
+
         <el-form-item>
           <div class="agreement">
             <el-checkbox v-model="agreeTerms">
@@ -59,10 +65,10 @@
             </el-checkbox>
           </div>
         </el-form-item>
-        
+
         <el-form-item>
-          <el-button 
-            type="primary" 
+          <el-button
+            type="primary"
             class="register-btn"
             :loading="registerLoading"
             @click="handleRegister"
@@ -70,10 +76,12 @@
             注册
           </el-button>
         </el-form-item>
-        
+
         <el-form-item>
           <div class="login-tip">
-            已有账号？<el-link type="primary" underline="never" @click="goToLogin">立即登录</el-link>
+            已有账号？<el-link type="primary" underline="never" @click="goToLogin"
+              >立即登录</el-link
+            >
           </div>
         </el-form-item>
       </el-form>
@@ -240,7 +248,10 @@ const goBack = () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+    transition:
+      border-color 0.2s ease,
+      color 0.2s ease,
+      background 0.2s ease;
 
     &:hover {
       border-color: var(--color-accent);
@@ -294,7 +305,10 @@ const goBack = () => {
     letter-spacing: 0.04em;
     color: #fff;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      background 0.2s ease,
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
 
     &:hover {
       background: var(--color-accent-hover);
@@ -328,6 +342,80 @@ const goBack = () => {
 
   .register-container .register-header .title {
     font-size: 22px;
+  }
+}
+
+.login-page,
+.register-page {
+  min-height: 70vh;
+  background: var(--bg-primary);
+  padding: 40px 16px 60px;
+}
+.bg-overlay,
+.logo-ring {
+  display: none;
+}
+.login-container,
+.register-container {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  backdrop-filter: none;
+  box-shadow: none;
+  padding: 36px 32px;
+}
+.login-header .title,
+.register-header .title {
+  font: 500 30px var(--font-serif);
+  color: var(--text-primary);
+  background: none;
+  -webkit-text-fill-color: var(--text-primary);
+}
+.subtitle,
+.register-tip,
+.login-tip {
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+.close-btn {
+  color: var(--text-tertiary);
+  background: transparent;
+  border: 0;
+  min-width: 44px;
+  min-height: 44px;
+}
+.password-help {
+  font-size: 12px;
+  color: var(--color-accent);
+}
+.login-btn,
+.register-btn {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  border-radius: 4px;
+  box-shadow: none;
+  color: var(--bg-card);
+  font-size: 14px;
+  min-height: 44px;
+}
+.agreement {
+  font-size: 11px;
+}
+.agreement :deep(.el-checkbox__label) {
+  white-space: normal;
+  font-size: 11px;
+}
+.agreement :deep(.el-checkbox) {
+  height: auto;
+  min-height: 32px;
+  align-items: flex-start;
+}
+@media (max-width: 500px) {
+  .login-container,
+  .register-container {
+    padding: 30px 22px;
   }
 }
 </style>

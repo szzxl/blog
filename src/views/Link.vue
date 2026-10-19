@@ -1,20 +1,10 @@
 <template>
   <div class="link">
     <!-- ── Banner ─────────────────────────────────────── -->
-    <div class="page-banner">
-      <div class="banner-overlay"></div>
-      <div class="banner-content">
-        <h1 class="banner-title">友情链接</h1>
-        <p class="banner-sub">共 {{ links.length }} 位朋友</p>
-      </div>
-      <button class="banner-apply-btn" @click="showApplyDialog = true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        申请友链
-      </button>
-    </div>
+    <header class="page-header container">
+      <h1>友情链接</h1>
+      <p>共 {{ links.length }} 位朋友</p>
+    </header>
 
     <!-- ── 内容区 ─────────────────────────────────────── -->
     <div class="main-wrap">
@@ -38,7 +28,15 @@
             </div>
             <div class="link-visit">
               <span class="visit-btn">访问</span>
-              <svg class="visit-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                class="visit-arrow"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <line x1="5" y1="12" x2="19" y2="12"></line>
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
@@ -48,7 +46,14 @@
           <!-- 空状态 -->
           <div v-if="links.length === 0 && !loading" class="empty-state">
             <div class="empty-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
               </svg>
@@ -66,7 +71,11 @@
     v-model="showApplyDialog"
     :close-on-press-escape="!submitting"
     :show-close="!submitting"
-    :before-close="(done: () => void) => { if (!submitting) done() }"
+    :before-close="
+      (done: () => void) => {
+        if (!submitting) done()
+      }
+    "
     width="560px"
     :close-on-click-modal="false"
     class="apply-dialog-wrap"
@@ -76,9 +85,16 @@
     <template #header>
       <div class="dialog-header">
         <div class="header-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
           </svg>
         </div>
         <div>
@@ -91,7 +107,7 @@
     <!-- 表单主体 -->
     <div class="apply-body">
       <el-form
-      :disabled="submitting"
+        :disabled="submitting"
         ref="formRef"
         :model="applyForm"
         :rules="formRules"
@@ -103,9 +119,19 @@
           <el-form-item label="网站名称" prop="siteName">
             <el-input v-model="applyForm.siteName" placeholder="我的技术博客">
               <template #prefix>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="2" y1="12" x2="22" y2="12" />
+                  <path
+                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                  />
                 </svg>
               </template>
             </el-input>
@@ -113,8 +139,16 @@
           <el-form-item label="站长名称" prop="siteAuthor">
             <el-input v-model="applyForm.siteAuthor" placeholder="张三">
               <template #prefix>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
                 </svg>
               </template>
             </el-input>
@@ -125,9 +159,16 @@
         <el-form-item label="网站地址" prop="siteUrl">
           <el-input v-model="applyForm.siteUrl" placeholder="https://example.com">
             <template #prefix>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
               </svg>
             </template>
           </el-input>
@@ -137,9 +178,18 @@
         <el-form-item label="联系邮箱" prop="email">
           <el-input v-model="applyForm.email" placeholder="your@email.com">
             <template #prefix>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                <polyline points="22,6 12,13 2,6"/>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                />
+                <polyline points="22,6 12,13 2,6" />
               </svg>
             </template>
           </el-input>
@@ -161,15 +211,33 @@
       <!-- 申请须知 -->
       <div class="apply-tips">
         <div class="tips-header">
-          <svg class="tips-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          <svg
+            class="tips-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
           申请须知
         </div>
         <div class="tips-grid">
           <div class="tip-item" v-for="tip in APPLY_TIPS" :key="tip">
-            <svg class="tip-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"/>
+            <svg
+              class="tip-check"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12" />
             </svg>
             <span>{{ tip }}</span>
           </div>
@@ -182,8 +250,16 @@
       <div class="dialog-footer">
         <button class="footer-cancel" :disabled="submitting" @click="resetForm">取消</button>
         <button class="footer-submit" :disabled="submitting" @click="submitApply">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="22" y1="2" x2="11" y2="13" />
+            <polygon points="22 2 15 22 11 13 2 9 22 2" />
           </svg>
           提交申请
         </button>
@@ -456,7 +532,9 @@ onMounted(() => {
       opacity: 0.03;
     }
 
-    .link-name { color: var(--color-accent); }
+    .link-name {
+      color: var(--color-accent);
+    }
 
     .link-avatar {
       box-shadow: var(--shadow-glow-strong);
@@ -752,7 +830,9 @@ onMounted(() => {
     }
 
     &.is-focus {
-      box-shadow: 0 0 0 1px var(--color-accent) inset, 0 0 0 3px rgba(22, 93, 255, 0.1);
+      box-shadow:
+        0 0 0 1px var(--color-accent) inset,
+        0 0 0 3px rgba(22, 93, 255, 0.1);
     }
   }
 
@@ -776,7 +856,9 @@ onMounted(() => {
     transition: box-shadow 0.2s;
 
     &:focus {
-      box-shadow: 0 0 0 1px var(--color-accent) inset, 0 0 0 3px rgba(22, 93, 255, 0.1);
+      box-shadow:
+        0 0 0 1px var(--color-accent) inset,
+        0 0 0 3px rgba(22, 93, 255, 0.1);
     }
   }
 }
@@ -963,6 +1045,63 @@ onMounted(() => {
   .page-banner .banner-content {
     position: relative;
     z-index: 1;
+  }
+}
+
+.container {
+  width: 100%;
+  max-width: none;
+  padding-inline: clamp(24px, 2vw, 32px);
+}
+.page-header.container {
+  width: calc(100% - clamp(48px, 4vw, 64px));
+  padding-inline: 0;
+}
+.main-wrap {
+  padding-top: 0;
+}
+.link-card {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  border-radius: 5px;
+  box-shadow: none;
+}
+.link-card:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--border-strong);
+}
+.card-glow {
+  display: none;
+}
+.links-grid {
+  gap: 24px;
+}
+.link-name {
+  font: 22px var(--font-serif);
+}
+.link-description {
+  font-size: 13px;
+}
+.apply-tips {
+  background: var(--bg-secondary);
+}
+.apply-btn,
+.empty-apply-btn {
+  background: var(--color-accent);
+  border-radius: 4px;
+  box-shadow: none;
+}
+@media (max-width: 760px) {
+  .container {
+    padding-inline: 16px;
+  }
+  .page-header.container {
+    width: calc(100% - 32px);
+    padding-inline: 0;
+  }
+  .links-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 </style>

@@ -1,117 +1,160 @@
 <template>
   <header class="header" :class="{ scrolled: isScrolled }">
-    <div class="container">
-      <!-- Logo -->
-      <router-link to="/" class="logo">
-        <img :src="siteLogo" class="logo-img" alt="" width="32" height="32" @error="handleLogoError" />
-        <span class="logo-name">{{ siteName || '博客' }}</span>
-      </router-link>
-
-      <!-- PC 端导航 -->
-      <nav class="nav desktop-nav">
+    <div class="container header-inner">
+      <router-link to="/" class="logo"
+        ><img :src="siteLogo" alt="" width="34" height="34" @error="handleLogoError" /><span
+          >{{ siteName || '时光博客' }}<small>记录技术与生活</small></span
+        ></router-link
+      >
+      <nav class="desktop-nav" aria-label="主导航">
         <router-link
-          v-for="item in navItems"
+          v-for="item in navItems.filter((item) =>
+            ['/', '/articles', '/category', '/album', '/tools'].includes(item.to)
+          )"
           :key="item.to"
           :to="item.to"
-          class="nav-item"
+          >{{ item.text }}</router-link
         >
-          <span class="nav-icon" :style="{ background: item.color + '22', color: item.color }">
-            <el-icon><component :is="item.icon" /></el-icon>
-          </span>
-          <span class="nav-text">{{ item.text }}</span>
-        </router-link>
+        <el-dropdown trigger="click" @command="(path: string) => router.push(path)"
+          ><button class="more-btn">更多 <span aria-hidden="true">⌄</span></button
+          ><template #dropdown
+            ><el-dropdown-menu
+              ><el-dropdown-item
+                v-for="item in navItems.filter(
+                  (item) => !['/', '/articles', '/category', '/album', '/tools'].includes(item.to)
+                )"
+                :key="item.to"
+                :command="item.to"
+                >{{ item.text }}</el-dropdown-item
+              ><el-dropdown-item command="/about">关于我</el-dropdown-item></el-dropdown-menu
+            ></template
+          ></el-dropdown
+        >
       </nav>
-
-      <!-- 右侧操作区 -->
       <div class="header-actions">
-        <button class="icon-btn" @click="openSearch" title="搜索 Ctrl+K">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.5-4.5"/>
-          </svg>
+        <button
+          class="search-btn icon-btn"
+          @click="openSearch"
+          aria-label="搜索文章"
+          title="搜索文章 Ctrl+K"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+            <circle cx="10.5" cy="10.5" r="7" />
+            <path d="m16 16 5 5" /></svg
+          ><span>搜索文章</span><kbd>Ctrl K</kbd>
         </button>
-        <button class="icon-btn" @click="toggleTheme" :title="themeTooltip">
-          <el-icon :size="17"><component :is="themeIconComp" /></el-icon>
-        </button>
-
-        <template v-if="userStore.isLoggedIn">
-          <el-dropdown @command="handleCommand">
+        <el-dropdown trigger="click" @command="setTheme"
+          ><button
+            class="icon-btn theme-btn"
+            :aria-label="`主题模式：${themeStore.themeMode === 'auto' ? '跟随系统' : themeStore.themeMode === 'dark' ? '深色' : '浅色'}，选择主题`"
+          >
+            <el-icon :size="19"><component :is="themeIconComp" /></el-icon></button
+          ><template #dropdown
+            ><el-dropdown-menu
+              ><el-dropdown-item
+                v-for="mode in [
+                  { value: 'light', label: '浅色模式' },
+                  { value: 'dark', label: '深色模式' },
+                  { value: 'auto', label: '跟随系统' }
+                ]"
+                :key="mode.value"
+                :command="mode.value"
+                >{{ themeStore.themeMode === mode.value ? '✓ ' : ''
+                }}{{ mode.label }}</el-dropdown-item
+              ></el-dropdown-menu
+            ></template
+          ></el-dropdown
+        >
+        <el-dropdown v-if="userStore.isLoggedIn" trigger="click" @command="handleCommand"
+          ><button class="account-btn" aria-label="打开账号菜单">
             <img
               :src="userStore.user?.avatar || '/default-avatar.svg'"
-              alt="头像"
+              alt=""
               class="user-avatar"
-            >
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item v-if="isAuthor" command="admin">管理后台</el-dropdown-item>
-                <el-dropdown-item command="profile">个人中心</el-dropdown-item>
-                <el-dropdown-item command="favorites">我的收藏</el-dropdown-item>
-                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-        </template>
-        <template v-else>
-          <button class="login-btn" @click="goToLogin">登录</button>
-        </template>
-
-        <!-- 移动端汉堡 -->
-        <button class="icon-btn mobile-menu-btn" @click="showMobileMenu = true">
-          <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor">
-            <rect width="16" height="2" rx="1"/><rect y="5" width="16" height="2" rx="1"/><rect y="10" width="16" height="2" rx="1"/>
+            /><span>{{
+              userStore.user?.nickname || userStore.user?.username || '我的账号'
+            }}</span></button
+          ><template #dropdown
+            ><el-dropdown-menu
+              ><el-dropdown-item v-if="isAuthor" command="admin">管理后台</el-dropdown-item
+              ><el-dropdown-item command="profile">个人资料</el-dropdown-item
+              ><el-dropdown-item command="favorites">我的收藏</el-dropdown-item
+              ><el-dropdown-item command="logout">退出登录</el-dropdown-item></el-dropdown-menu
+            ></template
+          ></el-dropdown
+        >
+        <button v-else class="login-btn" @click="goToLogin">登录</button>
+        <button
+          class="icon-btn mobile-menu-btn"
+          @click="showMobileMenu = true"
+          aria-label="打开导航菜单"
+          :aria-expanded="showMobileMenu"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
       </div>
     </div>
-
-    <!-- 移动端菜单 -->
-    <el-drawer v-model="showMobileMenu" direction="ltr" size="280px" :with-header="false">
+    <el-drawer v-model="showMobileMenu" direction="rtl" size="min(320px, 100vw)" title="导航">
       <div class="mobile-menu">
-        <div class="mobile-logo">
-          <img :src="siteLogo" alt="" width="32" height="32" @error="handleLogoError" />
-          <span>{{ siteName || '博客' }}</span>
-        </div>
-        <nav class="mobile-nav">
+        <router-link to="/" class="mobile-brand" @click="showMobileMenu = false">{{
+          siteName || '时光博客'
+        }}</router-link>
+        <nav class="mobile-nav" aria-label="手机导航">
           <router-link
             v-for="item in navItems"
             :key="item.to"
             :to="item.to"
-            class="mobile-nav-item"
             @click="showMobileMenu = false"
-          >
-            <span class="mobile-nav-icon" :style="{ background: item.color + '18', color: item.color }">
-              <el-icon :size="16"><component :is="item.icon" /></el-icon>
-            </span>
-            {{ item.text }}
-          </router-link>
+            ><el-icon><component :is="item.icon" /></el-icon>{{ item.text }}</router-link
+          ><router-link to="/about" @click="showMobileMenu = false">关于我</router-link>
         </nav>
         <div class="mobile-actions">
-          <button class="mobile-action-btn" @click="toggleTheme; showMobileMenu = false">
-            <el-icon style="vertical-align:-2px;margin-right:6px"><component :is="themeIconComp" /></el-icon>{{ themeTooltip }}
-          </button>
-          <template v-if="userStore.isLoggedIn">
-            <button v-if="isAuthor" class="mobile-action-btn" @click="handleMobileCommand('admin')">管理后台</button>
-            <button class="mobile-action-btn" @click="handleMobileCommand('profile')">个人中心</button>
-            <button class="mobile-action-btn" @click="handleMobileCommand('logout')">退出登录</button>
-          </template>
-          <template v-else>
-            <button class="mobile-action-btn accent" @click="handleMobileLogin">登录</button>
-          </template>
+          <p>显示主题</p>
+          <div class="mobile-themes">
+            <button
+              v-for="mode in [
+                { value: 'light', label: '浅色' },
+                { value: 'dark', label: '深色' },
+                { value: 'auto', label: '自动' }
+              ]"
+              :key="mode.value"
+              :aria-pressed="themeStore.themeMode === mode.value"
+              @click="setTheme(mode.value)"
+            >
+              {{ mode.label }}
+            </button>
+          </div>
+          <template v-if="userStore.isLoggedIn"
+            ><button v-if="isAuthor" @click="handleMobileCommand('admin')">管理后台 ↗</button
+            ><button @click="handleMobileCommand('profile')">个人资料</button
+            ><button @click="handleMobileCommand('favorites')">我的收藏</button
+            ><button @click="handleMobileCommand('logout')">退出登录</button></template
+          ><button v-else @click="handleMobileLogin">登录账号 →</button>
         </div>
       </div>
     </el-drawer>
   </header>
 </template>
-
 <script setup lang="ts">
-
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { useThemeStore } from '@/stores/theme'
 import { fetchWebsiteConfigWithCache, useWebsiteConfigRefresh } from '@/utils/websiteConfig'
 import {
-  House, Document, Folder, CollectionTag,
-  PictureFilled, EditPen, Connection, Tools, Moon, Sunny,
+  House,
+  Document,
+  Folder,
+  CollectionTag,
+  PictureFilled,
+  EditPen,
+  Connection,
+  Tools,
+  Moon,
+  Sunny,
+  Monitor
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -123,10 +166,10 @@ const navItems = [
   { to: '/articles', icon: Document, text: '文章', color: '#722ed1' },
   { to: '/category', icon: Folder, text: '分类', color: '#ff7d00' },
   { to: '/tag', icon: CollectionTag, text: '标签', color: '#f53f3f' },
-{ to: '/album', icon: PictureFilled, text: '相册', color: '#0fc6c2' },
+  { to: '/album', icon: PictureFilled, text: '相册', color: '#0fc6c2' },
   { to: '/guestbook', icon: EditPen, text: '留言板', color: '#f77234' },
   { to: '/link', icon: Connection, text: '友链', color: '#9fdb1d' },
-  { to: '/tools', icon: Tools, text: '工具', color: '#00b42a' },
+  { to: '/tools', icon: Tools, text: '工具', color: '#00b42a' }
 ]
 
 const siteName = ref('')
@@ -135,9 +178,13 @@ const siteLogo = ref(DEFAULT_SITE_LOGO)
 const showMobileMenu = ref(false)
 const isScrolled = ref(false)
 
-const themeIconComp = computed(() => themeStore.appliedTheme === 'dark' ? Sunny : Moon)
-const themeTooltip = computed(() => themeStore.appliedTheme === 'dark' ? '切换到浅色模式' : '切换到深色模式')
-const toggleTheme = () => themeStore.toggleTheme()
+const themeIconComp = computed(() =>
+  themeStore.themeMode === 'auto' ? Monitor : themeStore.appliedTheme === 'dark' ? Moon : Sunny
+)
+
+const setTheme = (mode: string) => {
+  if (mode === 'light' || mode === 'dark' || mode === 'auto') themeStore.setTheme(mode)
+}
 const openSearch = () => window.dispatchEvent(new CustomEvent('open-search'))
 
 const handleLogoError = () => {
@@ -192,7 +239,9 @@ const handleScroll = () => {
   isScrolled.value = window.scrollY > 10
 }
 
-useWebsiteConfigRefresh(() => { void fetchWebsiteConfig() })
+useWebsiteConfigRefresh(() => {
+  void fetchWebsiteConfig()
+})
 onMounted(async () => {
   fetchWebsiteConfig()
   window.addEventListener('scroll', handleScroll)
@@ -213,283 +262,234 @@ onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
 })
 </script>
-
 <style scoped lang="scss">
 .header {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  height: 64px;
-  z-index: 999;
-  background-image: url('/bg-banner.jpg');
-  background-size: cover;
-  background-position: center 20%;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.25);
-  transition: box-shadow 0.3s ease;
-
-  /* 半透明遮罩，保证导航文字可读 */
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(8, 18, 40, 0.55);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    pointer-events: none;
-  }
-
-  /* 流光底边 */
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #165dff, #0fc6c2, #ff7d00, #f53f3f, #165dff);
-    background-size: 300% 100%;
-    animation: header-flow 5s linear infinite;
-  }
-
-  .container {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    position: relative;
-  }
+  z-index: 100;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
 }
-
-@keyframes header-flow {
-  from { background-position: 0% center; }
-  to   { background-position: 300% center; }
+.header.scrolled {
+  box-shadow: 0 2px 10px #00000005;
 }
-
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  min-height: 78px;
+}
 .logo {
+  display: flex;
+  align-items: center;
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 900;
-  color: #fff;
-  text-decoration: none;
-  letter-spacing: -0.03em;
-  transition: color 0.2s ease;
-  text-shadow: 0 1px 8px rgba(0,0,0,0.4);
-
-  &:hover { color: #7eb8ff !important; }
-
-  .logo-img {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    object-fit: cover;
-    flex-shrink: 0;
-  }
+  gap: 11px;
+  color: var(--text-primary);
+  font-size: 21px;
+  font-weight: 650;
 }
-
-.nav {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex: 1;
+.logo img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
 }
-
-.nav-item {
+.logo small {
+  display: block;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+.desktop-nav {
   display: flex;
+  gap: 16px;
   align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  border-radius: var(--radius-btn);
-  color: rgba(255,255,255,0.85);
+}
+.desktop-nav > a {
+  padding: 26px 9px 23px;
   font-size: 13px;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
   white-space: nowrap;
-
-  .nav-icon {
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    flex-shrink: 0;
-    transition: transform 0.2s ease;
-    .el-icon { font-size: 14px; }
-  }
-
-  &:hover {
-    background: rgba(255,255,255,0.12);
-    color: #fff !important;
-    .nav-icon { transform: scale(1.15); }
-  }
-
-  &.router-link-active {
-    color: #7eb8ff !important;
-    background: rgba(22, 93, 255, 0.2);
-    font-weight: 700;
-  }
 }
-
+.desktop-nav > a.router-link-exact-active {
+  border-bottom-color: var(--text-primary);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.more-btn {
+  background: transparent;
+  border: 0;
+  min-height: 44px;
+  padding: 8px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
 .header-actions {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-shrink: 0;
+  margin-left: auto;
 }
-
-.icon-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-btn);
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.2);
-  color: rgba(255,255,255,0.85);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
+.icon-btn,
+.login-btn,
+.account-btn {
+  min-height: 44px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  border-radius: 5px;
+  display: inline-flex;
   justify-content: center;
-  font-size: 16px;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: rgba(255,255,255,0.5);
-    color: #fff;
-    background: rgba(255,255,255,0.12);
-  }
+  align-items: center;
+  gap: 9px;
+  color: var(--text-primary);
 }
-
+.icon-btn {
+  width: 44px;
+  padding: 0;
+}
+.icon-btn svg {
+  width: 19px;
+  height: 19px;
+}
+.search-btn {
+  width: auto;
+  padding: 0 12px;
+  color: var(--text-secondary);
+  background: transparent;
+  font-size: 12px;
+}
+.search-btn kbd {
+  font: 10px var(--font-sans);
+  background: var(--bg-soft);
+  padding: 1px 4px;
+  color: var(--text-tertiary);
+}
 .login-btn {
-  padding: 7px 18px;
-  border-radius: var(--radius-btn);
-  background: rgba(22,93,255,0.75);
-  border: 1px solid rgba(22,93,255,0.5);
-  color: #fff;
+  padding: 0 19px;
   font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(4px);
-
-  &:hover { background: rgba(22,93,255,0.95); }
 }
-
+.account-btn {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+.account-btn span {
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .user-avatar {
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--border-strong);
-  cursor: pointer;
-  transition: all 0.2s ease;
+}
+.mobile-menu-btn {
+  display: none;
+}
+.mobile-brand {
   display: block;
-
-  &:hover { border-color: var(--color-accent); box-shadow: var(--shadow-glow); }
+  font: 24px var(--font-serif);
+  padding-bottom: 20px;
+  color: var(--text-primary);
 }
-
-.mobile-menu-btn { display: none; }
-
-.mobile-menu {
-  padding: 24px 16px;
-  height: 100%;
-  background: var(--bg-card);
+.mobile-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.mobile-nav a {
   display: flex;
-  flex-direction: column;
-  gap: 24px;
-
-  .mobile-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: var(--font-display);
-    font-size: 22px;
-    font-weight: 900;
-    color: var(--text-primary);
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border-color);
-    letter-spacing: -0.03em;
-
-    img {
-      flex-shrink: 0;
-      border-radius: 8px;
-      object-fit: cover;
-    }
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  min-height: 48px;
+  padding: 10px;
+}
+.mobile-nav .router-link-exact-active {
+  color: var(--color-accent);
+  background: var(--bg-soft);
+  border-radius: 4px;
+}
+.mobile-actions {
+  margin-top: 24px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 22px;
+  font-size: 13px;
+}
+.mobile-actions > button {
+  display: block;
+  min-height: 44px;
+  background: transparent;
+  border: 0;
+  width: 100%;
+  text-align: left;
+}
+.mobile-themes {
+  display: flex;
+  gap: 6px;
+  margin: 12px 0 18px;
+}
+.mobile-themes button {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  min-height: 44px;
+}
+.mobile-themes button[aria-pressed='true'] {
+  color: var(--color-accent);
+  background: var(--bg-soft);
+  border-color: var(--color-accent);
+}
+@media (max-width: 1100px) {
+  .header-inner {
+    gap: 20px;
   }
-
-  .mobile-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex: 1;
+  .desktop-nav {
+    gap: 7px;
   }
-
-  .mobile-nav-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 11px 14px;
-    border-radius: var(--radius-btn);
-    color: var(--text-secondary);
-    font-size: 15px;
-    transition: all 0.2s ease;
-
-    .mobile-nav-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      background: var(--bg-secondary);
-    }
-
-    &:hover, &.router-link-active {
-      background: var(--bg-secondary);
-      color: var(--color-accent);
-    }
+  .search-btn {
+    width: 44px;
+    padding: 0;
   }
-
-  .mobile-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border-color);
-  }
-
-  .mobile-action-btn {
-    padding: 11px 14px;
-    border-radius: var(--radius-btn);
-    background: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    font-size: 14px;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.2s ease;
-
-    &:hover {
-      border-color: var(--color-accent);
-      color: var(--color-accent);
-    }
-
-    &.accent {
-      background: var(--color-accent);
-      border-color: var(--color-accent);
-      color: #fff;
-
-      &:hover { background: var(--color-accent-hover); }
-    }
+  .search-btn span,
+  .search-btn kbd {
+    display: none;
   }
 }
-
-@media (max-width: 1024px) {
-  .desktop-nav { display: none; }
-  .mobile-menu-btn { display: flex; }
-  .header .container { gap: 16px; }
+@media (max-width: 850px) {
+  .desktop-nav {
+    display: none;
+  }
+  .mobile-menu-btn {
+    display: inline-flex;
+  }
+  .header-inner {
+    min-height: 72px;
+  }
+}
+@media (max-width: 500px) {
+  .logo {
+    font-size: 18px;
+    gap: 8px;
+  }
+  .logo img {
+    width: 28px;
+    height: 28px;
+  }
+  .logo small {
+    display: none;
+  }
+  .header-inner {
+    gap: 8px;
+    min-height: 68px;
+  }
+  .header-actions {
+    gap: 5px;
+  }
+  .login-btn,
+  .account-btn {
+    display: none;
+  }
 }
 </style>

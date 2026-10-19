@@ -1,451 +1,159 @@
 <template>
-  <div class="about">
-    <!-- ── Banner ─────────────────────────────────────── -->
-    <div class="page-banner">
-      <div class="banner-overlay"></div>
-      <div class="banner-content">
-        <h1 class="banner-title">关于我</h1>
-        <p class="banner-sub">认识博主</p>
-      </div>
-    </div>
-
-    <!-- ── 内容区 ─────────────────────────────────────── -->
-    <div class="main-wrap">
-      <div class="container">
-
-        <!-- 个人介绍 -->
-        <section class="about-card card">
-          <div class="intro-section">
-            <div class="avatar-wrap">
-              <img src="/default-avatar.svg" alt="博主头像" class="avatar-img" />
-            </div>
-            <div class="intro-text">
-              <h2 class="intro-name">博主</h2>
-              <p>你好！我是一名拥有 <strong>5年经验</strong> 的全栈开发工程师。</p>
-              <p>这个博客系统是我独立开发的作品，融合了现代化的技术栈和优雅的设计理念。</p>
-            </div>
-          </div>
+  <div class="about container">
+    <header class="page-header">
+      <span class="eyebrow">关于这里</span>
+      <h1>关于我</h1>
+      <p>{{ config.website_motto || '记录技术与生活。' }}</p>
+    </header>
+    <div class="about-layout">
+      <section class="intro">
+        <span class="monogram" aria-hidden="true">{{
+          (config.site_name || '时光').slice(0, 1)
+        }}</span>
+        <h2>{{ config.site_name || '时光博客' }}</h2>
+        <p>
+          {{
+            config.site_description ||
+            '这里整理项目中的技术笔记、解决问题的过程，也分享一些日常记录。'
+          }}
+        </p>
+        <router-link to="/guestbook" class="text-link">有想法，给我留言 →</router-link>
+      </section>
+      <div>
+        <section class="about-section">
+          <h2>从这里开始</h2>
+          <router-link to="/articles"
+            ><span>文章笔记</span><small>看看最近在记录什么 ↗</small></router-link
+          ><router-link to="/category"
+            ><span>分类与主题</span><small>找到你感兴趣的内容 ↗</small></router-link
+          ><router-link to="/album"
+            ><span>日常相册</span><small>文字之外的片刻 ↗</small></router-link
+          >
         </section>
-
-        <!-- 技术栈 -->
-        <section class="about-card card">
-          <h3 class="card-section-title">
-            <span class="title-bar"></span>
-            技术栈
-          </h3>
-          <div class="tech-tags">
-            <span class="tech-tag" data-color="blue">Vue 3</span>
-            <span class="tech-tag" data-color="blue">TypeScript</span>
-            <span class="tech-tag" data-color="purple">Vite</span>
-            <span class="tech-tag" data-color="purple">Element Plus</span>
-            <span class="tech-tag" data-color="green">Pinia</span>
-            <span class="tech-tag" data-color="green">Node.js</span>
-            <span class="tech-tag" data-color="orange">Spring Boot</span>
-            <span class="tech-tag" data-color="orange">MySQL</span>
-            <span class="tech-tag" data-color="orange">springboot</span>
-            <span class="tech-tag" data-color="red">redis</span>
-            <span class="tech-tag" data-color="red">ES</span>
-            <span class="tech-tag" data-color="blue">docker</span>
-            <span class="tech-tag" data-color="purple">MQ</span>
-          </div>
+        <section class="about-section">
+          <h2>联系与交流</h2>
+          <a v-if="config.social_email" :href="`mailto:${config.social_email}`"
+            ><span>邮箱</span><small>{{ config.social_email }}</small></a
+          ><a
+            v-if="config.social_github"
+            :href="config.social_github"
+            target="_blank"
+            rel="noopener noreferrer"
+            ><span>GitHub</span><small>看看我的代码 ↗</small></a
+          ><a
+            v-if="config.social_gitee"
+            :href="config.social_gitee"
+            target="_blank"
+            rel="noopener noreferrer"
+            ><span>Gitee</span><small>看看我的代码 ↗</small></a
+          >
+          <p v-if="config.social_wechat" class="wechat">微信：{{ config.social_wechat }}</p>
+          <p>问题、建议，或只是打个招呼，都可以留在留言板。</p>
         </section>
-
-        <!-- 联系方式 -->
-        <section class="about-card card">
-          <h3 class="card-section-title">
-            <span class="title-bar"></span>
-            联系我
-          </h3>
-          <p class="contact-intro">如果你对这个博客系统感兴趣，或者需要定制开发服务，欢迎联系我！</p>
-          <div class="contact-list">
-            <div class="contact-item" v-if="socialEmail">
-              <div class="contact-icon email-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                  <polyline points="22,6 12,13 2,6"></polyline>
-                </svg>
-              </div>
-              <div class="contact-body">
-                <span class="contact-label">邮箱</span>
-                <a :href="`mailto:${socialEmail}`" class="contact-value">{{ socialEmail }}</a>
-              </div>
-            </div>
-            <div class="contact-item" v-if="socialWechat">
-              <div class="contact-icon wechat-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
-              </div>
-              <div class="contact-body">
-                <span class="contact-label">微信</span>
-                <span class="contact-value">{{ socialWechat }}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="footer-note">
-            <p>期待与你的合作！</p>
-          </div>
-        </section>
-
       </div>
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { fetchWebsiteConfigWithCache } from '@/utils/websiteConfig'
-
-const socialEmail = ref('')
-const socialWechat = ref('')
-
-onMounted(async () => {
-  const config = await fetchWebsiteConfigWithCache()
-  if (config.social_email) socialEmail.value = config.social_email
-  if (config.social_wechat) socialWechat.value = config.social_wechat
+import { onMounted, onUnmounted, ref } from 'vue'
+import { fetchWebsiteConfigWithCache, useWebsiteConfigRefresh } from '@/utils/websiteConfig'
+import type { WebsiteConfig } from '@/utils/websiteConfig'
+const config = ref<WebsiteConfig>({})
+let disposed = false
+const fetchConfig = async () => {
+  const value = await fetchWebsiteConfigWithCache()
+  if (!disposed) config.value = value
+}
+onMounted(fetchConfig)
+useWebsiteConfigRefresh(() => {
+  void fetchConfig()
+})
+onUnmounted(() => {
+  disposed = true
 })
 </script>
-
 <style scoped lang="scss">
-// ── Banner ─────────────────────────────────────────────
-.page-banner {
-  position: relative;
-  height: 200px;
-  background: url('/bg-banner.jpg') center 30% / cover no-repeat;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-
-  .banner-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(5, 12, 30, 0.62);
-  }
-
-  .banner-content {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    padding: 0 24px;
-
-    .banner-title {
-      font-family: var(--font-display);
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: #fff;
-      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
-      margin: 0 0 8px 0;
-      line-height: 1.3;
-    }
-
-    .banner-sub {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.65);
-      margin: 0;
-      font-family: var(--font-sans);
-    }
-  }
+.about {
+  padding-bottom: 55px;
 }
-
-// ── 主内容包装器 ───────────────────────────────────────
-.main-wrap {
-  padding-top: 48px;
-  padding-bottom: 80px;
+.page-header h1 {
+  margin-top: 8px;
 }
-
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+.about-layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 1fr) minmax(0, 1.5fr);
+  gap: clamp(32px, 6vw, 96px);
 }
-
-// ── 通用卡片 ───────────────────────────────────────────
-.about-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  padding: 36px 40px;
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
-
-  &:hover {
-    box-shadow: var(--shadow-card-hover);
-    border-color: var(--border-strong);
-  }
-}
-
-.card-section-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0 0 24px 0;
-  letter-spacing: -0.01em;
-
-  .title-bar {
-    display: block;
-    width: 4px;
-    height: 18px;
-    background: var(--gradient-accent);
-    border-radius: 3px;
-    flex-shrink: 0;
-  }
-}
-
-// ── 个人介绍 ───────────────────────────────────────────
-.intro-section {
-  display: flex;
-  align-items: flex-start;
-  gap: 28px;
-
-  .avatar-wrap {
-    flex-shrink: 0;
-
-    .avatar-img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      border: 3px solid var(--border-strong);
-      box-shadow: var(--shadow-glow);
-      object-fit: cover;
-    }
-  }
-
-  .intro-text {
-    flex: 1;
-
-    .intro-name {
-      font-family: var(--font-display);
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin: 0 0 12px 0;
-    }
-
-    p {
-      font-size: 15px;
-      line-height: 1.85;
-      color: var(--text-secondary);
-      margin: 8px 0 0 0;
-      font-family: var(--font-sans);
-
-      strong {
-        color: var(--color-accent);
-        font-weight: 700;
-      }
-    }
-  }
-}
-
-// ── 技术栈 ─────────────────────────────────────────────
-.tech-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-
-  .tech-tag {
-    padding: 5px 14px;
-    border-radius: var(--radius-tag);
-    font-size: 13px;
-    font-family: var(--font-sans);
-    font-weight: 500;
-    cursor: default;
-    transition: all 0.25s ease;
-    border: 1px solid transparent;
-
-    &[data-color="blue"] {
-      background: rgba(22, 93, 255, 0.08);
-      color: var(--color-accent);
-      border-color: rgba(22, 93, 255, 0.2);
-      &:hover {
-        background: var(--color-accent);
-        color: #fff;
-        box-shadow: 0 0 12px rgba(22, 93, 255, 0.35);
-      }
-    }
-
-    &[data-color="purple"] {
-      background: rgba(114, 46, 209, 0.08);
-      color: var(--color-accent-2);
-      border-color: rgba(114, 46, 209, 0.2);
-      &:hover {
-        background: var(--color-accent-2);
-        color: #fff;
-        box-shadow: 0 0 12px rgba(114, 46, 209, 0.35);
-      }
-    }
-
-    &[data-color="green"] {
-      background: rgba(0, 180, 42, 0.08);
-      color: var(--color-cyan);
-      border-color: rgba(0, 180, 42, 0.2);
-      &:hover {
-        background: var(--color-cyan);
-        color: #fff;
-        box-shadow: 0 0 12px rgba(0, 180, 42, 0.35);
-      }
-    }
-
-    &[data-color="orange"] {
-      background: rgba(255, 125, 0, 0.08);
-      color: var(--color-accent-3);
-      border-color: rgba(255, 125, 0, 0.2);
-      &:hover {
-        background: var(--color-accent-3);
-        color: #fff;
-        box-shadow: 0 0 12px rgba(255, 125, 0, 0.35);
-      }
-    }
-
-    &[data-color="red"] {
-      background: rgba(245, 63, 63, 0.08);
-      color: var(--color-pink);
-      border-color: rgba(245, 63, 63, 0.2);
-      &:hover {
-        background: var(--color-pink);
-        color: #fff;
-        box-shadow: 0 0 12px rgba(245, 63, 63, 0.35);
-      }
-    }
-  }
-}
-
-// ── 联系方式 ───────────────────────────────────────────
-.contact-intro {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.85;
-  margin: 0 0 20px 0;
-  font-family: var(--font-sans);
-}
-
-.contact-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.contact-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
+.intro {
   background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-card);
-  transition: all 0.25s ease;
-
-  &:hover {
-    border-color: var(--color-accent);
-    box-shadow: var(--shadow-glow);
-    transform: translateX(4px);
-  }
-
-  .contact-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-
-    svg {
-      width: 18px;
-      height: 18px;
-    }
-
-    &.email-icon {
-      background: rgba(22, 93, 255, 0.1);
-      color: var(--color-accent);
-    }
-
-    &.wechat-icon {
-      background: rgba(0, 180, 42, 0.1);
-      color: var(--color-cyan);
-    }
-  }
-
-  .contact-body {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-
-    .contact-label {
-      font-size: 11px;
-      color: var(--text-tertiary);
-      font-family: var(--font-sans);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    .contact-value {
-      font-size: 15px;
-      color: var(--text-primary);
-      font-weight: 500;
-      font-family: var(--font-sans);
-      text-decoration: none;
-      transition: color 0.2s;
-
-      &:is(a):hover {
-        color: var(--color-accent);
-      }
-    }
-  }
+  border-radius: 4px;
+  padding: 32px;
+  align-self: start;
 }
-
-.footer-note {
-  margin-top: 28px;
-  padding-top: 24px;
+.monogram {
+  width: 60px;
+  height: 60px;
+  border: 1px solid var(--border-strong);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font: 30px var(--font-serif);
+  color: var(--color-accent);
+}
+.intro h2 {
+  font: 28px var(--font-serif);
+  margin: 24px 0 18px;
+}
+.intro p {
+  font-size: 14px;
+  line-height: 2;
+}
+.text-link {
+  display: inline-block;
+  font-size: 13px;
+  min-height: 44px;
+  margin-top: 20px;
+  color: var(--color-accent);
+}
+.about-section {
+  padding: 5px 0 30px;
+  margin-bottom: 24px;
+}
+.about-section h2 {
+  font: 25px var(--font-serif);
+  margin-bottom: 24px;
+}
+.about-section > a {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 60px;
+  align-items: center;
   border-top: 1px solid var(--border-color);
-  text-align: center;
-
-  p {
-    font-family: var(--font-display);
-    font-size: 15px;
-    color: var(--text-tertiary);
-    margin: 0;
-    font-style: italic;
-    letter-spacing: 0.02em;
-  }
 }
-
-// ── 响应式 ────────────────────────────────────────────
-@media (max-width: 768px) {
-  .page-banner {
-    height: 160px;
-
-    .banner-content .banner-title {
-      font-size: 1.7rem;
-    }
+.about-section small {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  overflow-wrap: anywhere;
+}
+.about-section p {
+  font-size: 13px;
+  margin-top: 16px;
+  line-height: 1.9;
+}
+@media (max-width: 760px) {
+  .about-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 30px;
   }
-
-  .main-wrap {
-    padding-top: 32px;
-    padding-bottom: 60px;
+  .intro {
+    padding: 26px;
   }
-
-  .container {
-    padding: 0 16px;
-  }
-
-  .about-card {
-    padding: 24px 20px;
-  }
-
-  .intro-section {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 20px;
+  .about-section > a {
+    font-size: 13px;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 0;
   }
 }
 </style>

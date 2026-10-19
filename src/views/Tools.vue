@@ -1,11 +1,9 @@
 <template>
   <div class="tools">
-    <div class="page-banner">
-      <div class="banner-content">
-        <h1>工具</h1>
-        <p>随手可用的小工具</p>
-      </div>
-    </div>
+    <header class="page-header container">
+      <h1>工具</h1>
+      <p>随手可用的小工具</p>
+    </header>
 
     <div class="container tools-content">
       <article class="tool-card" aria-labelledby="miniprogram-title">
@@ -21,14 +19,25 @@
             <span class="guide-number" aria-hidden="true">02</span>
             <p>手机浏览时，保存二维码，在微信扫一扫中从相册选择图片。</p>
           </div>
-          <a class="download-link" :href="miniprogramQr" target="_blank" rel="noopener noreferrer" :download="`${miniprogramName}二维码.jpg`">
+          <a
+            class="download-link"
+            :href="miniprogramQr"
+            target="_blank"
+            rel="noopener noreferrer"
+            :download="`${miniprogramName}二维码.jpg`"
+          >
             <el-icon aria-hidden="true"><Download /></el-icon>
             保存二维码
           </a>
         </div>
 
         <figure class="qr-panel">
-          <img :src="miniprogramQr" :alt="`${miniprogramName}二维码，请使用微信扫一扫`" width="258" height="294" />
+          <img
+            :src="miniprogramQr"
+            :alt="`${miniprogramName}二维码，请使用微信扫一扫`"
+            width="258"
+            height="294"
+          />
           <figcaption>微信扫一扫，打开小程序</figcaption>
         </figure>
       </article>
@@ -82,10 +91,16 @@ onMounted(() => { void refreshTool() })
     margin-bottom: 8px;
   }
 
-  p { font-size: 13px; color: rgba(255, 255, 255, 0.75); }
+  p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.75);
+  }
 }
 
-.tools-content { padding-top: 48px; padding-bottom: 48px; }
+.tools-content {
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
 
 .tool-card {
   display: grid;
@@ -119,7 +134,12 @@ onMounted(() => { void refreshTool() })
   color: var(--text-primary);
 }
 
-.tool-description { margin-bottom: 28px; font-size: 15px; color: var(--text-secondary); line-height: 1.8; }
+.tool-description {
+  margin-bottom: 28px;
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
 
 .scan-guide {
   display: flex;
@@ -131,7 +151,11 @@ onMounted(() => { void refreshTool() })
   color: var(--text-secondary);
 }
 
-.guide-number { color: var(--color-success); font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.guide-number {
+  color: var(--color-success);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
 
 .download-link {
   display: inline-flex;
@@ -144,10 +168,18 @@ onMounted(() => { void refreshTool() })
   color: var(--text-primary);
   font-size: 14px;
   text-decoration: none;
-  transition: border-color 0.2s, color 0.2s;
+  transition:
+    border-color 0.2s,
+    color 0.2s;
 
-  &:hover { border-color: var(--color-success); color: var(--color-success); }
-  &:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; }
+  &:hover {
+    border-color: var(--color-success);
+    color: var(--color-success);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+  }
 }
 
 .qr-panel {
@@ -158,13 +190,62 @@ onMounted(() => { void refreshTool() })
   border: 1px solid #ede8e1;
   border-radius: 12px;
 
-  img { display: block; width: 258px; max-width: 100%; height: auto; margin: 0 auto; }
-  figcaption { margin-top: 8px; color: #4e5969; font-size: 12px; line-height: 1.7; }
+  img {
+    display: block;
+    width: 258px;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+  }
+  figcaption {
+    margin-top: 8px;
+    color: #4e5969;
+    font-size: 12px;
+    line-height: 1.7;
+  }
 }
 
 @media (max-width: 768px) {
-  .tool-card { grid-template-columns: minmax(0, 1fr); padding: 24px; gap: 28px; }
-  .qr-panel { width: 100%; max-width: 306px; justify-self: center; }
-  .tools-content { padding-top: 32px; padding-bottom: 24px; }
+  .tool-card {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 24px;
+    gap: 28px;
+  }
+  .qr-panel {
+    width: 100%;
+    max-width: 306px;
+    justify-self: center;
+  }
+  .tools-content {
+    padding-top: 32px;
+    padding-bottom: 24px;
+  }
+}
+
+.page-header.container {
+  width: calc(100% - clamp(48px, 4vw, 64px));
+  padding-inline: 0;
+}
+.tools-content {
+  padding-top: 0;
+}
+.tool-card {
+  max-width: none;
+  border-radius: 5px;
+  box-shadow: none;
+}
+.tool-label {
+  color: var(--color-ochre);
+}
+.qr-panel {
+  background: var(--bg-secondary);
+}
+@media (max-width: 760px) {
+  .page-header.container {
+    width: calc(100% - 32px);
+  }
+  .tool-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 </style>

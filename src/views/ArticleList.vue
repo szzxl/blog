@@ -1,565 +1,352 @@
 <template>
-  <div class="article-list">
-    <!-- ── Banner ──────────────────────────────────────── -->
-    <div class="page-banner">
-      <div class="banner-overlay"></div>
-      <div class="banner-content">
-        <h1 class="banner-title">所有文章</h1>
-        <p class="banner-subtitle">共 {{ total }} 篇</p>
-      </div>
-    </div>
-
-    <!-- ── 筛选栏（重叠在 Banner 底部）─────────────────── -->
-    <div class="filter-wrap">
-      <div class="container">
-        <div class="filter-bar">
-          <el-input
-            v-model="searchKeyword"
-            placeholder="搜索标题或正文..." maxlength="100"
-            :prefix-icon="Search"
-            clearable
-            class="search-input"
-            @keyup.enter="handleSearch"
-            @clear="handleClear"
-          >
-            <template #append>
-              <el-button @click="handleSearch" icon="Search">搜索</el-button>
-            </template>
-          </el-input>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── 主体内容 ─────────────────────────────────────── -->
-    <div class="container main-body">
-      <!-- 文章列表 -->
-      <div class="articles">
-        <!-- 骨架屏 -->
-        <Skeleton v-if="loading" type="article-list" :count="6" />
-
-        <!-- 文章卡片 -->
-        <div
-          v-else
-          class="article-card"
-          v-for="article in articles"
-          :key="article.id"
-          @click="viewArticle(article.id)"
+  <div class="article-index container">
+    <header class="page-header">
+      <span class="eyebrow">文章索引</span>
+      <h1>文章</h1>
+      <p>搜索标题和正文，也可以从分类与标签继续查找。</p>
+    </header>
+    <div class="index-tools">
+      <form class="search-form" @submit.prevent="handleSearch">
+        <label class="sr-only" for="article-keyword">搜索文章</label
+        ><input
+          id="article-keyword"
+          v-model="searchKeyword"
+          maxlength="100"
+          placeholder="搜索标题或正文"
+          type="search"
+        /><button class="primary-btn" type="submit">搜索</button>
+      </form>
+      <nav class="category-tabs" aria-label="文章分类">
+        <button
+          :aria-pressed="!selectedCategory"
+          :class="{ active: !selectedCategory }"
+          @click="updateQuery({ category: '' })"
         >
-          <!-- 角标 -->
-          <div class="badges" v-if="article.isTop === 1 || article.isRecommend === 1">
-            <span class="badge badge-top" v-if="article.isTop === 1">置顶</span>
-            <span class="badge badge-recommend" v-if="article.isRecommend === 1">推荐</span>
-          </div>
-
-          <div class="card-left">
-            <div class="article-cover">
-              <img v-lazyload="article.articleCover || '/default-cover.svg'" alt="封面" />
-            </div>
-          </div>
-
-          <div class="card-right">
-            <h2 class="article-title">{{ article.articleName }}</h2>
-            <p v-if="article.summary" class="article-summary">{{ article.summary }}</p>
-            <div class="article-tags" v-if="article.articleTag">
-              <span class="tag" v-for="tag in parseTags(article.articleTag)" :key="tag">
-                {{ tag }}
-              </span>
-            </div>
-            <div class="article-footer">
-              <div class="meta-info">
-                <span class="meta-item">{{ formatTimestamp(article.createTime) }}</span>
-                <span class="meta-item" v-if="article.articleCategory">{{ article.articleCategory }}</span>
-                <span class="meta-item">{{ article.readNum || 0 }} 阅读</span>
-                <span class="meta-item">{{ article.likeCount || 0 }} 喜欢</span>
-              </div>
-              <div class="read-btn">阅读全文 →</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 空状态 -->
-        <div v-if="loadError && !loading" class="empty-state" role="alert">
-          <p>文章加载失败，请稍后重试</p>
-          <el-button @click="fetchArticles">重新加载</el-button>
-        </div>
-        <div v-else-if="!loading && articles.length === 0" class="empty-state">
-          <div class="empty-text">暂无文章</div>
-        </div>
-      </div>
-
-      <!-- 分页 -->
-      <div class="pagination" v-if="total > 0">
-        <el-pagination
-          background
-          layout="total, prev, pager, next, jumper"
-          :total="total"
-          :page-size="pageSize"
-          :current-page="pageNo"
-          @current-change="handlePageChange"
-        />
-      </div>
+          全部</button
+        ><button
+          v-for="category in categories"
+          :key="category.id || category.categoryName || category.name"
+          :aria-pressed="selectedCategory === (category.categoryName || category.name)"
+          :class="{ active: selectedCategory === (category.categoryName || category.name) }"
+          @click="updateQuery({ category: category.categoryName || category.name || '' })"
+        >
+          {{ category.categoryName || category.name
+          }}<small v-if="(category.articleCount ?? category.count ?? category.num) !== undefined">{{
+            category.articleCount ?? category.count ?? category.num
+          }}</small>
+        </button>
+      </nav>
     </div>
+    <div class="result-summary">
+      <p role="status">
+        {{ loading ? '正在查找文章…' : loadError ? '暂时无法获取文章' : `共 ${total} 篇文章` }}
+      </p>
+      <button
+        v-if="appliedFilters.length"
+        @click="updateQuery({ keyword: '', category: '', tag: '' })"
+      >
+        清除全部筛选 ×
+      </button>
+    </div>
+    <div v-if="appliedFilters.length" class="applied-filters" aria-label="当前筛选">
+      <button
+        v-for="filter in appliedFilters"
+        :key="filter.key"
+        @click="updateQuery({ [filter.key]: '' })"
+        :aria-label="`移除${filter.label}：${filter.value}`"
+      >
+        {{ filter.label }}：{{ filter.value }} <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <Skeleton v-if="loading" type="article-list" :count="4" />
+    <div v-else-if="loadError" class="empty-state" role="alert">
+      <h2>文章加载失败</h2>
+      <p>当前筛选条件已保留，可以重新尝试。</p>
+      <el-button @click="fetchArticles">重新加载</el-button>
+    </div>
+    <div v-else-if="!articles.length" class="empty-state">
+      <h2>没有找到符合条件的文章</h2>
+      <p>
+        {{
+          appliedFilters.length
+            ? '试试更短的关键词，或清除筛选看看其他文章。'
+            : '文章还在整理中，过段时间再来看看。'
+        }}
+      </p>
+      <el-button
+        v-if="appliedFilters.length"
+        @click="updateQuery({ keyword: '', category: '', tag: '' })"
+        >查看全部文章</el-button
+      >
+    </div>
+    <div v-else class="index-list">
+      <ArticleCard v-for="article in articles" :key="article.id" :article="article" />
+    </div>
+    <div v-if="!loading && !loadError && total > pageSize" class="pagination">
+      <el-pagination
+        background
+        layout="total, prev, pager, next"
+        :total="total"
+        :page-size="pageSize"
+        :current-page="pageNo"
+        @current-change="handlePageChange"
+      />
+    </div>
+    <p v-else-if="!loading && !loadError && articles.length" class="index-end">
+      以上为当前条件下的全部文章
+    </p>
   </div>
 </template>
-
 <script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { getArticleList, getCategoryList } from '@/api/article'
 import { normalizePage, lastPage } from '@/utils/pagination'
-import { ref, onMounted, onUnmounted, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { getArticleList } from '@/api/article'
-import { Search } from '@element-plus/icons-vue'
-import { formatTimestamp, parseTags } from '@/utils/format'
-import Skeleton from '@/components/Skeleton.vue'
 import { createLatestRequest } from '@/utils/latestRequest'
+import type { ArticleSummary } from '@/types/article'
+import ArticleCard from '@/components/ArticleCard.vue'
+import Skeleton from '@/components/Skeleton.vue'
 
-const router = useRouter()
-const route = useRoute()
-
-interface Article {
-  id: number
-  articleName: string
-  articleCover?: string
-  articleCategory?: string
-  summary?: string
-  articleTag?: string
-  readNum?: number
-  likeCount?: number
-  createTime?: number
-  isRecommend?: number  // 是否推荐 1=是 0=否
-  isTop?: number  // 是否置顶 1=是 0=否
+interface Category {
+  id?: number
+  categoryName?: string
+  name?: string
+  articleCount?: number
+  count?: number
+  num?: number
 }
-
+const route = useRoute()
+const router = useRouter()
 const searchKeyword = ref('')
-const articles = ref<Article[]>([])
+const articles = ref<ArticleSummary[]>([])
+const categories = ref<Category[]>([])
 const total = ref(0)
 const pageNo = ref(1)
-const pageSize = ref(10)
-const loading = ref(false)
+const pageSize = 10
+const loading = ref(true)
 const loadError = ref(false)
 const articleRequest = createLatestRequest()
-
-// 将当前状态同步到 URL query（不产生历史记录）
-const syncToUrl = () => {
+let disposed = false
+const queryText = (key: string) =>
+  typeof route.query[key] === 'string' ? route.query[key].slice(0, 100) : ''
+const selectedCategory = computed(() => queryText('category'))
+const appliedFilters = computed(() =>
+  [
+    { key: 'keyword', label: '关键词', value: queryText('keyword') },
+    { key: 'category', label: '分类', value: selectedCategory.value },
+    { key: 'tag', label: '标签', value: queryText('tag') }
+  ].filter((item) => item.value)
+)
+const updateQuery = (patch: Record<string, string>) => {
   const query: Record<string, string> = {}
-  if (pageNo.value > 1) query.page = String(pageNo.value)
-  if (searchKeyword.value) query.keyword = searchKeyword.value
-  if (route.query.category) query.category = route.query.category as string
-  return router.replace({ query })
+  for (const key of ['keyword', 'category', 'tag']) {
+    const value = (patch[key] ?? queryText(key)).trim()
+    if (value) query[key] = value
+  }
+  if (patch.page && Number(patch.page) > 1) query.page = patch.page
+  const target = router.resolve({ path: '/articles', query })
+  if (target.fullPath === route.fullPath) {
+    searchKeyword.value = query.keyword || ''
+    void fetchArticles()
+  } else void router.push({ path: '/articles', query })
 }
-
-// 从 URL query 恢复状态
-const restoreFromUrl = () => {
-  pageNo.value = normalizePage(route.query.page)
-  searchKeyword.value = typeof route.query.keyword === 'string' ? route.query.keyword.slice(0, 100) : ''
-}
-
-// 获取文章列表
+const handleSearch = () => updateQuery({ keyword: searchKeyword.value.trim() })
+const handlePageChange = (page: number) => updateQuery({ page: String(page) })
 const fetchArticles = async () => {
   const requestId = articleRequest.next()
-  loadError.value = false
   loading.value = true
+  loadError.value = false
   try {
-    const params: any = {
+    const response = (await getArticleList({
       pageNo: pageNo.value,
-      pageSize: pageSize.value
+      pageSize,
+      keyword: queryText('keyword') || undefined,
+      articleCategory: selectedCategory.value || undefined,
+      articleTag: queryText('tag') || undefined
+    })) as unknown as { list?: ArticleSummary[]; total?: number } | ArticleSummary[]
+    if (disposed || !articleRequest.isCurrent(requestId)) return
+    const list = Array.isArray(response) ? response : response?.list || []
+    const count = Array.isArray(response) ? response.length : (response?.total ?? list.length)
+    const finalPage = lastPage(count, pageSize)
+    if (pageNo.value > finalPage) {
+      await router.replace({
+        query: { ...route.query, page: finalPage > 1 ? String(finalPage) : undefined }
+      })
+      return
     }
-    if (searchKeyword.value) params.keyword = searchKeyword.value.trim()
-    if (route.query.category) params.articleCategory = route.query.category
-
-    const res: any = await getArticleList(params)
-    if (!articleRequest.isCurrent(requestId)) return
-
-    if (res && res.list) {
-      const finalPage = lastPage(res.total ?? 0, pageSize.value)
-      if (pageNo.value > finalPage) {
-        pageNo.value = finalPage
-        await syncToUrl()
-        return
-      }
-      articles.value = res.list
-      total.value = res.total || 0
-    } else if (Array.isArray(res)) {
-      articles.value = res
-      total.value = res.length
-    }
-  } catch (error) {
-    if (articleRequest.isCurrent(requestId)) loadError.value = true
+    articles.value = list
+    total.value = count
+  } catch {
+    if (!disposed && articleRequest.isCurrent(requestId)) loadError.value = true
   } finally {
-    if (articleRequest.isCurrent(requestId)) loading.value = false
+    if (!disposed && articleRequest.isCurrent(requestId)) loading.value = false
   }
 }
-
-// 搜索
-const handleSearch = () => {
-  pageNo.value = 1
-  if (route.query.keyword === searchKeyword.value && !route.query.page) void fetchArticles()
-  else void syncToUrl()
-}
-
-// 清除搜索
-const handleClear = () => {
-  pageNo.value = 1
-  if (route.query.keyword === searchKeyword.value && !route.query.page) void fetchArticles()
-  else void syncToUrl()
-}
-
-// 分页变化
-const handlePageChange = (page: number) => {
-  pageNo.value = page
-  syncToUrl()
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-const viewArticle = (id: number) => {
-  router.push(`/article/${id}`)
-}
-
-// 监听浏览器前进/后退，以及外部 category 参数变化
-watch(() => route.query, (newQuery, oldQuery) => {
-  if (
-    newQuery.page !== oldQuery.page ||
-    newQuery.keyword !== oldQuery.keyword ||
-    newQuery.category !== oldQuery.category
-  ) {
-    restoreFromUrl()
-    fetchArticles()
+watch(
+  () => [route.query.page, route.query.keyword, route.query.category, route.query.tag],
+  () => {
+    pageNo.value = normalizePage(route.query.page)
+    searchKeyword.value = queryText('keyword')
+    void fetchArticles()
+  },
+  { immediate: true }
+)
+onMounted(async () => {
+  try {
+    const response = (await getCategoryList({ pageSize: 100 })) as unknown as
+      { list?: Category[] } | Category[]
+    if (!disposed) categories.value = Array.isArray(response) ? response : response?.list || []
+  } catch {
+    /* 分类不可用时，仍可搜索文章 */
   }
 })
-
-onMounted(() => {
-  restoreFromUrl()
-  fetchArticles()
+onUnmounted(() => {
+  disposed = true
+  articleRequest.invalidate()
 })
-onUnmounted(() => articleRequest.invalidate())
 </script>
-
 <style scoped lang="scss">
-.article-summary { color: var(--text-secondary); font-size: 13px; line-height: 1.7; margin: 8px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-// ── Banner ────────────────────────────────────────────
-.page-banner {
-  position: relative;
-  height: 200px;
-  background: url('/bg-banner.jpg') center 30% / cover no-repeat;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .banner-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(5, 12, 30, 0.62);
-  }
-
-  .banner-content {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-
-    .banner-title {
-      font-family: var(--font-display);
-      font-size: 2.2rem;
-      font-weight: 700;
-      color: #fff;
-      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
-      margin: 0 0 8px 0;
-      line-height: 1.2;
-    }
-
-    .banner-subtitle {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.65);
-      margin: 0;
-      font-family: var(--font-sans);
-    }
-  }
+.article-index {
+  padding-bottom: 50px;
 }
-
-// ── 筛选栏（Banner 底部重叠）─────────────────────────
-.filter-wrap {
-  position: relative;
-  z-index: 10;
-  margin-top: -24px;
-
-  .filter-bar {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-card);
-    box-shadow: var(--shadow-card);
-    padding: 18px 24px;
-
-    .search-input {
-      :deep(.el-input__wrapper) {
-        border-radius: var(--radius-btn);
-        background: var(--bg-secondary);
-        transition: box-shadow 0.25s ease;
-
-        &.is-focus {
-          box-shadow: 0 0 0 1px var(--color-accent) inset;
-        }
-      }
-
-      :deep(.el-input-group__append) {
-        background: var(--bg-secondary);
-        border-color: var(--border-color);
-        border-radius: 0 var(--radius-btn) var(--radius-btn) 0;
-
-        .el-button {
-          color: var(--text-secondary);
-          font-family: var(--font-sans);
-
-          &:hover {
-            color: var(--color-accent);
-          }
-        }
-      }
-    }
-  }
+.page-header .eyebrow {
+  display: block;
+  margin-bottom: 8px;
 }
-
-// ── 容器 ──────────────────────────────────────────────
-.container {
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-.main-body {
-  padding-top: 48px;
-  padding-bottom: 80px;
-}
-
-// ── 文章列表 ──────────────────────────────────────────
-.articles {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-bottom: 36px;
-}
-
-.article-card {
-  display: flex;
+.index-tools {
+  padding: 22px 24px 0;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
-  cursor: pointer;
-  position: relative;
-  transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
-
-  &:hover {
-    box-shadow: var(--shadow-card-hover);
-    transform: translateY(-4px);
-    border-color: var(--color-accent);
-
-    .article-cover img {
-      transform: scale(1.07);
-    }
-
-    .article-title {
-      color: var(--color-accent);
-    }
-
-    .read-btn {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  .badges {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    display: flex;
-    gap: 6px;
-    z-index: 2;
-
-    .badge {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 3px 10px;
-      border-radius: var(--radius-tag);
-      letter-spacing: 0.04em;
-      color: #fff;
-
-      &.badge-top {
-        background: var(--gradient-accent);
-      }
-
-      &.badge-recommend {
-        background: linear-gradient(135deg, rgba(22, 93, 255, 0.85) 0%, rgba(114, 46, 209, 0.85) 100%);
-      }
-    }
-  }
-
-  .card-left {
-    width: 200px;
-    height: 140px;
-    flex-shrink: 0;
-
-    .article-cover {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: var(--bg-secondary);
-
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-    }
-  }
-
-  .card-right {
-    flex: 1;
-    padding: 22px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    min-width: 0;
-
-    .article-title {
-      font-family: var(--font-display);
-      font-size: 19px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin: 0;
-      line-height: 1.45;
-      letter-spacing: -0.01em;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      transition: color 0.2s ease;
-    }
-
-    .article-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-
-      .tag {
-        padding: 2px 10px;
-        border-radius: var(--radius-tag);
-        background: var(--bg-secondary);
-        color: var(--text-tertiary);
-        font-size: 11px;
-        border: 1px solid transparent;
-        transition: all 0.2s;
-
-        &:hover {
-          background: transparent;
-          border-color: var(--color-accent);
-          color: var(--color-accent);
-        }
-      }
-    }
-
-    .article-footer {
-      margin-top: auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-
-      .meta-info {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px 12px;
-
-        .meta-item {
-          font-size: 12px;
-          color: var(--text-tertiary);
-          font-family: var(--font-sans);
-        }
-      }
-
-      .read-btn {
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--color-accent);
-        white-space: nowrap;
-        opacity: 0;
-        transform: translateX(-6px);
-        transition: opacity 0.25s ease, transform 0.25s ease;
-        letter-spacing: 0.02em;
-        font-family: var(--font-sans);
-      }
-    }
-  }
+  border-radius: 5px;
+  margin-bottom: 26px;
 }
-
-// ── 空状态 ────────────────────────────────────────────
-.empty-state {
-  text-align: center;
-  padding: 72px 0;
-  color: var(--text-tertiary);
-  font-size: 15px;
-
-  .empty-text {
-    font-family: var(--font-display);
-  }
-}
-
-// ── 分页 ──────────────────────────────────────────────
-.pagination {
+.search-form {
   display: flex;
-  justify-content: center;
-  padding: 32px 0 0;
-  border-top: 1px solid var(--border-color);
-
-  :deep(.el-pagination) {
-    .el-pager li {
-      border-radius: var(--radius-btn);
-      transition: background 0.2s ease, color 0.2s ease;
-      font-family: var(--font-sans);
-
-      &.is-active {
-        background: var(--color-accent);
-        color: #fff;
-      }
-    }
-
-    .btn-prev,
-    .btn-next {
-      border-radius: var(--radius-btn);
-    }
-  }
+  gap: 12px;
+  max-width: 800px;
+  margin-bottom: 18px;
 }
-
-// ── 响应式 ────────────────────────────────────────────
-@media (max-width: 768px) {
-  .page-banner {
-    height: 160px;
-
-    .banner-content .banner-title {
-      font-size: 1.8rem;
-    }
+.search-form input {
+  min-height: 46px;
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 10px 14px;
+  min-width: 0;
+  flex: 1;
+  font-size: 14px;
+}
+.primary-btn {
+  min-height: 46px;
+  background: var(--color-accent);
+  color: var(--bg-card);
+  padding: 8px 22px;
+  border: 0;
+  border-radius: 4px;
+  font-size: 13px;
+}
+.category-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.category-tabs button {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  min-height: 44px;
+  padding: 10px 14px;
+  font-size: 12px;
+}
+.category-tabs button.active {
+  border-color: var(--color-accent);
+  background: var(--bg-soft);
+  color: var(--color-accent);
+}
+.category-tabs small {
+  font-size: 10px;
+  margin-left: 8px;
+}
+.result-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  min-height: 36px;
+}
+.result-summary button {
+  background: transparent;
+  border: 0;
+  min-height: 44px;
+  color: var(--color-accent);
+  font-size: 12px;
+}
+.applied-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.applied-filters button {
+  min-height: 40px;
+  padding: 7px 12px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-soft);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--color-accent);
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  text-align: left;
+}
+.applied-filters span {
+  margin-left: 8px;
+}
+.index-end {
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  border-top: 1px solid var(--border-color);
+  padding: 24px 0;
+}
+.empty-state h2 {
+  font: 24px var(--font-serif);
+  margin-bottom: 14px;
+}
+.empty-state p {
+  font-size: 13px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  clip-path: inset(50%);
+  overflow: hidden;
+}
+@media (max-width: 760px) {
+  .index-tools {
+    padding: 16px 14px 0;
+    margin-bottom: 18px;
   }
-
-  .filter-wrap .filter-bar {
-    padding: 14px 16px;
+  .search-form {
+    gap: 8px;
   }
-
-  .main-body {
-    padding-top: 36px;
-    padding-bottom: 60px;
+  .search-form input {
+    font-size: 13px;
   }
-
-  .article-card {
-    flex-direction: column;
-
-    .card-left {
-      width: 100%;
-      height: 180px;
-    }
-
-    .card-right {
-      padding: 18px;
-    }
+  .primary-btn {
+    padding-inline: 16px;
+  }
+  .category-tabs button {
+    padding-inline: 9px;
+    font-size: 12px;
+  }
+  .category-tabs small {
+    margin-left: 4px;
   }
 }
 </style>

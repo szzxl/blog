@@ -2,17 +2,26 @@
   <Teleport to="body">
     <Transition name="search-fade">
       <div v-if="show" class="search-overlay" @click.self="close">
-        <div class="search-box">
-
+        <div class="search-box" role="dialog" aria-modal="true" aria-label="搜索文章">
           <div class="search-header">
-            <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.5-4.5"/>
+            <svg
+              class="s-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="11" cy="11" r="7.5" />
+              <path d="m21 21-4.5-4.5" />
             </svg>
             <input
               ref="inputRef"
               v-model="keyword"
               class="s-input"
               placeholder="搜索文章…"
+              aria-label="搜索关键词"
               autocomplete="off"
               maxlength="100"
               @keydown.escape="close"
@@ -21,7 +30,7 @@
               @keydown.down.prevent="moveSelect(1)"
               @input="onInput"
             />
-            <kbd class="s-esc" @click="close">ESC</kbd>
+            <button class="s-esc" @click="close" aria-label="关闭搜索">Esc</button>
           </div>
 
           <div class="search-body">
@@ -46,16 +55,22 @@
                 @mouseenter="selected = i"
                 @click="goTo(item)"
               >
-                <div><div class="s-title">{{ item.articleName }}</div><p v-if="item.summary" class="s-summary">{{ item.summary }}</p></div>
+                <div>
+                  <div class="s-title">{{ item.articleName }}</div>
+                  <p v-if="item.summary" class="s-summary">{{ item.summary }}</p>
+                </div>
                 <div class="s-meta">
                   <span v-if="item.articleCategory" class="s-cat">{{ item.articleCategory }}</span>
-                  <span v-if="item.createTime" class="s-date">{{ formatTimestamp(item.createTime) }}</span>
+                  <span v-if="item.createTime" class="s-date">{{
+                    formatTimestamp(item.createTime)
+                  }}</span>
                 </div>
               </li>
             </ul>
-            <button v-if="!searching && !searchError && total > 0" class="s-all" @click="viewAll">查看全部 {{ total }} 条结果 →</button>
+            <button v-if="!searching && !searchError && total > 0" class="s-all" @click="viewAll">
+              查看全部 {{ total }} 条结果 →
+            </button>
           </div>
-
         </div>
       </div>
     </Transition>
@@ -110,7 +125,11 @@ const onInput = () => {
   total.value = 0
   searchError.value = false
   const q = keyword.value.trim().slice(0, 100)
-  if (!q) { results.value = []; searching.value = false; return }
+  if (!q) {
+    results.value = []
+    searching.value = false
+    return
+  }
   searching.value = true
   searchTimer = setTimeout(async () => {
     try {
@@ -119,7 +138,10 @@ const onInput = () => {
       results.value = res?.list ?? (Array.isArray(res) ? res : [])
       total.value = res?.total ?? results.value.length
     } catch {
-      if (searchRequest.isCurrent(requestId)) { results.value = []; searchError.value = true }
+      if (searchRequest.isCurrent(requestId)) {
+        results.value = []
+        searchError.value = true
+      }
     } finally {
       if (searchRequest.isCurrent(requestId)) searching.value = false
     }
@@ -169,8 +191,25 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-.s-summary { margin: 6px 0 0; color: var(--text-tertiary); font-size: 12px; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.s-all { display: block; width: 100%; padding: 14px; background: var(--bg-secondary); color: var(--color-accent); border: 0; cursor: pointer; }
+.s-summary {
+  margin: 6px 0 0;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.s-all {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: var(--bg-secondary);
+  color: var(--color-accent);
+  border: 0;
+  cursor: pointer;
+}
 .search-overlay {
   position: fixed;
   inset: 0;
@@ -202,7 +241,8 @@ onUnmounted(() => {
 }
 
 .s-icon {
-  width: 20px; height: 20px;
+  width: 20px;
+  height: 20px;
   color: var(--text-tertiary);
   flex-shrink: 0;
 }
@@ -216,7 +256,9 @@ onUnmounted(() => {
   color: var(--text-primary);
   caret-color: var(--color-accent);
   font-family: var(--font-sans);
-  &::placeholder { color: var(--text-tertiary); }
+  &::placeholder {
+    color: var(--text-tertiary);
+  }
 }
 
 .s-esc {
@@ -230,7 +272,10 @@ onUnmounted(() => {
   flex-shrink: 0;
   font-family: var(--font-sans);
   transition: all 0.15s;
-  &:hover { border-color: var(--color-accent); color: var(--color-accent); }
+  &:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
 }
 
 .search-body {
@@ -272,11 +317,15 @@ onUnmounted(() => {
 
   &.active {
     background: var(--bg-secondary);
-    .s-title { color: var(--color-accent); }
+    .s-title {
+      color: var(--color-accent);
+    }
   }
   &:hover {
     background: var(--bg-secondary);
-    .s-title { color: var(--color-accent); }
+    .s-title {
+      color: var(--color-accent);
+    }
   }
 }
 
@@ -313,13 +362,73 @@ onUnmounted(() => {
 }
 
 /* Transition */
-.search-fade-enter-active { transition: opacity 0.2s ease; }
-.search-fade-leave-active  { transition: opacity 0.18s ease; }
+.search-fade-enter-active {
+  transition: opacity 0.2s ease;
+}
+.search-fade-leave-active {
+  transition: opacity 0.18s ease;
+}
 .search-fade-enter-from,
-.search-fade-leave-to      { opacity: 0; }
+.search-fade-leave-to {
+  opacity: 0;
+}
 
-.search-fade-enter-active .search-box { transition: transform 0.22s ease, opacity 0.2s ease; }
-.search-fade-leave-active  .search-box { transition: transform 0.18s ease, opacity 0.18s ease; }
+.search-fade-enter-active .search-box {
+  transition:
+    transform 0.22s ease,
+    opacity 0.2s ease;
+}
+.search-fade-leave-active .search-box {
+  transition:
+    transform 0.18s ease,
+    opacity 0.18s ease;
+}
 .search-fade-enter-from .search-box,
-.search-fade-leave-to   .search-box  { transform: translateY(-16px); opacity: 0; }
+.search-fade-leave-to .search-box {
+  transform: translateY(-16px);
+  opacity: 0;
+}
+
+.search-box {
+  border-radius: 6px;
+}
+.s-title {
+  font-family: var(--font-serif);
+  font-size: 17px;
+}
+.s-esc {
+  border: 1px solid var(--border-color);
+  background: transparent;
+  min-height: 36px;
+  padding: 5px 8px;
+  color: var(--text-tertiary);
+  font-size: 11px;
+}
+.s-input {
+  font-size: 16px;
+}
+.s-tip {
+  font-size: 13px;
+}
+.s-item.active {
+  background: var(--bg-soft);
+}
+.search-body {
+  max-height: 65dvh;
+  overflow: auto;
+}
+@media (max-width: 760px) {
+  .search-overlay {
+    padding-top: 24px;
+  }
+  .search-header {
+    padding: 16px;
+  }
+  .s-meta {
+    font-size: 11px;
+  }
+  .s-date {
+    display: none;
+  }
+}
 </style>
