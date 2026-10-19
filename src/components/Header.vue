@@ -3,7 +3,7 @@
     <div class="container">
       <!-- Logo -->
       <router-link to="/" class="logo">
-        <img :src="siteLogo" class="logo-img" alt="" width="32" height="32" />
+        <img :src="siteLogo" class="logo-img" alt="" width="32" height="32" @error="handleLogoError" />
         <span class="logo-name">{{ siteName || '博客' }}</span>
       </router-link>
 
@@ -67,7 +67,7 @@
     <el-drawer v-model="showMobileMenu" direction="ltr" size="280px" :with-header="false">
       <div class="mobile-menu">
         <div class="mobile-logo">
-          <img :src="siteLogo" alt="" width="32" height="32" />
+          <img :src="siteLogo" alt="" width="32" height="32" @error="handleLogoError" />
           <span>{{ siteName || '博客' }}</span>
         </div>
         <nav class="mobile-nav">
@@ -130,7 +130,8 @@ const navItems = [
 ]
 
 const siteName = ref('')
-const siteLogo = ref('/logo.svg')
+const DEFAULT_SITE_LOGO = '/logo.svg?v=paper-plane-1'
+const siteLogo = ref(DEFAULT_SITE_LOGO)
 const showMobileMenu = ref(false)
 const isScrolled = ref(false)
 
@@ -139,11 +140,15 @@ const themeTooltip = computed(() => themeStore.appliedTheme === 'dark' ? '切换
 const toggleTheme = () => themeStore.toggleTheme()
 const openSearch = () => window.dispatchEvent(new CustomEvent('open-search'))
 
+const handleLogoError = () => {
+  siteLogo.value = DEFAULT_SITE_LOGO
+}
+
 const fetchWebsiteConfig = async () => {
   try {
     const config = await fetchWebsiteConfigWithCache()
     if (config.site_name) siteName.value = config.site_name
-    siteLogo.value = config.logo || '/logo.svg'
+    siteLogo.value = config.logo?.trim() || DEFAULT_SITE_LOGO
   } catch {
     // 静默失败
   }
