@@ -12,6 +12,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     ArticleCard: typeof import('./src/components/ArticleCard.vue')['default']
+    AuthCard: typeof import('./src/components/AuthCard.vue')['default']
     Comment: typeof import('./src/components/Comment.vue')['default']
     ElButton: typeof import('element-plus/es/components/button/index')['ElButton']
     ElCheckbox: typeof import('element-plus/es/components/checkbox/index')['ElCheckbox']
@@ -26,7 +27,6 @@ declare module 'vue' {
     ElIcon: typeof import('element-plus/es/components/icon/index')['ElIcon']
     ElImageViewer: typeof import('element-plus/es/components/image-viewer/index')['ElImageViewer']
     ElInput: typeof import('element-plus/es/components/input/index')['ElInput']
-    ElLink: typeof import('element-plus/es/components/link/index')['ElLink']
     ElPagination: typeof import('element-plus/es/components/pagination/index')['ElPagination']
     ElPopover: typeof import('element-plus/es/components/popover/index')['ElPopover']
     ElProgress: typeof import('element-plus/es/components/progress/index')['ElProgress']

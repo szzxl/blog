@@ -157,7 +157,7 @@ router.beforeEach(async (to, _from, next) => {
   // 只有明确标记 requiresAuth 的路由才需要登录
   if (to.meta.requiresAuth === true && !userStore.isLoggedIn) {
     ElMessage.warning('请先登录')
-    next('/login')
+    next({ path: '/login', query: { redirect: to.fullPath } })
   } else {
     next()
   }
