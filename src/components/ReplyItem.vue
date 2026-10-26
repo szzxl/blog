@@ -12,6 +12,11 @@
         </span>
       </div>
       <div class="comment-text">{{ reply.content }}</div>
+      <div v-if="reply.images.length" class="reply-images">
+        <button v-for="image in reply.images" :key="image" type="button" @click="$emit('preview', image)">
+          <img :src="image" alt="回复图片，点击预览" loading="lazy" />
+        </button>
+      </div>
       <div class="comment-footer">
         <span class="comment-time">{{ formatTime(reply.createTime) }}</span>
         <span class="action-btn like-btn" :class="{ liked: reply.isLiked }" @click="$emit('like', reply)">
@@ -35,6 +40,7 @@
           @like="$emit('like', $event)"
           @reply="$emit('reply', $event)"
           @delete="$emit('delete', $event)"
+          @preview="$emit('preview', $event)"
         />
       </div>
     </div>
@@ -43,20 +49,22 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { CommentView } from '@/types/comment'
 import { useUserStore } from '@/stores/user'
 
 defineOptions({ name: 'ReplyItem' })
 
 const props = defineProps<{
-  reply: any
+  reply: CommentView
   rootId: string | number
   depth?: number
 }>()
 
 const emit = defineEmits<{
-  like: [reply: any]
+  preview: [url: string]
+  like: [reply: CommentView]
   reply: [payload: { parentId: string | number; atName: string; rootId: string | number }]
-  delete: [reply: any]
+  delete: [reply: CommentView]
 }>()
 
 const userStore = useUserStore()
@@ -75,7 +83,7 @@ const onReply = () => {
   })
 }
 
-const formatTime = (timestamp: number) => {
+const formatTime = (timestamp: number | string) => {
   if (!timestamp) return ''
   const d = new Date(timestamp)
   const now = new Date()
@@ -117,6 +125,10 @@ $accent-author: #fb7299;
   user-select: none;
   margin-top: 2px;
 }
+
+.reply-images { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.reply-images img { width: 90px; height: 90px; object-fit: cover; border-radius: 6px; }
+.reply-images button { cursor: zoom-in; padding: 0; border: 0; background: transparent; }
 
 .reply-body { flex: 1; min-width: 0; }
 

@@ -89,7 +89,7 @@ service.interceptors.request.use(
     const rawToken = localStorage.getItem('ACCESS_TOKEN')
     if (rawToken) {
       const token = parseToken(rawToken)
-      if (token && config.headers) {
+      if (token && config.headers && !config.headers.Authorization) {
         config.headers.Authorization = `Bearer ${token}`
       }
     }
@@ -122,7 +122,7 @@ service.interceptors.response.use(
     if (res.code !== undefined && res.code !== 0) {
       // 公开接口返回 401 表示"未登录但内容仍可访问"，静默处理
       const silent = isSilentApi(url) || (res.code === 401 && isPublicApi(url))
-      const failure = new Error(res.message || res.msg || '请求失败')
+      const failure = Object.assign(new Error(res.message || res.msg || '请求失败'), { code: res.code })
       if (!silent) showRequestError(failure)
       else markRequestErrorNotified(failure)
       

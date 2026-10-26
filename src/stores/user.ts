@@ -20,6 +20,8 @@ export const useUserStore = defineStore('user', () => {
   const user = ref<User | null>(null)
   const isLoggedIn = ref(false)
   const token = ref<string>('')
+  const validatedToken = ref('')
+  const hasValidatedSession = computed(() => Boolean(token.value) && validatedToken.value === token.value)
   let authVersion = 0
   let pendingProfile: { token: string; promise: Promise<boolean> } | null = null
 
@@ -28,6 +30,7 @@ export const useUserStore = defineStore('user', () => {
     pendingProfile = null
     user.value = null
     token.value = ''
+    validatedToken.value = ''
     isLoggedIn.value = false
     localStorage.removeItem('ACCESS_TOKEN')
     localStorage.removeItem('user')
@@ -109,6 +112,7 @@ export const useUserStore = defineStore('user', () => {
         roles: info.roles || []
       }
       token.value = requestToken
+      validatedToken.value = requestToken
       isLoggedIn.value = true
       localStorage.setItem('user', JSON.stringify(user.value))
       return true
@@ -124,7 +128,7 @@ export const useUserStore = defineStore('user', () => {
 
   // 退出登录
   const logout = async () => {
-    const request = logoutApi()
+    const request = logoutApi(token.value || parseToken(localStorage.getItem('ACCESS_TOKEN')))
     clearAuth()
     try {
       await request
@@ -146,6 +150,7 @@ export const useUserStore = defineStore('user', () => {
     isLoggedIn,
     token,
     isAuthor,
+    hasValidatedSession,
     clearAuth,
     login,
     logout,

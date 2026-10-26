@@ -145,12 +145,18 @@ router.beforeEach(async (to, _from, next) => {
   }
 
   // 如果有可解析的 token 但没有用户信息，尝试获取用户信息
-  if (token && !userStore.user) {
+  if (token && (!userStore.hasValidatedSession || userStore.token !== token)) {
     try {
+      if (userStore.token !== token) {
+        userStore.user = null
+        userStore.isLoggedIn = false
+      }
       userStore.token = token
       await userStore.fetchUserInfo()
     } catch (error) {
-      if (parseToken(localStorage.getItem('ACCESS_TOKEN')) === token) userStore.clearAuth()
+      const failure = error as { code?: unknown; response?: { status?: number } }
+      if ((failure.code === 401 || failure.response?.status === 401) &&
+        parseToken(localStorage.getItem('ACCESS_TOKEN')) === token) userStore.clearAuth()
     }
   }
 

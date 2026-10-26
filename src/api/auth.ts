@@ -44,9 +44,10 @@ export const updatePassword = (data: { oldPassword: string; newPassword: string 
   })
 }
 
-export const logout = () => {
+export const logout = (token: string) => {
   return request({
     url: '/system/auth/logout',
-    method: 'post'
+    method: 'post',
+    headers: { Authorization: `Bearer ${token}` }
   })
 }

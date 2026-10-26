@@ -14,6 +14,7 @@ declare module 'vue' {
     ArticleCard: typeof import('./src/components/ArticleCard.vue')['default']
     AuthCard: typeof import('./src/components/AuthCard.vue')['default']
     Comment: typeof import('./src/components/Comment.vue')['default']
+    CommentForm: typeof import('./src/components/CommentForm.vue')['default']
     ElButton: typeof import('element-plus/es/components/button/index')['ElButton']
     ElCheckbox: typeof import('element-plus/es/components/checkbox/index')['ElCheckbox']
     ElConfigProvider: typeof import('element-plus/es/components/config-provider/index')['ElConfigProvider']

@@ -8,56 +8,7 @@
     <!-- 发表评论表单 -->
     <div class="comment-form">
       <template v-if="userStore.isLoggedIn">
-        <div class="form-row">
-          <div class="avatar-wrap">
-            <div class="avatar">{{ (userStore.user?.nickname || userStore.user?.username || '?')[0].toUpperCase() }}</div>
-          </div>
-          <div class="form-input-wrap">
-            <el-input
-              ref="commentInputRef"
-              v-model="commentText"
-              type="textarea"
-              :rows="3"
-              placeholder="发一条友善的评论"
-              maxlength="500"
-              show-word-limit
-            />
-            <div class="form-toolbar">
-              <EmojiPicker @select="insertEmoji" />
-              <button class="img-upload-btn" @click="triggerCommentUpload" title="上传图片">
-                <el-icon><Upload /></el-icon>
-              </button>
-              <input
-                ref="commentFileInput"
-                type="file"
-                accept="image/*"
-                multiple
-                style="display:none"
-                @change="handleCommentFileChange"
-              />
-              <el-button
-                type="primary"
-                class="submit-btn"
-                :loading="submitting"
-                @click="submitComment"
-              >发布</el-button>
-            </div>
-            <!-- 图片预览 -->
-            <div class="image-list" v-if="commentImages.length > 0">
-              <div
-                class="image-item"
-                v-for="(image, index) in commentImages"
-                :key="image"
-              >
-                <img :src="image" alt="预览图">
-                <span class="img-del" @click="removeCommentImage(index)">×</span>
-              </div>
-              <div class="upload-btn" v-if="commentImages.length < 9" @click="triggerCommentUpload">
-                <el-icon><Plus /></el-icon>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CommentForm ref="commentFormRef" :submitting="submitting" @submit="submitComment" />
       </template>
       <template v-else>
         <div class="login-tip">
@@ -103,7 +54,7 @@
             </div>
 
             <!-- 展开回复 -->
-            <div class="expand-replies" v-if="comment.replyCount > 0">
+            <div class="expand-replies" v-if="(comment.replyCount || 0) > 0">
               <span class="expand-btn" @click="toggleReplies(comment)" v-if="!loadingReplies[comment.id]">
                 <svg viewBox="0 0 16 16" fill="currentColor" class="arrow-icon" :class="{ open: expandedReplies[comment.id] }">
                   <path d="M8 10.5L3 5.5h10z"/>
@@ -124,52 +75,23 @@
                 @like="handleLike"
                 @reply="({ parentId, atName, rootId }) => startReply(parentId, atName, rootId)"
                 @delete="handleDelete"
+                @preview="previewImage"
               />
+              <el-button v-if="expandedReplies[comment.id]!.length < (replyTotals[comment.id] || 0)"
+                :loading="loadingReplies[comment.id]" @click="loadReplies(comment.id, true)">加载更多回复</el-button>
             </div>
 
-            <!-- 回复输入框 -->
-            <div class="reply-box" v-if="replyState !== null && replyState.rootId === comment.id">
-              <el-input
-                ref="replyInputRef"
-                v-model="replyText"
-                type="textarea"
-                :rows="2"
-                :placeholder="`回复 @${replyState.atName}`"
-                maxlength="500"
-                autofocus
-              />
-              <div class="form-toolbar">
-                <EmojiPicker @select="insertReplyEmoji" />
-                <button class="img-upload-btn" @click="triggerReplyUpload" title="上传图片">
-                  <el-icon><Upload /></el-icon>
-                </button>
-                <input
-                  ref="replyFileInput"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  style="display:none"
-                  @change="handleReplyFileChange"
-                />
-                <div class="reply-box-actions">
-                  <el-button size="small" @click="cancelReply">取消</el-button>
-                  <el-button type="primary" size="small" :loading="replySubmitting" @click="submitReply(comment)">发布</el-button>
-                </div>
-              </div>
-              <div class="image-list" v-if="replyImages.length > 0">
-                <div class="image-item" v-for="(img, idx) in replyImages" :key="img">
-                  <img :src="img" alt="预览图">
-                  <span class="img-del" @click="replyImages.splice(idx, 1)">×</span>
-                </div>
-                <div class="upload-btn" v-if="replyImages.length < 9" @click="triggerReplyUpload">
-                  <el-icon><Plus /></el-icon>
-                </div>
-              </div>
-            </div>
+            <CommentForm v-if="replyState !== null && replyState.rootId === comment.id"
+              :key="String(replyState.parentId)" :ref="setReplyForm" :submitting="replySubmitting"
+              :placeholder="`回复 @${replyState.atName}`" :rows="2" cancelable
+              @cancel="cancelReply" @submit="submitReply" />
           </div>
         </div>
       </template>
 
+      <div v-else-if="loadError" class="empty-state" role="alert">
+        评论加载失败，<button @click="loadComments">重试</button>
+      </div>
       <div v-else-if="!loading" class="empty-state">
         <div class="empty-text">还没有评论，快来说点什么吧~</div>
       </div>
@@ -199,509 +121,191 @@
 </template>
 
 <script setup lang="ts">
-import { showRequestError } from '@/utils/requestError'
-
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import type { ComponentPublicInstance } from 'vue'
 import { ElMessage } from 'element-plus/es/components/message/index'
 import { ElMessageBox } from 'element-plus/es/components/message-box/index'
-import { Plus, Upload } from '@element-plus/icons-vue'
-import { getArticleComments, addArticleComment, deleteArticleComment, likeArticleComment, getPhotoComments, addPhotoComment, deletePhotoComment, likePhotoComment, getCommentReplies } from '@/api/comment'
-import { uploadImage } from '@/api/file'
+import { getArticleComments, addArticleComment, deleteArticleComment, likeArticleComment, getPhotoComments, addPhotoComment, deletePhotoComment, likePhotoComment, getCommentReplies, toCommentView } from '@/api/comment'
 import { useUserStore } from '@/stores/user'
 import { useRouter, useRoute } from 'vue-router'
-import EmojiPicker from './EmojiPicker.vue'
+import { showRequestError } from '@/utils/requestError'
+import { formatTimestamp } from '@/utils/format'
+import type { CommentId, CommentSubmission, CommentView } from '@/types/comment'
+import CommentForm from './CommentForm.vue'
 import ReplyItem from './ReplyItem.vue'
 
-const props = defineProps<{
-  articleId?: string | number
-  sourceId?: string | number
-  sourceType?: 'article' | 'photo'
-}>()
-
+const props = defineProps<{ articleId?: CommentId; sourceId?: CommentId; sourceType?: 'article' | 'photo' }>()
 const resolvedId = computed(() => props.sourceId ?? props.articleId ?? '')
 const isPhoto = computed(() => props.sourceType === 'photo')
-
 const userStore = useUserStore()
 const router = useRouter()
 const route = useRoute()
-
-const commentText = ref('')
-const commentInputRef = ref()
-const commentImages = ref<string[]>([])
-const comments = ref<any[]>([])
+const comments = ref<CommentView[]>([])
 const loading = ref(false)
+const loadError = ref(false)
 const submitting = ref(false)
+const replySubmitting = ref(false)
 const total = ref(0)
 const currentPage = ref(1)
 const pageSize = ref(10)
-
-const commentFileInput = ref<HTMLInputElement>()
 const lightboxSrc = ref('')
-const likingIds = ref<Set<number | string>>(new Set())
-let loadCommentsSeq = 0
+const likingIds = new Set<CommentId>()
+const deletingIds = new Set<CommentId>()
+const commentFormRef = ref<InstanceType<typeof CommentForm>>()
+let replyForm: InstanceType<typeof CommentForm> | null = null
+const setReplyForm = (element: Element | ComponentPublicInstance | null) => {
+  replyForm = element as InstanceType<typeof CommentForm> | null
+}
+const expandedReplies = ref<Record<CommentId, CommentView[]>>({})
+const loadingReplies = ref<Record<CommentId, boolean>>({})
+const replyPages = ref<Record<CommentId, number>>({})
+const replyTotals = ref<Record<CommentId, number>>({})
+const replyState = ref<{ parentId: CommentId; rootId: CommentId; atName: string } | null>(null)
+let loadSequence = 0
+let repliesVersion = 0
 let disposed = false
-
-// ── 展开回复 ──────────────────────────────────────────
-const expandedReplies = ref<Record<string | number, any[]>>({})
-const loadingReplies = ref<Record<string | number, boolean>>({})
-
-const resolveIsAuthor = (c: any) =>
-  c.isAuthor || (userStore.isAuthor && String(c.creator) === String(userStore.user?.id))
-
-const mapReply = (r: any): any => ({
-  ...r,
-  user: { id: r.userId, nickname: r.username, isAuthor: resolveIsAuthor(r) },
-  createTime: r.createTime || Date.now(),
-  isLiked: r.isLiked || false,
-  likeCount: r.likeCount || 0,
-  replyToName: r.replyToName || '',
-  children: (r.children || []).map(mapReply)
-})
-
-const toggleReplies = async (comment: any) => {
-  const id = comment.id
-  if (expandedReplies.value[id]) {
-    delete expandedReplies.value[id]
-    return
-  }
-  loadingReplies.value[id] = true
-  try {
-    const res: any = await getCommentReplies(id)
-    const list = Array.isArray(res) ? res : (res?.list || res?.data || [])
-    if (!disposed) expandedReplies.value[id] = list.map(mapReply)
-  } catch (error) {
-    showRequestError(error, '获取回复失败')
-  } finally {
-    loadingReplies.value[id] = false
-  }
-}
-
-// ── 回复状态 ──────────────────────────────────────────
-const replyState = ref<{ parentId: number | string; rootId: number | string; atName: string } | null>(null)
-const replyText = ref('')
-const replyImages = ref<string[]>([])
-const replySubmitting = ref(false)
-const replyInputRef = ref()
-const replyFileInput = ref<HTMLInputElement>()
-
-const startReply = (parentId: number | string, atName: string, rootId: number | string) => {
-  if (replyState.value?.parentId === parentId && replyState.value?.atName === atName) {
-    cancelReply()
-    return
-  }
-  replyState.value = { parentId, rootId, atName }
-  replyText.value = ''
-  replyImages.value = []
-}
-
-const cancelReply = () => {
+const resetReplies = () => {
+  repliesVersion++
+  expandedReplies.value = {}
+  loadingReplies.value = {}
+  replyPages.value = {}
+  replyTotals.value = {}
   replyState.value = null
-  replyText.value = ''
-  replyImages.value = []
 }
-
-const submitReply = async (_topComment: any) => {
-  if (replySubmitting.value || !replyState.value || disposed) return
-  if (!userStore.isLoggedIn) {
-    ElMessage.warning('请先登录')
-    router.push({ path: '/login', query: { redirect: route.fullPath } })
-    return
-  }
-  const trimmed = replyText.value.trim()
-  if (!trimmed) { ElMessage.warning('请输入回复内容'); return }
-
-  const target = replyState.value
-  replySubmitting.value = true
+const sessionCurrent = (token: string) => !disposed && userStore.isLoggedIn && token === userStore.token
+const requireLogin = () => {
+  if (userStore.isLoggedIn) return true
+  ElMessage.warning('请先登录')
+  void router.push({ path: '/login', query: { redirect: route.fullPath } })
+  return false
+}
+const loadReplies = async (id: CommentId, append = false) => {
+  if (loadingReplies.value[id] || disposed) return
+  loadingReplies.value[id] = true
+  const version = repliesVersion
+  const page = append ? (replyPages.value[id] || 0) + 1 : 1
   try {
-    if (isPhoto.value) {
-      await addPhotoComment({
-        username: userStore.user!.nickname || userStore.user!.username || '',
-        photoId: resolvedId.value,
-        content: trimmed,
-        images: replyImages.value,
-        userId: Number(userStore.user!.id),
-        parentId: target.parentId,
-        rootId: target.rootId
-      })
-    } else {
-      await addArticleComment({
-        username: userStore.user!.nickname || userStore.user!.username || '',
-        articleId: resolvedId.value,
-        content: trimmed,
-        images: replyImages.value,
-        userId: Number(userStore.user!.id),
-        parentId: target.parentId,
-        rootId: target.rootId
-      })
-    }
-    if (disposed) return
-    const rootId = target.rootId
-    if (replyState.value === target) cancelReply()
-    currentPage.value = 1
-    await loadComments()
-    if (disposed) return
-    // 若该评论回复列表已展开，同步刷新
-    if (expandedReplies.value[rootId]) {
-      const res: any = await getCommentReplies(rootId)
-      if (disposed) return
-      const list = Array.isArray(res) ? res : (res?.list || res?.data || [])
-      expandedReplies.value[rootId] = list.map(mapReply)
-    }
-    ElMessage.success('回复成功')
+    const result = await getCommentReplies(id, page)
+    if (disposed || version !== repliesVersion) return
+    const list = result.list.map(toCommentView)
+    expandedReplies.value[id] = append ? [...(expandedReplies.value[id] || []), ...list] : list
+    replyPages.value[id] = page
+    replyTotals.value[id] = result.total
   } catch (error) {
-    showRequestError(error, '回复失败，请重试')
-  } finally {
-    replySubmitting.value = false
-  }
+    if (!disposed) showRequestError(error, '获取回复失败')
+  } finally { if (version === repliesVersion) loadingReplies.value[id] = false }
 }
-
-const insertReplyEmoji = (emoji: string) => {
-  const textarea = replyInputRef.value?.textarea
-  if (!textarea) { replyText.value += emoji; return }
-  const start = textarea.selectionStart
-  const end = textarea.selectionEnd
-  replyText.value = replyText.value.substring(0, start) + emoji + replyText.value.substring(end)
-  nextTick(() => {
-    textarea.selectionStart = textarea.selectionEnd = start + emoji.length
-    textarea.focus()
-  })
+const toggleReplies = (comment: CommentView) => {
+  if (expandedReplies.value[comment.id]) delete expandedReplies.value[comment.id]
+  else void loadReplies(comment.id)
 }
-
-const triggerReplyUpload = () => replyFileInput.value?.click()
-
-const handleReplyFileChange = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const files = target.files
-  if (files) uploadImagesToList(Array.from(files), replyImages.value)
-  target.value = ''
+const startReply = (parentId: CommentId, atName: string, rootId: CommentId) => {
+  if (!requireLogin() || replySubmitting.value) return
+  if (replyState.value?.parentId === parentId) { cancelReply(); return }
+  replyState.value = { parentId, rootId, atName }
 }
-
-const uploadImagesToList = async (files: File[], list: string[]) => {
-  const valid = files.filter(file => {
-    if (!file.type.startsWith('image/')) { ElMessage.error(`${file.name} 不是图片文件`); return false }
-    if (file.size > 5 * 1024 * 1024) { ElMessage.error(`${file.name} 大小超过 5MB`); return false }
-    return true
-  })
-
-  const remaining = 9 - list.length
-  if (remaining <= 0) { ElMessage.warning('最多只能上传 9 张图片'); return }
-
-  const toUpload = valid.slice(0, remaining)
-  if (toUpload.length < valid.length) ElMessage.warning('最多只能上传 9 张图片')
-
-  const results = await Promise.allSettled(toUpload.map(file => uploadImage(file)))
-  results.forEach(result => {
-    if (result.status === 'fulfilled' && result.value) list.push(result.value as unknown as string)
-    else if (result.status === 'rejected') ElMessage.error('图片上传失败')
-  })
-}
-
-const onLbKeydown = (e: KeyboardEvent) => { if (e.key === 'Escape') lightboxSrc.value = '' }
-
-// 插入表情
-const insertEmoji = (emoji: string) => {
-  const textarea = commentInputRef.value?.textarea
-  if (!textarea) {
-    commentText.value += emoji
-    return
-  }
-  
-  const start = textarea.selectionStart
-  const end = textarea.selectionEnd
-  const text = commentText.value
-  
-  commentText.value = text.substring(0, start) + emoji + text.substring(end)
-  
-  nextTick(() => {
-    textarea.selectionStart = textarea.selectionEnd = start + emoji.length
-    textarea.focus()
-  })
-}
-
-// 判断是否可以删除评论
-const canDelete = (comment: any) => {
-  if (!userStore.isLoggedIn || !userStore.user) return false
-  return String(comment.creator) === String(userStore.user.id)
-}
-
-// 加载评论列表
+const cancelReply = () => { if (!replySubmitting.value) replyState.value = null }
 const loadComments = async () => {
   if (disposed) return
-  const seq = ++loadCommentsSeq
+  const sequence = ++loadSequence
   loading.value = true
+  loadError.value = false
   try {
-    const response: any = isPhoto.value
-      ? await getPhotoComments({ photoId: resolvedId.value, pageNo: currentPage.value, pageSize: pageSize.value })
-      : await getArticleComments({ articleId: resolvedId.value, pageNo: currentPage.value, pageSize: pageSize.value })
-
-    // 丢弃过期响应
-    if (seq !== loadCommentsSeq) return
-    const lastPage = Math.max(1, Math.ceil((response?.total ?? 0) / pageSize.value))
-    if (!Array.isArray(response) && currentPage.value > lastPage) {
-      currentPage.value = lastPage
-      return loadComments()
+    const paging = { pageNo: currentPage.value, pageSize: pageSize.value }
+    const result = isPhoto.value
+      ? await getPhotoComments({ photoId: resolvedId.value, ...paging })
+      : await getArticleComments({ articleId: resolvedId.value, ...paging })
+    if (sequence !== loadSequence) return
+    const lastPage = Math.max(1, Math.ceil(result.total / pageSize.value))
+    if (currentPage.value > lastPage) { currentPage.value = lastPage; return loadComments() }
+    comments.value = result.list.map(toCommentView)
+    total.value = result.total
+  } catch (error) {
+    if (sequence === loadSequence) {
+      loadError.value = true
+      showRequestError(error, '评论加载失败，请重试')
     }
-
-    const rawData = Array.isArray(response) ? response : (response?.list || response?.data || [])
-
-    const parseImages = (raw: any): string[] => {
-      if (!raw) return []
-      try { return typeof raw === 'string' ? JSON.parse(raw) : raw } catch { return [] }
-    }
-
-    // Flatten backend data (handles both flat lists and pre-nested replies arrays)
-    const flatData: any[] = []
-    const flattenItems = (items: any[]) => {
-      for (const item of items) {
-        flatData.push(item)
-        if (item.replies?.length) flattenItems(item.replies)
-      }
-    }
-    flattenItems(rawData)
-
-    // Map all items to a uniform shape
-    const mapped = flatData.map((c: any) => ({
-      ...c,
-      images: parseImages(c.images),
-      user: { id: c.userId, nickname: c.username, isAuthor: resolveIsAuthor(c) },
-      createTime: c.createTime || Date.now(),
-      replies: [] as any[],
-      isLiked: c.isLiked || false,
-      likeCount: c.likeCount || 0,
-      replyToName: c.replyToName || ''
-    }))
-
-    // Build parent-child tree: use rootId to attach all replies under their
-    // root comment (2-level only), parentId is only used for @mention display.
-    const byId: Record<string | number, any> = {}
-    for (const c of mapped) byId[c.id] = c
-
-    const topLevel: any[] = []
-    for (const c of mapped) {
-      const rootId = c.rootId
-      const pid = c.parentId
-      // No parent → top-level comment
-      if (!pid && !rootId) {
-        topLevel.push(c)
-        continue
-      }
-      // Find root container (prefer rootId, fall back to parentId)
-      const rootComment = (rootId && byId[rootId]) || (pid && byId[pid])
-      if (rootComment && !rootComment.parentId && !rootComment.rootId) {
-        // Attach directly under root, set @mention from parentId
-        c.replyToName = pid && byId[pid] ? byId[pid].user?.nickname || '' : ''
-        rootComment.replies.push(c)
-      } else {
-        // Orphan or root not in current page — treat as top-level
-        topLevel.push(c)
-      }
-    }
-
-    comments.value = topLevel
-    total.value = response?.total || topLevel.length
-  } catch {
-    if (seq === loadCommentsSeq) {
-      comments.value = []
-      total.value = 0
-    }
-  } finally {
-    if (seq === loadCommentsSeq) loading.value = false
-  }
+  } finally { if (sequence === loadSequence) loading.value = false }
 }
-
-// 触发评论图片上传
-const triggerCommentUpload = () => {
-  commentFileInput.value?.click()
-}
-
-// 处理评论图片选择
-const handleCommentFileChange = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const files = target.files
-  if (files) {
-    handleCommentFiles(Array.from(files))
-  }
-  target.value = ''
-}
-
-// 处理评论图片文件
-const handleCommentFiles = (files: File[]) => uploadImagesToList(files, commentImages.value)
-
-// 删除评论图片
-const removeCommentImage = (index: number) => {
-  commentImages.value.splice(index, 1)
-}
-
-// 发表评论
-const submitComment = async () => {
-  if (submitting.value || disposed) return
-  if (!userStore.isLoggedIn) {
-    ElMessage.warning('请先登录')
-    router.push({
-      path: '/login',
-      query: { redirect: router.currentRoute.value.fullPath }
-    })
-    return
-  }
-  
-  const trimmed = commentText.value.trim()
-  if (!trimmed) {
-    ElMessage.warning('请输入评论内容')
-    return
-  }
-  if (trimmed.length < 2) {
-    ElMessage.warning('评论内容至少 2 个字符')
-    return
-  }
-  if (trimmed.length > 500) {
-    ElMessage.warning('评论内容不能超过 500 个字符')
-    return
-  }
-  
-  const submittedText = commentText.value
-  const submittedImages = [...commentImages.value]
+const submitComment = async (data: CommentSubmission) => {
+  if (submitting.value || !requireLogin()) return
+  const token = userStore.token
   submitting.value = true
   try {
-    if (isPhoto.value) {
-      await addPhotoComment({
-        username: userStore.user!.nickname || userStore.user!.username || '',
-        photoId: resolvedId.value,
-        content: trimmed,
-        images: submittedImages,
-        likeCount: 0,
-        userId: Number(userStore.user!.id)
-      })
-    } else {
-      await addArticleComment({
-        username: userStore.user!.nickname || userStore.user!.username || '',
-        articleId: resolvedId.value,
-        content: trimmed,
-        images: submittedImages,
-        likeCount: 0,
-        userId: Number(userStore.user!.id)
-      })
-    }
-    if (disposed) return
-    ElMessage.success('评论发表成功！')
-    if (commentText.value === submittedText) commentText.value = ''
-    commentImages.value = commentImages.value.filter(image => !submittedImages.includes(image))
+    if (isPhoto.value) await addPhotoComment({ photoId: resolvedId.value, ...data })
+    else await addArticleComment({ articleId: resolvedId.value, ...data })
+    if (!sessionCurrent(token)) return
+    commentFormRef.value?.acknowledge(data)
+    ElMessage.success('评论发表成功')
     currentPage.value = 1
     await loadComments()
-  } catch (error) {
-    showRequestError(error, '发表失败，请重试')
-  } finally {
-    submitting.value = false
-  }
+  } catch (error) { if (sessionCurrent(token)) showRequestError(error, '发表失败，请重试') }
+  finally { submitting.value = false }
 }
-
-// 点赞评论
-const handleLike = async (comment: any) => {
-  if (!userStore.isLoggedIn) {
-    ElMessage.warning('请先登录')
-    router.push({
-      path: '/login',
-      query: { redirect: router.currentRoute.value.fullPath }
-    })
-    return
-  }
-
-  if (likingIds.value.has(comment.id)) return
-  likingIds.value.add(comment.id)
-
-  const wasLiked = comment.isLiked
+const submitReply = async (data: CommentSubmission) => {
+  if (replySubmitting.value || !replyState.value || !requireLogin()) return
+  const target = replyState.value
+  const token = userStore.token
+  const form = replyForm
+  replySubmitting.value = true
   try {
-    if (isPhoto.value) {
-      await likePhotoComment({ commentId: comment.id, type: wasLiked ? 2 : 1 })
-    } else {
-      await likeArticleComment({ commentArticleId: comment.id, type: wasLiked ? 2 : 1 })
-    }
-    if (disposed) return
-    comment.isLiked = !wasLiked
-    comment.likeCount = Math.max(0, (comment.likeCount || 0) + (wasLiked ? -1 : 1))
-  } catch (error) {
-    showRequestError(error, '操作失败，请重试')
-  } finally {
-    likingIds.value.delete(comment.id)
-  }
-}
-
-// 删除评论
-const handleDelete = async (comment: any) => {
-  try {
-    await ElMessageBox.confirm(
-      '确定删除这条评论及其下的全部回复吗？删除后无法恢复。',
-      '删除确认',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-    )
-
-    if (isPhoto.value) {
-      await deletePhotoComment({ commentId: comment.id })
-    } else {
-      await deleteArticleComment({ commentId: comment.id })
-    }
-    ElMessage.success('评论已删除')
-
-    const rootId = comment.rootId
-    if (rootId) {
-      delete expandedReplies.value[rootId]
-    } else {
-      delete expandedReplies.value[comment.id]
-    }
+    const payload = { ...data, parentId: target.parentId, rootId: target.rootId }
+    if (isPhoto.value) await addPhotoComment({ photoId: resolvedId.value, ...payload })
+    else await addArticleComment({ articleId: resolvedId.value, ...payload })
+    if (!sessionCurrent(token)) return
+    form?.acknowledge(data)
+    if (replyState.value === target) replyState.value = null
     await loadComments()
-  } catch (error: any) {
-    if (error !== 'cancel') {
-      showRequestError(error, '删除失败，请重试')
-    }
-  }
+    if (sessionCurrent(token) && expandedReplies.value[target.rootId]) await loadReplies(target.rootId)
+    ElMessage.success('回复成功')
+  } catch (error) { if (sessionCurrent(token)) showRequestError(error, '回复失败，请重试') }
+  finally { replySubmitting.value = false }
 }
-
-// 分页
+const canDelete = (comment: CommentView) => userStore.isLoggedIn && String(comment.creator) === String(userStore.user?.id)
+const handleLike = async (comment: CommentView) => {
+  if (!requireLogin() || likingIds.has(comment.id)) return
+  const token = userStore.token
+  const wasLiked = comment.isLiked
+  likingIds.add(comment.id)
+  try {
+    const type = wasLiked ? 2 : 1
+    if (isPhoto.value) await likePhotoComment({ commentId: comment.id, type })
+    else await likeArticleComment({ commentArticleId: comment.id, type })
+    if (!sessionCurrent(token)) return
+    comment.isLiked = !wasLiked
+    comment.likeCount = Math.max(0, comment.likeCount + (wasLiked ? -1 : 1))
+  } catch (error) { if (sessionCurrent(token)) showRequestError(error, '操作失败，请重试') }
+  finally { likingIds.delete(comment.id) }
+}
+const handleDelete = async (comment: CommentView) => {
+  if (!requireLogin() || deletingIds.has(comment.id)) return
+  const token = userStore.token
+  deletingIds.add(comment.id)
+  try {
+    await ElMessageBox.confirm('确定删除这条评论及其下的全部回复吗？删除后无法恢复。', '删除确认', { type: 'warning' })
+    if (!sessionCurrent(token)) return
+    if (isPhoto.value) await deletePhotoComment({ commentId: comment.id })
+    else await deleteArticleComment({ commentId: comment.id })
+    if (!sessionCurrent(token)) return
+    resetReplies()
+    await loadComments()
+    ElMessage.success('评论已删除')
+  } catch (error) {
+    if (sessionCurrent(token) && error !== 'cancel' && error !== 'close') showRequestError(error, '删除失败，请重试')
+  } finally { deletingIds.delete(comment.id) }
+}
 const handlePageChange = (page: number) => {
   currentPage.value = page
-  loadComments()
-  // 滚动到评论区顶部
+  resetReplies()
+  void loadComments()
   document.querySelector('.comment-section')?.scrollIntoView({ behavior: 'smooth' })
 }
-
-// 格式化时间
-const formatCommentTime = (timestamp: number) => {
-  if (!timestamp) return ''
-  const date = new Date(timestamp)
-  const now = new Date()
-  
-  if (date.toDateString() === now.toDateString()) {
-    const hours = String(date.getHours()).padStart(2, '0')
-    const minutes = String(date.getMinutes()).padStart(2, '0')
-    return `今天 ${hours}:${minutes}`
-  }
-  
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  return `${year}-${month}-${day} ${hours}:${minutes}`
-}
-
-// 预览图片
-const previewImage = (url: string) => {
-  lightboxSrc.value = url
-}
-
-onMounted(() => {
-  loadComments()
-  window.addEventListener('keydown', onLbKeydown)
-})
-
-onUnmounted(() => {
-  disposed = true
-  loadCommentsSeq++
-  window.removeEventListener('keydown', onLbKeydown)
-})
+const formatCommentTime = (timestamp: number | string) => formatTimestamp(typeof timestamp === 'string' ? new Date(timestamp).getTime() : timestamp, 'YYYY-MM-DD HH:mm')
+const previewImage = (url: string) => { lightboxSrc.value = url }
+const onKeydown = (event: KeyboardEvent) => { if (event.key === 'Escape') lightboxSrc.value = '' }
+watch(() => userStore.token, () => { resetReplies(); void loadComments() })
+onMounted(() => { void loadComments(); window.addEventListener('keydown', onKeydown) })
+onUnmounted(() => { disposed = true; loadSequence++; window.removeEventListener('keydown', onKeydown) })
 </script>
 
 <style scoped lang="scss">
