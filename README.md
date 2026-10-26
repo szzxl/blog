@@ -17,12 +17,6 @@
 - 分类、标签的前台内存缓存有效期为 60 秒。
 - Element Plus 按组件导入；默认封面使用 `public/default-cover.svg`，背景使用压缩后的 `public/bg-banner.jpg`。
 
-定向验证命令：`node scripts/validate-visits.cjs`、`node scripts/validate-config.cjs`。前者验证访问统计和请求拦截器，后者验证配置过期、存储不可用、失败回退及错误提示去重；均不打开页面或连接后端。
-
-`node scripts/validate-requests.cjs` 验证搜索结果乱序、清空与关闭搜索，以及相册切换和离开后的响应隔离。使用现有 TypeScript 和 Vue 依赖，不新增测试框架。
-
-`node scripts/validate-lifecycle.cjs` 验证标签切换重置分页、旧响应隔离、登录失败与退出后的认证清理，以及首页卸载后的延迟响应不会启动动画或定时任务。
-
 相册公开查询使用 `/web/album/list` 和 `/web/album/photo/list`，禁用相册不展示；后端需配套发布。个人中心展示实际账号信息并提供收藏入口。
 
 - **主题切换** - 支持浅色/深色/自动三种主题模式，跟随系统偏好
@@ -143,7 +137,6 @@ time-blog-web/
 │   ├── App.vue
 │   └── main.ts
 ├── index.html
-├── scripts/                    # 定向验证脚本
 ├── .env.development
 ├── .env.production
 ├── vite.config.ts
@@ -158,12 +151,6 @@ time-blog-web/
 页脚展示累计浏览、今日浏览和今日访客。内容页面成功导航或刷新计入浏览次数，同一浏览器当天只计一位访客；日期按北京时间计算，统计从功能启用后开始。
 
 后端需要先手动执行 `F:\gitea\blog-backstage\sql\20261010_blog_visit.sql`，再部署前后端。接口为 `POST /admin-api/web/visit/report` 与 `GET /admin-api/web/visit/summary`；原文章阅读量独立保留。登录、注册、个人中心、收藏和 404 页面不计数，博主仅查询统计。开发环境也正常计数，本地验证时使用未登录窗口，并确保后端已启动且已建表；统计计入当前连接后端的数据库。统计失败不影响正常阅读。
-
-定向验证路由计数及静默请求行为：
-
-```bash
-node scripts/validate-visits.cjs
-```
 
 ### 文章系统
 

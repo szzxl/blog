@@ -9,7 +9,7 @@
 - `src/api/`：业务接口和 Axios 请求处理；`src/router/`、`src/stores/`：路由、登录和主题状态。
 - `src/composables/`、`src/directives/`、`src/utils/`：组合式函数、指令及工具。
 - `src/styles/global.scss`：主题与全局样式；`src/assets/`、`public/`：静态资源。
-- `scripts/`：定向验证脚本；`dist/`：生成产物，不提交。
+- `dist/`：生成产物，不提交。
 
 ## 开发与构建
 
@@ -19,7 +19,6 @@
 - `npm run dev`：启动 Vite；默认端口 `80`，`/admin-api`、`/sitemap.xml` 和 `/robots.txt` 代理到本地后端 `localhost:48080`。
 - `npm run build`：执行 `vue-tsc -b` 类型检查并生成生产构建。
 - `npm run preview`：预览已有构建；API 仍需单独配置可用后端。
-- `node scripts/validate-visits.cjs`：验证访问统计与请求拦截器，无需启动后端。
 
 ## 代码风格与命名
 
@@ -31,7 +30,7 @@
 
 ## 验证与贡献
 
-业务代码或构建配置修改后运行 `npm run build`；访问统计改动同时运行定向脚本。当前没有 `npm test`、统一测试框架或覆盖率门槛。PR 记录验证结果与未验证项；纯文档修改检查准确性和空白即可。
+业务代码或构建配置修改后运行 `npm run build`。当前没有 `npm test`、统一测试框架或覆盖率门槛。PR 记录验证结果与未验证项；纯文档修改检查准确性和空白即可。
 
 提交历史包含中文主题及 `feat:`、`fix:`、`docs:` 前缀。提交说明应描述具体变更，避免仅写“优化”。保持范围集中，不覆盖或夹带无关改动。检查通过后自动提交本次任务相关文件，并推送到 `gitea`、`gitee` 和 `github` 三个远程的对应分支；纯文档修改同样执行。推送时保留远程改动，不强制推送，不自动部署。PR 说明问题、解决方式及配置影响，关联 issue，界面变更附截图或复现步骤。
 
