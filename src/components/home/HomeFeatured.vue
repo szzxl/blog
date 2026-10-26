@@ -26,7 +26,6 @@
     <div class="feature-rail">
       <router-link v-if="secondary" :to="`/article/${secondary.id}`" class="feature-note"
         ><div>
-          <span class="eyebrow">接着读</span>
           <h2>{{ secondary.articleName }}</h2>
           <p>
             {{ secondary.articleCategory }}
@@ -217,13 +216,10 @@ const copyContact = async (value: string, label: string) => {
   min-width: 0;
   flex: 1;
 }
-.feature-note .eyebrow {
-  color: #d1bc85;
-}
 .feature-note h2 {
   color: inherit;
   font: 500 23px/1.6 var(--font-serif);
-  margin: 10px 0 14px;
+  margin: 0 0 14px;
   overflow-wrap: anywhere;
   display: -webkit-box;
   -webkit-line-clamp: 3;

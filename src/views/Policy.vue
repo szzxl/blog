@@ -1,7 +1,6 @@
 <template>
   <main class="policy">
     <router-link to="/register" class="back">← 返回注册</router-link>
-    <span class="eyebrow">{{ privacy ? '信息处理说明' : '使用说明' }}</span>
     <h1>{{ privacy ? '隐私政策' : '用户协议' }}</h1>
     <p class="intro">{{ privacy ? '这里说明使用博客时，哪些信息会被保存或公开。' : '欢迎阅读与交流。注册前，请了解以下使用规则。' }}</p>
     <template v-if="privacy">
@@ -30,8 +29,7 @@ const email = computed(() => config.value.social_email || '')
 <style scoped lang="scss">
 .policy { max-width: 760px; margin: auto; padding: 48px 24px 80px; color: var(--text-primary); }
 .back, .policy a { color: var(--color-accent); font-size: 14px; }
-.eyebrow { display: block; margin-top: 40px; color: var(--text-tertiary); font-size: 12px; letter-spacing: .12em; }
-h1 { font-family: var(--font-serif); font-size: 36px; margin: 16px 0; }
+h1 { font-family: var(--font-serif); font-size: 36px; margin: 40px 0 16px; }
 .intro { color: var(--text-secondary); padding-bottom: 28px; border-bottom: 1px solid var(--border-color); }
 section { margin-top: 32px; } h2 { font-size: 19px; font-family: var(--font-serif); } p { line-height: 1.9; color: var(--text-secondary); }
 </style>

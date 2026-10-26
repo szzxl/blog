@@ -8,7 +8,6 @@ defineProps<{ title: string; description: string }>()
       <router-link to="/" class="auth-back">返回首页</router-link>
       <div class="auth-card">
         <header class="auth-heading">
-          <p class="auth-eyebrow">读者账号</p>
           <h1 id="auth-title">{{ title }}</h1>
           <p class="auth-description">{{ description }}</p>
         </header>
@@ -50,12 +49,6 @@ defineProps<{ title: string; description: string }>()
 }
 .auth-heading {
   margin-bottom: 28px;
-}
-.auth-eyebrow {
-  margin: 0 0 8px;
-  color: var(--text-tertiary);
-  font-size: 11px;
-  letter-spacing: 2px;
 }
 .auth-heading h1 {
   margin: 0 0 10px;

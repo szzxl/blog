@@ -1,13 +1,11 @@
 <template>
   <div class="profile container">
     <header class="page-header">
-      <span class="eyebrow">我的账号</span>
       <h1>个人资料</h1>
       <p>管理评论与留言中显示的资料，以及账号安全。</p>
     </header>
     <div class="profile-layout">
       <aside class="account-card">
-        <span class="eyebrow">我的账号</span>
         <img :src="userStore.user?.avatar || '/default-avatar.svg'" alt="当前头像" class="avatar" />
         <h1>{{ userStore.user?.nickname || userStore.user?.username }}</h1>
         <p>{{ userStore.user?.username }}</p>
@@ -284,13 +282,6 @@ onUnmounted(() => {
   border-inline: 0;
   border-radius: 0;
 }
-.account-card .eyebrow {
-  display: block;
-  font-size: 12px;
-  color: var(--text-tertiary);
-  letter-spacing: 0.15em;
-  margin-bottom: 28px;
-}
 .avatar {
   display: block;
   width: 56px;
@@ -413,7 +404,6 @@ h2 {
     gap: 4px 12px;
     padding: 18px 0 6px;
   }
-  .account-card .eyebrow { display: none; }
   .account-card .avatar { grid-column: 1; grid-row: 1 / 3; width: 48px; height: 48px; }
   .account-card h1 { grid-column: 2; grid-row: 1; margin: 0; align-self: end; font-size: 20px; }
   .account-card p { grid-column: 2; grid-row: 2; font-size: 11px; overflow-wrap: anywhere; }

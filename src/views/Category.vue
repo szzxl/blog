@@ -1,7 +1,6 @@
 <template>
   <div class="catalog-page container">
     <header class="page-header">
-      <span class="eyebrow">按主题阅读</span>
       <h1>文章分类</h1>
       <p>{{ loading ? '正在整理分类…' : `共 ${categories.length} 个分类，找到你想读的方向。` }}</p>
     </header>

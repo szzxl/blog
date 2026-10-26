@@ -2,7 +2,6 @@
   <div class="home container">
     <section class="home-heading">
       <div>
-        <p class="eyebrow">个人博客</p>
         <h1>笔记与日常</h1>
         <p>{{ config.site_description || '项目笔记、排错过程，偶尔记点别的。' }}</p>
       </div>

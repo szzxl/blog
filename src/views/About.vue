@@ -1,7 +1,6 @@
 <template>
   <div class="about container">
     <header class="page-header">
-      <span class="eyebrow">关于这里</span>
       <h1>关于我</h1>
       <p>{{ config.website_motto || '记录技术与生活。' }}</p>
     </header>

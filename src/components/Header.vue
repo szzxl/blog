@@ -3,7 +3,7 @@
     <div class="container header-inner">
       <router-link to="/" class="logo"
         ><img :src="siteLogo" alt="" width="34" height="34" @error="handleLogoError" /><span
-          >{{ siteName || '时光博客' }}<small>记录技术与生活</small></span
+          >{{ siteName || '时光博客' }}</span
         ></router-link
       >
       <nav class="desktop-nav" aria-label="主导航">
@@ -285,12 +285,6 @@ onUnmounted(() => {
   height: 34px;
   object-fit: contain;
 }
-.logo small {
-  display: block;
-  font-size: 10px;
-  color: var(--text-tertiary);
-  font-weight: 400;
-}
 .desktop-nav {
   display: flex;
   gap: 16px;
@@ -468,9 +462,6 @@ onUnmounted(() => {
   .logo img {
     width: 28px;
     height: 28px;
-  }
-  .logo small {
-    display: none;
   }
   .header-inner {
     gap: 8px;

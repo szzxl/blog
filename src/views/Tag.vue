@@ -1,7 +1,6 @@
 <template>
   <div class="tag-page container">
     <header class="page-header">
-      <span class="eyebrow">细一点的主题</span>
       <h1>标签</h1>
       <p>{{ loading ? '正在加载标签…' : `共 ${tags.length} 个标签，按文章数量排列。` }}</p>
     </header>

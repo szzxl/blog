@@ -1,7 +1,6 @@
 <template>
   <div class="album container">
     <header class="page-header">
-      <span class="eyebrow">生活记录</span>
       <h1>{{ currentAlbum ? currentAlbum.albumName : '相册' }}</h1>
       <p>
         {{

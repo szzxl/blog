@@ -1,7 +1,6 @@
 <template>
   <div class="article-index container">
     <header class="page-header">
-      <span class="eyebrow">文章索引</span>
       <h1>文章</h1>
       <p>搜索标题和正文，也可以从分类与标签继续查找。</p>
     </header>
@@ -201,10 +200,6 @@ onUnmounted(() => {
 <style scoped lang="scss">
 .article-index {
   padding-bottom: 50px;
-}
-.page-header .eyebrow {
-  display: block;
-  margin-bottom: 8px;
 }
 .index-tools {
   padding: 22px 24px 0;
